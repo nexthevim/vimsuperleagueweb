@@ -37,6 +37,7 @@ const Player = mongoose.model('Player', new mongoose.Schema({
     saves: { type: Number, default: 0 },
     mvps: { type: Number, default: 0 },
     position: { type: String, default: "FWD" },
+    rank: { type: String, enum: ['C', 'B', 'A', 'S', 'SS'], default: 'C' },
     country: { type: String, default: "" },
     timezone: { type: String, default: "" },
     theme: { type: String, default: "blue" },
@@ -1119,21 +1120,21 @@ const LINEUP_SLOTS = ['gk', 'def1', 'def2', 'mid1', 'mid2', 'fwd1', 'fwd2'];
 const LINEUP_SLOT_COORDS = {
     A: {
         gk:   { x: 50, y: 8 },
-        def1: { x: 20, y: 24 },
-        def2: { x: 80, y: 24 },
-        mid1: { x: 32, y: 36 },
-        mid2: { x: 68, y: 36 },
-        fwd1: { x: 38, y: 47 },
-        fwd2: { x: 62, y: 47 }
+        def1: { x: 18, y: 20 },
+        def2: { x: 82, y: 20 },
+        mid1: { x: 40, y: 32 },
+        mid2: { x: 60, y: 32 },
+        fwd1: { x: 20, y: 44 },
+        fwd2: { x: 80, y: 44 }
     },
     B: {
         gk:   { x: 50, y: 92 },
-        def1: { x: 20, y: 76 },
-        def2: { x: 80, y: 76 },
-        mid1: { x: 32, y: 64 },
-        mid2: { x: 68, y: 64 },
-        fwd1: { x: 38, y: 53 },
-        fwd2: { x: 62, y: 53 }
+        def1: { x: 18, y: 80 },
+        def2: { x: 82, y: 80 },
+        mid1: { x: 40, y: 68 },
+        mid2: { x: 60, y: 68 },
+        fwd1: { x: 20, y: 56 },
+        fwd2: { x: 80, y: 56 }
     }
 };
 
@@ -1337,13 +1338,22 @@ app.post('/admin/approve-player', async (req, res) => {
 
     try {
 
+        const allowedRanks = ['C', 'B', 'A', 'S', 'SS'];
+        const submittedRank = (req.body.rank || '').toUpperCase();
+
+        const updatePayload = {
+            verified: true,
+            cardImage:
+                req.body.cardImage
+        };
+
+        if (allowedRanks.includes(submittedRank)) {
+            updatePayload.rank = submittedRank;
+        }
+
         await Player.findByIdAndUpdate(
             req.body.playerId,
-            {
-                verified: true,
-                cardImage:
-                    req.body.cardImage
-            }
+            updatePayload
         );
 
         res.redirect('/admin');
@@ -1374,32 +1384,42 @@ app.post('/admin/update-market-player', async (req, res) => {
             saves,
             mvps,
             bio,
-            cardImage
+            cardImage,
+            rank
         } = req.body;
+
+        const allowedRanks = ['C', 'B', 'A', 'S', 'SS'];
+        const submittedRank = (rank || '').toUpperCase();
+
+        const updatePayload = {
+
+            goals:
+                parseInt(goals) || 0,
+
+            assists:
+                parseInt(assists) || 0,
+
+            saves:
+                parseInt(saves) || 0,
+
+            mvps:
+                parseInt(mvps) || 0,
+
+            bio,
+
+            cardImage
+
+        };
+
+        if (allowedRanks.includes(submittedRank)) {
+            updatePayload.rank = submittedRank;
+        }
 
         await Player.findOneAndUpdate(
             {
                 name: username
             },
-            {
-
-                goals:
-                    parseInt(goals) || 0,
-
-                assists:
-                    parseInt(assists) || 0,
-
-                saves:
-                    parseInt(saves) || 0,
-
-                mvps:
-                    parseInt(mvps) || 0,
-
-                bio,
-
-                cardImage
-
-            }
+            updatePayload
         );
 
         res.redirect('/admin');

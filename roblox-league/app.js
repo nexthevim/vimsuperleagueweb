@@ -236,11 +236,92 @@ app.use(async (req, res, next) => {
     }
 });
 
+// ============================================================
+// OPEN GRAPH / DISCORD EMBED HELPERS
+//
+// Discord (and Slack, Twitter, iMessage, etc.) don't run JavaScript when
+// unfurling a link — they just read <meta property="og:..."> tags out of
+// the raw HTML response. So every page needs those tags baked into its
+// server-rendered HTML. These helpers build that data; the actual tags
+// live in views/partials/og-meta.ejs, which needs to be included inside
+// your <head> on every page (see the note further down for the one line
+// to add).
+// ============================================================
+
+function absoluteUrl(req, maybeRelativePath) {
+    const base = req.protocol + '://' + req.get('host');
+
+    if (!maybeRelativePath) return base + '/images/vimgfx.png';
+
+    if (/^https?:\/\//i.test(maybeRelativePath)) return maybeRelativePath;
+
+    return base + (maybeRelativePath.startsWith('/') ? '' : '/') + maybeRelativePath;
+}
+
+// Generic fallback embed for any page that doesn't build its own
+// (home, market, metrics, records, info, etc.) — still gives Discord
+// something decent to show instead of a blank/broken embed.
+function defaultOg(req, title, description) {
+    return {
+        ogTitle: title || 'VIM Super League',
+        ogDescription:
+            description ||
+            'Competitive Roblox football league — player market, live matches, stats and records.',
+        ogImage: absoluteUrl(req),
+        ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl
+    };
+}
+
+// Rich per-match embed: score (or kickoff time) + competition, and the
+// home team's crest as the preview image so the embed actually looks
+// like "this match" rather than a generic site banner.
+function buildMatchOg(req, match) {
+    const details = match.details || {};
+
+    const goalsA = parseInt(details.goalsA);
+    const goalsB = parseInt(details.goalsB);
+
+    const hasScore =
+        !Number.isNaN(goalsA) &&
+        !Number.isNaN(goalsB) &&
+        (match.status === 'completed' || match.status === 'live');
+
+    const competition = details.competition || 'VIM Super League';
+    const teamA = match.teamA || 'Team A';
+    const teamB = match.teamB || 'Team B';
+
+    const ogTitle = `${teamA} vs ${teamB} — VIM Super League`;
+
+    let ogDescription;
+
+    if (hasScore) {
+        const finished = match.status === 'completed' ? 'FT' : 'LIVE';
+        ogDescription = `${finished}: ${teamA} ${goalsA} - ${goalsB} ${teamB} · ${competition}`;
+    } else {
+        const when = details.date || match.time || 'Kickoff TBC';
+        ogDescription = `Upcoming fixture · ${when} · ${competition}`;
+    }
+
+    const ogImage = absoluteUrl(req, match.logoA || match.logoB);
+
+    return {
+        ogTitle,
+        ogDescription,
+        ogImage,
+        ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl
+    };
+}
+
 // --- PAGES ---
 
 app.get('/', async (req, res) => {
     res.render('index', {
-        page: 'home'
+        page: 'home',
+        ...defaultOg(
+            req,
+            'VIM Super League',
+            'Competitive Roblox football league — player market, live matches, stats and records.'
+        )
     });
 });
 
@@ -258,7 +339,12 @@ app.get('/market', async (req, res) => {
             page: 'market',
             players,
             teams,
-            error: req.query.error || null
+            error: req.query.error || null,
+            ...defaultOg(
+                req,
+                'Player Market — VIM Super League',
+                'Browse registered player cards, stats, positions and franchise auctions.'
+            )
         });
 
     } catch (err) {
@@ -299,7 +385,12 @@ app.post('/market/view/:name', async (req, res) => {
 
 app.get('/matches', (req, res) => {
     res.render('matches', {
-        page: 'matches'
+        page: 'matches',
+        ...defaultOg(
+            req,
+            'Matches — VIM Super League',
+            'Upcoming fixtures, live scores and completed match results.'
+        )
     });
 });
 
@@ -312,25 +403,37 @@ app.get('/match/:id', async (req, res) => {
 
     res.render('match-details', {
         match,
-        page: 'matches'
+        page: 'matches',
+        ...buildMatchOg(req, match)
     });
 });
 
 app.get('/metrics', (req, res) => {
     res.render('metrics', {
-        page: 'metrics'
+        page: 'metrics',
+        ...defaultOg(
+            req,
+            'Metrics — VIM Super League',
+            'League-wide statistics: goals, assists, saves, MVPs and player leaderboards.'
+        )
     });
 });
 
 app.get('/league-records', (req, res) => {
     res.render('league-records', {
-        page: 'records'
+        page: 'records',
+        ...defaultOg(
+            req,
+            'League Records — VIM Super League',
+            'Historic achievements, records and milestones from across the league.'
+        )
     });
 });
 
 app.get('/info', (req, res) => {
     res.render('info', {
-        page: 'info'
+        page: 'info',
+        ...defaultOg(req, 'Info — VIM Super League')
     });
 });
 

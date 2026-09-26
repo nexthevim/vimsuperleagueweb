@@ -1,88 +1,54 @@
 <%- include('partials/navbar') %>
 
-<div class="min-h-[85vh] flex items-center justify-center relative overflow-hidden py-12 px-4 transition-colors duration-200">
-    
-    <!-- DYNAMIC BACKGROUND AMBIENCE -->
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-slate-400/10 dark:bg-slate-700/15 blur-[140px] rounded-full pointer-events-none"></div>
+<main class="min-h-[85vh] flex items-center justify-center bg-slate-50 px-6 py-16">
 
-    <div class="relative z-10 w-full max-w-md">
-        
-        <!-- CARD CONTAINER -->
-        <div class="bg-white/80 dark:bg-slate-900/80 p-8 sm:p-10 rounded-[32px] border border-slate-200/80 dark:border-slate-800 shadow-2xl backdrop-blur-xl transition-all duration-300">
-            
-            <!-- CARD HEADER -->
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-4 border border-slate-200 dark:border-slate-700">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Restricted Terminal
-                </div>
-                
-                <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tight text-slate-900 dark:text-white">
-                    Staff <span class="text-slate-400 dark:text-slate-500">Access</span>
-                </h1>
-                <p class="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-wider">
-                    Enter system key to unlock management controls
-                </p>
-            </div>
+    <div class="w-full max-w-sm">
 
-            <!-- ERROR NOTIFICATION -->
+        <div class="text-center mb-8">
+            <span class="text-[11px] text-blue-600 font-black uppercase tracking-[0.25em]">VIM Super League</span>
+            <h1 class="text-4xl font-black italic uppercase tracking-tighter text-slate-900 mt-1">Staff Login</h1>
+            <p class="text-xs text-slate-400 font-bold uppercase tracking-wide mt-2">
+                Enter the admin password to continue
+            </p>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-[28px] shadow-sm p-8">
+
             <% if (typeof error !== 'undefined' && error) { %>
-                <div class="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl mb-6 flex items-center gap-3">
-                    <svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                <div class="bg-red-50 border border-red-200 text-red-600 text-xs font-bold uppercase tracking-wide rounded-2xl px-4 py-3 mb-6 flex items-center gap-2">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86l-8.18 14.17A1 1 0 003 19.5h18a1 1 0 00.89-1.47L13.71 3.86a1 1 0 00-1.72 0z"/>
                     </svg>
-                    <span class="text-rose-600 dark:text-rose-400 text-xs font-black uppercase tracking-wide"><%= error %></span>
+                    <%= error %>
                 </div>
             <% } %>
 
-            <!-- AUTHENTICATION FORM -->
-            <form action="/admin-login" method="POST" class="space-y-6">
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center px-1">
-                        <label class="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-widest">
-                            Security Key
-                        </label>
-                        <span class="text-[9px] font-mono text-slate-400 uppercase">ENV_KEY_AUTH</span>
-                    </div>
-
-                    <div class="relative group">
-                        <input type="password" 
-                               name="password" 
-                               required 
-                               autofocus
-                               placeholder="VIM-STAFF-2025"
-                               class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl text-slate-900 dark:text-white text-center text-sm font-mono tracking-widest outline-none focus:border-slate-900 dark:focus:border-white focus:ring-2 focus:ring-slate-900/10 dark:focus:ring-white/10 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-700">
-                        
-                        <!-- CORNER HUD ACCENTS -->
-                        <div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-slate-300 dark:border-slate-700 rounded-tl-lg pointer-events-none group-focus-within:border-slate-900 dark:group-focus-within:border-white transition-colors"></div>
-                        <div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-slate-300 dark:border-slate-700 rounded-br-lg pointer-events-none group-focus-within:border-slate-900 dark:group-focus-within:border-white transition-colors"></div>
-                    </div>
+            <form action="/admin-login" method="POST" class="space-y-5">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest block mb-1.5">
+                        Password
+                    </label>
+                    <input
+                        type="password"
+                        name="password"
+                        required
+                        autofocus
+                        placeholder="••••••••"
+                        class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl text-slate-900 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-all">
                 </div>
-                
-                <button type="submit" 
-                        class="w-full relative overflow-hidden bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] transition-all transform hover:scale-[1.01] active:scale-[0.99] shadow-xl shadow-slate-900/10 dark:shadow-none group">
-                    <span class="relative z-10 flex items-center justify-center gap-2">
-                        <span>Authenticate</span>
-                        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
-                    </span>
-                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 dark:via-black/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+
+                <button type="submit"
+                        class="w-full bg-slate-900 hover:bg-slate-800 text-white py-3.5 rounded-2xl font-black uppercase text-xs tracking-widest transition-all shadow-sm">
+                    Log In
                 </button>
             </form>
 
-            <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
-                <p class="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-[0.25em]">
-                    VIM Super League • Internal Operations Only
-                </p>
-            </div>
-
         </div>
-    </div>
-</div>
 
-<style>
-    @keyframes shimmer {
-        100% { transform: translateX(100%); }
-    }
-</style>
+        <p class="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-6">
+            Staff access only &middot; VIM Super League
+        </p>
+
+    </div>
+
+</main>

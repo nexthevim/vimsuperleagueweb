@@ -23,7 +23,7 @@ app.use(session({
     saveUninitialized: true
 }));
 
-const ADMIN_KEY = "VIM-STAFF-2025";
+const ADMIN_KEY = "yakuza26";
 
 // --- MODELS ---
 const Player = mongoose.model('Player', new mongoose.Schema({
@@ -264,6 +264,35 @@ app.get('/market', async (req, res) => {
         console.error("Market Route Error:", err);
 
         res.redirect('/?error=MarketLoadFailed');
+    }
+});
+
+app.post('/market/view/:name', async (req, res) => {
+    try {
+        const player = await Player.findOne({
+            name: new RegExp(`^${req.params.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i')
+        });
+
+        if (!player) {
+            return res.json({ success: false });
+        }
+
+        const viewer = req.session.playerId || req.ip || 'anon';
+
+        if (!Array.isArray(player.views)) {
+            player.views = [];
+        }
+
+        if (!player.views.includes(viewer)) {
+            player.views.push(viewer);
+            await player.save();
+        }
+
+        res.json({ success: true, count: player.views.length });
+
+    } catch (err) {
+        console.error("Market View Count Error:", err);
+        res.json({ success: false });
     }
 });
 

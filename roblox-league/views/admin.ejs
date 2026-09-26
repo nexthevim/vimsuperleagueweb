@@ -2247,6 +2247,24 @@
 
                                             </div>
 
+                                            <div>
+
+                                                <label class="text-xs font-bold uppercase text-slate-700 block mb-1">
+                                                    Player Rank
+                                                </label>
+
+                                                <select
+                                                    name="rank"
+                                                    class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-slate-900 text-xs outline-none focus:border-blue-500 uppercase font-bold">
+                                                    <option value="C" selected>C Rank</option>
+                                                    <option value="B">B Rank</option>
+                                                    <option value="A">A Rank</option>
+                                                    <option value="S">S Rank</option>
+                                                    <option value="SS">SS Rank</option>
+                                                </select>
+
+                                            </div>
+
                                             <button
                                                 type="submit"
                                                 class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-xl text-xs font-bold uppercase text-white transition">
@@ -2388,6 +2406,19 @@
 
                                 <div class="flex items-center gap-2">
 
+                                    <%
+                                        let curRank = (player.rank || 'C').toUpperCase();
+                                        let rankBadgeClass = 'bg-slate-200 text-slate-600';
+                                        if (curRank === 'SS') rankBadgeClass = 'bg-gradient-to-r from-fuchsia-500 to-amber-400 text-white';
+                                        else if (curRank === 'S') rankBadgeClass = 'bg-gradient-to-r from-amber-500 to-red-500 text-white';
+                                        else if (curRank === 'A') rankBadgeClass = 'bg-gradient-to-r from-violet-500 to-blue-500 text-white';
+                                        else if (curRank === 'B') rankBadgeClass = 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white';
+                                    %>
+
+                                    <span class="text-[10px] font-black px-2 py-0.5 rounded uppercase <%= rankBadgeClass %>">
+                                        <%= curRank %> Rank
+                                    </span>
+
                                     <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-600 uppercase">
                                         ID: <%= pId.slice(-4) %>
                                     </span>
@@ -2446,6 +2477,30 @@
                                         type="hidden"
                                         name="username"
                                         value="<%= player.name %>">
+
+
+                                    <!-- RANK -->
+                                    <div>
+
+                                        <label class="admin-label">
+                                            Player Rank
+                                        </label>
+
+                                        <select
+                                            name="rank"
+                                            class="admin-input uppercase font-black">
+                                            <option value="C" <%= curRank === 'C' ? 'selected' : '' %>>C Rank</option>
+                                            <option value="B" <%= curRank === 'B' ? 'selected' : '' %>>B Rank</option>
+                                            <option value="A" <%= curRank === 'A' ? 'selected' : '' %>>A Rank</option>
+                                            <option value="S" <%= curRank === 'S' ? 'selected' : '' %>>S Rank</option>
+                                            <option value="SS" <%= curRank === 'SS' ? 'selected' : '' %>>SS Rank</option>
+                                        </select>
+
+                                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">
+                                            Shown as the colour-coded badge on this player's market card.
+                                        </p>
+
+                                    </div>
 
 
                                     <div>

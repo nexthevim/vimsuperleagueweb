@@ -1,0 +1,77 @@
+<%- include('partials/navbar') %>
+
+<style>
+    body { background-color: #030303; color: #fff; font-family: 'Inter', sans-serif; }
+    
+    .glass-panel { 
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 2.5rem;
+    }
+</style>
+
+<main class="max-w-6xl mx-auto px-10 py-24 text-white min-h-screen">
+    <a href="/metrics" class="inline-flex items-center gap-2 text-blue-500 text-[10px] font-black uppercase tracking-[0.4em] mb-16 hover:opacity-70 transition-all">
+        <span class="text-lg">←</span> Return to Metrics
+    </a>
+    
+    <div class="flex flex-col md:flex-row items-center gap-12 mb-24">
+        <div class="relative group">
+            <div class="absolute -inset-1 bg-blue-600 rounded-full blur opacity-10 group-hover:opacity-30 transition duration-1000"></div>
+            <img src="<%= team.logo %>" class="relative w-48 h-48 object-contain drop-shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+        </div>
+        
+        <div class="text-center md:text-left">
+            <h1 class="text-6xl md:text-8xl font-black italic uppercase tracking-tighter leading-none mb-4">
+                <%= team.name %>
+            </h1>
+            <p class="opacity-40 uppercase tracking-[0.5em] text-[10px] font-bold text-blue-500">
+                <%= group.name %> • Official Club Roster
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="glass-panel p-10 flex flex-col items-center justify-center text-center border-blue-500/20">
+            <h3 class="text-blue-500 text-[10px] font-black uppercase mb-8 tracking-[0.4em] opacity-60">Team Manager</h3>
+            <% const manager = (team.roster || []).find(p => p.isManager); %>
+            <div class="relative">
+                <p class="text-4xl font-black uppercase italic tracking-tighter">
+                    <%= manager ? manager.name : 'Vacant' %>
+                </p>
+                <div class="h-1 w-12 bg-blue-600 mx-auto mt-4 rounded-full"></div>
+            </div>
+        </div>
+
+        <div class="glass-panel p-10 md:col-span-2">
+            <div class="flex justify-between items-center mb-10">
+                <h3 class="text-blue-500 text-[10px] font-black uppercase tracking-[0.4em] opacity-60">Active Squad</h3>
+                <span class="text-[10px] opacity-30 font-bold uppercase"><%= (team.roster || []).length %> Members</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <% 
+                   const playersOnly = (team.roster || []).filter(p => !p.isManager); 
+                   if(playersOnly.length > 0) {
+                       playersOnly.forEach(player => { 
+                %>
+                    <div class="flex justify-between items-center p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-blue-500/40 transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-1 h-8 bg-blue-600/20 group-hover:bg-blue-600 transition-colors rounded-full"></div>
+                            <span class="text-lg font-black uppercase italic tracking-tight group-hover:translate-x-1 transition-transform">
+                                <%= player.name %>
+                            </span>
+                        </div>
+                    </div>
+                <%     }); 
+                   } else { %>
+                    <div class="col-span-2 py-10 text-center opacity-20 italic uppercase tracking-widest text-sm">
+                        No active players found
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</main>

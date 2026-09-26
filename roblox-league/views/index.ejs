@@ -1,0 +1,1257 @@
+<%- include('partials/navbar') %>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --brand-blue: #0088ff;
+        --brand-cyan: #00c6ff;
+        --text-dark: #0f172a;
+        --text-muted: #64748b;
+    }
+
+    /* Multi-layered Soft Greyish-White Gradient Background */
+    body {
+        background-color: #f4f6f9;
+        background-image: 
+            radial-gradient(at 0% 20%, rgba(226, 232, 240, 0.8) 0px, transparent 50%),
+            radial-gradient(at 100% 50%, rgba(203, 213, 225, 0.6) 0px, transparent 50%),
+            radial-gradient(at 0% 80%, rgba(226, 232, 240, 0.8) 0px, transparent 50%),
+            linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+        background-attachment: fixed;
+        color: var(--text-dark);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        overflow-x: hidden;
+        min-height: 100vh;
+    }
+
+    /* Fullscreen Hero Background Image with Overlay */
+    .hero-container {
+        position: relative;
+        background: url('/images/vimgfx.png') center/cover no-repeat;
+        min-height: 85vh;
+    }
+
+    /* Fog / Cloud Transition into Grey Tone at Hero Bottom */
+    .fog-bottom {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 220px;
+        background: linear-gradient(to bottom, transparent 0%, rgba(244, 246, 249, 0.7) 40%, #f4f6f9 100%);
+        pointer-events: none;
+    }
+
+    /* Glassmorphism Elevated Cards with Gradient Fill */
+    .clean-card {
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(203, 213, 225, 0.6);
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08);
+        border-radius: 1.5rem;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .clean-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px -10px rgba(0, 136, 255, 0.15);
+        border-color: rgba(0, 136, 255, 0.4);
+    }
+
+    /* Custom Search & Action Bar */
+    .search-pill {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #0088ff 0%, #00c6ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #0088ff 0%, #00c6ff 100%);
+        box-shadow: 0 8px 20px rgba(0, 136, 255, 0.3);
+    }
+
+    .btn-gradient:hover {
+        opacity: 0.95;
+        box-shadow: 0 12px 25px rgba(0, 136, 255, 0.45);
+    }
+
+    /* Standout Grey-Gradient Container Cards */
+    .section-grey-gradient {
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+        border-radius: 2rem;
+        border: 1px solid #cbd5e1;
+        box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    }
+
+    /* =========================================================
+       HOMEPAGE TOUR
+       ========================================================= */
+
+    #vim-tour-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 50000;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    #vim-tour-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #vim-tour-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.76);
+        pointer-events: auto;
+    }
+
+    #vim-tour-spotlight {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border-radius: 9999px;
+        border: 2px solid rgba(0, 198, 255, 0.95);
+        box-shadow:
+            0 0 0 4px rgba(0, 136, 255, 0.10),
+            0 0 30px rgba(0, 136, 255, 0.45),
+            0 0 70px rgba(0, 198, 255, 0.25);
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        transition:
+            left 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+            top 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+            width 0.35s ease,
+            height 0.35s ease;
+    }
+
+    #vim-tour-card {
+        position: fixed;
+        width: min(360px, calc(100vw - 32px));
+        background: rgba(255, 255, 255, 0.97);
+        color: #0f172a;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: 20px;
+        padding: 22px;
+        box-shadow:
+            0 30px 80px rgba(0, 0, 0, 0.35),
+            0 10px 30px rgba(0, 136, 255, 0.15);
+        z-index: 50002;
+        pointer-events: auto;
+        transition:
+            left 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+            top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #vim-tour-card::before {
+        content: "";
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: white;
+        border-left: 1px solid rgba(226, 232, 240, 0.9);
+        border-top: 1px solid rgba(226, 232, 240, 0.9);
+        transform: rotate(45deg);
+        top: -7px;
+        left: 34px;
+    }
+
+    #vim-tour-card.centered::before {
+        display: none;
+    }
+
+    .vim-tour-eyebrow {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #0088ff;
+        margin-bottom: 6px;
+    }
+
+    .vim-tour-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 20px;
+        font-weight: 900;
+        line-height: 1.15;
+        margin-bottom: 8px;
+    }
+
+    .vim-tour-description {
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.65;
+        margin-bottom: 18px;
+    }
+
+    .vim-tour-progress {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 16px;
+    }
+
+    .vim-tour-progress span {
+        height: 4px;
+        width: 20px;
+        border-radius: 999px;
+        background: #e2e8f0;
+        transition: all 0.25s ease;
+    }
+
+    .vim-tour-progress span.active {
+        width: 32px;
+        background: linear-gradient(90deg, #0088ff, #00c6ff);
+    }
+
+    .vim-tour-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .vim-tour-skip {
+        border: none;
+        background: transparent;
+        color: #94a3b8;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 8px 4px;
+    }
+
+    .vim-tour-next {
+        border: none;
+        background: linear-gradient(135deg, #0088ff, #00c6ff);
+        color: white;
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 11px 17px;
+        border-radius: 11px;
+        box-shadow: 0 7px 18px rgba(0, 136, 255, 0.25);
+    }
+
+    #vim-tour-launcher {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        width: 42px;
+        height: 42px;
+        border-radius: 9999px;
+        background: rgba(15, 23, 42, 0.92);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25);
+        z-index: 40000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 900;
+        transition: all 0.2s ease;
+    }
+
+    #vim-tour-launcher:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 16px 35px rgba(0, 136, 255, 0.25);
+    }
+
+    html.dark #vim-tour-launcher {
+        background: rgba(255, 255, 255, 0.94);
+        color: #0f172a;
+    }
+
+    @media (max-width: 640px) {
+        #vim-tour-card {
+            bottom: 20px !important;
+            top: auto !important;
+            left: 16px !important;
+            width: calc(100vw - 32px);
+        }
+
+        #vim-tour-card::before {
+            display: none;
+        }
+
+        #vim-tour-spotlight {
+            width: 75px;
+            height: 75px;
+        }
+
+        #vim-tour-launcher {
+            right: 14px;
+            bottom: 14px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        #vim-tour-spotlight,
+        #vim-tour-card {
+            transition: none !important;
+        }
+    }
+</style>
+
+<!-- =========================================================
+     HOMEPAGE TOUR
+     ========================================================= -->
+
+<div id="vim-tour-overlay" aria-hidden="true">
+    <div id="vim-tour-backdrop"></div>
+    <div id="vim-tour-spotlight"></div>
+
+    <div id="vim-tour-card">
+        <div class="vim-tour-eyebrow" id="vim-tour-eyebrow">
+            VIM SUPER LEAGUE
+        </div>
+
+        <div class="vim-tour-title" id="vim-tour-title">
+            Welcome to VIMSL
+        </div>
+
+        <div class="vim-tour-description" id="vim-tour-description">
+            Let's take a quick look around the league.
+        </div>
+
+        <div class="vim-tour-progress" id="vim-tour-progress"></div>
+
+        <div class="vim-tour-actions">
+            <button type="button" id="vim-tour-skip" class="vim-tour-skip">
+                Skip Tour
+            </button>
+
+            <button type="button" id="vim-tour-next" class="vim-tour-next">
+                Next →
+            </button>
+        </div>
+    </div>
+</div>
+
+<button
+    id="vim-tour-launcher"
+    type="button"
+    aria-label="Replay VIMSL tutorial"
+    title="Replay VIMSL tutorial"
+>
+    ?
+</button>
+
+<!-- HERO SECTION -->
+<header class="hero-container relative flex items-center justify-center pt-24 pb-48 px-6 text-center">
+    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent"></div>
+
+    <div class="relative z-10 max-w-4xl mx-auto mt-8">
+        <span class="inline-block bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full mb-6">
+            VIM SUPER LEAGUE
+        </span>
+
+        <h1 class="font-['Syne'] text-4xl sm:text-6xl md:text-7xl font-black text-white uppercase tracking-tight leading-tight mb-4">
+            FIND THE PERFECT <span class="gradient-text">LEAGUE</span> TO COMPETE
+        </h1>
+        
+        <p class="text-white/80 text-sm sm:text-base font-medium max-w-2xl mx-auto mb-10 tracking-wide">
+            Track official fixtures, inspect player markets, and jump straight into high-stakes league competitions.
+        </p>
+
+        <!-- Centered Floating Quick Bar -->
+        <div class="relative max-w-2xl mx-auto z-50">
+            <form id="search-form" action="/matches" method="GET" class="search-pill rounded-2xl p-3 flex flex-col sm:flex-row items-center gap-3">
+                <div class="flex-1 w-full flex items-center gap-3 px-4 py-2">
+                    <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0a7 7 0 0114 0z"></path>
+                    </svg>
+
+                    <input 
+                        id="live-search-input" 
+                        name="q"
+                        type="text" 
+                        placeholder="Search teams, players, or matches..." 
+                        autocomplete="off"
+                        class="w-full bg-transparent text-gray-800 placeholder-gray-400 text-sm font-medium focus:outline-none"
+                    >
+                </div>
+
+                <button 
+                    type="submit" 
+                    id="search-btn" 
+                    class="btn-gradient text-white text-xs font-bold uppercase tracking-wider px-8 py-4 rounded-xl w-full sm:w-auto shrink-0 transition text-center cursor-pointer"
+                >
+                    SEARCH ARENA
+                </button>
+            </form>
+
+            <!-- Live Suggestions Dropdown -->
+            <div 
+                id="search-results-dropdown" 
+                class="hidden absolute left-0 right-0 mt-2 bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-2xl p-4 space-y-4 max-h-96 overflow-y-auto text-left z-50"
+            >
+            </div>
+        </div>
+    </div>
+
+    <div class="fog-bottom"></div>
+</header>
+
+<main class="relative z-20 max-w-7xl mx-auto px-6 -mt-16 pb-32">
+
+    <!-- FLOATING FEATURE CARDS -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24">
+        
+        <!-- Next Match Card -->
+        <div id="tour-featured-match" class="lg:col-span-7 clean-card p-8 flex flex-col justify-between">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <span class="text-[11px] font-bold text-sky-500 uppercase tracking-widest block">
+                        Featured Fixture
+                    </span>
+
+                    <h3 class="font-['Syne'] text-2xl font-bold text-gray-900">
+                        Upcoming Match
+                    </h3>
+                </div>
+
+                <span class="bg-sky-50 text-sky-600 border border-sky-100 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    LIVE SCHEDULE
+                </span>
+            </div>
+
+            <% let nextMatch = matches.find(m => m.status === 'upcoming'); %>
+
+            <% if(nextMatch) { %>
+                <div class="flex items-center justify-between bg-gradient-to-r from-slate-50 via-white to-slate-50 rounded-2xl p-6 border border-slate-200/60 my-4 shadow-sm">
+                    <div class="flex flex-col items-center gap-2 flex-1">
+                        <img src="<%= nextMatch.logoA %>" class="w-14 h-14 object-contain drop-shadow-sm">
+                        <span class="font-bold text-sm text-gray-800 uppercase">
+                            <%= nextMatch.teamA %>
+                        </span>
+                    </div>
+                    
+                    <div class="text-center px-4">
+                        <span class="font-['Syne'] font-black text-2xl text-sky-500">
+                            VS
+                        </span>
+
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                            <%= nextMatch.time %>
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-2 flex-1">
+                        <img src="<%= nextMatch.logoB %>" class="w-14 h-14 object-contain drop-shadow-sm">
+                        <span class="font-bold text-sm text-gray-800 uppercase">
+                            <%= nextMatch.teamB %>
+                        </span>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="py-12 text-center bg-slate-50/80 rounded-2xl border border-dashed border-slate-200">
+                    <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                        No upcoming matches scheduled
+                    </p>
+                </div>
+            <% } %>
+
+            <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-200/60 text-xs font-semibold text-gray-500">
+                <span>Laague Matches</span>
+
+                <a href="/matches" class="text-sky-500 hover:text-sky-600 flex items-center gap-1 font-bold">
+                    View Full Fixtures →
+                </a>
+            </div>
+        </div>
+
+        <!-- Live Broadcast Preview Card -->
+        <div class="lg:col-span-5 clean-card p-3 flex flex-col overflow-hidden bg-black text-white relative group">
+            <% if(liveLink && liveLink.trim() !== "") { %>
+                <% 
+                    let embedLink = liveLink;
+
+                    if (liveLink.includes('watch?v=')) {
+                        embedLink = liveLink.replace('watch?v=', 'embed/').split('&')[0];
+                    }
+                    else if (liveLink.includes('youtu.be/')) {
+                        embedLink = liveLink.replace('youtu.be/', 'youtube.com/embed/').split('?')[0];
+                    }
+                %>
+
+                <iframe 
+                    class="w-full h-full min-h-[260px] rounded-xl" 
+                    src="<%= embedLink %>" 
+                    frameborder="0" 
+                    allowfullscreen
+                ></iframe>
+            <% } else { %>
+                <div class="flex-1 min-h-[260px] rounded-xl bg-slate-900 flex flex-col items-center justify-center p-6 text-center">
+                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-['Syne'] text-lg font-bold uppercase text-white/70">
+                        Stream is currently Offline
+                    </span>
+
+                    <span class="text-xs text-gray-500 uppercase tracking-wider mt-1">
+                        No live stream active
+                    </span>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- 3-STEP GUIDE SECTION -->
+    <div class="section-grey-gradient p-10 sm:p-14 mb-28">
+        <div class="text-center max-w-3xl mx-auto mb-14">
+            <span class="text-xs font-bold text-sky-500 uppercase tracking-[0.25em] block mb-2">
+                A GUIDE TO THE LEAGUE
+            </span>
+
+            <h2 class="font-['Syne'] text-3xl sm:text-4xl font-black text-gray-900">
+                ENTER THE LEAGUE WITH EASE
+            </h2>
+
+            <p class="text-gray-600 text-sm mt-3">
+                Follow these three straightforward steps to go from free agent to competing on the main stage.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+
+            <!-- Step 1 -->
+            <div class="flex flex-col items-center group">
+                <div class="w-20 h-20 rounded-2xl bg-white text-sky-500 border border-slate-200/80 flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300 shadow-md">
+                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0a3 3 0 016 0zm6 3a2 2 0 11-4 0a2 2 0 014 0zM7 10a2 2 0 11-4 0a2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+
+                <h3 class="font-['Syne'] font-bold text-xl text-gray-900 mb-2">
+                    1. Join Community
+                </h3>
+
+                <p class="text-xs text-gray-600 leading-relaxed max-w-xs">
+                    Connect your Discord account and introduce yourself to active scouts and team leaders.
+                </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="flex flex-col items-center group">
+                <div class="w-20 h-20 rounded-2xl bg-white text-sky-500 border border-slate-200/80 flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300 shadow-md">
+                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+
+                <h3 class="font-['Syne'] font-bold text-xl text-gray-900 mb-2">
+                    2. Register Card
+                </h3>
+
+                <p class="text-xs text-gray-600 leading-relaxed max-w-xs">
+                    Fill out your player profile, stats, and role preferences in our live Market Hub.
+                </p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="flex flex-col items-center group">
+                <div class="w-20 h-20 rounded-2xl bg-white text-sky-500 border border-slate-200/80 flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300 shadow-md">
+                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                    </svg>
+                </div>
+
+                <h3 class="font-['Syne'] font-bold text-xl text-gray-900 mb-2">
+                    3. Start Competing
+                </h3>
+
+                <p class="text-xs text-gray-600 leading-relaxed max-w-xs">
+                    Get recruited to an official roster and compete for championship titles.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECENT RESULTS SECTION -->
+    <div class="mb-24" id="tour-results">
+        <div class="flex justify-between items-end mb-8 border-b border-slate-300/60 pb-4">
+            <div>
+                <span class="text-xs font-bold text-sky-500 uppercase tracking-widest block mb-1">
+                    SCOREBOARD
+                </span>
+
+                <h2 class="font-['Syne'] text-3xl font-bold text-gray-900">
+                    Recent Match Results
+                </h2>
+            </div>
+
+            <a href="/matches" class="text-xs font-bold text-sky-500 hover:text-sky-600 uppercase tracking-wider">
+                All Results →
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <% let recentResults = matches.filter(m => m.status === 'completed').reverse().slice(0, 4); %>
+
+            <% if(recentResults.length > 0) { %>
+                <% recentResults.forEach(r => { %>
+                    <a href="/match/<%= r.id %>" class="clean-card p-6 block group">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full uppercase">
+                                Final Score
+                            </span>
+
+                            <span class="text-[10px] text-gray-400 font-semibold">
+                                <%= r.time %>
+                            </span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <img src="<%= r.logoA %>" class="w-6 h-6 object-contain">
+
+                                    <span class="font-bold text-xs text-gray-800 uppercase group-hover:text-sky-500 transition">
+                                        <%= r.teamA %>
+                                    </span>
+                                </div>
+
+                                <span class="font-['Syne'] font-black text-base text-gray-900">
+                                    <%= (r.details && r.details.goalsA) ? r.details.goalsA : 0 %>
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <img src="<%= r.logoB %>" class="w-6 h-6 object-contain">
+
+                                    <span class="font-bold text-xs text-gray-500 uppercase">
+                                        <%= r.teamB %>
+                                    </span>
+                                </div>
+
+                                <span class="font-['Syne'] font-black text-base text-gray-400">
+                                    <%= (r.details && r.details.goalsB) ? r.details.goalsB : 0 %>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <div class="col-span-full py-12 clean-card text-center text-gray-400 text-xs font-bold uppercase tracking-widest">
+                    No recent match results available
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- NEWS AND STORIES SECTION -->
+    <div class="mb-24">
+        <div class="flex justify-between items-end mb-8 border-b border-slate-300/60 pb-4">
+            <div>
+                <span class="text-xs font-bold text-sky-500 uppercase tracking-widest block mb-1">
+                    JOURNAL
+                </span>
+
+                <h2 class="font-['Syne'] text-3xl font-bold text-gray-900">
+                    Latest League Stories
+                </h2>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <% if (typeof stories !== 'undefined' && stories.length > 0) { %>
+                <% stories.slice().reverse().forEach(story => { %>
+                    <div class="clean-card overflow-hidden group flex flex-col">
+                        <div class="aspect-video w-full overflow-hidden relative">
+                            <img 
+                                src="<%= story.image %>" 
+                                class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                            >
+                        </div>
+
+                        <div class="p-6 flex-1 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
+                                    <%= story.date || 'Article' %>
+                                </span>
+
+                                <h4 class="font-['Syne'] font-bold text-lg text-gray-900 group-hover:text-sky-500 transition leading-snug mb-2">
+                                    <%= story.title %>
+                                </h4>
+
+                                <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                                    <%= story.description %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="col-span-full py-12 clean-card text-center text-gray-400 text-xs font-bold uppercase tracking-widest">
+                    No news articles published yet
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- BOTTOM ACTION CTA -->
+    <div class="section-grey-gradient p-12 text-center">
+        <h3 class="font-['Syne'] text-3xl font-bold text-gray-900 mb-3">
+            READY TO JOIN THE COMPETITION?
+        </h3>
+
+        <p class="text-xs text-gray-600 uppercase tracking-widest max-w-md mx-auto mb-8">
+            Set up your player card and start connecting with teams right away.
+        </p>
+
+        <a href="/market" class="btn-gradient inline-flex items-center gap-3 text-white px-10 py-5 rounded-2xl font-bold text-xs uppercase tracking-widest transition">
+            LET'S PLAN YOUR CAREER
+
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+        </a>
+    </div>
+
+</main>
+
+<!-- =========================================================
+     HOMEPAGE TOUR SCRIPT
+     ========================================================= -->
+
+<script>
+(function () {
+    const overlay = document.getElementById('vim-tour-overlay');
+    const backdrop = document.getElementById('vim-tour-backdrop');
+    const spotlight = document.getElementById('vim-tour-spotlight');
+    const card = document.getElementById('vim-tour-card');
+
+    const eyebrow = document.getElementById('vim-tour-eyebrow');
+    const title = document.getElementById('vim-tour-title');
+    const description = document.getElementById('vim-tour-description');
+    const progress = document.getElementById('vim-tour-progress');
+
+    const nextButton = document.getElementById('vim-tour-next');
+    const skipButton = document.getElementById('vim-tour-skip');
+    const launcher = document.getElementById('vim-tour-launcher');
+
+    if (!overlay || !spotlight || !card) return;
+
+    const tourSteps = [
+        {
+            selector: '[data-tour="market"]',
+            mobileSelector: '[data-tour="market-mobile"]',
+            eyebrow: 'PLAYER MARKET',
+            title: 'Build your player profile',
+            description: 'The Market is where you can browse registered players, inspect their cards, stats, positions and player information.'
+        },
+        {
+            selector: '[data-tour="matches"]',
+            mobileSelector: '[data-tour="matches-mobile"]',
+            eyebrow: 'MATCH CENTER',
+            title: 'Follow the fixtures',
+            description: 'Matches contains upcoming fixtures, completed games and individual match details.'
+        },
+        {
+            selector: '[data-tour="metrics"]',
+            mobileSelector: '[data-tour="metrics-mobile"]',
+            eyebrow: 'LEAGUE METRICS',
+            title: 'Track the numbers',
+            description: 'Metrics is where the league statistics come together — goals, assists, saves, MVPs and other player records.'
+        },
+        {
+            selector: '[data-tour="records"]',
+            mobileSelector: '[data-tour="records-mobile"]',
+            eyebrow: 'LEAGUE RECORDS',
+            title: 'Explore the history',
+            description: 'Records gives you the bigger picture: notable league achievements, historical records and milestones.'
+        },
+        {
+            selector: '#live-search-input',
+            eyebrow: 'SEARCH ARENA',
+            title: 'Find anything quickly',
+            description: 'Search for teams, players or matches directly from the homepage. Start typing and the live suggestions will appear.'
+        },
+        {
+            selector: '#tour-featured-match',
+            eyebrow: 'FEATURED FIXTURE',
+            title: 'See what is coming up',
+            description: 'The homepage automatically highlights the next scheduled match so you can jump into the action quickly.'
+        },
+        {
+            selector: '#tour-results',
+            eyebrow: 'SCOREBOARD',
+            title: 'Keep up with results',
+            description: 'Recent completed matches appear here with their final scores. You can open any match for its full details.'
+        }
+    ];
+
+    let currentStep = 0;
+
+    function isMobileLayout() {
+        return window.innerWidth < 1280;
+    }
+
+    function getTarget(step) {
+        let target = null;
+
+        if (isMobileLayout() && step.mobileSelector) {
+            target = document.querySelector(step.mobileSelector);
+        }
+
+        if (!target && step.selector) {
+            target = document.querySelector(step.selector);
+        }
+
+        return target;
+    }
+
+    function createProgress() {
+        progress.innerHTML = '';
+
+        tourSteps.forEach(function (_, index) {
+            const dot = document.createElement('span');
+
+            if (index === currentStep) {
+                dot.classList.add('active');
+            }
+
+            progress.appendChild(dot);
+        });
+    }
+
+    function positionTourCard(target) {
+        const margin = 16;
+        const cardWidth = Math.min(360, window.innerWidth - 32);
+
+        card.style.width = cardWidth + 'px';
+
+        if (window.innerWidth <= 640) {
+            card.classList.add('centered');
+            card.style.left = '16px';
+            card.style.top = 'auto';
+            card.style.bottom = '20px';
+            return;
+        }
+
+        card.classList.remove('centered');
+
+        const rect = target.getBoundingClientRect();
+
+        let left = rect.left;
+        let top = rect.bottom + 22;
+
+        if (left + cardWidth > window.innerWidth - margin) {
+            left = window.innerWidth - cardWidth - margin;
+        }
+
+        if (left < margin) {
+            left = margin;
+        }
+
+        const estimatedCardHeight = 220;
+
+        if (top + estimatedCardHeight > window.innerHeight - margin) {
+            top = rect.top - estimatedCardHeight - 22;
+
+            if (top < margin) {
+                top = margin;
+                card.classList.add('centered');
+            }
+        }
+
+        card.style.left = left + 'px';
+        card.style.top = top + 'px';
+        card.style.bottom = 'auto';
+    }
+
+    function moveSpotlight(target) {
+        const rect = target.getBoundingClientRect();
+
+        const isSmall = window.innerWidth <= 640;
+
+        let width = rect.width;
+        let height = rect.height;
+
+        if (width < 55) width = 55;
+        if (height < 45) height = 45;
+
+        const padding = isSmall ? 10 : 9;
+
+        spotlight.style.left = (rect.left + rect.width / 2) + 'px';
+        spotlight.style.top = (rect.top + rect.height / 2) + 'px';
+        spotlight.style.width = (width + padding * 2) + 'px';
+        spotlight.style.height = (height + padding * 2) + 'px';
+    }
+
+    function showStep(index) {
+        currentStep = index;
+
+        const step = tourSteps[currentStep];
+        const target = getTarget(step);
+
+        if (!target) {
+            if (currentStep < tourSteps.length - 1) {
+                showStep(currentStep + 1);
+            } else {
+                finishTour();
+            }
+
+            return;
+        }
+
+        if (isMobileLayout() && step.mobileSelector) {
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenu && !mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.add('active');
+            }
+        }
+
+        target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center'
+        });
+
+        setTimeout(function () {
+            moveSpotlight(target);
+            positionTourCard(target);
+        }, 120);
+
+        eyebrow.textContent = step.eyebrow;
+        title.textContent = step.title;
+        description.textContent = step.description;
+
+        createProgress();
+
+        if (currentStep === tourSteps.length - 1) {
+            nextButton.textContent = 'Finish ✓';
+        } else {
+            nextButton.textContent = 'Next →';
+        }
+    }
+
+    function startTour() {
+        currentStep = 0;
+
+        overlay.classList.add('active');
+        overlay.setAttribute('aria-hidden', 'false');
+
+        document.body.style.overflow = 'hidden';
+
+        showStep(0);
+    }
+
+    function finishTour() {
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+
+        document.body.style.overflow = '';
+
+        localStorage.setItem('vim_home_tour_seen', 'true');
+
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenu) {
+            mobileMenu.classList.remove('active');
+        }
+    }
+
+    nextButton.addEventListener('click', function () {
+        if (currentStep >= tourSteps.length - 1) {
+            finishTour();
+            return;
+        }
+
+        showStep(currentStep + 1);
+    });
+
+    skipButton.addEventListener('click', function () {
+        finishTour();
+    });
+
+    backdrop.addEventListener('click', function () {
+        finishTour();
+    });
+
+    launcher.addEventListener('click', function () {
+        startTour();
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (!overlay.classList.contains('active')) return;
+
+        if (event.key === 'Escape') {
+            finishTour();
+        }
+
+        if (event.key === 'ArrowRight') {
+            if (currentStep < tourSteps.length - 1) {
+                showStep(currentStep + 1);
+            }
+        }
+
+        if (event.key === 'ArrowLeft') {
+            if (currentStep > 0) {
+                showStep(currentStep - 1);
+            }
+        }
+    });
+
+    window.addEventListener('resize', function () {
+        if (!overlay.classList.contains('active')) return;
+
+        const step = tourSteps[currentStep];
+        const target = getTarget(step);
+
+        if (target) {
+            moveSpotlight(target);
+            positionTourCard(target);
+        }
+    });
+
+    /*
+     * First visit only.
+     *
+     * If you want to test the tour again in your browser console:
+     *
+     * localStorage.removeItem('vim_home_tour_seen')
+     *
+     * Then refresh the homepage.
+     */
+
+    const hasSeenTour = localStorage.getItem('vim_home_tour_seen');
+
+    if (!hasSeenTour) {
+        setTimeout(function () {
+            startTour();
+        }, 900);
+    }
+})();
+</script>
+
+<!-- =========================================================
+     EXISTING HOMEPAGE SEARCH
+     ========================================================= -->
+
+<script>
+    // Embed existing EJS data directly into browser JS
+    const localMatches = <%- JSON.stringify(matches || []) %>;
+    const localPlayers = <%- typeof players !== 'undefined' ? JSON.stringify(players) : '[]' %>;
+
+    const searchInput = document.getElementById('live-search-input');
+    const dropdown = document.getElementById('search-results-dropdown');
+    const searchForm = document.getElementById('search-form');
+
+    let debounceTimer;
+    let topTargetUrl = '';
+
+    // Handle typing input
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+
+        const query = e.target.value.trim().toLowerCase();
+
+        if (query.length < 1) {
+            dropdown.classList.add('hidden');
+            dropdown.innerHTML = '';
+            topTargetUrl = '';
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+
+            // Try server endpoint first
+            fetch(`/api/search?q=${encodeURIComponent(query)}`)
+                .then(res => res.ok ? res.json() : Promise.reject('No server API'))
+                .then(data => renderSearchResults(data, query))
+                .catch(() => {
+
+                    // Client-Side Search Engine Fallback
+                    const matchedMatches = localMatches.filter(m => 
+                        (m.teamA && m.teamA.toLowerCase().includes(query)) ||
+                        (m.teamB && m.teamB.toLowerCase().includes(query))
+                    );
+
+                    const matchedPlayers = localPlayers.filter(p =>
+                        (p.name && p.name.toLowerCase().includes(query)) ||
+                        (p.role && p.role.toLowerCase().includes(query))
+                    );
+
+                    renderSearchResults(
+                        {
+                            matches: matchedMatches,
+                            players: matchedPlayers
+                        },
+                        query
+                    );
+                });
+
+        }, 150);
+    });
+
+    function renderSearchResults(data, query) {
+        const { players, matches } = data;
+
+        let html = '';
+
+        topTargetUrl = '';
+
+        const hasMatches = matches && matches.length > 0;
+        const hasPlayers = players && players.length > 0;
+
+        if (!hasMatches && !hasPlayers) {
+            dropdown.innerHTML = `
+                <div class="text-center py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    No matching teams or players found for "${query}"
+                </div>
+            `;
+
+            dropdown.classList.remove('hidden');
+
+            return;
+        }
+
+        // 1. Render Matches
+        if (hasMatches) {
+
+            if (!topTargetUrl) {
+                topTargetUrl = `/match/${matches[0].id || ''}`;
+            }
+
+            html += `
+                <div>
+                    <span class="text-[10px] font-bold text-sky-500 uppercase tracking-widest block mb-2 px-2">
+                        Matches & Teams
+                    </span>
+
+                    <div class="space-y-1">
+            `;
+
+            matches.forEach(m => {
+
+                const matchUrl = m.id
+                    ? `/match/${m.id}`
+                    : `/matches?q=${encodeURIComponent(query)}`;
+
+                html += `
+                    <a 
+                        href="${matchUrl}" 
+                        class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 transition border border-transparent hover:border-slate-200"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+
+                            <span class="text-xs font-bold text-gray-800 uppercase">
+                                ${m.teamA}
+                                <span class="text-sky-500">vs</span>
+                                ${m.teamB}
+                            </span>
+                        </div>
+
+                        <span class="text-[10px] text-gray-400 font-semibold uppercase px-2 py-0.5 bg-slate-100 rounded-md">
+                            ${m.status || m.time || 'Fixture'}
+                        </span>
+                    </a>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+        }
+
+        // 2. Render Players
+        if (hasPlayers) {
+
+            if (!topTargetUrl) {
+                topTargetUrl = players[0].id
+                    ? `/player/${players[0].id}`
+                    : `/market`;
+            }
+
+            html += `
+                <div class="${hasMatches ? 'pt-3 border-t border-slate-100' : ''}">
+                    <span class="text-[10px] font-bold text-sky-500 uppercase tracking-widest block mb-2 px-2">
+                        Registered Players
+                    </span>
+
+                    <div class="space-y-1">
+            `;
+
+            players.forEach(p => {
+
+                const playerUrl = p.id
+                    ? `/player/${p.id}`
+                    : `/market?search=${encodeURIComponent(p.name)}`;
+
+                html += `
+                    <a 
+                        href="${playerUrl}" 
+                        class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 transition border border-transparent hover:border-slate-200"
+                    >
+                        <div class="flex items-center gap-3">
+                            <div class="w-7 h-7 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                                ${p.name ? p.name.charAt(0) : 'P'}
+                            </div>
+
+                            <div>
+                                <span class="text-xs font-bold text-gray-800 block">
+                                    ${p.name}
+                                </span>
+
+                                <span class="text-[10px] text-gray-400 font-medium">
+                                    ${p.team || 'Free Agent'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <span class="text-[10px] text-sky-600 font-bold uppercase tracking-wider bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
+                            ${p.role || 'Player'}
+                        </span>
+                    </a>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+        }
+
+        dropdown.innerHTML = html;
+        dropdown.classList.remove('hidden');
+    }
+
+    // Direct submit action
+    searchForm.addEventListener('submit', (e) => {
+        if (topTargetUrl) {
+            e.preventDefault();
+            window.location.href = topTargetUrl;
+        }
+    });
+
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+</script>

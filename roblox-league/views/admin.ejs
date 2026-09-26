@@ -1,0 +1,3378 @@
+<%- include('partials/navbar') %>
+
+<main class="py-12 px-4 md:px-8 max-w-7xl mx-auto space-y-8 bg-slate-50 text-slate-900 min-h-screen">
+
+    <!-- ========================================================= -->
+    <!-- HEADER -->
+    <!-- ========================================================= -->
+    <div class="border-b border-slate-200 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <span class="text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-100 px-3 py-1 rounded-full border border-blue-200">
+                Control Center
+            </span>
+
+            <h1 class="text-3xl md:text-4xl font-black italic uppercase tracking-tighter text-slate-900 mt-2">
+                ADMIN <span class="text-blue-600">DASHBOARD</span>
+            </h1>
+
+            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">
+                League management • matches • players • teams • auctions
+            </p>
+        </div>
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- MAIN NAVIGATION -->
+    <!-- ========================================================= -->
+    <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-4" id="adminTabs">
+
+        <button
+            onclick="switchTab('broadcast')"
+            id="tab-broadcast"
+            class="tab-btn active px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-blue-600 text-white border-blue-600 shadow-md">
+            Broadcast & Schedule
+        </button>
+
+        <button
+            onclick="switchTab('reports')"
+            id="tab-reports"
+            class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-100">
+            Match Center
+        </button>
+
+        <button
+            onclick="switchTab('tables')"
+            id="tab-tables"
+            class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-100">
+            Tables & Roster
+        </button>
+
+        <button
+            onclick="switchTab('queue')"
+            id="tab-queue"
+            class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-100">
+            Verification Queue
+        </button>
+
+        <button
+            onclick="switchTab('market')"
+            id="tab-market"
+            class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-100">
+            Player Market
+        </button>
+
+        <button
+            onclick="switchTab('auction')"
+            id="tab-auction"
+            class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-100">
+            Auction Control
+        </button>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- CATEGORY 1: BROADCAST & SCHEDULE -->
+    <!-- ========================================================= -->
+    <section id="section-broadcast" class="tab-section space-y-8">
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- LEFT -->
+            <div class="space-y-8">
+
+                <!-- LIVE STREAM -->
+                <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 shadow-sm">
+
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                        <div>
+                            <h3 class="text-xs font-black uppercase text-slate-700 tracking-widest">
+                                Live Stream Broadcast
+                            </h3>
+                            <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                                Control the league's current broadcast link
+                            </p>
+                        </div>
+                    </div>
+
+                    <form action="/admin/live" method="POST" class="space-y-4">
+                        <div>
+                            <label class="admin-label">YouTube Link</label>
+                            <input
+                                name="link"
+                                value="<%= typeof liveLink !== 'undefined' ? liveLink : '' %>"
+                                placeholder="https://youtube.com/live/..."
+                                class="w-full mt-1 bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-slate-900 placeholder-slate-400 outline-none focus:border-blue-500 focus:bg-white text-xs font-medium transition">
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-xl font-bold uppercase text-xs text-white transition shadow-sm">
+                            Update Broadcast Link
+                        </button>
+                    </form>
+                </div>
+
+
+                <!-- SCHEDULE MATCH -->
+                <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 shadow-sm">
+
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <span class="text-[9px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+                                Fixture Manager
+                            </span>
+                            <h3 class="text-xs font-black uppercase text-slate-700 tracking-widest mt-3">
+                                Schedule New Match
+                            </h3>
+                            <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                                Choose the exact date and time. Viewers will see it in their local timezone.
+                            </p>
+                        </div>
+
+                        <span class="hidden sm:inline-flex text-[9px] font-black uppercase tracking-wider text-slate-400 bg-slate-50 border border-slate-200 px-2 py-1 rounded-lg">
+                            Localized Time
+                        </span>
+                    </div>
+
+                    <form action="/admin/add-match" method="POST" class="space-y-5">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="admin-label">Team A</label>
+                                <select name="teamA" class="admin-input" required>
+                                    <option value="" disabled selected>Select Team A...</option>
+                                    <% if (typeof groups !== 'undefined') { %>
+                                        <% groups.forEach(g => { %>
+                                            <% (g.teams || []).forEach(t => { %>
+                                                <option value="<%= t.name %>"><%= t.name %></option>
+                                            <% }) %>
+                                        <% }) %>
+                                    <% } %>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="admin-label">Team A Logo URL</label>
+                                <input name="logoA" placeholder="Optional logo URL" class="admin-input">
+                            </div>
+
+                            <div>
+                                <label class="admin-label">Team B</label>
+                                <select name="teamB" class="admin-input" required>
+                                    <option value="" disabled selected>Select Team B...</option>
+                                    <% if (typeof groups !== 'undefined') { %>
+                                        <% groups.forEach(g => { %>
+                                            <% (g.teams || []).forEach(t => { %>
+                                                <option value="<%= t.name %>"><%= t.name %></option>
+                                            <% }) %>
+                                        <% }) %>
+                                    <% } %>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="admin-label">Team B Logo URL</label>
+                                <input name="logoB" placeholder="Optional logo URL" class="admin-input">
+                            </div>
+                        </div>
+
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="admin-label">Match Date & Time</label>
+                                <input
+                                    type="datetime-local"
+                                    name="time"
+                                    id="newMatchDateTime"
+                                    class="admin-input"
+                                    required>
+                                <p class="text-[9px] text-slate-400 font-bold uppercase mt-1.5">
+                                    Your browser's local time • stored as one real moment
+                                </p>
+                            </div>
+
+                            <div>
+                                <label class="admin-label">Tags</label>
+                                <input
+                                    name="tags"
+                                    placeholder="LEAGUE, FINALS, MATCHDAY 3"
+                                    class="admin-input">
+                            </div>
+                        </div>
+
+
+                        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-white border border-blue-100 flex items-center justify-center text-blue-600 font-black">
+                                🌍
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-wider text-blue-700">
+                                    Timezone handled automatically
+                                </p>
+                                <p class="text-[10px] text-blue-600/80 font-semibold mt-1 leading-relaxed">
+                                    Enter the fixture using your computer's local date and time. The public schedule can convert the stored match time for each viewer.
+                                </p>
+                            </div>
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="w-full bg-slate-900 hover:bg-slate-800 text-white py-3.5 rounded-xl font-bold uppercase text-xs transition shadow-sm">
+                            Schedule Match
+                        </button>
+
+                    </form>
+                </div>
+
+
+                <!-- ACTIVE SCHEDULE -->
+                <div class="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm space-y-5">
+
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                        <div>
+                            <span class="text-[9px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
+                                Matchday Control
+                            </span>
+                            <h3 class="text-xs font-black uppercase text-slate-700 tracking-widest mt-3">
+                                Active Schedule
+                            </h3>
+                            <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                                Edit fixtures, start a match live, or remove a fixture.
+                            </p>
+                        </div>
+
+                        <span class="text-[10px] font-black text-blue-600 bg-blue-50 border border-blue-100 px-2 py-1 rounded-lg">
+                            <%= typeof matches !== 'undefined' ? matches.length : 0 %> MATCHES
+                        </span>
+                    </div>
+
+
+                    <div class="max-h-[520px] overflow-y-auto space-y-3 pr-1">
+
+                        <% if (typeof matches !== 'undefined' && matches.length > 0) { %>
+
+                            <% matches.forEach((m) => { %>
+
+                                <div
+                                    class="schedule-card bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3"
+                                    data-match-id="<%= m.id || m._id %>"
+                                    data-team-a="<%= m.teamA || '' %>"
+                                    data-team-b="<%= m.teamB || '' %>"
+                                    data-logo-a="<%= m.logoA || '' %>"
+                                    data-logo-b="<%= m.logoB || '' %>"
+                                    data-time="<%= m.time || '' %>"
+                                    data-tags="<%= m.tags || '' %>">
+
+                                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-2 h-2 rounded-full <%= m.isLive || m.status === 'live' ? 'bg-red-500 animate-pulse' : 'bg-slate-300' %>"></span>
+                                                <span class="text-sm uppercase text-slate-900 font-black truncate">
+                                                    <%= m.teamA %> <span class="text-slate-400">vs</span> <%= m.teamB %>
+                                                </span>
+                                            </div>
+
+                                            <div class="flex flex-wrap items-center gap-2 mt-2">
+                                                <span
+                                                    class="vim-local-time text-[10px] text-blue-600 font-bold bg-blue-50 border border-blue-100 px-2 py-1 rounded-lg"
+                                                    data-vim-datetime="<%= m.time || '' %>">
+                                                    <%= m.time || 'Date not set' %>
+                                                </span>
+
+                                                <% if (m.isLive || m.status === 'live') { %>
+                                                    <span class="text-[9px] font-black uppercase text-red-600 bg-red-50 border border-red-100 px-2 py-1 rounded-lg animate-pulse">
+                                                        LIVE
+                                                    </span>
+                                                <% } else if (m.status === 'completed' || m.completed) { %>
+                                                    <span class="text-[9px] font-black uppercase text-slate-500 bg-slate-100 border border-slate-200 px-2 py-1 rounded-lg">
+                                                        COMPLETED
+                                                    </span>
+                                                <% } else { %>
+                                                    <span class="text-[9px] font-black uppercase text-amber-600 bg-amber-50 border border-amber-100 px-2 py-1 rounded-lg">
+                                                        SCHEDULED
+                                                    </span>
+                                                <% } %>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="flex flex-wrap gap-2 sm:justify-end">
+
+                                            <% if (!(m.isLive || m.status === 'live')) { %>
+                                                <form
+                                                    action="/admin/set-match-live"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Make this match LIVE now?');">
+
+                                                    <input type="hidden" name="matchId" value="<%= m.id || m._id %>">
+
+                                                    <button
+                                                        type="submit"
+                                                        class="text-red-600 hover:text-red-700 text-[9px] font-black uppercase px-3 py-2 rounded-lg bg-red-50 border border-red-200 transition">
+                                                        Make LIVE
+                                                    </button>
+                                                </form>
+                                            <% } %>
+
+                                            <button
+                                                type="button"
+                                                onclick="openScheduleEditor(this)"
+                                                class="text-blue-600 hover:text-blue-700 text-[9px] font-black uppercase px-3 py-2 rounded-lg bg-blue-50 border border-blue-200 transition">
+                                                Edit
+                                            </button>
+
+                                            <form
+                                                action="/admin/delete-match"
+                                                method="POST"
+                                                onsubmit="return confirm('Delete this match? This cannot be undone.');">
+
+                                                <input
+                                                    type="hidden"
+                                                    name="matchId"
+                                                    value="<%= m.id || m._id %>">
+
+                                                <button
+                                                    type="submit"
+                                                    class="text-red-600 hover:text-red-700 text-[9px] font-black uppercase px-3 py-2 rounded-lg bg-red-50 border border-red-200 transition">
+                                                    Delete
+                                                </button>
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <% if(m.tags) { %>
+                                        <div class="flex gap-1 flex-wrap">
+                                            <% m.tags.split(',').forEach(t => { %>
+                                                <span class="bg-white text-blue-700 border border-blue-200 px-2 py-0.5 rounded text-[9px] font-bold uppercase">
+                                                    <%= t.trim() %>
+                                                </span>
+                                            <% }) %>
+                                        </div>
+                                    <% } %>
+
+                                </div>
+
+                            <% }) %>
+
+                        <% } else { %>
+
+                            <p class="text-xs text-slate-400 text-center py-8">
+                                No scheduled matches found.
+                            </p>
+
+                        <% } %>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT -->
+            <div class="space-y-8">
+
+                <!-- HALL OF FAME -->
+                <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 shadow-sm">
+
+                    <div>
+                        <span class="text-[9px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100">
+                            VIM History
+                        </span>
+
+                        <h3 class="text-xs font-black uppercase text-slate-700 tracking-widest mt-3">
+                            League Hall of Fame
+                        </h3>
+
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                            Build a proper historical archive for seasons, tournaments and individual achievements.
+                        </p>
+                    </div>
+
+
+                    <form action="/admin/add-record" method="POST" class="space-y-4">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                            <div>
+                                <label class="admin-label">Competition Type</label>
+                                <select name="category" class="admin-input">
+                                    <option value="season">Season</option>
+                                    <option value="tournament">Tournament</option>
+                                    <option value="career">Career / All-Time</option>
+                                    <option value="special">Special Award</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="admin-label">Season / Edition</label>
+                                <input
+                                    name="season"
+                                    placeholder="e.g. VSL Season 3"
+                                    class="admin-input">
+                            </div>
+
+                            <div>
+                                <label class="admin-label">Competition / Tournament</label>
+                                <input
+                                    name="competition"
+                                    placeholder="e.g. VIM Cup"
+                                    class="admin-input">
+                            </div>
+
+                            <div>
+                                <label class="admin-label">Award / Record</label>
+                                <select name="recordType" class="admin-input">
+                                    <option value="champion">Champion / Winner</option>
+                                    <option value="runner_up">Runner-up</option>
+                                    <option value="most_goals">Most Goals</option>
+                                    <option value="most_assists">Most Assists</option>
+                                    <option value="most_saves">Most Saves</option>
+                                    <option value="mvp">MVP</option>
+                                    <option value="best_manager">Best Manager</option>
+                                    <option value="golden_boot">Golden Boot</option>
+                                    <option value="golden_glove">Golden Glove</option>
+                                    <option value="custom">Custom Record</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+
+                        <input
+                            name="title"
+                            placeholder="Record title / display name"
+                            required
+                            class="admin-input">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                            <div>
+                                <label class="admin-label">Winner / Holder</label>
+                                <input
+                                    name="holder"
+                                    placeholder="Player, manager or team"
+                                    required
+                                    class="admin-input">
+                            </div>
+
+                            <div>
+                                <label class="admin-label">Value</label>
+                                <input
+                                    name="value"
+                                    placeholder="e.g. 24 goals / 9 saves / 1 title"
+                                    required
+                                    class="admin-input">
+                            </div>
+
+                        </div>
+
+
+                        <textarea
+                            name="description"
+                            placeholder="Optional note about the achievement..."
+                            class="admin-input h-20"></textarea>
+
+
+                        <button
+                            type="submit"
+                            class="w-full bg-amber-500 hover:bg-amber-600 py-3 rounded-xl font-black uppercase text-xs text-white transition shadow-sm">
+                            Add Hall of Fame Record
+                        </button>
+
+                    </form>
+
+
+                    <div class="border-t border-slate-200 pt-5">
+
+                        <div class="flex items-center justify-between mb-3">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                Archive
+                            </p>
+
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">
+                                <%= typeof records !== 'undefined' ? records.length : 0 %> records
+                            </span>
+                        </div>
+
+
+                        <div class="max-h-[430px] overflow-y-auto space-y-3 pr-1">
+
+                            <% if (typeof records !== 'undefined' && records.length > 0) { %>
+
+                                <% records.forEach(rec => { %>
+
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+
+                                        <div class="flex items-start justify-between gap-3">
+
+                                            <div class="min-w-0">
+
+                                                <div class="flex flex-wrap gap-1.5 mb-2">
+
+                                                    <% if (rec.category) { %>
+                                                        <span class="text-[8px] font-black uppercase tracking-wider text-amber-700 bg-amber-100 px-2 py-0.5 rounded">
+                                                            <%= rec.category %>
+                                                        </span>
+                                                    <% } %>
+
+                                                    <% if (rec.recordType) { %>
+                                                        <span class="text-[8px] font-black uppercase tracking-wider text-blue-700 bg-blue-100 px-2 py-0.5 rounded">
+                                                            <%= String(rec.recordType).replace(/_/g, ' ') %>
+                                                        </span>
+                                                    <% } %>
+
+                                                    <% if (rec.season) { %>
+                                                        <span class="text-[8px] font-black uppercase tracking-wider text-slate-500 bg-white border border-slate-200 px-2 py-0.5 rounded">
+                                                            <%= rec.season %>
+                                                        </span>
+                                                    <% } %>
+
+                                                </div>
+
+                                                <p class="text-xs font-black text-slate-900">
+                                                    <%= rec.title %>
+                                                </p>
+
+                                                <p class="text-[11px] text-slate-600 font-semibold mt-1">
+                                                    <%= rec.holder %>
+                                                    <% if (rec.value) { %>
+                                                        <span class="text-blue-600">• <%= rec.value %></span>
+                                                    <% } %>
+                                                </p>
+
+                                                <% if (rec.competition) { %>
+                                                    <p class="text-[9px] text-slate-400 uppercase font-bold mt-1">
+                                                        <%= rec.competition %>
+                                                    </p>
+                                                <% } %>
+
+                                                <% if (rec.description) { %>
+                                                    <p class="text-[10px] text-slate-400 mt-2 leading-relaxed">
+                                                        <%= rec.description %>
+                                                    </p>
+                                                <% } %>
+
+                                            </div>
+
+
+                                            <div class="flex gap-1 shrink-0">
+
+                                                <button
+                                                    type="button"
+                                                    onclick="openRecordEditor(this)"
+                                                    data-record-id="<%= rec.id || rec._id %>"
+                                                    data-title="<%= rec.title || '' %>"
+                                                    data-holder="<%= rec.holder || '' %>"
+                                                    data-value="<%= rec.value || '' %>"
+                                                    data-category="<%= rec.category || 'season' %>"
+                                                    data-season="<%= rec.season || '' %>"
+                                                    data-competition="<%= rec.competition || '' %>"
+                                                    data-record-type="<%= rec.recordType || 'custom' %>"
+                                                    data-description="<%= rec.description || '' %>"
+                                                    class="text-blue-600 hover:text-blue-700 text-[9px] font-black uppercase px-2 py-1 bg-blue-50 border border-blue-100 rounded-lg">
+                                                    Edit
+                                                </button>
+
+                                                <form action="/admin/delete-record" method="POST" onsubmit="return confirm('Delete this Hall of Fame record? This cannot be undone.');">
+
+                                                    <input
+                                                        type="hidden"
+                                                        name="recordId"
+                                                        value="<%= rec.id || rec._id %>">
+
+                                                    <button
+                                                        type="submit"
+                                                        class="text-red-600 hover:text-red-700 text-xs font-black px-2 py-1 rounded-lg bg-red-50 border border-red-100">
+                                                        ×
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                <% }) %>
+
+                            <% } else { %>
+
+                                <p class="text-xs text-slate-400 text-center py-6">
+                                    No Hall of Fame records added yet.
+                                </p>
+
+                            <% } %>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- NEWS -->
+                <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 shadow-sm">
+
+                    <div>
+                        <h3 class="text-xs font-black uppercase text-blue-600 tracking-widest">
+                            News & Announcements
+                        </h3>
+
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                            Publish league news and updates
+                        </p>
+                    </div>
+
+                    <form action="/admin/add-story" method="POST" class="space-y-3">
+
+                        <input
+                            name="title"
+                            placeholder="Story Title"
+                            required
+                            class="admin-input">
+
+                        <textarea
+                            name="description"
+                            placeholder="Headline Summary..."
+                            required
+                            class="admin-input h-24"></textarea>
+
+                        <input
+                            name="image"
+                            placeholder="Banner Image URL"
+                            required
+                            class="admin-input">
+
+                        <button
+                            type="submit"
+                            class="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl font-bold uppercase text-xs transition">
+                            Publish Story
+                        </button>
+
+                    </form>
+
+
+                    <div class="max-h-[220px] overflow-y-auto space-y-2 pr-1">
+
+                        <% if (typeof stories !== 'undefined' && stories.length > 0) { %>
+
+                            <% stories.forEach((story, sIdx) => { %>
+
+                                <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+
+                                    <img
+                                        src="<%= story.image %>"
+                                        class="w-10 h-10 rounded-lg object-cover bg-slate-200">
+
+                                    <div class="flex-1 truncate">
+
+                                        <p class="text-xs font-bold text-slate-900 truncate">
+                                            <%= story.title %>
+                                        </p>
+
+                                        <p class="text-[10px] text-slate-500 truncate">
+                                            <%= story.description %>
+                                        </p>
+
+                                    </div>
+
+                                    <form action="/admin/delete-story" method="POST" onsubmit="return confirm('Delete this story? This cannot be undone.');">
+
+                                        <input
+                                            type="hidden"
+                                            name="storyIndex"
+                                            value="<%= sIdx %>">
+
+                                        <button
+                                            class="text-red-600 hover:text-red-700 text-[10px] font-black px-2 py-1 bg-red-100 rounded">
+                                            REMOVE
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            <% }) %>
+
+                        <% } %>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- SCHEDULE EDITOR MODAL -->
+    <!-- ========================================================= -->
+    <div id="scheduleEditorModal" class="admin-modal hidden">
+        <div class="admin-modal-backdrop" onclick="closeScheduleEditor()"></div>
+
+        <div class="admin-modal-card max-w-2xl">
+
+            <div class="flex items-start justify-between gap-4 mb-6">
+                <div>
+                    <span class="text-[9px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+                        Fixture Editor
+                    </span>
+                    <h3 class="text-xl font-black italic uppercase text-slate-900 mt-3">
+                        Edit Scheduled Match
+                    </h3>
+                    <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                        Changes here update the schedule entry only.
+                    </p>
+                </div>
+
+                <button type="button" onclick="closeScheduleEditor()" class="admin-modal-close">×</button>
+            </div>
+
+            <form action="/admin/update-match" method="POST" class="space-y-5">
+
+                <input type="hidden" name="matchId" id="scheduleEditId">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                    <div>
+                        <label class="admin-label">Team A</label>
+                        <select name="teamA" id="scheduleEditTeamA" class="admin-input" required>
+                            <option value="" disabled>Select Team A...</option>
+                            <% if (typeof groups !== 'undefined') { %>
+                                <% groups.forEach(g => { %>
+                                    <% (g.teams || []).forEach(t => { %>
+                                        <option value="<%= t.name %>"><%= t.name %></option>
+                                    <% }) %>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="admin-label">Team A Logo URL</label>
+                        <input name="logoA" id="scheduleEditLogoA" class="admin-input" placeholder="Optional logo URL">
+                    </div>
+
+                    <div>
+                        <label class="admin-label">Team B</label>
+                        <select name="teamB" id="scheduleEditTeamB" class="admin-input" required>
+                            <option value="" disabled>Select Team B...</option>
+                            <% if (typeof groups !== 'undefined') { %>
+                                <% groups.forEach(g => { %>
+                                    <% (g.teams || []).forEach(t => { %>
+                                        <option value="<%= t.name %>"><%= t.name %></option>
+                                    <% }) %>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="admin-label">Team B Logo URL</label>
+                        <input name="logoB" id="scheduleEditLogoB" class="admin-input" placeholder="Optional logo URL">
+                    </div>
+
+                    <div>
+                        <label class="admin-label">Date & Time</label>
+                        <input type="datetime-local" name="time" id="scheduleEditTime" class="admin-input" required>
+                    </div>
+
+                    <div>
+                        <label class="admin-label">Tags</label>
+                        <input name="tags" id="scheduleEditTags" class="admin-input" placeholder="LEAGUE, FINALS">
+                    </div>
+
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2 pt-2">
+
+                    <button
+                        type="button"
+                        onclick="closeScheduleEditor()"
+                        class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-black uppercase text-xs transition">
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-black uppercase text-xs transition">
+                        Save Schedule Changes
+                    </button>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- HALL OF FAME EDITOR MODAL -->
+    <!-- ========================================================= -->
+    <div id="recordEditorModal" class="admin-modal hidden">
+        <div class="admin-modal-backdrop" onclick="closeRecordEditor()"></div>
+
+        <div class="admin-modal-card max-w-2xl">
+
+            <div class="flex items-start justify-between gap-4 mb-6">
+                <div>
+                    <span class="text-[9px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100">
+                        History Editor
+                    </span>
+                    <h3 class="text-xl font-black italic uppercase text-slate-900 mt-3">
+                        Edit Hall of Fame Record
+                    </h3>
+                </div>
+
+                <button type="button" onclick="closeRecordEditor()" class="admin-modal-close">×</button>
+            </div>
+
+            <form action="/admin/update-record" method="POST" class="space-y-4">
+
+                <input type="hidden" name="recordId" id="recordEditId">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                    <div>
+                        <label class="admin-label">Competition Type</label>
+                        <select name="category" id="recordEditCategory" class="admin-input">
+                            <option value="season">Season</option>
+                            <option value="tournament">Tournament</option>
+                            <option value="career">Career / All-Time</option>
+                            <option value="special">Special Award</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="admin-label">Season / Edition</label>
+                        <input name="season" id="recordEditSeason" class="admin-input" placeholder="VSL Season 3">
+                    </div>
+
+                    <div>
+                        <label class="admin-label">Competition / Tournament</label>
+                        <input name="competition" id="recordEditCompetition" class="admin-input" placeholder="VIM Cup">
+                    </div>
+
+                    <div>
+                        <label class="admin-label">Award / Record</label>
+                        <select name="recordType" id="recordEditType" class="admin-input">
+                            <option value="champion">Champion / Winner</option>
+                            <option value="runner_up">Runner-up</option>
+                            <option value="most_goals">Most Goals</option>
+                            <option value="most_assists">Most Assists</option>
+                            <option value="most_saves">Most Saves</option>
+                            <option value="mvp">MVP</option>
+                            <option value="best_manager">Best Manager</option>
+                            <option value="golden_boot">Golden Boot</option>
+                            <option value="golden_glove">Golden Glove</option>
+                            <option value="custom">Custom Record</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <input name="title" id="recordEditTitle" class="admin-input" placeholder="Record title" required>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input name="holder" id="recordEditHolder" class="admin-input" placeholder="Winner / holder" required>
+                    <input name="value" id="recordEditValue" class="admin-input" placeholder="Value" required>
+                </div>
+
+                <textarea name="description" id="recordEditDescription" class="admin-input h-24" placeholder="Optional note..."></textarea>
+
+                <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                    <button type="button" onclick="closeRecordEditor()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-black uppercase text-xs transition">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-xl font-black uppercase text-xs transition">
+                        Save Record Changes
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+<!-- CATEGORY 2: MATCH CENTER -->
+    <!-- ========================================================= -->
+    <section id="section-reports" class="tab-section hidden space-y-8">
+
+        <div class="bg-white p-6 md:p-10 rounded-3xl border border-slate-200 shadow-sm space-y-8">
+
+            <!-- HEADER -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+
+                <div>
+                    <span class="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200">
+                        Match Center
+                    </span>
+
+                    <h2 class="text-2xl font-black italic uppercase text-slate-900 mt-2">
+                        Match Details Editor
+                    </h2>
+
+                    <p class="text-xs text-slate-500 uppercase font-bold tracking-wider mt-1">
+                        Overview • lineups • statistics • MVP
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- MATCH SELECT -->
+            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+
+                <label class="text-xs font-black uppercase text-emerald-600 tracking-wider mb-2 block">
+                    Select Match
+                </label>
+
+                <select
+                    name="matchId"
+                    id="matchEditorSelect"
+                    class="w-full bg-white border border-slate-200 p-3.5 rounded-xl text-slate-900 text-xs outline-none focus:border-emerald-500"
+                    required>
+
+                    <option value="" disabled selected>
+                        Select match to edit...
+                    </option>
+
+                    <% if (typeof matches !== 'undefined') { %>
+
+                        <% matches.forEach(m => { %>
+
+                            <option value="<%= m.id || m._id %>">
+                                <%= m.teamA %> vs <%= m.teamB %> (<%= m.time %>)
+                            </option>
+
+                        <% }) %>
+
+                    <% } %>
+
+                </select>
+
+                <p class="text-[10px] text-slate-400 uppercase font-bold mt-2">
+                    Match selection will control the editor below.
+                </p>
+
+            </div>
+
+
+            <!-- MATCH EDITOR FORM -->
+            <form action="/admin/update-match-details" method="POST" class="space-y-8">
+
+                <input
+                    type="hidden"
+                    name="matchId"
+                    id="hiddenMatchId">
+
+
+                <!-- ================================================= -->
+                <!-- OVERVIEW -->
+                <!-- ================================================= -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-5">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+                            <h3 class="text-xs font-black uppercase text-emerald-600 tracking-wider">
+                                01 • Match Overview
+                            </h3>
+
+                            <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                                Public-facing match information
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+                        <div class="lg:col-span-2">
+
+                            <label class="admin-label">
+                                Match Narrative / Remarks
+                            </label>
+
+                            <textarea
+                                name="narrative"
+                                placeholder="Detailed recap, remarks or match story..."
+                                class="admin-input h-28"></textarea>
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="admin-label">
+                                Highlights Video
+                            </label>
+
+                            <input
+                                name="highlights"
+                                placeholder="YouTube URL"
+                                class="admin-input">
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="admin-label">
+                                Standout Performances
+                            </label>
+
+                            <input
+                                name="standouts"
+                                placeholder="Key individual contributions..."
+                                class="admin-input">
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="admin-label">
+                                Team A Possession %
+                            </label>
+
+                            <input
+                                type="number"
+                                name="possessionA"
+                                min="0"
+                                max="100"
+                                placeholder="50"
+                                class="admin-input">
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="admin-label">
+                                Team B Possession %
+                            </label>
+
+                            <input
+                                type="number"
+                                name="possessionB"
+                                min="0"
+                                max="100"
+                                placeholder="50"
+                                class="admin-input">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- SCORE -->
+                <!-- ================================================= -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+
+                    <div class="mb-5">
+
+                        <h3 class="text-xs font-black uppercase text-emerald-600 tracking-wider">
+                            02 • Final Score
+                        </h3>
+
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                            Match result and team totals
+                        </p>
+
+                    </div>
+
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200">
+
+                            <p class="text-xs font-black text-blue-600 uppercase tracking-wider mb-3">
+                                Team A
+                            </p>
+
+                            <label class="admin-label">
+                                Goals
+                            </label>
+
+                            <input
+                                type="number"
+                                name="goalsA"
+                                min="0"
+                                placeholder="0"
+                                class="admin-input">
+
+                        </div>
+
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200">
+
+                            <p class="text-xs font-black text-red-600 uppercase tracking-wider mb-3">
+                                Team B
+                            </p>
+
+                            <label class="admin-label">
+                                Goals
+                            </label>
+
+                            <input
+                                type="number"
+                                name="goalsB"
+                                min="0"
+                                placeholder="0"
+                                class="admin-input">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- LINEUPS -->
+                <!-- ================================================= -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-6">
+
+                    <div>
+
+                        <h3 class="text-xs font-black uppercase text-emerald-600 tracking-wider">
+                            03 • Starting Lineups
+                        </h3>
+
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                            7 players per side • player selection will use the Market database
+                        </p>
+
+                    </div>
+
+
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+                        <!-- TEAM A -->
+                        <div class="bg-white border border-blue-200 rounded-2xl p-5 space-y-4">
+
+                            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+
+                                <div>
+                                    <p class="text-xs font-black uppercase text-blue-600">
+                                        Team A
+                                    </p>
+
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold">
+                                        Starting XI / 7-player lineup
+                                    </p>
+                                </div>
+
+                                <span class="text-[10px] font-black bg-blue-50 text-blue-600 border border-blue-100 px-2 py-1 rounded-lg">
+                                    7 SLOTS
+                                </span>
+
+                            </div>
+
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                                <div class="sm:col-span-2">
+                                    <label class="admin-label">Goalkeeper</label>
+
+                                    <select
+                                        name="lineupA_gk"
+                                        id="lineupA_gk"
+                                        class="player-select">
+                                        <option value="">Select goalkeeper...</option>
+                                    </select>
+                                </div>
+
+
+                                <div>
+                                    <label class="admin-label">Defender 1</label>
+
+                                    <select
+                                        name="lineupA_def1"
+                                        id="lineupA_def1"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+                                </div>
+
+
+                                <div>
+                                    <label class="admin-label">Defender 2</label>
+
+                                    <select
+                                        name="lineupA_def2"
+                                        id="lineupA_def2"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+                                </div>
+
+
+                                <div>
+                                    <label class="admin-label">Midfielder 1</label>
+
+                                    <select
+                                        name="lineupA_mid1"
+                                        id="lineupA_mid1"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+                                </div>
+
+
+                                <div>
+                                    <label class="admin-label">Midfielder 2</label>
+
+                                    <select
+                                        name="lineupA_mid2"
+                                        id="lineupA_mid2"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+                                </div>
+
+
+                                <div>
+                                    <label class="admin-label">Forward 1</label>
+
+                                    <select
+                                        name="lineupA_fwd1"
+                                        id="lineupA_fwd1"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+                                </div>
+
+
+                                <div>
+                                    <label class="admin-label">Forward 2</label>
+
+                                    <select
+                                        name="lineupA_fwd2"
+                                        id="lineupA_fwd2"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- TEAM B -->
+                        <div class="bg-white border border-red-200 rounded-2xl p-5 space-y-4">
+
+                            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+
+                                <div>
+                                    <p class="text-xs font-black uppercase text-red-600">
+                                        Team B
+                                    </p>
+
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold">
+                                        Starting XI / 7-player lineup
+                                    </p>
+                                </div>
+
+                                <span class="text-[10px] font-black bg-red-50 text-red-600 border border-red-100 px-2 py-1 rounded-lg">
+                                    7 SLOTS
+                                </span>
+
+                            </div>
+
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                                <div class="sm:col-span-2">
+
+                                    <label class="admin-label">
+                                        Goalkeeper
+                                    </label>
+
+                                    <select
+                                        name="lineupB_gk"
+                                        id="lineupB_gk"
+                                        class="player-select">
+                                        <option value="">Select goalkeeper...</option>
+                                    </select>
+
+                                </div>
+
+
+                                <div>
+
+                                    <label class="admin-label">
+                                        Defender 1
+                                    </label>
+
+                                    <select
+                                        name="lineupB_def1"
+                                        id="lineupB_def1"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+
+                                </div>
+
+
+                                <div>
+
+                                    <label class="admin-label">
+                                        Defender 2
+                                    </label>
+
+                                    <select
+                                        name="lineupB_def2"
+                                        id="lineupB_def2"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+
+                                </div>
+
+
+                                <div>
+
+                                    <label class="admin-label">
+                                        Midfielder 1
+                                    </label>
+
+                                    <select
+                                        name="lineupB_mid1"
+                                        id="lineupB_mid1"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+
+                                </div>
+
+
+                                <div>
+
+                                    <label class="admin-label">
+                                        Midfielder 2
+                                    </label>
+
+                                    <select
+                                        name="lineupB_mid2"
+                                        id="lineupB_mid2"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+
+                                </div>
+
+
+                                <div>
+
+                                    <label class="admin-label">
+                                        Forward 1
+                                    </label>
+
+                                    <select
+                                        name="lineupB_fwd1"
+                                        id="lineupB_fwd1"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+
+                                </div>
+
+
+                                <div>
+
+                                    <label class="admin-label">
+                                        Forward 2
+                                    </label>
+
+                                    <select
+                                        name="lineupB_fwd2"
+                                        id="lineupB_fwd2"
+                                        class="player-select">
+                                        <option value="">Select player...</option>
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- OLD COMPATIBILITY LINEUP FIELDS -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <div>
+
+                            <label class="admin-label">
+                                Legacy Team A Lineup
+                            </label>
+
+                            <textarea
+                                name="lineupA"
+                                rows="4"
+                                placeholder="GK:PlayerOne:8.5&#10;DEF:PlayerTwo:7.9"
+                                class="w-full bg-white border border-slate-200 p-3 rounded-xl text-slate-900 text-xs outline-none focus:border-emerald-500 font-mono"></textarea>
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="admin-label">
+                                Legacy Team B Lineup
+                            </label>
+
+                            <textarea
+                                name="lineupB"
+                                rows="4"
+                                placeholder="GK:PlayerThree:8.0&#10;MID:PlayerFour:8.2"
+                                class="w-full bg-white border border-slate-200 p-3 rounded-xl text-slate-900 text-xs outline-none focus:border-emerald-500 font-mono"></textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- PLAYER MATCH STATS -->
+                <!-- ================================================= -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-6">
+
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+
+                        <div>
+
+                            <h3 class="text-xs font-black uppercase text-emerald-600 tracking-wider">
+                                04 • Match Player Statistics
+                            </h3>
+
+                            <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                                Stats for this match only — player database remains the main source of career totals
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                        <!-- TEAM A -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
+
+                            <div class="flex justify-between items-center">
+
+                                <div>
+                                    <p class="text-xs font-black uppercase text-blue-600">
+                                        Team A Players
+                                    </p>
+
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold">
+                                        Goals • assists • saves • rating
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onclick="addStatRow('teamA')"
+                                    class="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded-lg font-bold uppercase border border-blue-200">
+                                    + Player
+                                </button>
+
+                            </div>
+
+                            <div
+                                id="statRows-teamA"
+                                class="space-y-2">
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- TEAM B -->
+                        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
+
+                            <div class="flex justify-between items-center">
+
+                                <div>
+                                    <p class="text-xs font-black uppercase text-red-600">
+                                        Team B Players
+                                    </p>
+
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold">
+                                        Goals • assists • saves • rating
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onclick="addStatRow('teamB')"
+                                    class="text-[10px] bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg font-bold uppercase border border-red-200">
+                                    + Player
+                                </button>
+
+                            </div>
+
+                            <div
+                                id="statRows-teamB"
+                                class="space-y-2">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- MVP -->
+                <!-- ================================================= -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+
+                    <div class="mb-5">
+
+                        <h3 class="text-xs font-black uppercase text-emerald-600 tracking-wider">
+                            05 • Player of the Match
+                        </h3>
+
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                            Select the MVP from the match lineup
+                        </p>
+
+                    </div>
+
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <div>
+
+                            <label class="admin-label">
+                                MVP Player
+                            </label>
+
+                            <select
+                                name="mvpName"
+                                id="mvpSelect"
+                                class="player-select">
+
+                                <option value="">
+                                    Select MVP...
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="admin-label">
+                                MVP Card Image Override
+                            </label>
+
+                            <input
+                                name="mvpCardUrl"
+                                placeholder="Optional image URL"
+                                class="admin-input">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- TEAM TOTALS -->
+                <!-- ================================================= -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+
+                    <div class="mb-5">
+
+                        <h3 class="text-xs font-black uppercase text-emerald-600 tracking-wider">
+                            06 • Match Totals
+                        </h3>
+
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                            Team-level totals for the completed match
+                        </p>
+
+                    </div>
+
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <div class="bg-white p-5 rounded-2xl border border-blue-200 space-y-3">
+
+                            <p class="text-xs font-black text-blue-600 uppercase">
+                                Team A
+                            </p>
+
+                            <input
+                                type="number"
+                                name="assistsA"
+                                min="0"
+                                placeholder="Total Assists"
+                                class="admin-input">
+
+                            <input
+                                type="number"
+                                name="savesA"
+                                min="0"
+                                placeholder="Total Saves"
+                                class="admin-input">
+
+                        </div>
+
+
+                        <div class="bg-white p-5 rounded-2xl border border-red-200 space-y-3">
+
+                            <p class="text-xs font-black text-red-600 uppercase">
+                                Team B
+                            </p>
+
+                            <input
+                                type="number"
+                                name="assistsB"
+                                min="0"
+                                placeholder="Total Assists"
+                                class="admin-input">
+
+                            <input
+                                type="number"
+                                name="savesB"
+                                min="0"
+                                placeholder="Total Saves"
+                                class="admin-input">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SAVE -->
+                <button
+                    type="submit"
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 py-4 rounded-xl font-black uppercase text-xs text-white shadow-sm transition">
+                    Save Complete Match Report
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- CATEGORY 3: TABLES & ROSTER -->
+    <!-- ========================================================= -->
+    <section id="section-tables" class="tab-section hidden space-y-8">
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- LEAGUE TABLES -->
+            <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-8 lg:col-span-3 shadow-sm">
+
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-5">
+
+                    <div>
+                        <span class="text-xs font-black uppercase tracking-widest text-indigo-600 bg-indigo-100 px-3 py-1 rounded-full border border-indigo-200">
+                            Competition Management
+                        </span>
+
+                        <h3 class="text-xl font-black italic uppercase text-slate-900 mt-2">
+                            League Standings & Rosters
+                        </h3>
+
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                            Manage standings manually while keeping team rosters connected to the player database and auction results.
+                        </p>
+                    </div>
+
+
+                    <form
+                        action="/admin/add-group"
+                        method="POST"
+                        class="flex gap-2 w-full sm:w-auto">
+
+                        <input
+                            name="name"
+                            placeholder="New Group / Division"
+                            required
+                            class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-slate-900 outline-none flex-1">
+
+                        <button
+                            type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl text-xs font-bold uppercase text-white transition">
+                            Create
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <% if (typeof groups !== 'undefined' && groups.length > 0) { %>
+
+                    <div class="space-y-8">
+
+                        <% groups.forEach(group => { %>
+
+                            <div class="space-y-6 p-5 border border-slate-200 rounded-2xl bg-slate-50">
+
+                                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-slate-200 pb-3">
+
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-indigo-500">
+                                            Division / Table
+                                        </p>
+                                        <h4 class="text-blue-600 font-black italic uppercase text-lg mt-1">
+                                            <%= group.name %>
+                                        </h4>
+                                    </div>
+
+                                    <form
+                                        action="/admin/delete-group"
+                                        method="POST"
+                                        onsubmit="return confirm('Delete this whole division and its teams? This cannot be undone.');">
+
+                                        <input
+                                            type="hidden"
+                                            name="groupId"
+                                            value="<%= group.id || group._id %>">
+
+                                        <button
+                                            type="submit"
+                                            class="text-red-600 hover:text-red-700 text-[10px] font-bold border border-red-200 px-3 py-1 rounded-full uppercase bg-red-50">
+                                            Delete Division
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+
+                                <div class="space-y-4">
+
+                                    <% (group.teams || []).forEach((team, index) => { %>
+
+                                        <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-4 shadow-sm">
+
+                                            <!-- TEAM TABLE ROW -->
+                                            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3">
+
+                                                <form
+                                                    action="/admin/update-team"
+                                                    method="POST"
+                                                    class="grid grid-cols-2 sm:grid-cols-7 gap-2 items-center text-slate-900 flex-1 w-full">
+
+                                                    <input type="hidden" name="groupId" value="<%= group.id || group._id %>">
+                                                    <input type="hidden" name="teamIndex" value="<%= index %>">
+
+                                                    <div class="flex items-center gap-2 col-span-2 min-w-0">
+                                                        <img
+                                                            src="<%= team.logo %>"
+                                                            class="w-7 h-7 object-contain bg-slate-100 rounded p-0.5 shrink-0">
+
+                                                        <div class="min-w-0">
+                                                            <span class="font-black text-xs truncate block">
+                                                                <%= team.name %>
+                                                            </span>
+                                                            <span class="text-[8px] text-slate-400 uppercase font-bold">
+                                                                Team management
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <span class="table-label">MP</span>
+                                                        <input name="mp" type="number" min="0" value="<%= team.mp || 0 %>" class="table-input">
+                                                    </div>
+
+                                                    <div>
+                                                        <span class="table-label">W</span>
+                                                        <input name="wins" type="number" min="0" value="<%= team.wins || 0 %>" class="table-input">
+                                                    </div>
+
+                                                    <div>
+                                                        <span class="table-label">L</span>
+                                                        <input name="loses" type="number" min="0" value="<%= team.loses || 0 %>" class="table-input">
+                                                    </div>
+
+                                                    <div>
+                                                        <span class="table-label">PTS</span>
+                                                        <input name="pts" type="number" min="0" value="<%= team.pts || 0 %>" class="table-input text-blue-600 font-bold">
+                                                    </div>
+
+                                                    <button
+                                                        type="submit"
+                                                        class="bg-blue-600 hover:bg-blue-700 py-1.5 rounded-lg text-[10px] font-bold uppercase text-white transition col-span-2 sm:col-span-1">
+                                                        Save
+                                                    </button>
+
+                                                </form>
+
+
+                                                <form
+                                                    action="/admin/delete-team"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Delete this team? This cannot be undone.');">
+
+                                                    <input type="hidden" name="groupId" value="<%= group.id || group._id %>">
+                                                    <input type="hidden" name="teamIndex" value="<%= index %>">
+
+                                                    <button
+                                                        type="submit"
+                                                        class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition border border-red-200">
+                                                        Delete
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
+
+
+                                            <!-- ROSTER -->
+                                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+
+                                                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+
+                                                    <div>
+                                                        <p class="text-[9px] font-black uppercase tracking-widest text-indigo-500">
+                                                            Squad Roster
+                                                        </p>
+                                                        <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">
+                                                            Auction winners can be added automatically by the backend later.
+                                                        </p>
+                                                    </div>
+
+                                                    <span class="text-[9px] font-black uppercase text-slate-500 bg-white border border-slate-200 px-2 py-1 rounded-lg">
+                                                        <%= (team.roster || []).length %> Players
+                                                    </span>
+
+                                                </div>
+
+
+                                                <div class="flex flex-wrap gap-2">
+
+                                                    <% (team.roster || []).forEach((player, pIdx) => { %>
+
+                                                        <div class="bg-white px-3 py-2 rounded-lg flex items-center gap-2 border border-slate-200 shadow-sm">
+
+                                                            <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[9px] font-black text-indigo-600">
+                                                                <%= player.name ? player.name.charAt(0).toUpperCase() : 'P' %>
+                                                            </div>
+
+                                                            <span class="text-xs uppercase <%= player.isManager ? 'text-blue-600 font-black' : 'text-slate-700 font-bold' %>">
+                                                                <%= player.isManager ? 'MGR: ' : '' %><%= player.name %>
+                                                            </span>
+
+                                                            <form
+                                                                action="/admin/delete-from-roster"
+                                                                method="POST"
+                                                                onsubmit="return confirm('Remove this player from the team roster?');">
+
+                                                                <input type="hidden" name="groupId" value="<%= group.id || group._id %>">
+                                                                <input type="hidden" name="teamIndex" value="<%= index %>">
+                                                                <input type="hidden" name="playerIndex" value="<%= pIdx %>">
+
+                                                                <button
+                                                                    type="submit"
+                                                                    class="text-red-500 font-bold hover:text-red-700 px-1">
+                                                                    ×
+                                                                </button>
+
+                                                            </form>
+
+                                                        </div>
+
+                                                    <% }) %>
+
+                                                    <% if (!(team.roster || []).length) { %>
+                                                        <p class="text-[10px] text-slate-400 uppercase font-bold py-2">
+                                                            No players currently assigned.
+                                                        </p>
+                                                    <% } %>
+
+                                                </div>
+
+
+                                                <form
+                                                    action="/admin/add-to-roster"
+                                                    method="POST"
+                                                    class="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-2">
+
+                                                    <input type="hidden" name="groupId" value="<%= group.id || group._id %>">
+                                                    <input type="hidden" name="teamIndex" value="<%= index %>">
+
+                                                    <select
+                                                        name="playerId"
+                                                        class="admin-input"
+                                                        required>
+
+                                                        <option value="" disabled selected>
+                                                            Select player from Player DB...
+                                                        </option>
+
+                                                        <% if (typeof players !== 'undefined') { %>
+                                                            <% players.filter(p => p.verified).forEach(p => { %>
+                                                                <option value="<%= p.id || p._id %>">
+                                                                    <%= p.name %> (<%= p.position || 'Player' %>)
+                                                                </option>
+                                                            <% }) %>
+                                                        <% } %>
+
+                                                    </select>
+
+
+                                                    <select
+                                                        name="isManager"
+                                                        class="admin-input">
+
+                                                        <option value="false">Player</option>
+                                                        <option value="true">Manager</option>
+
+                                                    </select>
+
+
+                                                    <button
+                                                        type="submit"
+                                                        class="bg-slate-900 hover:bg-slate-800 px-4 py-2 rounded-lg text-xs font-bold uppercase text-white transition">
+                                                        Add to Roster
+                                                    </button>
+
+                                                </form>
+
+
+                                                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3">
+                                                    <p class="text-[9px] font-black uppercase tracking-wider text-indigo-700">
+                                                        Automatic Auction Integration
+                                                    </p>
+                                                    <p class="text-[10px] text-indigo-600/80 font-semibold mt-1 leading-relaxed">
+                                                        When the auction backend finalizes a winning bid, the player should be linked to this team's roster automatically. Manual roster additions remain available for admin corrections.
+                                                    </p>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    <% }) %>
+
+
+                                    <!-- ADD TEAM -->
+                                    <form
+                                        action="/admin/update-team"
+                                        method="POST"
+                                        class="grid grid-cols-1 sm:grid-cols-3 gap-2 p-4 border border-dashed border-slate-300 rounded-xl bg-white">
+
+                                        <input type="hidden" name="groupId" value="<%= group.id || group._id %>">
+
+                                        <input
+                                            name="teamName"
+                                            required
+                                            placeholder="New Team Name"
+                                            class="bg-slate-50 p-2.5 rounded-lg text-xs text-slate-900 border border-slate-200 outline-none">
+
+                                        <input
+                                            name="logo"
+                                            placeholder="Logo Image URL"
+                                            class="bg-slate-50 p-2.5 rounded-lg text-xs text-slate-900 border border-slate-200 outline-none">
+
+                                        <button
+                                            type="submit"
+                                            class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase rounded-lg py-2 transition">
+                                            Add Team
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        <% }) %>
+
+                    </div>
+
+                <% } else { %>
+
+                    <div class="py-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                        <p class="text-xs text-slate-400 uppercase font-bold tracking-widest">
+                            No divisions created yet
+                        </p>
+                    </div>
+
+                <% } %>
+
+            </div>
+
+        </div>
+
+    </section>
+<!-- CATEGORY 4: VERIFICATION QUEUE -->
+    <!-- ========================================================= -->
+    <section id="section-queue" class="tab-section hidden space-y-8">
+
+        <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 shadow-sm">
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+
+                <div>
+
+                    <span class="text-xs font-black uppercase tracking-widest text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-200">
+                        Registrations
+                    </span>
+
+                    <h2 class="text-2xl font-black italic uppercase text-amber-600 mt-2">
+                        Verification Queue
+                    </h2>
+
+                </div>
+
+
+                <input
+                    type="text"
+                    onkeyup="filterQueue(this)"
+                    placeholder="Filter applications..."
+                    class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl text-xs text-slate-900 outline-none w-full md:w-64 focus:border-amber-500 transition-all">
+
+            </div>
+
+
+            <div class="space-y-3" id="queueList">
+
+                <% let pending = (typeof players !== 'undefined') ? players.filter(p => !p.verified) : []; %>
+
+                <% if (pending.length > 0) { %>
+
+                    <% pending.forEach(player => { %>
+
+                        <details
+                            class="queue-card group bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden hover:border-amber-400 transition">
+
+                            <summary class="p-4 cursor-pointer flex items-center justify-between list-none">
+
+                                <div class="flex items-center gap-4">
+
+                                    <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center font-black italic text-amber-600 uppercase border border-amber-200">
+                                        <%= player.name ? player.name.charAt(0) : 'P' %>
+                                    </div>
+
+                                    <div>
+
+                                        <p class="font-bold text-slate-900 uppercase text-sm">
+                                            <%= player.name %>
+                                        </p>
+
+                                        <p class="text-[11px] text-blue-600 font-medium">
+                                            <%= player.discord %>
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <span class="text-xs font-bold uppercase text-amber-600 group-open:rotate-180 transition-transform">
+                                    Review Details ↓
+                                </span>
+
+                            </summary>
+
+
+                            <div class="p-6 bg-white border-t border-slate-200 space-y-6">
+
+                                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                                    <div class="space-y-4">
+
+                                        <div>
+
+                                            <p class="text-[10px] font-bold uppercase text-slate-500 mb-1">
+                                                User Password
+                                            </p>
+
+                                            <p class="bg-slate-50 p-3 rounded-lg text-xs text-amber-600 font-mono border border-slate-200">
+                                                <%= player.password %>
+                                            </p>
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <p class="text-[10px] font-bold uppercase text-slate-500 mb-1">
+                                                Bio / Notes
+                                            </p>
+
+                                            <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-700 italic border border-slate-200">
+                                                "<%= player.experience || player.bio %>"
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="lg:col-span-2 space-y-4">
+
+                                        <form
+                                            action="/admin/approve-player"
+                                            method="POST"
+                                            class="space-y-4">
+
+                                            <input
+                                                type="hidden"
+                                                name="playerId"
+                                                value="<%= player.id || player._id %>">
+
+                                            <div>
+
+                                                <label class="text-xs font-bold uppercase text-slate-700 block mb-1">
+                                                    Market Card Image URL
+                                                </label>
+
+                                                <input
+                                                    name="cardImage"
+                                                    placeholder="Custom Card URL (Optional)"
+                                                    class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-slate-900 text-xs outline-none focus:border-blue-500">
+
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-xl text-xs font-bold uppercase text-white transition">
+                                                Approve & Verify Player
+                                            </button>
+
+                                        </form>
+
+
+                                        <form
+                                            action="/admin/delete-player"
+                                            method="POST"
+                                            onsubmit="return confirm('Reject application?');">
+
+                                            <input
+                                                type="hidden"
+                                                name="playerId"
+                                                value="<%= player.id || player._id %>">
+
+                                            <button
+                                                type="submit"
+                                                class="w-full bg-red-50 hover:bg-red-100 text-red-600 py-3 rounded-xl text-xs font-bold uppercase transition border border-red-200">
+                                                Reject Application
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </details>
+
+                    <% }) %>
+
+                <% } else { %>
+
+                    <div class="py-10 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+
+                        <p class="text-xs text-slate-400 uppercase font-bold tracking-widest">
+                            No pending registrations
+                        </p>
+
+                    </div>
+
+                <% } %>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- CATEGORY 5: PLAYER MARKET -->
+    <!-- ========================================================= -->
+    <section id="section-market" class="tab-section hidden space-y-8">
+
+        <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 shadow-sm">
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+
+                <div>
+
+                    <span class="text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-100 px-3 py-1 rounded-full border border-blue-200">
+                        Player Database
+                    </span>
+
+                    <h2 class="text-2xl font-black italic uppercase text-slate-900 mt-2">
+                        Verified Player Market
+                    </h2>
+
+                    <p class="text-xs text-slate-500 uppercase font-bold tracking-wider mt-1">
+                        Player profile • career stats • card • bio
+                    </p>
+
+                </div>
+
+
+                <input
+                    type="text"
+                    id="playerSearch"
+                    onkeyup="filterPlayers()"
+                    placeholder="Search players..."
+                    class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl text-xs text-slate-900 outline-none w-full md:w-64 focus:border-blue-500 transition-all">
+
+            </div>
+
+
+            <div
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                id="marketList">
+
+                <% if (typeof players !== 'undefined') { %>
+
+                    <% players.filter(p => p.verified).forEach(player => { %>
+
+                        <% let pId = (player.id || player._id).toString(); %>
+
+                        <details
+                            class="player-card group bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-400 transition"
+                            data-name="<%= (player.name || '').toLowerCase() %>">
+
+                            <summary class="p-4 cursor-pointer flex items-center justify-between list-none">
+
+                                <div class="flex items-center gap-3">
+
+                                    <%
+                                        let adminPreviewImg =
+                                            (player.cardImage &&
+                                            player.cardImage !== 'none' &&
+                                            player.cardImage !== '')
+                                            ? player.cardImage
+                                            : `https://www.roblox.com/headshot-thumbnail/image?userName=${encodeURIComponent(player.name)}&width=420&height=420&format=png`;
+                                    %>
+
+                                    <img
+                                        src="<%= adminPreviewImg %>"
+                                        class="w-10 h-10 rounded-xl object-cover bg-slate-200 border border-slate-300"
+                                        onerror="this.src='https://www.roblox.com/headshot-thumbnail/image?userName=Roblox&width=420&height=420&format=png'">
+
+                                    <div>
+
+                                        <p class="font-bold text-slate-900 uppercase text-sm">
+                                            <%= player.name %>
+                                        </p>
+
+                                        <p class="text-[10px] text-blue-600 font-bold uppercase">
+                                            <%= player.position || 'No Position' %>
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="flex items-center gap-2">
+
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-600 uppercase">
+                                        ID: <%= pId.slice(-4) %>
+                                    </span>
+
+                                    <span class="text-xs font-bold text-slate-400 group-open:rotate-180 transition-transform">
+                                        ↓
+                                    </span>
+
+                                </div>
+
+                            </summary>
+
+
+                            <div class="p-6 bg-white border-t border-slate-200 space-y-6">
+
+                                <!-- SECURITY -->
+                                <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl">
+
+                                    <p class="text-[10px] font-bold uppercase text-amber-700 mb-1">
+                                        User Credentials
+                                    </p>
+
+                                    <div class="flex items-center justify-between gap-3">
+
+                                        <p class="text-xs text-slate-700 font-mono">
+                                            Password:
+                                            <span id="passText-<%= pId %>">
+                                                ••••••••
+                                            </span>
+                                        </p>
+
+                                        <button
+                                            type="button"
+                                            onclick="togglePasswordView('<%= pId %>', '<%= player.password %>')"
+                                            class="text-[10px] font-bold text-amber-700 uppercase hover:underline">
+                                            Toggle
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- PLAYER STATS -->
+                                <form
+                                    action="/admin/update-market-player"
+                                    method="POST"
+                                    class="space-y-5">
+
+                                    <input
+                                        type="hidden"
+                                        name="playerId"
+                                        value="<%= pId %>">
+
+                                    <input
+                                        type="hidden"
+                                        name="username"
+                                        value="<%= player.name %>">
+
+
+                                    <div>
+
+                                        <div class="flex justify-between items-center mb-3">
+
+                                            <div>
+
+                                                <p class="text-xs font-black uppercase text-blue-600">
+                                                    Career Statistics
+                                                </p>
+
+                                                <p class="text-[10px] text-slate-400 uppercase font-bold">
+                                                    Main source for leaderboard data
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="grid grid-cols-2 gap-3">
+
+                                            <div>
+                                                <label class="admin-label">Goals</label>
+
+                                                <input
+                                                    name="goals"
+                                                    type="number"
+                                                    value="<%= player.goals || 0 %>"
+                                                    class="admin-input">
+                                            </div>
+
+
+                                            <div>
+                                                <label class="admin-label">Assists</label>
+
+                                                <input
+                                                    name="assists"
+                                                    type="number"
+                                                    value="<%= player.assists || 0 %>"
+                                                    class="admin-input">
+                                            </div>
+
+
+                                            <div>
+                                                <label class="admin-label">Saves</label>
+
+                                                <input
+                                                    name="saves"
+                                                    type="number"
+                                                    value="<%= player.saves || 0 %>"
+                                                    class="admin-input">
+                                            </div>
+
+
+                                            <div>
+                                                <label class="admin-label">MVPs</label>
+
+                                                <input
+                                                    name="mvps"
+                                                    type="number"
+                                                    value="<%= player.mvps || 0 %>"
+                                                    class="admin-input">
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- CARD -->
+                                    <div>
+
+                                        <label class="admin-label">
+                                            Custom Card Image URL
+                                        </label>
+
+                                        <input
+                                            name="cardImage"
+                                            value="<%= player.cardImage || '' %>"
+                                            placeholder="Roblox Headshot Default"
+                                            class="admin-input">
+
+                                    </div>
+
+
+                                    <!-- BIO -->
+                                    <div>
+
+                                        <label class="admin-label">
+                                            Player Bio
+                                        </label>
+
+                                        <textarea
+                                            name="bio"
+                                            class="admin-input h-24"><%= player.bio || '' %></textarea>
+
+                                    </div>
+
+
+                                    <!-- SAVE / DELETE -->
+                                    <div class="flex gap-2 pt-2">
+
+                                        <button
+                                            type="submit"
+                                            class="flex-1 bg-blue-600 hover:bg-blue-700 py-3 rounded-xl font-bold uppercase text-xs text-white transition">
+                                            Save Player
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onclick="triggerDelete('<%= pId %>')"
+                                            class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-3 rounded-xl text-xs font-bold uppercase transition border border-red-200">
+                                            Delete
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+                        </details>
+
+                    <% }) %>
+
+                <% } %>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- CATEGORY 6: AUCTION CONTROL -->
+    <!-- ========================================================= -->
+    <section id="section-auction" class="tab-section hidden space-y-8">
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- SESSION CONTROL -->
+            <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 lg:col-span-1 shadow-sm">
+
+                <div>
+                    <span class="text-xs font-black uppercase tracking-widest text-purple-600 bg-purple-100 px-3 py-1 rounded-full border border-purple-200">
+                        Auction Session
+                    </span>
+
+                    <h2 class="text-xl font-black italic uppercase text-slate-900 mt-2">
+                        Auction Control
+                    </h2>
+
+                    <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                        One league-wide auction session. No separate team clocks.
+                    </p>
+                </div>
+
+
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+
+                    <div class="flex justify-between items-center gap-3">
+
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                Current Session
+                            </p>
+
+                            <p class="text-sm font-black uppercase text-slate-900 mt-1">
+                                <%= typeof auctionSession !== 'undefined' && auctionSession && auctionSession.name ? auctionSession.name : 'Auction Session' %>
+                            </p>
+                        </div>
+
+                        <%
+                            let auctionStatus =
+                                (typeof auctionSession !== 'undefined' && auctionSession && auctionSession.status)
+                                    ? String(auctionSession.status).toLowerCase()
+                                    : 'idle';
+                        %>
+
+                        <% if (auctionStatus === 'live' || auctionStatus === 'active') { %>
+                            <span class="text-[9px] font-black uppercase text-red-600 bg-red-50 border border-red-100 px-2 py-1 rounded-lg animate-pulse">
+                                LIVE
+                            </span>
+                        <% } else if (auctionStatus === 'ended' || auctionStatus === 'closed') { %>
+                            <span class="text-[9px] font-black uppercase text-slate-500 bg-slate-100 border border-slate-200 px-2 py-1 rounded-lg">
+                                ENDED
+                            </span>
+                        <% } else { %>
+                            <span class="text-[9px] font-black uppercase text-amber-600 bg-amber-50 border border-amber-100 px-2 py-1 rounded-lg">
+                                READY
+                            </span>
+                        <% } %>
+
+                    </div>
+
+
+                    <div class="grid grid-cols-2 gap-3 mt-4">
+
+                        <div class="bg-white rounded-xl border border-slate-200 p-3">
+                            <p class="text-[8px] font-black uppercase text-slate-400">Teams</p>
+                            <p class="text-lg font-black text-purple-600 mt-1">
+                                <%= typeof auctionTeams !== 'undefined' ? auctionTeams.length : 0 %>
+                            </p>
+                        </div>
+
+                        <div class="bg-white rounded-xl border border-slate-200 p-3">
+                            <p class="text-[8px] font-black uppercase text-slate-400">Max Squad</p>
+                            <p class="text-lg font-black text-purple-600 mt-1">
+                                <%= typeof auctionSession !== 'undefined' && auctionSession && auctionSession.maxRosterSize ? auctionSession.maxRosterSize : 7 %>
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SESSION SETTINGS -->
+                <form action="/admin/auction/update-session" method="POST" class="space-y-4">
+
+                    <div>
+                        <label class="admin-label">Session Name</label>
+                        <input
+                            name="name"
+                            value="<%= typeof auctionSession !== 'undefined' && auctionSession ? (auctionSession.name || '') : '' %>"
+                            placeholder="e.g. VSL Season 3 Auction"
+                            class="admin-input">
+                    </div>
+
+                    <div>
+                        <label class="admin-label">Maximum Final Squad Size</label>
+                        <input
+                            type="number"
+                            name="maxRosterSize"
+                            min="1"
+                            max="50"
+                            value="<%= typeof auctionSession !== 'undefined' && auctionSession && auctionSession.maxRosterSize ? auctionSession.maxRosterSize : 7 %>"
+                            class="admin-input"
+                            required>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase mt-1.5">
+                            If a team wins more players than this, its manager will choose which players become the final roster.
+                        </p>
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="w-full bg-slate-900 hover:bg-slate-800 py-3 rounded-xl font-bold uppercase text-xs text-white transition">
+                        Save Session Settings
+                    </button>
+
+                </form>
+
+
+                <!-- START / END -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+                    <form
+                        action="/admin/auction/start"
+                        method="POST"
+                        onsubmit="return confirm('Start the auction session now for all enrolled teams?');">
+
+                        <button
+                            type="submit"
+                            class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
+                            ▶ Start Auction
+                        </button>
+
+                    </form>
+
+                    <form
+                        action="/admin/auction/end"
+                        method="POST"
+                        onsubmit="return confirm('End the auction session now? This will begin roster finalization for teams over the squad limit.');">
+
+                        <button
+                            type="submit"
+                            class="w-full bg-red-600 hover:bg-red-700 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
+                            ■ End Auction
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <div class="bg-purple-50 border border-purple-100 rounded-2xl p-4">
+                    <p class="text-[9px] font-black uppercase tracking-wider text-purple-700">
+                        How this works
+                    </p>
+                    <p class="text-[10px] text-purple-600/80 font-semibold mt-1 leading-relaxed">
+                        All enrolled teams share the same auction state. Admin starts and ends the session whenever needed. There are no individual team start/end times.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- TEAM SETUP -->
+            <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 lg:col-span-2 shadow-sm">
+
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-200 pb-4">
+
+                    <div>
+                        <span class="text-xs font-black uppercase tracking-widest text-purple-600 bg-purple-100 px-3 py-1 rounded-full border border-purple-200">
+                            Auction Teams
+                        </span>
+
+                        <h3 class="text-xl font-black italic uppercase text-slate-900 mt-1">
+                            Enrolled Teams
+                        </h3>
+
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                            Assign manager + starting budget. Auction timing is controlled by the session above.
+                        </p>
+                    </div>
+
+                    <span class="text-[10px] font-black text-purple-600 bg-purple-50 border border-purple-100 px-2 py-1 rounded-lg">
+                        <%= typeof auctionTeams !== 'undefined' ? auctionTeams.length : 0 %> ENROLLED
+                    </span>
+
+                </div>
+
+
+                <!-- ADD / UPDATE TEAM -->
+                <form
+                    action="/admin/add-auction-team"
+                    method="POST"
+                    class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+                        <div>
+                            <label class="admin-label">Select Team</label>
+                            <select name="teamName" class="admin-input" required>
+                                <option value="" disabled selected>Select an active team...</option>
+
+                                <% if (typeof groups !== 'undefined') { %>
+                                    <% groups.forEach(g => { %>
+                                        <% (g.teams || []).forEach(t => { %>
+                                            <option value="<%= t.name %>">
+                                                <%= t.name %> (<%= g.name %>)
+                                            </option>
+                                        <% }) %>
+                                    <% }) %>
+                                <% } %>
+
+                            </select>
+                        </div>
+
+
+                        <div>
+                            <label class="admin-label">Starting Budget</label>
+                            <input
+                                type="number"
+                                name="budget"
+                                min="0"
+                                placeholder="e.g. 100000000"
+                                class="admin-input"
+                                required>
+                        </div>
+
+
+                        <div>
+                            <label class="admin-label">Assign Manager</label>
+
+                            <select
+                                name="managerName"
+                                id="managerSelect"
+                                class="admin-input"
+                                required>
+
+                                <option value="" disabled selected>
+                                    Choose assigned manager...
+                                </option>
+
+                                <% if (typeof players !== 'undefined') { %>
+                                    <% players.filter(p => p.verified).forEach(p => { %>
+                                        <option
+                                            value="<%= p.name %>"
+                                            data-search="<%= (p.name || '').toLowerCase() %>">
+                                            <%= p.name %> (<%= p.position || 'Player' %>)
+                                        </option>
+                                    <% }) %>
+                                <% } %>
+
+                            </select>
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-xl font-bold uppercase text-xs text-white transition shadow-sm">
+                        Enroll Team in Auction
+                    </button>
+
+                </form>
+
+
+                <!-- ACTIVE AUCTION TEAMS -->
+                <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    id="auctionTeamsList">
+
+                    <% if (typeof auctionTeams !== 'undefined' && auctionTeams.length > 0) { %>
+
+                        <% auctionTeams.forEach(aTeam => { %>
+
+                            <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-4 relative">
+
+                                <div class="flex justify-between items-start gap-3">
+
+                                    <div>
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-purple-500">
+                                            Auction Participant
+                                        </p>
+
+                                        <h4 class="font-black italic uppercase text-slate-900 text-base mt-1">
+                                            <%= aTeam.name %>
+                                        </h4>
+
+                                        <p class="text-[11px] font-bold text-purple-600 uppercase mt-1">
+                                            Manager: <%= aTeam.manager || 'Unassigned' %>
+                                        </p>
+                                    </div>
+
+
+                                    <form
+                                        action="/admin/delete-auction-team"
+                                        method="POST"
+                                        onsubmit="return confirm('Remove this team from the auction session? This does not delete the actual league team.');">
+
+                                        <input
+                                            type="hidden"
+                                            name="teamId"
+                                            value="<%= aTeam.id || aTeam._id %>">
+
+                                        <button
+                                            class="text-red-600 hover:text-red-700 text-[9px] font-black uppercase px-2 py-1 bg-red-50 border border-red-100 rounded-lg">
+                                            Remove
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+
+                                <div class="grid grid-cols-2 gap-2">
+
+                                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                                        <p class="text-[8px] font-black uppercase text-slate-400">
+                                            Budget
+                                        </p>
+                                        <p class="text-sm font-black text-emerald-600 font-mono mt-1">
+                                            $<%= Number(aTeam.budget || 0).toLocaleString() %>
+                                        </p>
+                                    </div>
+
+                                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                                        <p class="text-[8px] font-black uppercase text-slate-400">
+                                            Won
+                                        </p>
+                                        <p class="text-sm font-black text-purple-600 mt-1">
+                                            <%= Array.isArray(aTeam.wonPlayers) ? aTeam.wonPlayers.length : (Array.isArray(aTeam.roster) ? aTeam.roster.length : 0) %>
+                                        </p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
+
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[9px] font-black uppercase text-slate-400">
+                                            Session State
+                                        </span>
+
+                                        <%
+                                            const teamAuctionStatus =
+                                                (aTeam.status || auctionStatus || 'ready').toString().toLowerCase();
+                                        %>
+
+                                        <% if (teamAuctionStatus === 'live' || teamAuctionStatus === 'active') { %>
+                                            <span class="text-[9px] font-black uppercase text-red-600">
+                                                LIVE
+                                            </span>
+                                        <% } else if (teamAuctionStatus === 'ended' || teamAuctionStatus === 'closed') { %>
+                                            <span class="text-[9px] font-black uppercase text-slate-500">
+                                                ENDED
+                                            </span>
+                                        <% } else { %>
+                                            <span class="text-[9px] font-black uppercase text-amber-600">
+                                                READY
+                                            </span>
+                                        <% } %>
+                                    </div>
+
+                                    <div class="h-px bg-slate-100"></div>
+
+                                    <p class="text-[9px] text-slate-400 font-bold uppercase leading-relaxed">
+                                        This team follows the global auction session. Individual start/end clocks are intentionally removed.
+                                    </p>
+
+                                </div>
+
+
+                                <!-- OVER-LIMIT NOTICE -->
+                                <% 
+                                    const wonCount =
+                                        Array.isArray(aTeam.wonPlayers)
+                                            ? aTeam.wonPlayers.length
+                                            : (Array.isArray(aTeam.roster) ? aTeam.roster.length : 0);
+
+                                    const maxRoster =
+                                        (typeof auctionSession !== 'undefined' && auctionSession && auctionSession.maxRosterSize)
+                                            ? Number(auctionSession.maxRosterSize)
+                                            : 7;
+                                %>
+
+                                <% if (wonCount > maxRoster) { %>
+
+                                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+
+                                        <div>
+                                            <p class="text-[9px] font-black uppercase tracking-wider text-amber-700">
+                                                Squad Selection Required
+                                            </p>
+
+                                            <p class="text-[10px] text-amber-600/90 font-semibold mt-1">
+                                                This team has <strong><%= wonCount %></strong> auction wins but can finish with only <strong><%= maxRoster %></strong> players.
+                                            </p>
+                                        </div>
+
+                                        <form action="/admin/auction/finalize-roster" method="POST" class="space-y-3">
+
+                                            <input
+                                                type="hidden"
+                                                name="teamId"
+                                                value="<%= aTeam.id || aTeam._id %>">
+
+                                            <div class="space-y-2">
+
+                                                <% if (Array.isArray(aTeam.wonPlayers)) { %>
+
+                                                    <% aTeam.wonPlayers.forEach((player, playerIndex) => { %>
+
+                                                        <label class="flex items-center gap-3 bg-white border border-amber-100 rounded-lg p-2.5 cursor-pointer hover:border-amber-300 transition">
+
+                                                            <input
+                                                                type="checkbox"
+                                                                name="selectedPlayers[]"
+                                                                value="<%= player.id || player._id || player.playerId || player.name %>"
+                                                                class="w-4 h-4 accent-amber-500"
+                                                                <%= playerIndex < maxRoster ? 'checked' : '' %>>
+
+                                                            <span class="text-[10px] font-black uppercase text-slate-700">
+                                                                <%= player.name || player %>
+                                                            </span>
+
+                                                        </label>
+
+                                                    <% }) %>
+
+                                                <% } else { %>
+
+                                                    <p class="text-[10px] text-slate-400 uppercase font-bold">
+                                                        Auction winners will appear here once the backend exposes them.
+                                                    </p>
+
+                                                <% } %>
+
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                class="w-full bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg text-[10px] font-black uppercase transition">
+                                                Finalize Selected Roster
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                <% } else if (wonCount > 0) { %>
+
+                                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3">
+                                        <p class="text-[9px] font-black uppercase tracking-wider text-emerald-700">
+                                            Roster Can Finalize Automatically
+                                        </p>
+                                        <p class="text-[10px] text-emerald-600/80 font-semibold mt-1">
+                                            <%= wonCount %> player(s) won • limit is <%= maxRoster %>. No manager selection is required.
+                                        </p>
+                                    </div>
+
+                                <% } %>
+
+                            </div>
+
+                        <% }) %>
+
+                    <% } else { %>
+
+                        <div class="col-span-full py-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+
+                            <p class="text-xs text-slate-400 uppercase font-bold tracking-widest">
+                                No teams added to the auction yet
+                            </p>
+
+                        </div>
+
+                    <% } %>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+<!-- SHARED ADMIN STYLES -->
+<!-- ============================================================= -->
+<style>
+
+    .admin-label {
+        display: block;
+        margin-bottom: 0.3rem;
+        font-size: 10px;
+        line-height: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: rgb(100 116 139);
+    }
+
+    .admin-input {
+        width: 100%;
+        background: rgb(248 250 252);
+        border: 1px solid rgb(226 232 240);
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        color: rgb(15 23 42);
+        font-size: 0.75rem;
+        outline: none;
+        transition: all 0.15s ease;
+    }
+
+    .admin-input:focus {
+        border-color: rgb(59 130 246);
+        background: white;
+    }
+
+    .player-select {
+        width: 100%;
+        background: rgb(248 250 252);
+        border: 1px solid rgb(226 232 240);
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        color: rgb(15 23 42);
+        font-size: 0.75rem;
+        outline: none;
+        transition: all 0.15s ease;
+    }
+
+    .player-select:focus {
+        border-color: rgb(16 185 129);
+        background: white;
+    }
+
+    .table-label {
+        font-size: 9px;
+        color: rgb(148 163 184);
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .table-input {
+        width: 100%;
+        background: rgb(248 250 252);
+        border: 1px solid rgb(226 232 240);
+        border-radius: 0.25rem;
+        padding: 0.375rem;
+        color: rgb(15 23 42);
+        text-align: center;
+        font-size: 0.75rem;
+        outline: none;
+    }
+
+    .table-input:focus {
+        border-color: rgb(59 130 246);
+        background: white;
+    }
+
+    /* =========================================================
+       ADMIN MODALS
+       ========================================================= */
+
+    .admin-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 200000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .admin-modal.hidden {
+        display: none;
+    }
+
+    .admin-modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .admin-modal-card {
+        position: relative;
+        width: 100%;
+        max-height: calc(100vh - 2rem);
+        overflow-y: auto;
+        background: white;
+        border: 1px solid rgb(226 232 240);
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 30px 90px rgba(15, 23, 42, 0.25);
+        animation: adminModalIn 0.22s ease-out;
+    }
+
+    .admin-modal-close {
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgb(226 232 240);
+        background: rgb(248 250 252);
+        color: rgb(100 116 139);
+        border-radius: 10px;
+        font-size: 20px;
+        line-height: 1;
+        font-weight: 900;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .admin-modal-close:hover {
+        background: rgb(241 245 249);
+        color: rgb(15 23 42);
+        transform: scale(1.04);
+    }
+
+    @keyframes adminModalIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .admin-modal {
+            padding: 0.6rem;
+            align-items: flex-end;
+        }
+
+        .admin-modal-card {
+            max-height: calc(100vh - 1.2rem);
+            border-radius: 1.25rem;
+            padding: 1.1rem;
+        }
+    }
+
+</style>
+
+
+<!-- ============================================================= -->
+<!-- ADMIN JAVASCRIPT -->
+<!-- ============================================================= -->
+<script>
+
+    /* ============================================================
+       HELPER FUNCTIONS & SCHEDULE EDITOR
+    ============================================================ */
+
+    function pad(number) {
+        return String(number).padStart(2, '0');
+    }
+
+    function toDateTimeLocalValue(dateInput) {
+        if (!dateInput) return '';
+        const date = new Date(dateInput);
+        if (Number.isNaN(date.getTime())) return '';
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    function openScheduleEditor(button) {
+        const card = button.closest('.schedule-card');
+        if (!card) return;
+        const modal = document.getElementById('scheduleEditorModal');
+        if (!modal) return;
+        document.getElementById('scheduleEditId').value = card.dataset.matchId || '';
+        document.getElementById('scheduleEditTeamA').value = card.dataset.teamA || '';
+        document.getElementById('scheduleEditTeamB').value = card.dataset.teamB || '';
+        document.getElementById('scheduleEditLogoA').value = card.dataset.logoA || '';
+        document.getElementById('scheduleEditLogoB').value = card.dataset.logoB || '';
+        document.getElementById('scheduleEditTime').value = toDateTimeLocalValue(card.dataset.time || '');
+        document.getElementById('scheduleEditTags').value = card.dataset.tags || '';
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeScheduleEditor() {
+        const modal = document.getElementById('scheduleEditorModal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    /* ============================================================ HALL OF FAME EDITOR ============================================================ */
+    function openRecordEditor(button) {
+        const modal = document.getElementById('recordEditorModal');
+        if (!modal) return;
+        document.getElementById('recordEditId').value = button.dataset.recordId || '';
+        document.getElementById('recordEditTitle').value = button.dataset.title || '';
+        document.getElementById('recordEditHolder').value = button.dataset.holder || '';
+        document.getElementById('recordEditValue').value = button.dataset.value || '';
+        document.getElementById('recordEditCategory').value = button.dataset.category || 'season';
+        document.getElementById('recordEditSeason').value = button.dataset.season || '';
+        document.getElementById('recordEditCompetition').value = button.dataset.competition || '';
+        document.getElementById('recordEditType').value = button.dataset.recordType || 'custom';
+        document.getElementById('recordEditDescription').value = button.dataset.description || '';
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeRecordEditor() {
+        const modal = document.getElementById('recordEditorModal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    /* ============================================================ LOCAL TIME DISPLAY ============================================================ */
+    function formatVimLocalTimes() {
+        const elements = document.querySelectorAll('[data-vim-datetime]');
+        elements.forEach(element => {
+            const raw = element.getAttribute('data-vim-datetime');
+            if (!raw) return;
+            const date = new Date(raw);
+            if (Number.isNaN(date.getTime())) {
+                return;
+            }
+            element.textContent = date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+        });
+    }
+
+    /* ============================================================ MATCH CENTER HELPERS ============================================================ */
+    function clearMatchEditor() {
+        const form = document.querySelector( 'form[action="/admin/update-match-details"]' );
+        if (!form) return;
+        form.reset();
+        const hiddenId = document.getElementById('hiddenMatchId');
+        if (hiddenId) {
+            hiddenId.value = '';
+        }
+        document .querySelectorAll('.player-select') .forEach(select => {
+            select.value = '';
+        });
+        document .querySelectorAll('[id^="statRows-"]') .forEach(container => {
+            container.innerHTML = '';
+        });
+    }
+
+    /* ============================================================ SAFETY: CLOSE MODALS WITH ESCAPE ============================================================ */
+    document.addEventListener('keydown', function(event) {
+        if (event.key !== 'Escape') return;
+        closeScheduleEditor();
+        closeRecordEditor();
+    });
+
+    /* ============================================================ ADMIN INITIALIZATION ============================================================ */
+    document.addEventListener('DOMContentLoaded', function() {
+        formatVimLocalTimes();
+        const defaultTab = document.querySelector('.tab-section:not(.hidden)');
+        if (!defaultTab) {
+            switchTab('broadcast');
+        }
+    });
+
+    /* ============================================================
+       TAB SWITCHING
+    ============================================================ */
+
+    function switchTab(tabName) {
+
+        const sections = document.querySelectorAll('.tab-section');
+
+        sections.forEach(section => {
+            section.classList.add('hidden');
+        });
+
+
+        const tabs = document.querySelectorAll('.tab-btn');
+
+        tabs.forEach(tab => {
+
+            tab.classList.remove(
+                'bg-blue-600',
+                'text-white',
+                'border-blue-600',
+                'shadow-md'
+            );
+
+            tab.classList.add(
+                'bg-white',
+                'text-slate-700',
+                'border-slate-200'
+            );
+
+        });
+
+
+        const activeSection = document.getElementById(`section-${tabName}`);
+
+        if (activeSection) {
+            activeSection.classList.remove('hidden');
+        }
+
+
+        const activeTab = document.getElementById(`tab-${tabName}`);
+
+        if (activeTab) {
+
+            activeTab.classList.remove(
+                'bg-white',
+                'text-slate-700',
+                'border-slate-200'
+            );
+
+            activeTab.classList.add(
+                'bg-blue-600',
+                'text-white',
+                'border-blue-600',
+                'shadow-md'
+            );
+
+        }
+
+    }
+
+
+    /* ============================================================
+       PASSWORD VIEW
+    ============================================================ */
+
+    function togglePasswordView(id, actualPass) {
+
+        const textElement =
+            document.getElementById(`passText-${id}`);
+
+        if (!textElement) return;
+
+
+        if (textElement.innerText === '••••••••') {
+
+            textElement.innerText = actualPass;
+
+        } else {
+
+            textElement.innerText = '••••••••';
+
+        }
+
+    }
+
+
+    /* ============================================================
+       DELETE PLAYER
+    ============================================================ */
+
+    function triggerDelete(id) {
+
+        if (!confirm('PERMANENTLY DELETE THIS PLAYER FROM THE MARKET?')) {
+            return;
+        }
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/admin/delete-player';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'playerId';
+        input.value = id;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+
+    }
+
+</script>

@@ -1,0 +1,102 @@
+/* Base Theme Variables */
+:root {
+    --primary: #00f2ff; /* Neon Blue */
+    --secondary: #7000ff; /* Purple */
+    --bg: #0b0b0e;
+    --bg-gradient: radial-gradient(circle at top right, #1a1a2e, #0b0b0e);
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    --input-bg: rgba(0, 0, 0, 0.4);
+    --input-border: rgba(255, 255, 255, 0.12);
+}
+
+/* Light Mode Overrides */
+[data-theme="light"] {
+    --bg: #f8fafc;
+    --bg-gradient: radial-gradient(circle at top right, #e2e8f0, #f8fafc);
+    --card-bg: #ffffff;
+    --card-border: rgba(0, 0, 0, 0.08);
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --input-bg: #f1f5f9;
+    --input-border: #cbd5e1;
+}
+
+body {
+    background-color: var(--bg);
+    background-image: var(--bg-gradient);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Glassmorphism Card Style */
+.card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Form Controls */
+.custom-input {
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-main);
+    transition: border-color 0.2s ease, background-color 0.3s ease;
+}
+
+.custom-input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+/* Navigation & Ticker */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%;
+    background: rgba(0, 0, 0, 0.6);
+    border-bottom: 1px solid var(--primary);
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--primary);
+    text-shadow: 0 0 10px var(--primary);
+}
+
+.ticker-wrap {
+    background: linear-gradient(90deg, var(--secondary), var(--primary));
+    padding: 8px 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.btn-join {
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    border: none;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-join:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 20px var(--primary);
+}

@@ -1,0 +1,333 @@
+<%- include('partials/navbar') %>
+
+<style>
+    /* Clean Light Glass Canvas */
+    .bg-vim-canvas {
+        background-color: #f8fafc;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(241, 245, 249, 0.9) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(226, 232, 240, 0.6) 0px, transparent 50%);
+        background-attachment: fixed;
+    }
+
+    /* Glass Cards */
+    .vim-glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .vim-glass-card:hover {
+        background: rgba(255, 255, 255, 0.9);
+        border-color: rgba(203, 213, 225, 1);
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Spotlight Glow Card */
+    .spotlight-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.85));
+        border: 1.5px solid rgba(15, 23, 42, 0.15);
+        box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Story Bubble Border Glow */
+    .story-ring {
+        background: linear-gradient(135deg, #0f172a, #64748b);
+        padding: 2px;
+    }
+
+    /* Tab Pill Active State */
+    .tab-pill {
+        color: #64748b;
+        transition: all 0.2s ease;
+    }
+    .tab-pill:hover {
+        color: #0f172a;
+        background: rgba(255, 255, 255, 0.8);
+    }
+    .tab-pill.active {
+        background: #0f172a;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+</style>
+
+<div class="min-h-screen bg-vim-canvas text-slate-900 font-sans pb-24">
+    <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto">
+
+        <!-- HEADER -->
+        <div class="flex flex-col items-center mb-10 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-200/60 border border-slate-300/50 mb-3">
+                <span class="w-2 h-2 rounded-full bg-slate-900 animate-pulse"></span>
+                <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-700">VIM Match Centre</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black uppercase tracking-tight text-slate-900 mb-2">
+                MATCH<span class="text-slate-400 font-light">ES</span>
+            </h1>
+            <p class="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Gameweek Hub & Live Stories</p>
+        </div>
+
+        <!-- MATCH STORIES CAROUSEL -->
+        <div class="mb-12">
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-800">Match Stories & Highlights</span>
+                    <span class="px-2 py-0.5 rounded-full bg-slate-200 text-[9px] font-extrabold text-slate-700">NEW</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 overflow-x-auto pb-4 no-scrollbar">
+                <% if(typeof stories !== 'undefined' && stories && stories.length > 0) { %>
+                    <% stories.forEach(story => { %>
+                        <button onclick="openStoryModal('<%= story.title %>', '<%= story.mediaUrl %>', '<%= story.matchId %>')" class="flex-shrink-0 flex flex-col items-center gap-2 group">
+                            <div class="story-ring rounded-full">
+                                <div class="w-16 h-16 rounded-full overflow-hidden bg-slate-100 border-2 border-white p-0.5">
+                                    <img src="<%= story.thumbUrl || 'https://via.placeholder.com/100/f1f5f9/475569?text=VIM' %>" class="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-300">
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-700 truncate max-w-[70px] uppercase"><%= story.title %></span>
+                        </button>
+                    <% }) %>
+                <% } else { %>
+                    <!-- Fallback Placeholder Stories -->
+                    <button onclick="openStoryModal(' derby preview ', 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600', '#')" class="flex-shrink-0 flex flex-col items-center gap-2 group">
+                        <div class="story-ring rounded-full">
+                            <div class="w-16 h-16 rounded-full overflow-hidden bg-slate-100 border-2 border-white p-0.5">
+                                <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=150" class="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-300">
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-700 truncate max-w-[80px] uppercase">Derby Day</span>
+                    </button>
+                    <button onclick="openStoryModal('Top 5 Goals', 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=600', '#')" class="flex-shrink-0 flex flex-col items-center gap-2 group">
+                        <div class="story-ring rounded-full">
+                            <div class="w-16 h-16 rounded-full overflow-hidden bg-slate-100 border-2 border-white p-0.5">
+                                <img src="https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=150" class="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-300">
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-700 truncate max-w-[80px] uppercase">Best Goals</span>
+                    </button>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- CATEGORY NAVIGATION TABS -->
+        <div class="flex items-center justify-between gap-4 mb-8 p-1.5 rounded-2xl bg-white/60 border border-slate-200 backdrop-blur-md">
+            <div class="flex items-center gap-1 w-full overflow-x-auto">
+                <button onclick="filterCategory('all')" id="tab-all" class="tab-pill active px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">All Matches</button>
+                <button onclick="filterCategory('live')" id="tab-live" class="tab-pill px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                    <span>Live Now</span>
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                </button>
+                <button onclick="filterCategory('upcoming')" id="tab-upcoming" class="tab-pill px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">Upcoming</button>
+                <button onclick="filterCategory('completed')" id="tab-completed" class="tab-pill px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">Results</button>
+            </div>
+        </div>
+
+        <% 
+            let spotlightMatch = matches ? matches.find(m => m.isToday || m.status === 'live') : null;
+            let liveMatches = matches ? matches.filter(m => m.status === 'live') : [];
+            let upcomingMatches = matches ? matches.filter(m => m.status !== 'completed' && m.status !== 'live') : [];
+            let completedMatches = matches ? matches.filter(m => m.status === 'completed') : [];
+        %>
+
+        <!-- TODAY / SPOTLIGHT MATCH BANNER -->
+        <% if(spotlightMatch) { %>
+            <div class="mb-12 match-section-spotlight">
+                <div class="flex items-center gap-2 mb-3 px-1">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                    <span class="text-xs font-black uppercase tracking-widest text-slate-800">Matchday Spotlight</span>
+                </div>
+                <a href="/match/<%= spotlightMatch.id %>" class="block group">
+                    <div class="spotlight-card rounded-3xl p-6 md:p-10 relative overflow-hidden">
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                            
+                            <!-- Team A -->
+                            <div class="flex-1 flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
+                                <img src="<%= spotlightMatch.logoA %>" onerror="this.onerror=null; this.src='https://via.placeholder.com/120/f1f5f9/475569?text=TEAM+A';" class="w-20 h-20 object-contain">
+                                <div>
+                                    <h2 class="text-2xl font-black uppercase text-slate-900 tracking-tight"><%= spotlightMatch.teamA %></h2>
+                                    <span class="text-xs font-bold text-slate-400 uppercase">Home Squad</span>
+                                </div>
+                            </div>
+
+                            <!-- Score / Status -->
+                            <div class="flex flex-col items-center justify-center my-2 md:my-0">
+                                <% if(spotlightMatch.status === 'completed' && spotlightMatch.details) { %>
+                                    <div class="bg-white border border-slate-200 px-8 py-3 rounded-2xl shadow-sm flex items-center gap-4">
+                                        <span class="text-4xl font-black text-slate-900"><%= spotlightMatch.details.goalsA || 0 %></span>
+                                        <span class="text-slate-300 font-black text-2xl">:</span>
+                                        <span class="text-4xl font-black text-slate-900"><%= spotlightMatch.details.goalsB || 0 %></span>
+                                    </div>
+                                <% } else if(spotlightMatch.status === 'live') { %>
+                                    <div class="bg-red-500 text-white px-6 py-2 rounded-full text-xs font-black tracking-widest uppercase animate-pulse mb-2">
+                                        LIVE NOW
+                                    </div>
+                                    <span class="text-xs font-extrabold text-slate-700 uppercase tracking-widest"><%= spotlightMatch.time || 'IN PLAY' %></span>
+                                <% } else { %>
+                                    <div class="bg-slate-900 text-white px-6 py-2 rounded-2xl text-sm font-black tracking-wider">
+                                        <%= spotlightMatch.time %>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">TODAY'S FIXTURE</span>
+                                <% } %>
+                            </div>
+
+                            <!-- Team B -->
+                            <div class="flex-1 flex flex-col-reverse md:flex-row items-center justify-end gap-4 text-center md:text-right">
+                                <div>
+                                    <h2 class="text-2xl font-black uppercase text-slate-900 tracking-tight"><%= spotlightMatch.teamB %></h2>
+                                    <span class="text-xs font-bold text-slate-400 uppercase">Away Squad</span>
+                                </div>
+                                <img src="<%= spotlightMatch.logoB %>" onerror="this.onerror=null; this.src='https://via.placeholder.com/120/f1f5f9/475569?text=TEAM+B';" class="w-20 h-20 object-contain">
+                            </div>
+
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <% } %>
+
+        <!-- SECTION 1: LIVE MATCHES -->
+        <div id="section-live" class="mb-12 match-category-block">
+            <% if(liveMatches.length > 0) { %>
+                <h2 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 px-1 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Live Matches
+                </h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <% liveMatches.forEach(m => { %>
+                        <%- include('partials/match-card', { m: m }) %>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- SECTION 2: UPCOMING MATCHES -->
+        <div id="section-upcoming" class="mb-12 match-category-block">
+            <h2 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 px-1">Upcoming Gameweek Fixtures</h2>
+            <% if(upcomingMatches.length > 0) { %>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <% upcomingMatches.forEach(m => { %>
+                        <a href="/match/<%= m.id %>" class="group block">
+                            <div class="vim-glass-card p-6 rounded-3xl flex flex-col justify-between h-full">
+                                <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">ID #<%= String(m.id).substring(0,6) %></span>
+                                    <span class="bg-emerald-50 text-emerald-600 border border-emerald-200/60 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">Scheduled</span>
+                                </div>
+                                <div class="flex items-center justify-between gap-4">
+                                    <div class="flex-1 text-center">
+                                        <img src="<%= m.logoA %>" onerror="this.onerror=null; this.src='https://via.placeholder.com/100/f1f5f9/475569?text=TEAM+A';" class="w-16 h-16 mx-auto object-contain mb-2">
+                                        <h3 class="font-extrabold text-sm uppercase text-slate-800 truncate"><%= m.teamA %></h3>
+                                    </div>
+                                    <div class="bg-slate-100 border border-slate-200/80 px-4 py-2 rounded-2xl text-center">
+                                        <span class="text-xs font-black text-slate-800 uppercase tracking-tight"><%= m.time %></span>
+                                    </div>
+                                    <div class="flex-1 text-center">
+                                        <img src="<%= m.logoB %>" onerror="this.onerror=null; this.src='https://via.placeholder.com/100/f1f5f9/475569?text=TEAM+B';" class="w-16 h-16 mx-auto object-contain mb-2">
+                                        <h3 class="font-extrabold text-sm uppercase text-slate-800 truncate"><%= m.teamB %></h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider py-4">No upcoming fixtures scheduled for this gameweek.</p>
+            <% } %>
+        </div>
+
+        <!-- SECTION 3: COMPLETED RESULTS -->
+        <div id="section-completed" class="mb-12 match-category-block">
+            <h2 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 px-1">Gameweek Results</h2>
+            <% if(completedMatches.length > 0) { %>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <% completedMatches.forEach(m => { %>
+                        <% 
+                            let goalsA = m.details ? (m.details.goalsA || 0) : 0;
+                            let goalsB = m.details ? (m.details.goalsB || 0) : 0;
+                        %>
+                        <a href="/match/<%= m.id %>" class="group block">
+                            <div class="vim-glass-card p-6 rounded-3xl flex flex-col justify-between h-full">
+                                <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">FINAL RESULT</span>
+                                    <span class="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">Completed</span>
+                                </div>
+                                <div class="flex items-center justify-between gap-4">
+                                    <div class="flex-1 text-center">
+                                        <img src="<%= m.logoA %>" onerror="this.onerror=null; this.src='https://via.placeholder.com/100/f1f5f9/475569?text=TEAM+A';" class="w-14 h-14 mx-auto object-contain mb-2">
+                                        <h3 class="font-extrabold text-sm uppercase text-slate-800 truncate"><%= m.teamA %></h3>
+                                    </div>
+                                    <div class="bg-white border border-slate-200 px-5 py-2.5 rounded-2xl flex items-center gap-3 shadow-sm">
+                                        <span class="text-2xl font-black text-slate-900"><%= goalsA %></span>
+                                        <span class="text-slate-300 font-bold">-</span>
+                                        <span class="text-2xl font-black text-slate-900"><%= goalsB %></span>
+                                    </div>
+                                    <div class="flex-1 text-center">
+                                        <img src="<%= m.logoB %>" onerror="this.onerror=null; this.src='https://via.placeholder.com/100/f1f5f9/475569?text=TEAM+B';" class="w-14 h-14 mx-auto object-contain mb-2">
+                                        <h3 class="font-extrabold text-sm uppercase text-slate-800 truncate"><%= m.teamB %></h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider py-4">No match results available yet.</p>
+            <% } %>
+        </div>
+
+    </main>
+</div>
+
+<!-- MATCH STORY MODAL -->
+<div id="storyModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl relative">
+        <button onclick="closeStoryModal()" class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-slate-900/50 text-white flex items-center justify-center font-black text-xs">✕</button>
+        <div class="h-96 w-full bg-slate-900 relative">
+            <img id="storyModalImage" src="" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+            <div class="absolute bottom-6 left-6 right-6 text-white">
+                <h3 id="storyModalTitle" class="text-xl font-black uppercase mb-3">Story Title</h3>
+                <a id="storyMatchBtn" href="#" class="inline-flex items-center gap-2 bg-white text-slate-900 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider hover:bg-slate-100 transition-all">
+                    <span>View Match Page</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterCategory(cat) {
+        const buttons = document.querySelectorAll('.tab-pill');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`tab-${cat}`).classList.add('active');
+
+        const liveSec = document.getElementById('section-live');
+        const upcomingSec = document.getElementById('section-upcoming');
+        const completedSec = document.getElementById('section-completed');
+
+        if (cat === 'all') {
+            if (liveSec) liveSec.style.display = 'block';
+            if (upcomingSec) upcomingSec.style.display = 'block';
+            if (completedSec) completedSec.style.display = 'block';
+        } else {
+            if (liveSec) liveSec.style.display = cat === 'live' ? 'block' : 'none';
+            if (upcomingSec) upcomingSec.style.display = cat === 'upcoming' ? 'block' : 'none';
+            if (completedSec) completedSec.style.display = cat === 'completed' ? 'block' : 'none';
+        }
+    }
+
+    function openStoryModal(title, mediaUrl, matchId) {
+        document.getElementById('storyModalTitle').innerText = title;
+        document.getElementById('storyModalImage').src = mediaUrl;
+        document.getElementById('storyMatchBtn').href = matchId ? `/match/${matchId}` : '#';
+        document.getElementById('storyModal').classList.remove('hidden');
+    }
+
+    function closeStoryModal() {
+        document.getElementById('storyModal').classList.add('hidden');
+    }
+</script>

@@ -1,0 +1,1212 @@
+<%- include('partials/navbar') %>
+
+<style>
+    /* MULTI-DIRECTIONAL CONVEYOR ANIMATIONS */
+    @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    @keyframes scrollRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+
+    .animate-conveyor-1 { display: flex; animation: scrollLeft 32s linear infinite; width: max-content; }
+    .animate-conveyor-2 { display: flex; animation: scrollRight 38s linear infinite; width: max-content; }
+
+    .animate-conveyor-1:hover, 
+    .animate-conveyor-2:hover { 
+        animation-play-state: paused; 
+    }
+    
+    /* LIGHT GLASSMORPHY BASE */
+    .glass-light {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 3D TILT & HOLOGRAM GLOW/SHEEN EFFECT */
+    .player-card { 
+        transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+        cursor: pointer; 
+        position: relative;
+        overflow: hidden;
+        transform-style: preserve-3d;
+        perspective: 1000px;
+        background: rgba(255, 255, 255, 0.95);
+    }
+    
+    /* SHINY HOVER GLOW & HIGH LIGHT INSPECT EFFECT */
+    .player-card:hover { 
+        z-index: 20; 
+        border-color: rgba(59, 130, 246, 0.9); 
+        box-shadow: 0 0 35px rgba(59, 130, 246, 0.35), 0 20px 40px -10px rgba(15, 23, 42, 0.15);
+    }
+
+    /* SHINY SWEEPING LIGHT GLARE */
+    .card-sheen {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.7) 45%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0.7) 55%, transparent 80%);
+        pointer-events: none;
+        z-index: 12;
+        opacity: 0;
+        transform: translateX(-100%);
+        transition: opacity 0.3s ease;
+    }
+
+    .player-card:hover .card-sheen {
+        opacity: 1;
+        transform: translateX(100%);
+        transition: transform 0.8s ease-in-out, opacity 0.3s ease;
+    }
+
+    /* COLOR-CODED POSITION BADGES */
+    .pos-fwd { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+    .pos-mid { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; }
+    .pos-def { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; }
+    .pos-gk  { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+    .pos-pro { background: linear-gradient(135deg, #64748b, #475569); color: #fff; }
+
+    /* RANK BADGES */
+    .rank-s { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; border: 1px solid #fef08a; }
+    .rank-a { background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: #fff; }
+    .rank-b { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+    .rank-c { background: linear-gradient(135deg, #64748b, #475569); color: #fff; }
+
+    /* GRAYSCALE TO FULL COLOR TRANSITION */
+    .card-img {
+        filter: grayscale(100%) contrast(1.05);
+        transition: filter 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s ease;
+    }
+    .player-card:hover .card-img {
+        filter: grayscale(0%) contrast(1);
+        transform: scale(1.06);
+    }
+
+    /* SLEEK CLICK ANIMATION */
+    .card-active-anim {
+        animation: sleekClick 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        pointer-events: none;
+    }
+
+    @keyframes sleekClick {
+        0% { transform: scale(1); box-shadow: 0 0 0 rgba(59, 130, 246, 0); }
+        50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
+        100% { transform: scale(1.02); opacity: 0.9; }
+    }
+
+    /* MODAL */
+    .modal { 
+        display: none; 
+        position: fixed; 
+        inset: 0; 
+        background: rgba(15, 23, 42, 0); 
+        z-index: 100; 
+        align-items: center; 
+        justify-content: center; 
+        padding: 20px; 
+        backdrop-filter: blur(0px);
+        transition: all 0.4s ease;
+    }
+    
+    .modal.active { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); }
+
+    #modalContainer {
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+        transform: translateY(30px) scale(0.96);
+        opacity: 0;
+    }
+
+    #modalContainer.show {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+
+    .stat-badge {
+        background: rgba(241, 245, 249, 0.8);
+        border: 1px solid rgba(226, 232, 240, 1);
+        backdrop-filter: blur(8px);
+    }
+
+    /* IMPROVED REGISTRATION & LOGIN FORM STYLING */
+    .form-label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #64748b;
+        margin-bottom: 0.35rem;
+    }
+
+    .form-input { 
+        width: 100%; 
+        background: #f8fafc; 
+        border: 1px solid #cbd5e1; 
+        padding: 0.75rem 1rem; 
+        border-radius: 0.85rem; 
+        outline: none; 
+        transition: all 0.25s ease; 
+        color: #0f172a; 
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+    .form-input:focus { 
+        border-color: #3b82f6; 
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+    }
+    select.form-input option { background: #ffffff; color: #0f172a; }
+
+    .position-radio:checked + label {
+        border-color: #3b82f6;
+        background: #eff6ff;
+        color: #1d4ed8;
+        box-shadow: 0 0 0 2px #3b82f6;
+    }
+
+    .hidden-form { display: none !important; }
+
+    /* CUSTOM SCROLLBAR */
+    .custom-scroll::-webkit-scrollbar { width: 4px; }
+    .custom-scroll::-webkit-scrollbar-track { background: rgba(241, 245, 249, 0.5); }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+    /* TAB ACTIVE STATES */
+    .team-tab.active {
+        background-color: #0f172a;
+        color: #ffffff;
+    }
+</style>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-red-600 text-white px-8 py-4 rounded-full font-black uppercase italic shadow-[0_15px_30px_rgba(220,38,38,0.3)] border border-white/20 animate-bounce text-xs tracking-wider">
+        ⚠️ <%= error %>
+    </div>
+<% } %>
+
+<main class="py-16 bg-slate-50 min-h-screen text-slate-900 overflow-hidden">
+    <!-- MARKET HEADER & CONTROLS -->
+    <div class="max-w-7xl mx-auto px-6 mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <span class="h-2.5 w-2.5 rounded-full bg-blue-600 animate-pulse"></span>
+                <p class="text-[11px] text-slate-400 font-black uppercase tracking-[0.25em]">VIM Super League Official Market</p>
+            </div>
+            <h2 class="text-5xl font-black italic uppercase tracking-tighter text-slate-900">PLAYER MARKET</h2>
+        </div>
+        
+        <!-- MODE SWITCH SLIDER & SEARCH BAR -->
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <!-- MODE SWITCH SLIDER -->
+            <div class="bg-slate-200 p-1 rounded-2xl flex items-center border border-slate-300 shadow-inner">
+                <button id="viewMarketBtn" onclick="switchMode('market')" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 bg-white text-slate-900 shadow-sm">
+                    Market
+                </button>
+                <button id="viewAuctionBtn" onclick="switchMode('auction')" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 text-slate-500 hover:text-slate-900">
+                    Auction Hub
+                </button>
+            </div>
+
+            <div class="relative flex-1 md:w-64" id="searchWrapper">
+                <input type="text" id="searchInput" onkeyup="filterCards()" placeholder="Search players..." class="w-full bg-white border border-slate-200 px-4 py-2.5 pl-9 rounded-2xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500 transition shadow-sm">
+                <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <div class="flex items-center bg-white border border-slate-200 p-1 rounded-2xl shadow-sm overflow-x-auto" id="filterWrapper">
+                <button onclick="setFilter('ALL')" class="filter-btn active text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-slate-900 text-white">ALL</button>
+                <button onclick="setFilter('FWD')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">FWD</button>
+                <button onclick="setFilter('MID')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">MID</button>
+                <button onclick="setFilter('DEF')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">DEF</button>
+                <button onclick="setFilter('GK')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">GK</button>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 px-4 py-2.5 rounded-2xl" id="countWrapper">
+                <span class="text-[10px] text-blue-600 font-black uppercase tracking-wider">● Players: <%= players.length %></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUCTION OVERRIDE NOTIFICATION BANNER (FOR MANAGERS) -->
+    <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam && typeof overriddenBids !== 'undefined' && overriddenBids && overriddenBids.length > 0) { %>
+        <div class="max-w-7xl mx-auto px-6 mb-6">
+            <div class="bg-amber-500 text-white p-4 rounded-2xl shadow-lg border border-amber-400 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl">⚠️</span>
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-wider">Auction Alert: Bid Overridden!</p>
+                        <p class="text-[11px] text-amber-100 font-bold">Other teams have outbid you on <%= overriddenBids.length %> player(s). Review your bids in the Auction Hub!</p>
+                    </div>
+                </div>
+                <button onclick="switchMode('auction')" class="bg-white text-amber-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-50 transition shadow-sm">
+                    View Bids
+                </button>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- MODE 1: STANDARD MARKET VIEW -->
+    <div id="marketSection">
+        <!-- MULTI-TIER DUAL CONVEYOR CARDS DISPLAY -->
+        <% if(players.length > 0) { %>
+            <% 
+                let fullList = players.length < 6 ? [...players, ...players, ...players, ...players] : [...players, ...players]; 
+                let tier1 = fullList.slice(0, Math.ceil(fullList.length / 2));
+                let tier2 = fullList.slice(Math.ceil(fullList.length / 2));
+                let tiers = [
+                    { list: tier1, anim: 'animate-conveyor-1', label: 'Top Tier Prospects' },
+                    { list: tier2, anim: 'animate-conveyor-2', label: 'Midfield, Defensive Anchors & Free Agents' }
+                ];
+            %>
+
+            <div class="space-y-6 mb-24">
+                <% tiers.forEach((t, idx) => { %>
+                    <div class="relative flex items-center border-y border-slate-200/80 bg-white/40 py-6">
+                        <div class="<%= t.anim %> gap-6 px-4" id="cardContainer<%= idx %>">
+                            <% t.list.forEach(p => { %>
+                                <% 
+                                    let posClass = 'pos-pro';
+                                    let pos = (p.position || 'PRO').toUpperCase();
+                                    if(pos === 'FWD' || pos === 'FORWARD') posClass = 'pos-fwd';
+                                    else if(pos === 'MID' || pos === 'MIDFIELD') posClass = 'pos-mid';
+                                    else if(pos === 'DEF' || pos === 'DEFENSE') posClass = 'pos-def';
+                                    else if(pos === 'GK' || pos === 'GOALKEEPER') posClass = 'pos-gk';
+
+                                    let rankClass = 'rank-c';
+                                    let rank = (p.rank || 'C').toUpperCase();
+                                    if(rank === 'S') rankClass = 'rank-s';
+                                    else if(rank === 'A') rankClass = 'rank-a';
+                                    else if(rank === 'B') rankClass = 'rank-b';
+
+                                    let pId = p._id || p.id || '';
+                                %>
+                                <div class="player-card card-item w-[260px] h-[350px] glass-light rounded-[28px] border border-slate-200 shadow-md flex-shrink-0 relative group"
+                                     data-name="<%= p.name.toLowerCase() %>"
+                                     data-pos="<%= pos %>"
+                                     onmousemove="tiltCard(event, this)" 
+                                     onmouseleave="resetTilt(this)"
+                                     onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= p.experience || p.bio %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>')">
+                                    
+                                    <!-- Shiny Dynamic Sweeping Glare -->
+                                    <div class="card-sheen"></div>
+
+                                    <% if (p.cardImage && p.cardImage.trim() !== "") { %>
+                                        <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover">
+                                    <% } else { %>
+                                        <div class="card-img w-full h-full bg-gradient-to-b from-slate-100 to-slate-200 flex items-center justify-center relative">
+                                            <span class="absolute top-10 text-[64px] font-black italic text-slate-300/40 select-none uppercase tracking-tighter"><%= p.position || 'PRO' %></span>
+                                            <svg class="w-24 h-24 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                        </div>
+                                    <% } %>
+
+                                    <!-- RANK BADGE AT BOTTOM RIGHT ON HOVER / ALWAYS VISIBLE -->
+                                    <div class="absolute bottom-4 right-4 z-20 transition-all duration-300 transform group-hover:scale-110">
+                                        <span class="<%= rankClass %> text-[10px] font-black px-2.5 py-1 rounded-xl uppercase shadow-lg tracking-wider border border-white/20"><%= rank %> RANK</span>
+                                    </div>
+
+                                    <!-- Card Overlays -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent p-5 flex flex-col justify-end z-10">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="<%= posClass %> text-[9px] font-black px-2.5 py-1 rounded-lg italic uppercase shadow-sm tracking-wide"><%= p.position || 'PRO' %></span>
+                                            <div class="flex items-center gap-1 bg-white/20 backdrop-filter blur-md px-2 py-0.5 rounded-md border border-white/20">
+                                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                <span class="text-[9px] text-white font-black"><%= p.views ? p.views.length : 0 %></span>
+                                            </div>
+                                        </div>
+                                        
+                                        <h3 class="font-black text-2xl italic uppercase tracking-tighter text-white drop-shadow-md"><%= p.name %></h3>
+                                        
+                                        <!-- Highest Bid Info in Market -->
+                                        <div class="mt-1 flex items-center justify-between text-[9px] font-black text-emerald-400">
+                                            <span>TOP BID: <%= p.highestBid ? p.highestBid + ' Vollars' : 'No Bids' %></span>
+                                            <% if (p.highestBidder) { %>
+                                                <span class="text-slate-300 text-[8px] uppercase truncate max-w-[90px]">(<%= p.highestBidder %>)</span>
+                                            <% } %>
+                                        </div>
+
+                                        <!-- Stat Strip Preview -->
+                                        <div class="grid grid-cols-4 gap-1 mt-2 pt-2 border-t border-white/15 text-center">
+                                            <div><p class="text-[7px] font-black text-white/50 uppercase">G</p><p class="text-xs font-black text-white"><%= p.goals || 0 %></p></div>
+                                            <div><p class="text-[7px] font-black text-white/50 uppercase">A</p><p class="text-xs font-black text-white"><%= p.assists || 0 %></p></div>
+                                            <div><p class="text-[7px] font-black text-white/50 uppercase">S</p><p class="text-xs font-black text-white"><%= p.saves || 0 %></p></div>
+                                            <div><p class="text-[7px] font-black text-blue-400 uppercase">MVP</p><p class="text-xs font-black text-blue-400"><%= p.mvps || 0 %></p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- MODE 2: AUCTION HUB VIEW -->
+    <div id="auctionSection" class="hidden max-w-7xl mx-auto px-6 mb-24">
+        <!-- AUCTION TIMER BANNER (IF ACTIVE) -->
+        <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-6 rounded-[32px] border border-slate-800 shadow-2xl mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-4">
+                <div class="h-12 w-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 text-2xl font-black">
+                    ⏱️
+                </div>
+                <div>
+                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Official Auction Window</span>
+                    <h3 class="text-2xl font-black italic uppercase tracking-tight">LIVE AUCTION SESSION</h3>
+                </div>
+            </div>
+            <div class="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl text-center">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Auction Status / Timer</span>
+                <span id="auctionTimerDisplay" class="text-xl font-black italic text-emerald-400 uppercase tracking-wider">
+                    <% if (typeof auctionEndTime !== 'undefined' && auctionEndTime) { %>
+                        Active (Ends in: <span id="timeRemaining">--:--:--</span>)
+                    <% } else { %>
+                        Auction Active / Open
+                    <% } %>
+                </span>
+            </div>
+        </div>
+
+        <% if (typeof auctionTeams !== 'undefined' && auctionTeams && auctionTeams.length > 0) { %>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- LEFT PANEL: TEAMS SELECTOR LIST -->
+                <div class="lg:col-span-4 space-y-4">
+                    <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-2">Participating Teams</h3>
+                    <div class="space-y-3">
+                        <% auctionTeams.forEach((t, i) => { %>
+                            <% let tId = t._id || t.id || ''; %>
+                            <div onclick="selectAuctionTeam('<%= tId %>')" 
+                                 id="teamCard-<%= tId %>" 
+                                 class="team-tab cursor-pointer bg-white border border-slate-200 p-5 rounded-[24px] shadow-sm hover:shadow-md transition-all flex items-center justify-between <%= i === 0 ? 'active' : '' %>">
+                                <div class="flex items-center gap-4">
+                                    <% if (t.logo) { %>
+                                        <img src="<%= t.logo %>" class="w-12 h-12 object-contain rounded-xl bg-slate-50 p-1 border border-slate-100">
+                                    <% } else { %>
+                                        <div class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 font-black text-lg">
+                                            <%= t.name.charAt(0) %>
+                                        </div>
+                                    <% } %>
+                                    <div>
+                                        <h4 class="font-black italic uppercase text-base text-slate-900"><%= t.name %></h4>
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase">Manager: <%= t.manager || 'Unassigned' %></p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm font-black text-emerald-600 block"><%= t.budget || 0 %> V</span>
+                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">BUDGET</span>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- RIGHT PANEL: TEAM DETAILS & BIDDING/ROSTER TOGGLE -->
+                <div class="lg:col-span-8">
+                    <% auctionTeams.forEach((t, i) => { %>
+                        <% let tId = t._id || t.id || ''; %>
+                        <div id="teamDetails-<%= tId %>" class="team-details-panel <%= i === 0 ? '' : 'hidden' %> bg-white border border-slate-200 rounded-[36px] p-8 shadow-xl">
+                            <!-- TEAM HEADER WITH ENLARGED LOGO & VOLLARS STATS -->
+                            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-slate-100 pb-8 mb-8">
+                                <% if (t.logo) { %>
+                                    <img src="<%= t.logo %>" class="w-28 h-28 object-contain rounded-3xl bg-slate-50 p-2 border border-slate-200 shadow-md flex-shrink-0">
+                                <% } else { %>
+                                    <div class="w-28 h-28 rounded-3xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-300 font-black text-5xl flex-shrink-0">
+                                        <%= t.name.charAt(0) %>
+                                    </div>
+                                <% } %>
+                                <div class="flex-1 text-center sm:text-left">
+                                    <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Official VIM Franchise</span>
+                                    <h2 class="text-4xl font-black italic uppercase text-slate-900 tracking-tight"><%= t.name %></h2>
+                                    <p class="text-xs text-slate-400 font-bold uppercase mt-1">Manager: <span class="text-slate-800"><%= t.manager || 'Unassigned' %></span></p>
+
+                                    <!-- BUDGET SUMMARY TILES (VOLLARS) -->
+                                    <div class="grid grid-cols-3 gap-3 mt-4">
+                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-center">
+                                            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Total Budget</span>
+                                            <span class="text-base font-black text-slate-900"><%= t.budget || 0 %> Vollars</span>
+                                        </div>
+                                        <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100 text-center">
+                                            <span class="text-[8px] font-black text-emerald-600 uppercase tracking-widest block">Remaining</span>
+                                            <span class="text-base font-black text-emerald-600"><%= (t.budget - (t.spent || 0)) %> Vollars</span>
+                                        </div>
+                                        <div class="bg-blue-50/60 p-3 rounded-2xl border border-blue-100 text-center">
+                                            <span class="text-[8px] font-black text-blue-600 uppercase tracking-widest block">Spent</span>
+                                            <span class="text-base font-black text-blue-600"><%= t.spent || 0 %> Vollars</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BIDDING VS ROSTER TABS -->
+                            <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
+                                <div class="flex items-center gap-3">
+                                    <button onclick="switchTeamSubTab('<%= tId %>', 'bidding')" id="tabBtn-bidding-<%= tId %>" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 text-white transition">
+                                        Bids In Progress
+                                    </button>
+                                    <button onclick="switchTeamSubTab('<%= tId %>', 'roster')" id="tabBtn-roster-<%= tId %>" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-900 transition">
+                                        Official Roster
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- SUB-TAB 1: BIDDING SIDE -->
+                            <div id="subTab-bidding-<%= tId %>" class="space-y-4">
+                                <% if (t.bids && t.bids.length > 0) { %>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <% t.bids.forEach(b => { %>
+                                            <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+                                                <div>
+                                                    <h5 class="font-black italic uppercase text-slate-900 text-sm"><%= b.playerName %></h5>
+                                                    <p class="text-[10px] text-blue-600 font-black uppercase">Current Bid: <%= b.amount %> Vollars</p>
+                                                </div>
+                                                <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam === tId) { %>
+                                                    <form action="/auction/withdraw" method="POST" onsubmit="return confirm('Withdraw bid for <%= b.playerName %>?')">
+                                                        <input type="hidden" name="playerId" value="<%= b.playerId %>">
+                                                        <input type="hidden" name="teamId" value="<%= tId %>">
+                                                        <button type="submit" class="bg-red-50 text-red-600 border border-red-200 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider transition">
+                                                            Withdraw
+                                                        </button>
+                                                    </form>
+                                                <% } %>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                <% } else { %>
+                                    <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                        <p class="text-xs font-black uppercase text-slate-400 tracking-wider">No active player bids placed by this team yet.</p>
+                                    </div>
+                                <% } %>
+                            </div>
+
+                            <!-- SUB-TAB 2: ROSTER SIDE (EMPTY UNTIL AUCTION ENDS) -->
+                            <div id="subTab-roster-<%= tId %>" class="hidden space-y-4">
+                                <% if (t.roster && t.roster.length > 0) { %>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <% t.roster.forEach(r => { %>
+                                            <div class="p-4 rounded-2xl border border-slate-200 bg-emerald-50/30 flex items-center justify-between">
+                                                <div>
+                                                    <h5 class="font-black italic uppercase text-slate-900 text-sm"><%= r.name %></h5>
+                                                    <p class="text-[10px] text-slate-400 font-bold uppercase"><%= r.position %> | Acquired for <%= r.boughtFor || 0 %> Vollars</p>
+                                                </div>
+                                                <span class="text-[10px] font-black text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-lg uppercase">Signed</span>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                <% } else { %>
+                                    <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                        <p class="text-xs font-black uppercase text-slate-400 tracking-wider">Roster is empty. Player allocations will appear here once the auction ends.</p>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="bg-white p-12 rounded-[36px] border border-slate-200 text-center">
+                <p class="text-sm font-black text-slate-400 uppercase tracking-widest">No auction teams configured by Admin yet.</p>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- LIGHT THEME FIFA MODAL WITH BIDDING CAPABILITY FOR MANAGERS -->
+    <div id="bioModal" class="modal" onclick="closeBio()">
+        <div class="max-w-4xl w-full flex flex-col md:flex-row gap-8 items-center relative" id="modalContainer" onclick="event.stopPropagation()">
+            <!-- Player Card Spotlight -->
+            <div class="relative group w-[300px] h-[420px] flex-shrink-0">
+                <div class="absolute -inset-2 bg-blue-500/20 blur-2xl rounded-full opacity-70"></div>
+                <div class="relative w-full h-full bg-white rounded-[36px] overflow-hidden border border-slate-200 shadow-2xl">
+                    <img id="modalImg" src="" class="w-full h-full object-cover">
+                    <div id="modalImgPlaceholder" class="w-full h-full bg-gradient-to-b from-slate-100 to-slate-200 flex items-center justify-center">
+                        <svg class="w-40 h-40 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+
+                    <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent">
+                        <div class="flex items-center gap-2">
+                            <span id="modalPosBadge" class="text-white text-[10px] font-black px-3 py-1 rounded-lg italic uppercase tracking-wider"></span>
+                            <span id="modalCountryBadge" class="text-slate-300 text-[10px] font-black uppercase tracking-widest"></span>
+                        </div>
+                        <h2 id="modalName" class="text-3xl font-black italic uppercase text-white tracking-tighter mt-1"></h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details & Bidding Panel -->
+            <div class="flex-1 bg-white p-8 md:p-10 rounded-[36px] border border-slate-200 shadow-2xl relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 text-[120px] font-black italic text-slate-100 pointer-events-none uppercase select-none">STATS</div>
+                
+                <div class="flex justify-between items-start mb-6 relative z-10">
+                    <div>
+                        <p id="modalDiscord" class="text-blue-600 font-black text-xs uppercase tracking-wider mb-0.5"></p>
+                        <p id="modalTZ" class="text-[10px] text-slate-400 font-bold uppercase mb-1"></p>
+                        <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Official VIM Player Contract</p>
+                    </div>
+                    <div class="text-right">
+                        <p id="modalViews" class="text-4xl font-black italic text-slate-900 leading-none">0</p>
+                        <p class="text-[8px] uppercase font-black text-blue-600 tracking-widest mt-1">PROFILE VIEWS</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 relative z-10">
+                    <div class="stat-badge p-3.5 rounded-2xl text-center"><p class="text-[8px] uppercase font-black text-slate-400 mb-0.5">Goals</p><p id="mGoals" class="text-2xl font-black italic text-slate-900">0</p></div>
+                    <div class="stat-badge p-3.5 rounded-2xl text-center"><p class="text-[8px] uppercase font-black text-slate-400 mb-0.5">Assists</p><p id="mAssists" class="text-2xl font-black italic text-slate-900">0</p></div>
+                    <div class="stat-badge p-3.5 rounded-2xl text-center"><p class="text-[8px] uppercase font-black text-slate-400 mb-0.5">Saves</p><p id="mSaves" class="text-2xl font-black italic text-slate-900">0</p></div>
+                    <div class="stat-badge p-3.5 rounded-2xl text-center border-blue-200 bg-blue-50/50"><p class="text-[8px] uppercase font-black text-blue-600 mb-0.5">MVP</p><p id="mMvps" class="text-2xl font-black italic text-blue-600">0</p></div>
+                </div>
+
+                <div class="relative z-10 mb-4">
+                    <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-2 font-black">Experience & Biography</p>
+                    <div id="modalBio" class="text-slate-600 leading-relaxed text-xs h-20 overflow-y-auto pr-3 italic bg-slate-50 p-3 rounded-2xl border border-slate-100 custom-scroll"></div>
+                </div>
+
+                <!-- AUCTION BIDDING SECTION INSIDE MODAL -->
+<div class="relative z-10 bg-slate-900 text-white p-4 rounded-2xl border border-slate-800 mb-4">
+    <div class="flex justify-between items-center mb-2">
+        <div>
+            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Highest Bid</span>
+            <span id="modalHighestBid" class="text-base font-black italic text-emerald-400">0 Vollars</span>
+        </div>
+
+        <div class="text-right">
+            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Reserve Price</span>
+            <span id="modalReservePrice" class="text-xs font-black text-slate-300">0 Vollars</span>
+        </div>
+    </div>
+
+    <% if ((typeof isManager !== 'undefined' && isManager) || (typeof currentManagerTeam !== 'undefined' && currentManagerTeam)) { %>
+
+        <!-- ADD / EDIT BID -->
+        <form action="/auction/bid" method="POST" class="mt-3">
+            <input type="hidden" id="modalPlayerId" name="playerId" value="">
+
+            <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam) { %>
+                <input type="hidden" name="teamId" value="<%= currentManagerTeam %>">
+            <% } %>
+
+            <div class="flex gap-2">
+                <input
+                    type="number"
+                    id="modalBidInput"
+                    name="bidAmount"
+                    placeholder="Bid Vollars..."
+                    required
+                    min="1"
+                    class="flex-1 bg-slate-800 border border-slate-700 text-white text-xs font-bold px-3 py-2 rounded-xl outline-none focus:border-blue-500"
+                >
+
+                <button
+                    type="submit"
+                    id="modalBidButton"
+                    class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest transition"
+                >
+                    Place Bid
+                </button>
+            </div>
+        </form>
+
+        <!-- BID MANAGEMENT BUTTONS -->
+        <div class="grid grid-cols-2 gap-2 mt-2">
+
+            <!-- EDIT BID -->
+            <button
+                type="button"
+                onclick="editCurrentBid()"
+                class="bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-white border border-amber-500/30 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition"
+            >
+                ✏️ Edit Bid
+            </button>
+
+            <!-- WITHDRAW BID -->
+            <form
+                action="/auction/withdraw"
+                method="POST"
+                onsubmit="return confirm('Withdraw your bid for this player?')"
+            >
+                <input type="hidden" id="modalWithdrawPlayerId" name="playerId" value="">
+
+                <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam) { %>
+                    <input type="hidden" name="teamId" value="<%= currentManagerTeam %>">
+                <% } %>
+
+                <button
+                    type="submit"
+                    class="w-full bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition"
+                >
+                    ↩ Withdraw Bid
+                </button>
+            </form>
+
+        </div>
+
+    <% } else { %>
+
+        <p class="text-[9px] text-slate-400 italic text-center mt-1">
+            Only authorized Team Managers can place bids.
+        </p>
+
+    <% } %>
+</div>
+
+                <button onclick="closeBio()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-900 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300">Return to Market</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER AUTHENTICATION & MANAGEMENT PANELS -->
+    <div class="max-w-4xl mx-auto px-6">
+        <% if (user) { %>
+            <div class="max-w-xl mx-auto bg-white p-10 rounded-[36px] shadow-xl border border-slate-200 text-center space-y-5">
+                <h3 class="text-2xl font-black italic uppercase text-slate-900">Welcome Back, <span class="text-blue-600"><%= user.name %></span></h3>
+                <div class="pt-2 space-y-3">
+                    <a href="/profile" class="block w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition shadow-md">Manage Profile & Stats</a>
+                    <form action="/profile/delete" method="POST" onsubmit="return confirm('Withdraw your application from the market?')">
+                        <button type="submit" class="w-full bg-red-50 text-red-600 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-red-200 hover:bg-red-600 hover:text-white transition">Withdraw Application</button>
+                    </form>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="max-w-2xl mx-auto">
+                <!-- Registration Form -->
+                <div id="registerBox" class="bg-white p-8 md:p-10 rounded-[36px] shadow-2xl border border-slate-200/80 relative overflow-hidden">
+                    <div class="mb-6 flex justify-between items-end border-b border-slate-100 pb-4">
+                        <div>
+                            <span class="text-[10px] font-black text-blue-600 tracking-widest uppercase">Market Application</span>
+                            <h3 class="text-3xl font-black italic uppercase text-slate-900">Register Player</h3>
+                        </div>
+                        <span class="text-xs font-black text-slate-300 italic">VIM LEAGUE</span>
+                    </div>
+
+                    <form action="/register" method="POST" class="space-y-5">
+                        <!-- Primary User Handles -->
+                        <div>
+                            <span class="form-label">Username and Information</span>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <input name="name" placeholder="Roblox Username" required class="form-input">
+                                </div>
+                                <div>
+                                    <input name="discord" placeholder="Discord Username (e.g. @user)" required class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visual Position Selection Cards -->
+                        <div>
+                            <span class="form-label">Select Primary Position</span>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                <div>
+                                    <input type="radio" id="posFWD" name="position" value="FWD" class="hidden position-radio" required>
+                                    <label for="posFWD" class="flex flex-col items-center justify-center p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition text-center">
+                                        <span class="text-xs font-black text-red-500">FWD</span>
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase">Forward</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="posMID" name="position" value="MID" class="hidden position-radio">
+                                    <label for="posMID" class="flex flex-col items-center justify-center p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition text-center">
+                                        <span class="text-xs font-black text-purple-500">MID</span>
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase">Midfield</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="posDEF" name="position" value="DEF" class="hidden position-radio">
+                                    <label for="posDEF" class="flex flex-col items-center justify-center p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition text-center">
+                                        <span class="text-xs font-black text-blue-500">DEF</span>
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase">Defense</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="posGK" name="position" value="GK" class="hidden position-radio">
+                                    <label for="posGK" class="flex flex-col items-center justify-center p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition text-center">
+                                        <span class="text-xs font-black text-amber-500">GK</span>
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase">Goalkeeper</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location & Timezone Selectors (Complete Country List Preserved) -->
+                        <div>
+                            <span class="form-label">Regional Information</span>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <select name="country" required class="form-input">
+                                    <option value="" disabled selected>Select Country</option>
+                                    <option value="Afghanistan">🇦🇫 Afghanistan</option>
+                                    <option value="Albania">🇦🇱 Albania</option>
+                                    <option value="Algeria">🇩🇿 Algeria</option>
+                                    <option value="Andorra">🇦🇩 Andorra</option>
+                                    <option value="Angola">🇦🇴 Angola</option>
+                                    <option value="Antigua and Barbuda">🇦🇬 Antigua and Barbuda</option>
+                                    <option value="Argentina">🇦🇷 Argentina</option>
+                                    <option value="Armenia">🇦🇲 Armenia</option>
+                                    <option value="Australia">🇦🇺 Australia</option>
+                                    <option value="Austria">🇦🇹 Austria</option>
+                                    <option value="Azerbaijan">🇦🇿 Azerbaijan</option>
+                                    <option value="Bahamas">🇧🇸 Bahamas</option>
+                                    <option value="Bahrain">🇧🇭 Bahrain</option>
+                                    <option value="Bangladesh">🇧🇩 Bangladesh</option>
+                                    <option value="Barbados">🇧🇧 Barbados</option>
+                                    <option value="Belarus">🇧🇾 Belarus</option>
+                                    <option value="Belgium">🇧🇪 Belgium</option>
+                                    <option value="Belize">🇧🇿 Belize</option>
+                                    <option value="Benin">🇧🇯 Benin</option>
+                                    <option value="Bhutan">🇧🇹 Bhutan</option>
+                                    <option value="Bolivia">🇧🇴 Bolivia</option>
+                                    <option value="Bosnia and Herzegovina">🇧🇦 Bosnia and Herzegovina</option>
+                                    <option value="Botswana">🇧🇼 Botswana</option>
+                                    <option value="Brazil">🇧🇷 Brazil</option>
+                                    <option value="Brunei">🇧🇳 Brunei</option>
+                                    <option value="Bulgaria">🇧🇬 Bulgaria</option>
+                                    <option value="Burkina Faso">🇧🇫 Burkina Faso</option>
+                                    <option value="Burundi">🇧🇮 Burundi</option>
+                                    <option value="Cabo Verde">🇨🇻 Cabo Verde</option>
+                                    <option value="Cambodia">🇰🇭 Cambodia</option>
+                                    <option value="Cameroon">🇨🇲 Cameroon</option>
+                                    <option value="Canada">🇨🇦 Canada</option>
+                                    <option value="Central African Republic">🇨🇫 Central African Republic</option>
+                                    <option value="Chad">🇹🇩 Chad</option>
+                                    <option value="Chile">🇨🇱 Chile</option>
+                                    <option value="China">🇨🇳 China</option>
+                                    <option value="Colombia">🇨🇴 Colombia</option>
+                                    <option value="Comoros">🇰🇲 Comoros</option>
+                                    <option value="Congo">🇨🇬 Congo</option>
+                                    <option value="Costa Rica">🇨🇷 Costa Rica</option>
+                                    <option value="Croatia">🇭🇷 Croatia</option>
+                                    <option value="Cuba">🇨🇺 Cuba</option>
+                                    <option value="Cyprus">🇨🇾 Cyprus</option>
+                                    <option value="Czech Republic">🇨🇿 Czech Republic</option>
+                                    <option value="Denmark">🇩🇰 Denmark</option>
+                                    <option value="Djibouti">🇩🇯 Djibouti</option>
+                                    <option value="Dominica">🇩🇲 Dominica</option>
+                                    <option value="Dominican Republic">🇩🇴 Dominican Republic</option>
+                                    <option value="Ecuador">🇪🇨 Ecuador</option>
+                                    <option value="Egypt">🇪🇬 Egypt</option>
+                                    <option value="El Salvador">🇸🇻 El Salvador</option>
+                                    <option value="Equatorial Guinea">🇬🇶 Equatorial Guinea</option>
+                                    <option value="Eritrea">🇪🇷 Eritrea</option>
+                                    <option value="Estonia">🇪🇪 Estonia</option>
+                                    <option value="Eswatini">🇸🇿 Eswatini</option>
+                                    <option value="Ethiopia">🇪🇹 Ethiopia</option>
+                                    <option value="Fiji">🇫🇯 Fiji</option>
+                                    <option value="Finland">🇫🇮 Finland</option>
+                                    <option value="France">🇫🇷 France</option>
+                                    <option value="Gabon">🇬🇦 Gabon</option>
+                                    <option value="Gambia">🇬🇲 Gambia</option>
+                                    <option value="Georgia">🇬🇪 Georgia</option>
+                                    <option value="Germany">🇩🇪 Germany</option>
+                                    <option value="Ghana">🇬🇭 Ghana</option>
+                                    <option value="Greece">🇬🇷 Greece</option>
+                                    <option value="Grenada">🇬🇩 Grenada</option>
+                                    <option value="Guatemala">🇬🇹 Guatemala</option>
+                                    <option value="Guinea">🇬🇳 Guinea</option>
+                                    <option value="Guinea-Bissau">🇬🇼 Guinea-Bissau</option>
+                                    <option value="Guyana">🇬🇾 Guyana</option>
+                                    <option value="Haiti">🇭🇹 Haiti</option>
+                                    <option value="Honduras">🇭🇳 Honduras</option>
+                                    <option value="Hungary">🇭🇺 Hungary</option>
+                                    <option value="Iceland">🇮🇸 Iceland</option>
+                                    <option value="India">🇮🇳 India</option>
+                                    <option value="Indonesia">🇮🇩 Indonesia</option>
+                                    <option value="Iran">🇮🇷 Iran</option>
+                                    <option value="Iraq">🇮🇶 Iraq</option>
+                                    <option value="Ireland">🇮🇪 Ireland</option>
+                                    <option value="Israel">🇮🇱 Israel</option>
+                                    <option value="Italy">🇮🇹 Italy</option>
+                                    <option value="Jamaica">🇯🇲 Jamaica</option>
+                                    <option value="Japan">🇯🇵 Japan</option>
+                                    <option value="Jordan">🇯🇴 Jordan</option>
+                                    <option value="Kazakhstan">🇰🇿 Kazakhstan</option>
+                                    <option value="Kenya">🇰🇪 Kenya</option>
+                                    <option value="Kiribati">🇰🇮 Kiribati</option>
+                                    <option value="Korea, North">🇰🇵 Korea, North</option>
+                                    <option value="Korea, South">🇰🇷 Korea, South</option>
+                                    <option value="Kuwait">🇰🇼 Kuwait</option>
+                                    <option value="Kyrgyzstan">🇰🇬 Kyrgyzstan</option>
+                                    <option value="Laos">🇱🇦 Laos</option>
+                                    <option value="Latvia">🇱🇻 Latvia</option>
+                                    <option value="Lebanon">🇱🇧 Lebanon</option>
+                                    <option value="Lesotho">🇱🇸 Lesotho</option>
+                                    <option value="Liberia">🇱🇷 Liberia</option>
+                                    <option value="Libya">🇱🇾 Libya</option>
+                                    <option value="Liechtenstein">🇱🇮 Liechtenstein</option>
+                                    <option value="Lithuania">🇱🇹 Lithuania</option>
+                                    <option value="Luxembourg">🇱🇺 Luxembourg</option>
+                                    <option value="Madagascar">🇲🇬 Madagascar</option>
+                                    <option value="Malawi">🇲🇼 Malawi</option>
+                                    <option value="Malaysia">🇲🇾 Malaysia</option>
+                                    <option value="Maldives">🇲🇻 Maldives</option>
+                                    <option value="Mali">🇲🇱 Mali</option>
+                                    <option value="Malta">🇲🇹 Malta</option>
+                                    <option value="Marshall Islands">🇲🇭 Marshall Islands</option>
+                                    <option value="Mauritania">🇲🇷 Mauritania</option>
+                                    <option value="Mauritius">🇲🇺 Mauritius</option>
+                                    <option value="Mexico">🇲🇽 Mexico</option>
+                                    <option value="Micronesia">🇫🇲 Micronesia</option>
+                                    <option value="Moldova">🇲🇩 Moldova</option>
+                                    <option value="Monaco">🇲🇨 Monaco</option>
+                                    <option value="Mongolia">🇲🇳 Mongolia</option>
+                                    <option value="Montenegro">🇲🇪 Montenegro</option>
+                                    <option value="Morocco">🇲🇦 Morocco</option>
+                                    <option value="Mozambique">🇲🇿 Mozambique</option>
+                                    <option value="Myanmar">🇲🇲 Myanmar</option>
+                                    <option value="Namibia">🇳🇦 Namibia</option>
+                                    <option value="Nauru">🇳🇷 Nauru</option>
+                                    <option value="Nepal">🇳🇵 Nepal</option>
+                                    <option value="Netherlands">🇳🇱 Netherlands</option>
+                                    <option value="New Zealand">🇳🇿 New Zealand</option>
+                                    <option value="Nicaragua">🇳🇮 Nicaragua</option>
+                                    <option value="Niger">🇳🇪 Niger</option>
+                                    <option value="Nigeria">🇳🇬 Nigeria</option>
+                                    <option value="North Macedonia">🇲🇰 North Macedonia</option>
+                                    <option value="Norway">🇳🇴 Norway</option>
+                                    <option value="Oman">🇴🇲 Oman</option>
+                                    <option value="Pakistan">🇵🇰 Pakistan</option>
+                                    <option value="Palau">🇵🇼 Palau</option>
+                                    <option value="Panama">🇵🇦 Panama</option>
+                                    <option value="Papua New Guinea">🇵🇬 Papua New Guinea</option>
+                                    <option value="Paraguay">🇵🇾 Paraguay</option>
+                                    <option value="Peru">🇵🇪 Peru</option>
+                                    <option value="Philippines">🇵🇭 Philippines</option>
+                                    <option value="Poland">🇵🇱 Poland</option>
+                                    <option value="Portugal">🇵🇹 Portugal</option>
+                                    <option value="Qatar">🇶🇦 Qatar</option>
+                                    <option value="Romania">🇷🇴 Romania</option>
+                                    <option value="Russia">🇷🇺 Russia</option>
+                                    <option value="Rwanda">🇷🇼 Rwanda</option>
+                                    <option value="Saint Kitts and Nevis">🇰🇳 Saint Kitts and Nevis</option>
+                                    <option value="Saint Lucia">🇱🇨 Saint Lucia</option>
+                                    <option value="Saint Vincent and the Grenadines">🇻🇨 Saint Vincent and the Grenadines</option>
+                                    <option value="Samoa">🇼🇸 Samoa</option>
+                                    <option value="San Marino">🇸🇲 San Marino</option>
+                                    <option value="Sao Tome and Principe">🇸🇹 Sao Tome and Principe</option>
+                                    <option value="Saudi Arabia">🇸🇦 Saudi Arabia</option>
+                                    <option value="Senegal">🇸🇳 Senegal</option>
+                                    <option value="Serbia">🇷🇸 Serbia</option>
+                                    <option value="Seychelles">🇸🇨 Seychelles</option>
+                                    <option value="Sierra Leone">🇸🇱 Sierra Leone</option>
+                                    <option value="Singapore">🇸🇬 Singapore</option>
+                                    <option value="Slovakia">🇸🇰 Slovakia</option>
+                                    <option value="Slovenia">🇸🇮 Slovenia</option>
+                                    <option value="Solomon Islands">🇸🇧 Solomon Islands</option>
+                                    <option value="Somalia">🇸🇴 Somalia</option>
+                                    <option value="South Africa">🇿🇦 South Africa</option>
+                                    <option value="South Sudan">🇸🇸 South Sudan</option>
+                                    <option value="Spain">🇪🇸 Spain</option>
+                                    <option value="Sri Lanka">🇱🇰 Sri Lanka</option>
+                                    <option value="Sudan">🇸🇩 Sudan</option>
+                                    <option value="Suriname">🇸🇷 Suriname</option>
+                                    <option value="Sweden">🇸🇪 Sweden</option>
+                                    <option value="Switzerland">🇨🇭 Switzerland</option>
+                                    <option value="Syria">🇸🇾 Syria</option>
+                                    <option value="Taiwan">🇹🇼 Taiwan</option>
+                                    <option value="Tajikistan">🇹🇯 Tajikistan</option>
+                                    <option value="Tanzania">🇹🇿 Tanzania</option>
+                                    <option value="Thailand">🇹🇭 Thailand</option>
+                                    <option value="Timor-Leste">🇹🇱 Timor-Leste</option>
+                                    <option value="Togo">🇹🇬 Togo</option>
+                                    <option value="Tonga">🇹🇴 Tonga</option>
+                                    <option value="Trinidad and Tobago">🇹🇹 Trinidad and Tobago</option>
+                                    <option value="Tunisia">🇹🇳 Tunisia</option>
+                                    <option value="Turkey">🇹🇷 Turkey</option>
+                                    <option value="Turkmenistan">🇹🇲 Turkmenistan</option>
+                                    <option value="Tuvalu">🇹🇻 Tuvalu</option>
+                                    <option value="Uganda">🇺🇬 Uganda</option>
+                                    <option value="Ukraine">🇺🇦 Ukraine</option>
+                                    <option value="United Arab Emirates">🇦🇪 United Arab Emirates</option>
+                                    <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                                    <option value="United States">🇺🇸 United States</option>
+                                    <option value="Uruguay">🇺🇾 Uruguay</option>
+                                    <option value="Uzbekistan">🇺🇿 Uzbekistan</option>
+                                    <option value="Vanuatu">🇻🇺 Vanuatu</option>
+                                    <option value="Vatican City">🇻🇦 Vatican City</option>
+                                    <option value="Venezuela">🇻🇪 Venezuela</option>
+                                    <option value="Vietnam">🇻🇳 Vietnam</option>
+                                    <option value="Yemen">🇾🇪 Yemen</option>
+                                    <option value="Zambia">🇿🇲 Zambia</option>
+                                    <option value="Zimbabwe">🇿🇼 Zimbabwe</option>
+                                </select>
+                                <select name="timezone" required class="form-input">
+                                    <option value="" disabled selected>Select Timezone Offset</option>
+                                    <option value="UTC-8 (PST)">UTC-8 (Pacific Time)</option>
+                                    <option value="UTC-5 (EST)">UTC-5 (Eastern Time)</option>
+                                    <option value="UTC+0 (GMT)">UTC+0 (Greenwich Mean Time)</option>
+                                    <option value="UTC+1 (CET)">UTC+1 (Central European Time)</option>
+                                    <option value="UTC+5:30 (IST)">UTC+5:30 (Indian Standard Time)</option>
+                                    <option value="UTC+8 (SGT/CST)">UTC+8 (Singapore / China Time)</option>
+                                    <option value="UTC+10 (AEST)">UTC+10 (Australian Eastern Time)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Player Bio & Experience -->
+                        <div>
+                            <span class="form-label">Bio and Experience</span>
+                            <textarea name="experience" placeholder="Detail past tournaments, playstyle, accolades, and team history for league scouts..." required class="form-input h-24 custom-scroll"></textarea>
+                        </div>
+
+                        <!-- Account Password -->
+                        <div>
+                            <span class="form-label">Create Password</span>
+                            <input type="password" name="password" placeholder="Create Password that you don't forget" required class="form-input">
+                        </div>
+
+                        <button type="submit" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition shadow-lg hover:shadow-blue-500/20">SUBMIT APPLICATION</button>
+                    </form>
+                    
+                    <div class="mt-6 text-center border-t border-slate-100 pt-4">
+                        <button onclick="toggleAuth()" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 transition underline underline-offset-4">Got an existing account? Sign In Here</button>
+                    </div>
+                </div>
+
+                <!-- Login Form -->
+                <div id="loginBox" class="bg-white p-8 md:p-10 rounded-[36px] shadow-2xl border border-slate-200/80 hidden-form">
+                    <div class="mb-6 border-b border-slate-100 pb-4">
+                        <span class="text-[10px] font-black text-blue-600 tracking-widest uppercase">Market Application</span>
+                        <h3 class="text-3xl font-black italic uppercase text-blue-600">Please login in market from here</h3>
+                    </div>
+
+                    <form action="/login" method="POST" class="space-y-4">
+                        <div>
+                            <span class="form-label">Roblox Account</span>
+                            <input name="username" placeholder="Enter Roblox Username" required class="form-input">
+                        </div>
+                        <div>
+                            <span class="form-label">Password</span>
+                            <input type="password" name="password" placeholder="Enter Password" required class="form-input">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition shadow-lg hover:shadow-blue-600/30">AUTHORIZE ACCESS</button>
+                    </form>
+
+                    <div class="mt-6 text-center border-t border-slate-100 pt-4">
+                        <button onclick="toggleAuth()" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 transition underline underline-offset-4">Need to registe? Submit Application</button>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</main>
+
+<script>
+    // MODE SWITCHER LOGIC (MARKET vs AUCTION HUB)
+    function switchMode(mode) {
+        const mSec = document.getElementById('marketSection');
+        const aSec = document.getElementById('auctionSection');
+        const mBtn = document.getElementById('viewMarketBtn');
+        const aBtn = document.getElementById('viewAuctionBtn');
+        const sWrap = document.getElementById('searchWrapper');
+        const fWrap = document.getElementById('filterWrapper');
+        const cWrap = document.getElementById('countWrapper');
+
+        if(mode === 'auction') {
+            mSec.classList.add('hidden');
+            aSec.classList.remove('hidden');
+            aBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 bg-white text-slate-900 shadow-sm';
+            mBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 text-slate-500 hover:text-slate-900';
+            if(sWrap) sWrap.classList.add('hidden');
+            if(fWrap) fWrap.classList.add('hidden');
+            if(cWrap) cWrap.classList.add('hidden');
+        } else {
+            aSec.classList.add('hidden');
+            mSec.classList.remove('hidden');
+            mBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 bg-white text-slate-900 shadow-sm';
+            aBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 text-slate-500 hover:text-slate-900';
+            if(sWrap) sWrap.classList.remove('hidden');
+            if(fWrap) fWrap.classList.remove('hidden');
+            if(cWrap) cWrap.classList.remove('hidden');
+        }
+    }
+
+    // AUCTION TEAM SELECTION LOGIC
+    function selectAuctionTeam(teamId) {
+        document.querySelectorAll('.team-tab').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.team-details-panel').forEach(el => el.classList.add('hidden'));
+
+        const targetCard = document.getElementById('teamCard-' + teamId);
+        const targetPanel = document.getElementById('teamDetails-' + teamId);
+
+        if(targetCard) targetCard.classList.add('active');
+        if(targetPanel) targetPanel.classList.remove('hidden');
+    }
+
+    // AUCTION TEAM SUB-TAB LOGIC (BIDDING VS ROSTER)
+    function switchTeamSubTab(teamId, tabType) {
+        const biddingTab = document.getElementById('subTab-bidding-' + teamId);
+        const rosterTab = document.getElementById('subTab-roster-' + teamId);
+        const biddingBtn = document.getElementById('tabBtn-bidding-' + teamId);
+        const rosterBtn = document.getElementById('tabBtn-roster-' + teamId);
+
+        if(tabType === 'roster') {
+            biddingTab.classList.add('hidden');
+            rosterTab.classList.remove('hidden');
+            rosterBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 text-white transition';
+            biddingBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-900 transition';
+        } else {
+            rosterTab.classList.add('hidden');
+            biddingTab.classList.remove('hidden');
+            biddingBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 text-white transition';
+            rosterBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-900 transition';
+        }
+    }
+
+    // FORM TOGGLE
+    function toggleAuth() {
+        document.getElementById('registerBox').classList.toggle('hidden-form');
+        document.getElementById('loginBox').classList.toggle('hidden-form');
+    }
+
+    // SEARCH & POSITION FILTERING LOGIC
+    let activePosFilter = 'ALL';
+
+    function setFilter(pos) {
+        activePosFilter = pos;
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            if(btn.innerText === pos) {
+                btn.className = 'filter-btn active text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-slate-900 text-white';
+            } else {
+                btn.className = 'filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition';
+            }
+        });
+        filterCards();
+    }
+
+    function filterCards() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('.card-item');
+
+        cards.forEach(card => {
+            const name = card.getAttribute('data-name');
+            const pos = card.getAttribute('data-pos');
+
+            const matchesSearch = name.includes(query);
+            const matchesPos = activePosFilter === 'ALL' || pos.includes(activePosFilter);
+
+            if (matchesSearch && matchesPos) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // 3D DYNAMIC MOUSE TILT & INSPECT SHINE EFFECT
+    function tiltCard(e, el) {
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const xc = rect.width / 2;
+        const yc = rect.height / 2;
+        const dx = (x - xc) / xc;
+        const dy = (y - yc) / yc;
+        el.style.transform = `rotateY(${dx * 14}deg) rotateX(${-dy * 14}deg) translateY(-6px)`;
+    }
+
+    function resetTilt(el) {
+        el.style.transform = `rotateY(0deg) rotateX(0deg) translateY(0px)`;
+    }
+
+    // FIFA MODAL LOGIC WITH POSITION COLOR MAPPING & AUCTION BID DATA
+    async function openBio(el, name, img, bio, discord, g, a, s, m, currentViews, pos, country, tz, highestBid, bidder, playerId, reservePrice) {
+        el.classList.add('card-active-anim');
+        
+        document.getElementById('modalName').innerText = name;
+        
+        const modalImg = document.getElementById('modalImg');
+        const placeholder = document.getElementById('modalImgPlaceholder');
+        if(img && img.trim() !== "" && img !== "undefined") {
+            modalImg.src = img;
+            modalImg.style.display = "block";
+            placeholder.style.display = "none";
+        } else {
+            modalImg.style.display = "none";
+            placeholder.style.display = "flex";
+        }
+
+        document.getElementById('modalBio').innerText = bio;
+        document.getElementById('modalDiscord').innerText = "@" + discord;
+        
+        // Dynamic Badge Styling in Modal
+        const posBadge = document.getElementById('modalPosBadge');
+        const posUpper = (pos || 'PRO').toUpperCase();
+        posBadge.innerText = posUpper;
+        
+        let posClass = 'pos-pro';
+        if(posUpper === 'FWD' || posUpper === 'FORWARD') posClass = 'pos-fwd';
+        else if(posUpper === 'MID' || posUpper === 'MIDFIELD') posClass = 'pos-mid';
+        else if(posUpper === 'DEF' || posUpper === 'DEFENSE') posClass = 'pos-def';
+        else if(posUpper === 'GK' || posUpper === 'GOALKEEPER') posClass = 'pos-gk';
+        
+        posBadge.className = `${posClass} text-white text-[10px] font-black px-3 py-1 rounded-lg italic uppercase tracking-wider`;
+
+        document.getElementById('modalCountryBadge').innerText = country || 'UNKNOWN';
+        document.getElementById('modalTZ').innerText = "TIMEZONE: " + (tz || 'N/A');
+        
+        document.getElementById('mGoals').innerText = g;
+        document.getElementById('mAssists').innerText = a;
+        document.getElementById('mSaves').innerText = s;
+        document.getElementById('mMvps').innerText = m;
+        document.getElementById('modalViews').innerText = currentViews;
+
+        // Set Auction Details in Modal safely
+        const hBid = (highestBid && highestBid !== 'undefined' && highestBid !== 'null') ? highestBid : '0';
+        const hBidder = (bidder && bidder !== 'undefined' && bidder !== 'null' && bidder !== 'None') ? bidder : null;
+        const rPrice = (reservePrice && reservePrice !== 'undefined' && reservePrice !== 'null') ? reservePrice : '0';
+
+        if(document.getElementById('modalHighestBid')) {
+    document.getElementById('modalHighestBid').innerText = hBid + " Vollars" + (hBidder ? " (" + hBidder + ")" : "");
+}
+if(document.getElementById('modalReservePrice')) {
+    document.getElementById('modalReservePrice').innerText = rPrice + " Vollars";
+}
+if(document.getElementById('modalPlayerId')) {
+    document.getElementById('modalPlayerId').value = (playerId && playerId !== 'undefined' && playerId !== 'null') ? playerId : '';
+}
+if(document.getElementById('modalWithdrawPlayerId')) {
+    document.getElementById('modalWithdrawPlayerId').value =
+        (playerId && playerId !== 'undefined' && playerId !== 'null') ? playerId : '';
+}
+if(document.getElementById('modalBidInput')) {
+    const minNextBid = Math.max(parseInt(hBid) + 1, parseInt(rPrice));
+    document.getElementById('modalBidInput').min = minNextBid;
+    document.getElementById('modalBidInput').placeholder = `Min bid: ${minNextBid} Vollars`;
+}
+
+try {
+    const response = await fetch(`/market/view/${name}`, { method: 'POST' });
+    const data = await response.json();
+    if(data.success) {
+        document.getElementById('modalViews').innerText = data.count;
+    }
+} catch(e) {
+    console.error("View count update failed", e);
+}
+
+setTimeout(() => {
+    const modal = document.getElementById('bioModal');
+    const container = document.getElementById('modalContainer');
+    modal.style.display = 'flex';
+    setTimeout(() => {
+        modal.classList.add('active');
+        container.classList.add('show');
+        el.classList.remove('card-active-anim');
+    }, 50);
+}, 350);
+}
+
+function editCurrentBid() {
+    const bidInput = document.getElementById('modalBidInput');
+    const bidButton = document.getElementById('modalBidButton');
+
+    if (!bidInput || !bidButton) return;
+
+    bidInput.focus();
+    bidInput.select();
+
+    bidButton.innerText = 'Update Bid';
+    bidButton.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+    bidButton.classList.add('bg-amber-500', 'hover:bg-amber-400');
+}
+
+function closeBio() { 
+    const modal = document.getElementById('bioModal');
+    const container = document.getElementById('modalContainer');
+    container.classList.remove('show');
+    modal.classList.remove('active');
+    setTimeout(() => { modal.style.display = 'none'; }, 350);
+}
+
+</script>

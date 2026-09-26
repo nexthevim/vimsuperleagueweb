@@ -1,0 +1,29 @@
+<%- include('partials/navbar') %>
+<div class="max-w-4xl mx-auto py-20 px-6">
+    <h1 class="heading-font text-5xl font-black italic mb-12 border-l-8 border-[#00f2ff] pl-6">PLAYER <span class="text-[#00f2ff]">STATS</span></h1>
+    <div class="glass rounded-2xl overflow-hidden">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="border-b border-white/10 bg-white/5 text-[10px] uppercase tracking-[0.2em] text-gray-400">
+                    <th class="p-6">Athlete</th>
+                    <th class="p-6">Goals</th>
+                    <th class="p-6">Saves</th>
+                    <th class="p-6">Rating</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+                <% sortedPlayers.forEach(p => { %>
+                <tr class="hover:bg-white/5 transition">
+                    <td class="p-6 flex items-center gap-4">
+                        <img src="<%= p.image %>" class="w-10 h-10 rounded-full object-cover border border-[#00f2ff]/50">
+                        <span class="font-bold"><%= p.name %></span>
+                    </td>
+                    <td class="p-6 font-mono"><%= p.goals %></td>
+                    <td class="p-6 font-mono text-gray-400"><%= p.saves %></td>
+                    <td class="p-6 font-black text-[#00f2ff]"><%= p.rating %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>

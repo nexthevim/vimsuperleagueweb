@@ -1,0 +1,1641 @@
+<script>
+    // Configure Tailwind dark mode dynamically
+    if (window.tailwind) {
+        tailwind.config = { darkMode: 'class' };
+    }
+
+    // Apply global dark/light theme instantly across all pages
+    (function() {
+        const savedTheme = localStorage.getItem('vim_theme') || "<%= typeof user !== 'undefined' && user && user.theme ? user.theme : 'system' %>";
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        const isDark = savedTheme === 'dark' || (savedTheme === 'system' && systemPrefersDark);
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    })();
+</script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+    /* GLOBAL PAGE BACKGROUND FIX FOR ALL PAGES */
+    html {
+        background-color: #f8fafc;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    html.dark {
+        background-color: #090d16 !important;
+        color-scheme: dark;
+    }
+
+    body { 
+        font-family: 'Inter', sans-serif; 
+        margin: 0; 
+        background-color: transparent !important;
+    }
+
+    html.dark body {
+        color: #f8fafc;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    html.dark ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    html.dark ::-webkit-scrollbar-thumb { background: #334155; }
+    
+    nav { z-index: 9999 !important; }
+
+    /* =========================================================
+       VIM CUSTOM CURSOR
+       ========================================================= */
+
+    @media (pointer: fine) {
+
+        html,
+        body,
+        a,
+        button,
+        input,
+        textarea,
+        select,
+        [role="button"] {
+            cursor: none !important;
+        }
+
+        #vim-cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #0088ff;
+            box-shadow:
+                0 0 8px rgba(0, 136, 255, 0.65),
+                0 0 18px rgba(0, 198, 255, 0.35);
+            pointer-events: none;
+            z-index: 9999999;
+            transform: translate(-50%, -50%);
+            transition:
+                width 0.18s ease,
+                height 0.18s ease,
+                border-color 0.18s ease,
+                background-color 0.18s ease,
+                box-shadow 0.18s ease;
+        }
+
+        #vim-cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 136, 255, 0.55);
+            background: rgba(0, 136, 255, 0.035);
+            pointer-events: none;
+            z-index: 9999998;
+            transform: translate(-50%, -50%);
+            transition:
+                width 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.22s ease,
+                background-color 0.22s ease,
+                box-shadow 0.22s ease;
+        }
+
+        html.dark #vim-cursor-dot {
+            background: #0f172a;
+            border-color: #00c6ff;
+            box-shadow:
+                0 0 8px rgba(0, 198, 255, 0.8),
+                0 0 20px rgba(0, 136, 255, 0.45);
+        }
+
+        html.dark #vim-cursor-ring {
+            border-color: rgba(0, 198, 255, 0.6);
+            background: rgba(0, 198, 255, 0.035);
+        }
+
+        #vim-cursor-ring.hover {
+            width: 48px;
+            height: 48px;
+            border-color: rgba(0, 198, 255, 0.8);
+            background: rgba(0, 198, 255, 0.06);
+            box-shadow:
+                0 0 20px rgba(0, 136, 255, 0.18),
+                inset 0 0 15px rgba(0, 198, 255, 0.04);
+        }
+
+        #vim-cursor-dot.hover {
+            width: 5px;
+            height: 5px;
+            background: #00c6ff;
+            border-color: #ffffff;
+            box-shadow:
+                0 0 10px rgba(0, 198, 255, 0.9),
+                0 0 22px rgba(0, 136, 255, 0.55);
+        }
+
+        #vim-cursor-ring.click {
+            width: 58px;
+            height: 58px;
+            border-color: rgba(0, 198, 255, 0);
+            background: rgba(0, 198, 255, 0.08);
+            box-shadow:
+                0 0 0 1px rgba(0, 198, 255, 0.15),
+                0 0 30px rgba(0, 136, 255, 0.25);
+        }
+
+        #vim-cursor-dot.hidden {
+            opacity: 0;
+        }
+
+        #vim-cursor-ring.hidden {
+            opacity: 0;
+        }
+
+        .vim-cursor-ripple {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 198, 255, 0.75);
+            pointer-events: none;
+            z-index: 9999997;
+            transform: translate(-50%, -50%) scale(1);
+            animation: vimCursorRipple 0.55s ease-out forwards;
+        }
+
+        @keyframes vimCursorRipple {
+            0% {
+                opacity: 0.9;
+                width: 10px;
+                height: 10px;
+            }
+
+            100% {
+                opacity: 0;
+                width: 58px;
+                height: 58px;
+            }
+        }
+    }
+
+    /* Frosted Glass Header */
+    .vim-nav-glass {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    html.dark .vim-nav-glass {
+        background: rgba(15, 23, 42, 0.85);
+        border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+    }
+
+    /* Navigation Link Pills */
+    .nav-link {
+        color: #64748b;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .nav-link:hover {
+        color: #0f172a;
+        background-color: rgba(241, 245, 249, 0.8);
+    }
+
+    html.dark .nav-link {
+        color: #94a3b8;
+    }
+
+    html.dark .nav-link:hover {
+        color: #f8fafc;
+        background-color: rgba(30, 41, 59, 0.8);
+    }
+
+    .nav-link.active {
+        color: #0f172a;
+        background-color: #f1f5f9;
+        font-weight: 800;
+        box-shadow: inset 0 0 0 1px rgba(203, 213, 225, 0.8);
+    }
+
+    html.dark .nav-link.active {
+        color: #ffffff;
+        background-color: #1e293b;
+        box-shadow: inset 0 0 0 1px rgba(51, 65, 85, 0.8);
+    }
+
+    /* Discord Pill Button Glow */
+    .glow-discord {
+        box-shadow: 0 4px 14px rgba(88, 101, 242, 0.25);
+        transition: all 0.2s ease;
+    }
+
+    .glow-discord:hover {
+        box-shadow: 0 6px 20px rgba(88, 101, 242, 0.4);
+        transform: translateY(-1px);
+    }
+
+    /* Mobile Menu Drawer Animation */
+    #mobile-menu { 
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+        transform: translateY(-10px); 
+        opacity: 0; 
+        pointer-events: none; 
+    }
+
+    #mobile-menu.active { 
+        transform: translateY(0); 
+        opacity: 1; 
+        pointer-events: all; 
+    }
+
+    /* =========================================================
+       VIM MINI HELP / AI BUTTONS
+       ========================================================= */
+
+    .vim-floating-tools {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        z-index: 100000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .vim-tool-button {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(203, 213, 225, 0.9);
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        color: #475569;
+        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.12);
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+    }
+
+    .vim-tool-button:hover {
+        transform: translateY(-3px) scale(1.05);
+        color: #0f172a;
+        border-color: rgba(0, 136, 255, 0.4);
+        box-shadow: 0 12px 30px rgba(0, 136, 255, 0.18);
+    }
+
+    html.dark .vim-tool-button {
+        background: rgba(15, 23, 42, 0.88);
+        border-color: rgba(51, 65, 85, 0.9);
+        color: #cbd5e1;
+    }
+
+    html.dark .vim-tool-button:hover {
+        color: #ffffff;
+        border-color: rgba(0, 136, 255, 0.55);
+        box-shadow: 0 12px 30px rgba(0, 136, 255, 0.18);
+    }
+
+    .vim-ai-button {
+        background: linear-gradient(145deg, #0f172a, #1e293b);
+        color: white;
+        border-color: rgba(71, 85, 105, 0.8);
+        box-shadow: 0 8px 25px rgba(15, 23, 42, 0.25);
+    }
+
+    .vim-ai-button:hover {
+        color: white;
+        border-color: rgba(0, 198, 255, 0.65);
+        box-shadow: 0 12px 32px rgba(0, 136, 255, 0.3);
+    }
+
+    .vim-ai-button::after {
+        content: "";
+        position: absolute;
+        inset: -3px;
+        border-radius: 50%;
+        border: 1px solid rgba(0, 198, 255, 0.2);
+        animation: vimAiPulse 2.4s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    @keyframes vimAiPulse {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 0.25;
+        }
+
+        50% {
+            transform: scale(1.18);
+            opacity: 0;
+        }
+    }
+
+    .vim-tool-label {
+        position: absolute;
+        right: 56px;
+        white-space: nowrap;
+        background: #0f172a;
+        color: white;
+        padding: 6px 9px;
+        border-radius: 8px;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0;
+        transform: translateX(5px);
+        pointer-events: none;
+        transition: all 0.2s ease;
+    }
+
+    .vim-tool-button:hover .vim-tool-label {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* =========================================================
+       VIM AI CHAT PANEL
+       ========================================================= */
+
+    #vim-ai-panel {
+        position: fixed;
+        right: 22px;
+        bottom: 82px;
+        width: min(390px, calc(100vw - 32px));
+        height: min(570px, calc(100vh - 110px));
+        z-index: 100001;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(203, 213, 225, 0.9);
+        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.22);
+        opacity: 0;
+        transform: translateY(16px) scale(0.96);
+        transform-origin: bottom right;
+        pointer-events: none;
+        transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #vim-ai-panel.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: all;
+    }
+
+    html.dark #vim-ai-panel {
+        background: rgba(9, 13, 22, 0.95);
+        border-color: rgba(51, 65, 85, 0.85);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+    }
+
+    .vim-ai-header {
+        padding: 17px 18px;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+    }
+
+    html.dark .vim-ai-header {
+        border-bottom-color: rgba(30, 41, 59, 0.9);
+    }
+
+    .vim-ai-brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .vim-ai-logo {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        background: linear-gradient(145deg, #0f172a, #334155);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 5px 15px rgba(15, 23, 42, 0.2);
+    }
+
+    .vim-ai-status {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    .vim-ai-close {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        border: none;
+        background: transparent;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .vim-ai-close:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+    }
+
+    html.dark .vim-ai-close:hover {
+        background: #1e293b;
+        color: white;
+    }
+
+    /* AI messages */
+    #vim-ai-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+        scroll-behavior: smooth;
+    }
+
+    .vim-ai-message {
+        max-width: 88%;
+        padding: 11px 13px;
+        border-radius: 14px;
+        font-size: 12px;
+        line-height: 1.55;
+        animation: vimMessageIn 0.25s ease forwards;
+    }
+
+    @keyframes vimMessageIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .vim-ai-message.bot {
+        align-self: flex-start;
+        background: #f1f5f9;
+        color: #334155;
+        border-bottom-left-radius: 5px;
+    }
+
+    html.dark .vim-ai-message.bot {
+        background: #172033;
+        color: #cbd5e1;
+    }
+
+    .vim-ai-message.user {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #0088ff, #00aeea);
+        color: white;
+        border-bottom-right-radius: 5px;
+        box-shadow: 0 5px 15px rgba(0, 136, 255, 0.16);
+    }
+
+    .vim-ai-message strong {
+        font-weight: 800;
+    }
+
+    .vim-ai-message a {
+        color: #0088ff;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .vim-ai-message a:hover {
+        text-decoration: underline;
+    }
+
+    .vim-ai-typing {
+        align-self: flex-start;
+        background: #f1f5f9;
+        color: #94a3b8;
+        padding: 11px 14px;
+        border-radius: 14px;
+        border-bottom-left-radius: 5px;
+        display: flex;
+        gap: 4px;
+        animation: vimMessageIn 0.2s ease forwards;
+    }
+
+    html.dark .vim-ai-typing {
+        background: #172033;
+    }
+
+    .vim-ai-typing span {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+        animation: vimTyping 1s infinite;
+    }
+
+    .vim-ai-typing span:nth-child(2) {
+        animation-delay: 0.15s;
+    }
+
+    .vim-ai-typing span:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    @keyframes vimTyping {
+        0%, 60%, 100% {
+            transform: translateY(0);
+            opacity: 0.45;
+        }
+
+        30% {
+            transform: translateY(-3px);
+            opacity: 1;
+        }
+    }
+
+    /* Suggested questions */
+    .vim-ai-suggestions {
+        padding: 0 18px 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        flex-shrink: 0;
+    }
+
+    .vim-ai-suggestion {
+        border: 1px solid #e2e8f0;
+        background: white;
+        color: #475569;
+        border-radius: 999px;
+        padding: 7px 10px;
+        font-size: 9px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .vim-ai-suggestion:hover {
+        border-color: #7dd3fc;
+        color: #0284c7;
+        background: #f0f9ff;
+        transform: translateY(-1px);
+    }
+
+    html.dark .vim-ai-suggestion {
+        background: #111827;
+        border-color: #334155;
+        color: #94a3b8;
+    }
+
+    html.dark .vim-ai-suggestion:hover {
+        border-color: #0369a1;
+        color: #7dd3fc;
+        background: #0f172a;
+    }
+
+    /* Input */
+    .vim-ai-input-wrap {
+        padding: 12px 14px 14px;
+        border-top: 1px solid rgba(226, 232, 240, 0.8);
+        flex-shrink: 0;
+    }
+
+    html.dark .vim-ai-input-wrap {
+        border-top-color: rgba(30, 41, 59, 0.9);
+    }
+
+    .vim-ai-input-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 5px 5px 5px 13px;
+        transition: all 0.2s ease;
+    }
+
+    .vim-ai-input-box:focus-within {
+        border-color: rgba(0, 136, 255, 0.5);
+        box-shadow: 0 0 0 3px rgba(0, 136, 255, 0.08);
+    }
+
+    html.dark .vim-ai-input-box {
+        background: #0f172a;
+        border-color: #334155;
+    }
+
+    .vim-ai-input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: #0f172a;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .vim-ai-input::placeholder {
+        color: #94a3b8;
+    }
+
+    html.dark .vim-ai-input {
+        color: #f8fafc;
+    }
+
+    .vim-ai-send {
+        width: 34px;
+        height: 34px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0088ff, #00b8ed);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .vim-ai-send:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0, 136, 255, 0.25);
+    }
+
+    .vim-ai-disclaimer {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 8px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-top: 7px;
+    }
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 640px) {
+
+        .vim-floating-tools {
+            right: 14px;
+            bottom: 14px;
+            gap: 8px;
+        }
+
+        .vim-tool-button {
+            width: 42px;
+            height: 42px;
+        }
+
+        .vim-tool-label {
+            display: none;
+        }
+
+        #vim-ai-panel {
+            right: 12px;
+            bottom: 70px;
+            width: calc(100vw - 24px);
+            height: min(570px, calc(100vh - 90px));
+            border-radius: 20px;
+        }
+    }
+</style>
+
+<nav class="fixed top-0 w-full vim-nav-glass h-20 transition-all duration-300">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+        
+        <!-- BRAND LOGO & USER AVATAR -->
+        <div class="flex items-center gap-4 lg:gap-6">
+            <a href="/" class="flex items-center gap-3 shrink-0 group">
+                <!-- Enlarged VIM Logo -->
+                <img src="/images/vimlogo.png" alt="VIM Super League Logo" class="w-12 h-12 object-contain group-hover:scale-105 transition-transform drop-shadow-md" />
+                
+                <!-- Updated Brand Colors (White/Slate instead of Blue) -->
+                <span class="text-lg md:text-xl font-black tracking-tight text-slate-900 dark:text-white uppercase whitespace-nowrap">
+                    VIM <span class="text-slate-500 dark:text-slate-400 font-extrabold">SUPER LEAGUE</span>
+                </span>
+            </a>
+
+            <!-- USER ACCOUNT BADGE -->
+            <div class="flex items-center gap-3 border-l border-slate-200/80 dark:border-slate-800 pl-4 lg:pl-6">
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <a href="/profile" class="flex items-center gap-2.5 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 px-3 py-1.5 rounded-full border border-slate-200/80 dark:border-slate-700 transition group">
+                        <div class="w-6 h-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full flex items-center justify-center font-black text-[10px]">
+                            <%= user.name.charAt(0).toUpperCase() %>
+                        </div>
+
+                        <div class="text-left hidden md:block">
+                            <p class="text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight leading-none"><%= user.name %></p>
+                        </div>
+                    </a>
+
+                    <a href="/logout" class="text-[9px] font-black uppercase tracking-wider text-slate-400 hover:text-rose-600 transition">
+                        Logout
+                    </a>
+                <% } else { %>
+                    <a href="/profile" class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition whitespace-nowrap shadow-sm">
+                        Sign In
+                    </a>
+                <% } %>
+            </div>
+        </div>
+        
+        <!-- DESKTOP NAVIGATION LINKS -->
+        <div class="hidden xl:flex items-center gap-1.5 bg-slate-100/50 dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200/60 dark:border-slate-800">
+            <% 
+                const currentPage = (typeof page !== 'undefined') ? page : ''; 
+                const getActive = (p) => (currentPage === p) ? 'active' : ''; 
+            %>
+
+            <a href="/" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('home') %>">Home</a>
+
+            <a href="/market" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('market') %>">Market</a>
+
+            <a href="/matches" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('matches') %>">Matches</a>
+
+            <a href="/metrics" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('metrics') %>">Metrics</a>
+
+            <a href="/league-records" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('records') %>">Records</a>
+
+            <a href="/info" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('info') %>">Info</a>
+
+            <a href="/admin" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('admin') %>">Admin</a>
+        </div>
+
+        <!-- COMMUNITY CTA & HANDBOOK -->
+        <div class="hidden xl:flex items-center gap-4">
+
+            <a href="https://vimsuperleague-rulebook.base44.app/" target="_blank" class="text-slate-400 hover:text-slate-900 dark:hover:text-white text-[10px] font-black uppercase tracking-widest transition-colors">
+                Handbook
+            </a>
+
+            <a href="https://discord.gg/2mjZbshphg" target="_blank" class="glow-discord bg-[#5865F2] text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition flex items-center gap-2">
+
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.334.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.334.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/>
+                </svg>
+
+                Discord
+            </a>
+        </div>
+
+        <!-- MOBILE MENU BUTTON -->
+        <button onclick="document.getElementById('mobile-menu').classList.toggle('active')" class="xl:hidden p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white">
+
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+
+        </button>
+    </div>
+
+    <!-- MOBILE DROPDOWN MENU -->
+    <div id="mobile-menu" class="absolute top-20 left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 xl:hidden px-6 py-6 flex flex-col gap-3 shadow-xl">
+
+        <a href="/" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100">
+            Home
+        </a>
+
+        <a href="/market" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
+            Market
+        </a>
+
+        <a href="/matches" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
+            Matches
+        </a>
+
+        <a href="/metrics" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
+            Metrics
+        </a>
+
+        <a href="/league-records" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
+            League Records
+        </a>
+
+        <a href="/info" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
+            Info
+        </a>
+
+        <a href="/admin" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
+            Admin
+        </a>
+        
+        <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3">
+
+            <a href="https://discord.gg/9Jz2d5PkwB" target="_blank" class="bg-[#5865F2] text-white text-center py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-sm">
+                Join Discord Community
+            </a>
+
+            <a href="https://vimsuperleague-rulebook.base44.app/" target="_blank" class="text-slate-400 text-center text-[10px] font-black uppercase tracking-widest">
+                Official Handbook
+            </a>
+
+        </div>
+    </div>
+</nav>
+
+<!-- NAV SPACER -->
+<div class="h-20"></div>
+
+
+<!-- =========================================================
+     VIM FLOATING HELP + AI
+     ========================================================= -->
+
+<div class="vim-floating-tools">
+
+    <!-- HELP / TUTORIAL BUTTON -->
+    <button
+        id="vim-help-button"
+        type="button"
+        class="vim-tool-button"
+        aria-label="VIM Help"
+        title="Open League Guide"
+        onclick="window.dispatchEvent(new CustomEvent('vim:open-tour'))"
+    >
+        <span class="vim-tool-label">League Guide</span>
+        <span class="text-lg font-black leading-none">?</span>
+    </button>
+
+    <!-- AI BUTTON -->
+    <button
+        id="vim-ai-button"
+        type="button"
+        class="vim-tool-button vim-ai-button"
+        aria-label="VIM AI Assistant"
+        onclick="toggleVimAI()"
+    >
+        <span class="vim-tool-label">VIM Assistant</span>
+
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 3l1.35 4.65L18 9l-4.65 1.35L12 15l-1.35-4.65L6 9l4.65-1.35L12 3z"></path>
+            <path d="M19 14l.7 2.3L22 17l-2.3.7L19 20l-.7-2.3L16 17l2.3-.7L19 14z"></path>
+        </svg>
+    </button>
+
+</div>
+
+
+<!-- =========================================================
+     VIM AI CHAT PANEL
+     ========================================================= -->
+
+<div id="vim-ai-panel">
+
+    <!-- HEADER -->
+    <div class="vim-ai-header">
+
+        <div class="vim-ai-brand">
+
+            <div class="vim-ai-logo">
+
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 3l1.35 4.65L18 9l-4.65 1.35L12 15l-1.35-4.65L6 9l4.65-1.35L12 3z"></path>
+                    <path d="M19 14l.7 2.3L22 17l-2.3.7L19 20l-.7-2.3L16 17l2.3-.7L19 14z"></path>
+                </svg>
+
+            </div>
+
+            <div>
+
+                <div class="flex items-center">
+
+                    <span class="vim-ai-status"></span>
+
+                    <span class="text-[11px] font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                        VIM Assistant
+                    </span>
+
+                </div>
+
+                <p class="text-[9px] text-slate-400 font-semibold mt-0.5">
+                    League knowledge system
+                </p>
+
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="vim-ai-close"
+            aria-label="Close VIM Assistant"
+            onclick="toggleVimAI(false)"
+        >
+
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M6 6l12 12M18 6L6 18"></path>
+            </svg>
+
+        </button>
+
+    </div>
+
+
+    <!-- MESSAGES -->
+    <div id="vim-ai-messages">
+
+        <div class="vim-ai-message bot">
+            Yo 👋 I'm the <strong>VIM Assistant</strong>.<br><br>
+            I'm still running in local mode for now, but I can help explain the league, pages, player market, matches, metrics and more.
+        </div>
+
+    </div>
+
+
+    <!-- QUICK QUESTIONS -->
+    <div class="vim-ai-suggestions">
+
+        <button
+            type="button"
+            class="vim-ai-suggestion"
+            onclick="askVimAI('What is the Player Market?')"
+        >
+            Player Market
+        </button>
+
+        <button
+            type="button"
+            class="vim-ai-suggestion"
+            onclick="askVimAI('How do matches work?')"
+        >
+            Matches
+        </button>
+
+        <button
+            type="button"
+            class="vim-ai-suggestion"
+            onclick="askVimAI('What are Metrics?')"
+        >
+            Metrics
+        </button>
+
+        <button
+            type="button"
+            class="vim-ai-suggestion"
+            onclick="askVimAI('How do I join VIM?')"
+        >
+            Join VIM
+        </button>
+
+    </div>
+
+
+    <!-- INPUT -->
+    <div class="vim-ai-input-wrap">
+
+        <form
+            id="vim-ai-form"
+            onsubmit="handleVimAISubmit(event)"
+        >
+
+            <div class="vim-ai-input-box">
+
+                <input
+                    id="vim-ai-input"
+                    class="vim-ai-input"
+                    type="text"
+                    autocomplete="off"
+                    maxlength="300"
+                    placeholder="Ask about VIM..."
+                >
+
+                <button
+                    type="submit"
+                    class="vim-ai-send"
+                    aria-label="Send message"
+                >
+
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path d="M4 12l16-8-5 16-3.5-6.5L4 12z"></path>
+                        <path d="M11.5 13.5L20 4"></path>
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </form>
+
+        <div class="vim-ai-disclaimer">
+            Local VIM knowledge • AI mode coming later
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     VIM AI + CURSOR + LEAGUE GUIDE BRIDGE
+     ========================================================= -->
+
+<script>
+/* =========================================================
+   VIM AI — LOCAL KNOWLEDGE ASSISTANT
+   ========================================================= */
+
+(function() {
+
+    const panel = document.getElementById('vim-ai-panel');
+    const input = document.getElementById('vim-ai-input');
+    const messages = document.getElementById('vim-ai-messages');
+
+    if (!panel || !input || !messages) return;
+
+
+    /* ---------------------------------------------------------
+       KNOWLEDGE BASE
+       --------------------------------------------------------- */
+
+    const knowledgeBase = [
+
+        {
+            keywords: ['market', 'player market', 'player card', 'players', 'buy player', 'scout'],
+            response: `The <strong>Player Market</strong> is where registered VIM players can be viewed, scouted and evaluated. Player cards contain information such as position, stats, experience and market-related details.<br><br><a href="/market">Open Player Market →</a>`
+        },
+
+        {
+            keywords: ['match', 'matches', 'fixture', 'fixtures', 'game', 'games', 'schedule'],
+            response: `The <strong>Matches</strong> section is your fixture hub. You can check upcoming fixtures, completed matches and open individual match reports.<br><br><a href="/matches">Open Matches →</a>`
+        },
+
+        {
+            keywords: ['metric', 'metrics', 'stats', 'statistics', 'stat'],
+            response: `<strong>Metrics</strong> is the league performance area. It's designed for tracking player performance and league-wide statistics.<br><br><a href="/metrics">Open Metrics →</a>`
+        },
+
+        {
+            keywords: ['record', 'records', 'history', 'historic', 'achievement'],
+            response: `<strong>League Records</strong> is where VIM's historical achievements and notable records can be explored.<br><br><a href="/league-records">Open Records →</a>`
+        },
+
+        {
+            keywords: ['info', 'information', 'rules', 'league', 'how does vim work', 'what is vim'],
+            response: `<strong>VIM Super League</strong> is the main league hub. This website brings together the player market, fixtures, statistics, records, league information and community links in one place.<br><br><a href="/info">Open League Info →</a>`
+        },
+
+        {
+            keywords: ['join', 'register', 'registration', 'free agent', 'become player', 'play'],
+            response: `Want to get involved? Start by checking the league information and joining the VIM community. Player registration and recruitment happen around the league's player ecosystem.<br><br><a href="/info">League Information →</a>`
+        },
+
+        {
+            keywords: ['discord', 'community', 'server'],
+            response: `The VIM Discord is the community hub where players, teams and league members can connect.<br><br><a href="https://discord.gg/9Jz2d5PkwB" target="_blank">Join the Discord →</a>`
+        },
+
+        {
+            keywords: ['handbook', 'rulebook', 'rules book'],
+            response: `The official VIM Handbook contains the league's rules and regulations.<br><br><a href="https://vimsuperleague-rulebook.base44.app/" target="_blank">Open Official Handbook →</a>`
+        },
+
+        {
+            keywords: ['home', 'homepage', 'main page'],
+            response: `You're already on the VIM home base 😭. The homepage gives you quick access to fixtures, broadcasts, recent results, league stories and the main navigation.`
+        },
+
+        {
+            keywords: ['admin', 'administrator', 'dashboard'],
+            response: `The <strong>Admin</strong> area is for authorised league management and administrative tools. If you're not a league administrator, you probably won't need to use it.`
+        },
+
+        {
+            keywords: ['goal', 'goals', 'scoring'],
+            response: `Goals are one of the core player performance statistics tracked across VIM. For the current player numbers, check the <strong>Metrics</strong> section or individual player information.<br><br><a href="/metrics">Open Metrics →</a>`
+        },
+
+        {
+            keywords: ['assist', 'assists'],
+            response: `Assists are tracked as part of player performance statistics. The Metrics section is the place to inspect league-wide performance data.<br><br><a href="/metrics">Open Metrics →</a>`
+        },
+
+        {
+            keywords: ['save', 'saves', 'goalkeeper', 'keeper', 'gk'],
+            response: `Saves are tracked as a player statistic, particularly useful for evaluating goalkeepers. Check the Metrics section for league performance data.<br><br><a href="/metrics">Open Metrics →</a>`
+        },
+
+        {
+            keywords: ['mvp', 'most valuable', 'valuable player'],
+            response: `MVPs are tracked as a player achievement/performance statistic. You can use Metrics to explore player performance data.`
+        },
+
+        {
+            keywords: ['position', 'positions', 'fwd', 'mid', 'def', 'forward', 'defender', 'midfielder'],
+            response: `Player positions describe their role on the pitch. VIM player cards can contain position information alongside their other player details. Check the <strong>Player Market</strong> to scout the available cards.<br><br><a href="/market">Open Player Market →</a>`
+        },
+
+        {
+            keywords: ['profile', 'account', 'login', 'sign in'],
+            response: `Your player/account area is available through the profile button in the navbar. If you're signed in, you'll see your account badge there.`
+        },
+
+        {
+            keywords: ['hello', 'hi', 'hey', 'yo', 'sup', 'wassup', 'wsp'],
+            response: `Yooo 😭 What's good? I'm the VIM Assistant. Ask me about the Market, Matches, Metrics, Records, rules or how the league works.`
+        },
+
+        {
+            keywords: ['who are you', 'what are you', 'ai', 'assistant'],
+            response: `I'm the <strong>VIM Assistant</strong> ✦. Right now I'm a local knowledge assistant built directly into the VIM website. I'm not connected to a real AI model yet — that's the next evolution 👀.`
+        },
+
+        {
+            keywords: ['help', 'what can you do', 'commands'],
+            response: `I can currently explain the main VIM sections, including:<br><br>• Player Market<br>• Matches & fixtures<br>• Metrics & stats<br>• League Records<br>• League information<br>• Community & Handbook<br>• Player registration basics<br><br>Try asking me something naturally!`
+        }
+
+    ];
+
+
+    /* ---------------------------------------------------------
+       RESPONSE ENGINE
+       --------------------------------------------------------- */
+
+    function generateResponse(question) {
+
+        const normalized = question
+            .toLowerCase()
+            .replace(/[?!.,]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        if (!normalized) {
+            return `Ask me something about VIM 👀`;
+        }
+
+
+        let bestMatch = null;
+        let bestScore = 0;
+
+        knowledgeBase.forEach(item => {
+
+            let score = 0;
+
+            item.keywords.forEach(keyword => {
+
+                if (normalized.includes(keyword)) {
+
+                    score += keyword.length >= 8 ? 3 : 2;
+
+                }
+
+            });
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestMatch = item;
+            }
+
+        });
+
+
+        if (bestMatch && bestScore > 0) {
+            return bestMatch.response;
+        }
+
+
+        /* Basic navigation detection */
+
+        if (normalized.includes('where') && normalized.includes('market')) {
+            return `The Player Market is in the main navigation at the top of the site.<br><br><a href="/market">Go to Market →</a>`;
+        }
+
+        if (normalized.includes('where') && normalized.includes('match')) {
+            return `Matches are available from the main navigation.<br><br><a href="/matches">Go to Matches →</a>`;
+        }
+
+
+        /* Unknown question fallback */
+
+        return `Hmm, I don't have that one in my VIM knowledge base yet 😭.<br><br>
+        Try asking about the <strong>Player Market</strong>, <strong>Matches</strong>, <strong>Metrics</strong>, <strong>League Records</strong>, the <strong>Handbook</strong>, or how to <strong>join VIM</strong>.`;
+    }
+
+
+    /* ---------------------------------------------------------
+       ADD MESSAGE
+       --------------------------------------------------------- */
+
+    function addMessage(content, type) {
+
+        const message = document.createElement('div');
+
+        message.className = `vim-ai-message ${type}`;
+        message.innerHTML = content;
+
+        messages.appendChild(message);
+
+        messages.scrollTop = messages.scrollHeight;
+
+        return message;
+    }
+
+
+    /* ---------------------------------------------------------
+       TYPING EFFECT
+       --------------------------------------------------------- */
+
+    function showTyping() {
+
+        const typing = document.createElement('div');
+
+        typing.className = 'vim-ai-typing';
+        typing.id = 'vim-ai-typing';
+
+        typing.innerHTML = `
+            <span></span>
+            <span></span>
+            <span></span>
+        `;
+
+        messages.appendChild(typing);
+
+        messages.scrollTop = messages.scrollHeight;
+
+    }
+
+
+    function removeTyping() {
+
+        const typing = document.getElementById('vim-ai-typing');
+
+        if (typing) {
+            typing.remove();
+        }
+
+    }
+
+
+    /* ---------------------------------------------------------
+       ASK AI
+       --------------------------------------------------------- */
+
+    window.askVimAI = function(question) {
+
+        if (!question || !question.trim()) return;
+
+        const cleanQuestion = question.trim();
+
+        addMessage(
+            escapeHtml(cleanQuestion),
+            'user'
+        );
+
+        showTyping();
+
+        const delay = 500 + Math.random() * 650;
+
+        setTimeout(() => {
+
+            removeTyping();
+
+            const response = generateResponse(cleanQuestion);
+
+            addMessage(response, 'bot');
+
+        }, delay);
+
+    };
+
+
+    /* ---------------------------------------------------------
+       FORM SUBMISSION
+       --------------------------------------------------------- */
+
+    window.handleVimAISubmit = function(event) {
+
+        event.preventDefault();
+
+        const question = input.value.trim();
+
+        if (!question) return;
+
+        input.value = '';
+
+        askVimAI(question);
+
+    };
+
+
+    /* ---------------------------------------------------------
+       OPEN / CLOSE
+       --------------------------------------------------------- */
+
+    window.toggleVimAI = function(forceState) {
+
+        let shouldOpen;
+
+        if (typeof forceState === 'boolean') {
+            shouldOpen = forceState;
+        } else {
+            shouldOpen = !panel.classList.contains('active');
+        }
+
+        if (shouldOpen) {
+
+            panel.classList.add('active');
+
+            setTimeout(() => {
+                input.focus();
+            }, 180);
+
+        } else {
+
+            panel.classList.remove('active');
+
+        }
+
+    };
+
+
+    /* ---------------------------------------------------------
+       ESCAPE HTML
+       --------------------------------------------------------- */
+
+    function escapeHtml(text) {
+
+        const div = document.createElement('div');
+
+        div.textContent = text;
+
+        return div.innerHTML;
+
+    }
+
+
+    /* ---------------------------------------------------------
+       CLOSE WHEN CLICKING OUTSIDE
+       --------------------------------------------------------- */
+
+    document.addEventListener('click', function(event) {
+
+        if (!panel.classList.contains('active')) return;
+
+        const aiButton = document.getElementById('vim-ai-button');
+
+        if (
+            !panel.contains(event.target) &&
+            aiButton &&
+            !aiButton.contains(event.target)
+        ) {
+            panel.classList.remove('active');
+        }
+
+    });
+
+
+    /* ---------------------------------------------------------
+       ESC TO CLOSE
+       --------------------------------------------------------- */
+
+    document.addEventListener('keydown', function(event) {
+
+        if (event.key === 'Escape' && panel.classList.contains('active')) {
+            panel.classList.remove('active');
+        }
+
+    });
+
+
+    /* ---------------------------------------------------------
+       AI KEYBOARD SHORTCUT
+       Ctrl + /
+       --------------------------------------------------------- */
+
+    document.addEventListener('keydown', function(event) {
+
+        if (
+            event.ctrlKey &&
+            event.key === '/'
+        ) {
+
+            event.preventDefault();
+
+            toggleVimAI(true);
+
+        }
+
+    });
+
+})();
+
+
+/* =========================================================
+   VIM LEAGUE GUIDE BRIDGE
+   =========================================================
+
+   The actual tour lives in index.ejs.
+
+   The navbar ? dispatches this event.
+   This listener finds the original homepage
+   tour launcher and triggers it.
+
+   This means the original tour code remains
+   completely untouched.
+   ========================================================= */
+
+window.addEventListener('vim:open-tour', function() {
+
+    const tourLauncher = document.getElementById('vim-tour-launcher');
+
+    if (tourLauncher) {
+        tourLauncher.click();
+    }
+
+});
+
+
+/* =========================================================
+   VIM CUSTOM CURSOR
+   ========================================================= */
+
+(function() {
+
+    if (!window.matchMedia('(pointer: fine)').matches) {
+        return;
+    }
+
+    const dot = document.createElement('div');
+    const ring = document.createElement('div');
+
+    dot.id = 'vim-cursor-dot';
+    ring.id = 'vim-cursor-ring';
+
+    document.body.appendChild(ring);
+    document.body.appendChild(dot);
+
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    let ringX = mouseX;
+    let ringY = mouseY;
+
+    let mouseInside = false;
+
+
+    function updateCursor() {
+
+        dot.style.left = mouseX + 'px';
+        dot.style.top = mouseY + 'px';
+
+        ringX += (mouseX - ringX) * 0.16;
+        ringY += (mouseY - ringY) * 0.16;
+
+        ring.style.left = ringX + 'px';
+        ring.style.top = ringY + 'px';
+
+        requestAnimationFrame(updateCursor);
+
+    }
+
+
+    document.addEventListener('mousemove', function(event) {
+
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+
+        if (!mouseInside) {
+            mouseInside = true;
+
+            dot.classList.remove('hidden');
+            ring.classList.remove('hidden');
+        }
+
+    });
+
+
+    document.addEventListener('mouseleave', function() {
+
+        mouseInside = false;
+
+        dot.classList.add('hidden');
+        ring.classList.add('hidden');
+
+    });
+
+
+    document.addEventListener('mouseenter', function() {
+
+        mouseInside = true;
+
+        dot.classList.remove('hidden');
+        ring.classList.remove('hidden');
+
+    });
+
+
+    document.addEventListener('mouseover', function(event) {
+
+        const target = event.target;
+
+        if (
+            target.closest('a') ||
+            target.closest('button') ||
+            target.closest('input') ||
+            target.closest('textarea') ||
+            target.closest('select') ||
+            target.closest('[role="button"]')
+        ) {
+
+            dot.classList.add('hover');
+            ring.classList.add('hover');
+
+        }
+
+    });
+
+
+    document.addEventListener('mouseout', function(event) {
+
+        const target = event.target;
+
+        if (
+            target.closest('a') ||
+            target.closest('button') ||
+            target.closest('input') ||
+            target.closest('textarea') ||
+            target.closest('select') ||
+            target.closest('[role="button"]')
+        ) {
+
+            dot.classList.remove('hover');
+            ring.classList.remove('hover');
+
+        }
+
+    });
+
+
+    document.addEventListener('mousedown', function() {
+
+        ring.classList.add('click');
+
+    });
+
+
+    document.addEventListener('mouseup', function() {
+
+        ring.classList.remove('click');
+
+    });
+
+
+    document.addEventListener('click', function(event) {
+
+        const ripple = document.createElement('div');
+
+        ripple.className = 'vim-cursor-ripple';
+
+        ripple.style.left = event.clientX + 'px';
+        ripple.style.top = event.clientY + 'px';
+
+        document.body.appendChild(ripple);
+
+        setTimeout(function() {
+            ripple.remove();
+        }, 600);
+
+    });
+
+
+    updateCursor();
+
+})();
+</script>

@@ -1,0 +1,1399 @@
+<%- include('partials/navbar') %>
+
+<%
+    const details = match.details || {};
+
+    const goalsA = parseInt(details.goalsA) || 0;
+    const goalsB = parseInt(details.goalsB) || 0;
+
+    const lineupA = details.lineupPlayersA || [];
+    const lineupB = details.lineupPlayersB || [];
+
+    const recentMeetings = details.recentMeetings || [];
+
+    const matchDate = details.date || match.date || '';
+    const competition = details.competition || match.competition || 'VIM SUPER LEAGUE';
+    const status = details.status || 'FULL TIME';
+
+    const videoUrl = details.videoUrl || details.highlights || '';
+
+    const remarks =
+        details.remarks ||
+        details.narrative ||
+        `An intense battle between ${match.teamA} and ${match.teamB}.`;
+
+    const mvpName = details.mvpName || 'N/A';
+    const mvpCard = details.mvpCardUrl || '';
+
+    const stats = [
+        {
+            label: 'Shots',
+            a: details.shotsA || 0,
+            b: details.shotsB || 0
+        },
+        {
+            label: 'Shots on Target',
+            a: details.shotsOnTargetA || 0,
+            b: details.shotsOnTargetB || 0
+        },
+        {
+            label: 'Possession',
+            a: details.possessionA || '50%',
+            b: details.possessionB || '50%'
+        },
+        {
+            label: 'Passes',
+            a: details.passesA || 0,
+            b: details.passesB || 0
+        },
+        {
+            label: 'Pass Accuracy',
+            a: details.passAccA || '0%',
+            b: details.passAccB || '0%'
+        },
+        {
+            label: 'Fouls',
+            a: details.foulsA || 0,
+            b: details.foulsB || 0
+        },
+        {
+            label: 'Corners',
+            a: details.cornersA || 0,
+            b: details.cornersB || 0
+        },
+        {
+            label: 'Offsides',
+            a: details.offsidesA || 0,
+            b: details.offsidesB || 0
+        },
+        {
+            label: 'Yellow Cards',
+            a: details.yellowA || 0,
+            b: details.yellowB || 0
+        },
+        {
+            label: 'Red Cards',
+            a: details.redA || 0,
+            b: details.redB || 0
+        }
+    ];
+%>
+
+<style>
+    .match-page {
+        background: #f5f7fb;
+        min-height: 100vh;
+        color: #0f172a;
+    }
+
+    .match-shell {
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+
+    .match-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+    }
+
+    .tab-btn.active {
+        background: #111827;
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
+    }
+
+    .tab-btn {
+        color: #64748b;
+    }
+
+    .tab-btn:hover {
+        color: #111827;
+    }
+
+    .pitch {
+        position: relative;
+        width: 100%;
+        max-width: 850px;
+        min-height: 850px;
+        margin: 0 auto;
+        overflow: hidden;
+        border-radius: 32px;
+        background:
+            repeating-linear-gradient(
+                0deg,
+                #239447 0px,
+                #239447 75px,
+                #208a42 75px,
+                #208a42 150px
+            );
+        box-shadow:
+            inset 0 0 0 2px rgba(255,255,255,0.5),
+            0 30px 70px rgba(15,23,42,0.16);
+    }
+
+    .pitch-lines {
+        position: absolute;
+        inset: 24px;
+        border: 2px solid rgba(255,255,255,0.65);
+        border-radius: 20px;
+        pointer-events: none;
+    }
+
+    .pitch-halfway {
+        position: absolute;
+        left: 24px;
+        right: 24px;
+        top: 50%;
+        border-top: 2px solid rgba(255,255,255,0.65);
+    }
+
+    .pitch-circle {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border: 2px solid rgba(255,255,255,0.65);
+        border-radius: 50%;
+    }
+
+    .pitch-center-dot {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 50%;
+    }
+
+    .penalty-box-top,
+    .penalty-box-bottom {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 230px;
+        height: 110px;
+        border: 2px solid rgba(255,255,255,0.65);
+    }
+
+    .penalty-box-top {
+        top: 24px;
+        border-top: none;
+    }
+
+    .penalty-box-bottom {
+        bottom: 24px;
+        border-bottom: none;
+    }
+
+    .goal-box-top,
+    .goal-box-bottom {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 50px;
+        border: 2px solid rgba(255,255,255,0.65);
+    }
+
+    .goal-box-top {
+        top: 24px;
+        border-top: none;
+    }
+
+    .goal-box-bottom {
+        bottom: 24px;
+        border-bottom: none;
+    }
+
+    .player-marker {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        width: 104px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 20;
+        transition: transform 0.2s ease;
+    }
+
+    .player-marker:hover {
+        transform: translate(-50%, -50%) scale(1.08);
+        z-index: 50;
+    }
+
+    .player-avatar {
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 5px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 3px solid #111827;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        font-size: 12px;
+        font-weight: 900;
+        color: #111827;
+    }
+
+    .player-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .player-label {
+        background: rgba(15,23,42,0.92);
+        color: white;
+        border-radius: 8px;
+        padding: 5px 7px;
+        font-size: 8px;
+        font-weight: 900;
+        text-transform: uppercase;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .player-rating {
+        display: inline-block;
+        background: white;
+        color: #111827;
+        border-radius: 5px;
+        padding: 2px 5px;
+        margin-bottom: 3px;
+        font-size: 8px;
+        font-weight: 900;
+    }
+
+    .team-badge {
+        width: 92px;
+        height: 92px;
+        border-radius: 24px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .team-badge img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .stat-bar {
+        height: 6px;
+        border-radius: 999px;
+        background: #e5e7eb;
+        overflow: hidden;
+    }
+
+    .stat-bar-fill-a {
+        height: 100%;
+        background: #2563eb;
+        border-radius: 999px;
+    }
+
+    .stat-bar-fill-b {
+        height: 100%;
+        background: #ef4444;
+        border-radius: 999px;
+    }
+
+    .player-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: rgba(15,23,42,0.55);
+        backdrop-filter: blur(10px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .player-modal.active {
+        display: flex;
+    }
+
+    @media (max-width: 768px) {
+        .pitch {
+            min-height: 700px;
+        }
+
+        .player-marker {
+            width: 82px;
+        }
+
+        .player-avatar {
+            width: 42px;
+            height: 42px;
+        }
+
+        .team-badge {
+            width: 65px;
+            height: 65px;
+        }
+    }
+</style>
+
+<main class="match-page pt-24 pb-16 px-4 md:px-6">
+    <div class="match-shell space-y-8">
+
+        <!-- ========================================================= -->
+        <!-- MATCH HEADER -->
+        <!-- ========================================================= -->
+
+        <section class="match-card rounded-[36px] overflow-hidden">
+
+            <div class="px-6 md:px-10 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600">
+                        <%= competition %>
+                    </p>
+                    <% if (matchDate) { %>
+                        <p class="text-xs font-bold text-slate-400 mt-1">
+                            <%= matchDate %>
+                        </p>
+                    <% } %>
+                </div>
+
+                <span class="px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-[9px] font-black uppercase tracking-widest">
+                    <%= status %>
+                </span>
+            </div>
+
+            <div class="px-6 md:px-12 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-8">
+
+                    <!-- TEAM A -->
+                    <div class="text-center">
+                        <div class="team-badge mx-auto">
+                            <img src="<%= match.logoA %>" alt="<%= match.teamA %>">
+                        </div>
+
+                        <h1 class="mt-5 text-2xl md:text-3xl font-black uppercase italic tracking-tight text-slate-900">
+                            <%= match.teamA %>
+                        </h1>
+                    </div>
+
+                    <!-- SCORE -->
+                    <div class="text-center">
+                        <div class="flex items-center justify-center gap-4">
+                            <span class="text-6xl md:text-8xl font-black tracking-tighter text-slate-900">
+                                <%= goalsA %>
+                            </span>
+
+                            <span class="text-2xl font-black text-slate-300">
+                                -
+                            </span>
+
+                            <span class="text-6xl md:text-8xl font-black tracking-tighter text-slate-900">
+                                <%= goalsB %>
+                            </span>
+                        </div>
+
+                        <span class="inline-flex mt-3 px-5 py-2 rounded-full bg-slate-900 text-white text-[9px] font-black uppercase tracking-[0.3em]">
+                            <%= status %>
+                        </span>
+                    </div>
+
+                    <!-- TEAM B -->
+                    <div class="text-center">
+                        <div class="team-badge mx-auto">
+                            <img src="<%= match.logoB %>" alt="<%= match.teamB %>">
+                        </div>
+
+                        <h1 class="mt-5 text-2xl md:text-3xl font-black uppercase italic tracking-tight text-slate-900">
+                            <%= match.teamB %>
+                        </h1>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================================= -->
+        <!-- TABS -->
+        <!-- ========================================================= -->
+
+        <div class="flex justify-center">
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-1.5 flex gap-1 w-full max-w-xl">
+
+                <button
+                    id="btn-overview"
+                    onclick="switchTab('overview')"
+                    class="tab-btn active flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                >
+                    Overview
+                </button>
+
+                <button
+                    id="btn-lineups"
+                    onclick="switchTab('lineups')"
+                    class="tab-btn flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                >
+                    Lineups
+                </button>
+
+                <button
+                    id="btn-stats"
+                    onclick="switchTab('stats')"
+                    class="tab-btn flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                >
+                    Statistics
+                </button>
+
+            </div>
+        </div>
+
+
+        <!-- ========================================================= -->
+        <!-- OVERVIEW -->
+        <!-- ========================================================= -->
+
+        <section id="tab-overview" class="tab-content space-y-8">
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <!-- MATCH REMARKS -->
+                <div class="lg:col-span-2 match-card rounded-[32px] p-8 md:p-10">
+
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-blue-600">
+                                Match Report
+                            </p>
+
+                            <h2 class="text-2xl font-black italic uppercase tracking-tight text-slate-900 mt-1">
+                                Match Remarks
+                            </h2>
+                        </div>
+
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black">
+                            ★
+                        </div>
+                    </div>
+
+                    <p class="text-lg md:text-xl font-bold leading-relaxed text-slate-600">
+                        <%= remarks %>
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-4 mt-10 pt-8 border-t border-slate-100">
+
+                        <div class="bg-slate-50 rounded-2xl p-5 text-center">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                Total Goals
+                            </p>
+
+                            <p class="text-3xl font-black text-slate-900 mt-1">
+                                <%= goalsA + goalsB %>
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-2xl p-5 text-center">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                MVP
+                            </p>
+
+                            <p class="text-xl font-black italic uppercase text-slate-900 mt-2 truncate">
+                                <%= mvpName %>
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- MVP -->
+                <div class="match-card rounded-[32px] p-7 text-center border-yellow-200">
+
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-yellow-600">
+                        Player of the Match
+                    </p>
+
+                    <h2 class="text-2xl font-black italic uppercase text-slate-900 mt-2">
+                        MVP
+                    </h2>
+
+                    <div class="mt-6 rounded-2xl overflow-hidden bg-slate-100 aspect-[3/4]">
+
+                        <% if (mvpCard) { %>
+
+                            <img
+                                src="<%= mvpCard %>"
+                                class="w-full h-full object-cover"
+                                onerror="this.style.display='none';"
+                            >
+
+                        <% } else { %>
+
+                            <div class="w-full h-full flex items-center justify-center text-slate-300 text-5xl font-black">
+                                MVP
+                            </div>
+
+                        <% } %>
+
+                    </div>
+
+                    <p class="mt-5 text-xl font-black italic uppercase text-slate-900">
+                        <%= mvpName %>
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- MATCH VIDEO -->
+
+            <% if (videoUrl) { %>
+
+                <section class="match-card rounded-[32px] p-6 md:p-8">
+
+                    <div class="flex items-center justify-between mb-5">
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-red-600">
+                                Match Media
+                            </p>
+
+                            <h2 class="text-2xl font-black italic uppercase text-slate-900">
+                                Match Highlights
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl overflow-hidden bg-black aspect-video">
+
+                        <iframe
+                            src="<%= videoUrl %>"
+                            class="w-full h-full"
+                            frameborder="0"
+                            allowfullscreen
+                        ></iframe>
+
+                    </div>
+
+                </section>
+
+            <% } %>
+
+
+            <!-- RECENT MEETINGS -->
+
+            <section class="match-card rounded-[32px] p-7 md:p-10">
+
+                <div class="mb-8">
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-blue-600">
+                        Head To Head
+                    </p>
+
+                    <h2 class="text-2xl font-black italic uppercase text-slate-900">
+                        Recent Meetings
+                    </h2>
+
+                    <p class="text-sm text-slate-400 mt-1">
+                        Previous matches between these two teams.
+                    </p>
+                </div>
+
+
+                <% if (recentMeetings.length > 0) { %>
+
+                    <div class="space-y-3">
+
+                        <% recentMeetings.forEach(previous => { %>
+
+                            <a
+                                href="/match/<%= previous._id || previous.id %>"
+                                class="group flex items-center justify-between gap-4 p-4 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/40 transition-all"
+                            >
+
+                                <div class="flex items-center gap-4 min-w-0">
+
+                                    <div class="w-11 h-11 rounded-xl bg-slate-50 flex items-center justify-center p-2">
+                                        <img
+                                            src="<%= previous.logoA %>"
+                                            class="w-full h-full object-contain"
+                                        >
+                                    </div>
+
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-black uppercase text-slate-900 truncate">
+                                            <%= previous.teamA %>
+                                        </p>
+
+                                        <p class="text-[9px] font-bold text-slate-400 uppercase">
+                                            vs
+                                        </p>
+
+                                        <p class="text-xs font-black uppercase text-slate-900 truncate">
+                                            <%= previous.teamB %>
+                                        </p>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="text-center shrink-0">
+
+                                    <p class="text-2xl font-black text-slate-900">
+                                        <%= previous.goalsA || 0 %>
+                                        <span class="text-slate-300 mx-1">-</span>
+                                        <%= previous.goalsB || 0 %>
+                                    </p>
+
+                                    <% if (previous.date) { %>
+                                        <p class="text-[8px] font-black uppercase tracking-widest text-slate-400">
+                                            <%= previous.date %>
+                                        </p>
+                                    <% } %>
+
+                                </div>
+
+
+                                <div class="text-slate-300 group-hover:text-blue-600 transition-colors">
+                                    →
+                                </div>
+
+                            </a>
+
+                        <% }) %>
+
+                    </div>
+
+                <% } else { %>
+
+                    <div class="text-center py-14 bg-slate-50 rounded-2xl border border-slate-100">
+
+                        <p class="text-sm font-black uppercase tracking-widest text-slate-400">
+                            No previous meetings recorded
+                        </p>
+
+                    </div>
+
+                <% } %>
+
+            </section>
+
+        </section>
+
+
+        <!-- ========================================================= -->
+        <!-- LINEUPS -->
+        <!-- ========================================================= -->
+
+        <section id="tab-lineups" class="tab-content hidden space-y-8">
+
+            <div class="text-center">
+
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-blue-600">
+                    Matchday XI
+                </p>
+
+                <h2 class="text-3xl font-black italic uppercase text-slate-900">
+                    Starting Lineups
+                </h2>
+
+                <p class="text-sm text-slate-400 mt-2">
+                    Click any player to view their profile.
+                </p>
+
+            </div>
+
+
+            <!-- PITCH -->
+
+            <div class="pitch">
+
+                <div class="pitch-lines"></div>
+                <div class="pitch-halfway"></div>
+                <div class="pitch-circle"></div>
+                <div class="pitch-center-dot"></div>
+
+                <div class="penalty-box-top"></div>
+                <div class="penalty-box-bottom"></div>
+
+                <div class="goal-box-top"></div>
+                <div class="goal-box-bottom"></div>
+
+
+                <!-- TEAM A LABEL -->
+
+                <div class="absolute top-8 left-1/2 -translate-x-1/2 z-30">
+
+                    <div class="bg-white/95 backdrop-blur rounded-full px-5 py-2 shadow-xl flex items-center gap-2">
+
+                        <img
+                            src="<%= match.logoA %>"
+                            class="w-5 h-5 object-contain"
+                        >
+
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-900">
+                            <%= match.teamA %>
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TEAM B LABEL -->
+
+                <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-30">
+
+                    <div class="bg-white/95 backdrop-blur rounded-full px-5 py-2 shadow-xl flex items-center gap-2">
+
+                        <img
+                            src="<%= match.logoB %>"
+                            class="w-5 h-5 object-contain"
+                        >
+
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-900">
+                            <%= match.teamB %>
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- TEAM A PLAYERS -->
+                <!-- ================================================= -->
+
+                <% if (lineupA.length > 0) { %>
+
+                    <% lineupA.forEach((player, index) => { %>
+
+                        <%
+                            const px = player.x !== undefined
+                                ? player.x
+                                : [50, 25, 50, 75, 30, 70, 50][index] || 50;
+
+                            const py = player.y !== undefined
+                                ? player.y
+                                : [88, 72, 72, 72, 55, 55, 38][index] || 50;
+                        %>
+
+                        <div
+                            class="player-marker"
+                            style="left:<%= px %>%; top:<%= py %>%;"
+                            onclick='openPlayerProfile(<%- JSON.stringify(player) %>)'
+                        >
+
+                            <div class="player-avatar">
+
+                                <% if (player.image || player.cardImage) { %>
+
+                                    <img
+                                        src="<%= player.image || player.cardImage %>"
+                                        alt="<%= player.name %>"
+                                    >
+
+                                <% } else { %>
+
+                                    <span>
+                                        <%= player.rating || '—' %>
+                                    </span>
+
+                                <% } %>
+
+                            </div>
+
+                            <% if (player.rating) { %>
+                                <span class="player-rating">
+                                    <%= player.rating %>
+                                </span>
+                            <% } %>
+
+                            <div class="player-label">
+                                <%= player.name || 'Player' %>
+                            </div>
+
+                        </div>
+
+                    <% }) %>
+
+                <% } %>
+
+
+                <!-- ================================================= -->
+                <!-- TEAM B PLAYERS -->
+                <!-- ================================================= -->
+
+                <% if (lineupB.length > 0) { %>
+
+                    <% lineupB.forEach((player, index) => { %>
+
+                        <%
+                            const px = player.x !== undefined
+                                ? player.x
+                                : [50, 25, 50, 75, 30, 70, 50][index] || 50;
+
+                            const py = player.y !== undefined
+                                ? player.y
+                                : [12, 28, 28, 28, 45, 45, 62][index] || 50;
+                        %>
+
+                        <div
+                            class="player-marker"
+                            style="left:<%= px %>%; top:<%= py %>%;"
+                            onclick='openPlayerProfile(<%- JSON.stringify(player) %>)'
+                        >
+
+                            <div class="player-avatar">
+
+                                <% if (player.image || player.cardImage) { %>
+
+                                    <img
+                                        src="<%= player.image || player.cardImage %>"
+                                        alt="<%= player.name %>"
+                                    >
+
+                                <% } else { %>
+
+                                    <span>
+                                        <%= player.rating || '—' %>
+                                    </span>
+
+                                <% } %>
+
+                            </div>
+
+                            <% if (player.rating) { %>
+                                <span class="player-rating">
+                                    <%= player.rating %>
+                                </span>
+                            <% } %>
+
+                            <div class="player-label">
+                                <%= player.name || 'Player' %>
+                            </div>
+
+                        </div>
+
+                    <% }) %>
+
+                <% } %>
+
+
+                <!-- EMPTY STATE -->
+
+                <% if (lineupA.length === 0 && lineupB.length === 0) { %>
+
+                    <div class="absolute inset-0 flex items-center justify-center z-30">
+
+                        <div class="bg-white/95 rounded-3xl px-8 py-7 text-center shadow-2xl">
+
+                            <p class="text-xs font-black uppercase tracking-widest text-slate-900">
+                                Lineups not available
+                            </p>
+
+                            <p class="text-[10px] font-bold text-slate-400 mt-2">
+                                Match lineups will appear here once added by an administrator.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                <% } %>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================= -->
+        <!-- STATISTICS -->
+        <!-- ========================================================= -->
+
+        <section id="tab-stats" class="tab-content hidden space-y-8">
+
+            <div class="text-center">
+
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-blue-600">
+                    Match Data
+                </p>
+
+                <h2 class="text-3xl font-black italic uppercase text-slate-900">
+                    Statistics
+                </h2>
+
+            </div>
+
+
+            <!-- SCORE SUMMARY -->
+
+            <div class="match-card rounded-[32px] p-8">
+
+                <div class="grid grid-cols-3 items-center text-center">
+
+                    <div>
+                        <p class="text-xs font-black uppercase text-slate-500">
+                            <%= match.teamA %>
+                        </p>
+
+                        <p class="text-5xl font-black text-blue-600 mt-2">
+                            <%= goalsA %>
+                        </p>
+                    </div>
+
+                    <div class="text-xs font-black uppercase tracking-[0.3em] text-slate-300">
+                        FINAL
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-black uppercase text-slate-500">
+                            <%= match.teamB %>
+                        </p>
+
+                        <p class="text-5xl font-black text-red-500 mt-2">
+                            <%= goalsB %>
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- STAT TABLE -->
+
+            <div class="match-card rounded-[32px] p-6 md:p-10">
+
+                <div class="space-y-7">
+
+                    <% stats.forEach(stat => { %>
+
+                        <%
+                            const cleanA = parseFloat(String(stat.a).replace('%','')) || 0;
+                            const cleanB = parseFloat(String(stat.b).replace('%','')) || 0;
+                            const total = cleanA + cleanB;
+
+                            const percentA = total > 0
+                                ? (cleanA / total) * 100
+                                : 50;
+
+                            const percentB = total > 0
+                                ? (cleanB / total) * 100
+                                : 50;
+                        %>
+
+                        <div>
+
+                            <div class="grid grid-cols-3 items-center gap-4 mb-2">
+
+                                <div class="text-left">
+                                    <span class="text-sm font-black text-slate-900">
+                                        <%= stat.a %>
+                                    </span>
+                                </div>
+
+                                <div class="text-center">
+                                    <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                        <%= stat.label %>
+                                    </span>
+                                </div>
+
+                                <div class="text-right">
+                                    <span class="text-sm font-black text-slate-900">
+                                        <%= stat.b %>
+                                    </span>
+                                </div>
+
+                            </div>
+
+
+                            <div class="flex gap-1">
+
+                                <div class="stat-bar flex-1 flex justify-end">
+                                    <div
+                                        class="stat-bar-fill-a"
+                                        style="width:<%= percentA %>%"
+                                    ></div>
+                                </div>
+
+                                <div class="stat-bar flex-1">
+                                    <div
+                                        class="stat-bar-fill-b"
+                                        style="width:<%= percentB %>%"
+                                    ></div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    <% }) %>
+
+                </div>
+
+            </div>
+
+
+            <!-- GOALS / PLAYER CONTRIBUTIONS -->
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+                <div class="match-card rounded-3xl p-6 text-center">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                        Goals
+                    </p>
+
+                    <p class="text-4xl font-black text-slate-900 mt-2">
+                        <%= goalsA + goalsB %>
+                    </p>
+                </div>
+
+                <div class="match-card rounded-3xl p-6 text-center">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                        Assists
+                    </p>
+
+                    <p class="text-4xl font-black text-slate-900 mt-2">
+                        <%= (parseInt(details.assistsA) || 0) + (parseInt(details.assistsB) || 0) %>
+                    </p>
+                </div>
+
+                <div class="match-card rounded-3xl p-6 text-center">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                        Saves
+                    </p>
+
+                    <p class="text-4xl font-black text-slate-900 mt-2">
+                        <%= (parseInt(details.savesA) || 0) + (parseInt(details.savesB) || 0) %>
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+</main>
+
+
+<!-- =============================================================== -->
+<!-- PLAYER PROFILE MODAL -->
+<!-- =============================================================== -->
+
+<div id="playerProfileModal" class="player-modal" onclick="closePlayerProfile(event)">
+
+    <div
+        class="bg-white rounded-[32px] shadow-2xl max-w-md w-full overflow-hidden"
+        onclick="event.stopPropagation()"
+    >
+
+        <div class="relative">
+
+            <button
+                onclick="closePlayerProfile()"
+                class="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/10 hover:bg-black/20 text-slate-700 font-black transition"
+            >
+                ×
+            </button>
+
+            <div class="bg-slate-100 h-56 flex items-center justify-center">
+
+                <img
+                    id="profileImage"
+                    class="max-h-full max-w-full object-contain"
+                    style="display:none;"
+                >
+
+                <div
+                    id="profilePlaceholder"
+                    class="text-6xl font-black text-slate-300"
+                >
+                    ?
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="p-7">
+
+            <div class="flex items-start justify-between gap-4">
+
+                <div>
+
+                    <p
+                        id="profilePosition"
+                        class="text-[9px] font-black uppercase tracking-[0.3em] text-blue-600"
+                    >
+                        PLAYER
+                    </p>
+
+                    <h2
+                        id="profileName"
+                        class="text-3xl font-black italic uppercase tracking-tight text-slate-900 mt-1"
+                    >
+                        Player
+                    </h2>
+
+                    <p
+                        id="profileCountry"
+                        class="text-xs font-bold text-slate-400 mt-1"
+                    >
+                        UNKNOWN
+                    </p>
+
+                </div>
+
+
+                <div class="bg-slate-900 text-white rounded-2xl px-4 py-3 text-center">
+
+                    <p class="text-[8px] uppercase tracking-widest opacity-50">
+                        Rating
+                    </p>
+
+                    <p
+                        id="profileRating"
+                        class="text-2xl font-black"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-3 gap-3 mt-7">
+
+                <div class="bg-slate-50 rounded-2xl p-4 text-center">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-slate-400">
+                        Goals
+                    </p>
+
+                    <p id="profileGoals" class="text-xl font-black text-slate-900 mt-1">
+                        0
+                    </p>
+                </div>
+
+                <div class="bg-slate-50 rounded-2xl p-4 text-center">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-slate-400">
+                        Assists
+                    </p>
+
+                    <p id="profileAssists" class="text-xl font-black text-slate-900 mt-1">
+                        0
+                    </p>
+                </div>
+
+                <div class="bg-slate-50 rounded-2xl p-4 text-center">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-slate-400">
+                        Saves
+                    </p>
+
+                    <p id="profileSaves" class="text-xl font-black text-slate-900 mt-1">
+                        0
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div
+                id="profileBioWrapper"
+                class="mt-6 pt-5 border-t border-slate-100"
+                style="display:none;"
+            >
+
+                <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                    About
+                </p>
+
+                <p
+                    id="profileBio"
+                    class="text-sm font-medium leading-relaxed text-slate-500"
+                ></p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* ================================================================
+       MAIN TABS
+    ================================================================ */
+
+    function switchTab(tabId) {
+
+        document.querySelectorAll('.tab-content').forEach(section => {
+            section.classList.add('hidden');
+        });
+
+        const selected = document.getElementById('tab-' + tabId);
+
+        if (selected) {
+            selected.classList.remove('hidden');
+        }
+
+
+        document.querySelectorAll('.tab-btn').forEach(button => {
+
+            button.classList.remove('active');
+
+        });
+
+
+        const activeButton = document.getElementById('btn-' + tabId);
+
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
+
+    }
+
+
+    /* ================================================================
+       PLAYER PROFILE
+    ================================================================ */
+
+    function openPlayerProfile(player) {
+
+        if (!player) return;
+
+        const modal = document.getElementById('playerProfileModal');
+
+        const name = player.name || 'Unknown Player';
+
+        document.getElementById('profileName').innerText = name;
+
+        document.getElementById('profilePosition').innerText =
+            player.position ||
+            player.pos ||
+            'PLAYER';
+
+        document.getElementById('profileCountry').innerText =
+            player.country ||
+            'UNKNOWN';
+
+        document.getElementById('profileRating').innerText =
+            player.rating ||
+            '—';
+
+        document.getElementById('profileGoals').innerText =
+            player.goals ||
+            0;
+
+        document.getElementById('profileAssists').innerText =
+            player.assists ||
+            0;
+
+        document.getElementById('profileSaves').innerText =
+            player.saves ||
+            0;
+
+
+        const image =
+            player.image ||
+            player.cardImage ||
+            '';
+
+        const profileImage =
+            document.getElementById('profileImage');
+
+        const placeholder =
+            document.getElementById('profilePlaceholder');
+
+
+        if (image) {
+
+            profileImage.src = image;
+
+            profileImage.style.display = 'block';
+
+            placeholder.style.display = 'none';
+
+        } else {
+
+            profileImage.style.display = 'none';
+
+            placeholder.style.display = 'block';
+
+        }
+
+
+        const bio =
+            player.bio ||
+            player.experience ||
+            '';
+
+        const bioWrapper =
+            document.getElementById('profileBioWrapper');
+
+        const bioElement =
+            document.getElementById('profileBio');
+
+
+        if (bio) {
+
+            bioElement.innerText = bio;
+
+            bioWrapper.style.display = 'block';
+
+        } else {
+
+            bioWrapper.style.display = 'none';
+
+        }
+
+
+        modal.classList.add('active');
+
+    }
+
+
+    function closePlayerProfile(event) {
+
+        if (
+            event &&
+            event.target &&
+            event.target.id !== 'playerProfileModal'
+        ) {
+            return;
+        }
+
+        document
+            .getElementById('playerProfileModal')
+            .classList.remove('active');
+
+    }
+
+
+    document.addEventListener('keydown', function(event) {
+
+        if (event.key === 'Escape') {
+
+            document
+                .getElementById('playerProfileModal')
+                .classList.remove('active');
+
+        }
+
+    });
+
+</script>

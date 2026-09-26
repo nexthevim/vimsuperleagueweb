@@ -1,0 +1,28 @@
+{
+  "name": "roblox-league",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "body-parser": "^2.2.1",
+    "connect-mongo": "^6.0.0",
+    "dotenv": "^17.4.2",
+    "ejs": "^3.1.10",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "memorystore": "^1.6.7",
+    "mongodb": "^7.0.0",
+    "mongoose": "^9.1.1",
+    "passport": "^0.7.0",
+    "passport-discord": "^0.1.4",
+    "passport-roblox": "^0.0.2"
+  }
+}

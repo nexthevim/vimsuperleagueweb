@@ -786,7 +786,7 @@
             <div class="text-center">
 
                 <p class="text-[9px] font-black uppercase tracking-[0.3em] text-blue-600">
-                    Matchday XI
+                    Matchday 7
                 </p>
 
                 <h2 class="text-3xl font-black italic uppercase text-slate-900">
@@ -865,13 +865,15 @@
                     <% lineupA.forEach((player, index) => { %>
 
                         <%
+                            // 7-a-side shape: GK, DEF1, DEF2, MID1, MID2, FWD1, FWD2
+                            // (matches the fixed slot order the admin panel saves).
                             const px = player.x !== undefined
                                 ? player.x
-                                : [50, 25, 50, 75, 30, 70, 50][index] || 50;
+                                : [50, 20, 80, 32, 68, 38, 62][index] || 50;
 
                             const py = player.y !== undefined
                                 ? player.y
-                                : [88, 72, 72, 72, 55, 55, 38][index] || 50;
+                                : [8, 24, 24, 36, 36, 47, 47][index] || 50;
                         %>
 
                         <div
@@ -937,13 +939,14 @@
                     <% lineupB.forEach((player, index) => { %>
 
                         <%
+                            // Mirror of Team A's shape, flipped toward the bottom goal.
                             const px = player.x !== undefined
                                 ? player.x
-                                : [50, 25, 50, 75, 30, 70, 50][index] || 50;
+                                : [50, 20, 80, 32, 68, 38, 62][index] || 50;
 
                             const py = player.y !== undefined
                                 ? player.y
-                                : [12, 28, 28, 28, 45, 45, 62][index] || 50;
+                                : [92, 76, 76, 64, 64, 53, 53][index] || 50;
                         %>
 
                         <div

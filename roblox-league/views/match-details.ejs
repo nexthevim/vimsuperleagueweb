@@ -9,6 +9,16 @@
     const lineupA = details.lineupPlayersA || [];
     const lineupB = details.lineupPlayersB || [];
 
+    // Colour-codes a match rating the way SofaScore/FotMob-style lineup
+    // cards do: strong performances green, average amber, poor red.
+    function ratingPillClass(rating) {
+        const n = parseFloat(rating);
+        if (rating === null || rating === undefined || rating === '' || Number.isNaN(n)) return '';
+        if (n >= 6.5) return 'rating-green';
+        if (n >= 5.0) return 'rating-amber';
+        return 'rating-red';
+    }
+
     const recentMeetings = details.recentMeetings || [];
 
     const matchDate = details.date || match.date || '';
@@ -213,7 +223,7 @@
     .player-marker {
         position: absolute;
         transform: translate(-50%, -50%);
-        width: 104px;
+        width: 92px;
         text-align: center;
         cursor: pointer;
         z-index: 20;
@@ -225,21 +235,29 @@
         z-index: 50;
     }
 
+    /* Wraps the round photo + rating pill so the pill can overlap the
+       bottom edge of the avatar, SofaScore/FotMob style. */
+    .player-avatar-frame {
+        position: relative;
+        width: 54px;
+        height: 54px;
+        margin: 0 auto 12px;
+    }
+
     .player-avatar {
-        width: 52px;
-        height: 52px;
-        margin: 0 auto 5px;
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
-        background: #ffffff;
-        border: 3px solid #111827;
-        box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+        background: #cbd5e1;
+        border: 2px solid rgba(255,255,255,0.9);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.35);
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
         font-size: 12px;
         font-weight: 900;
-        color: #111827;
+        color: #1e293b;
     }
 
     .player-avatar img {
@@ -248,29 +266,81 @@
         object-fit: cover;
     }
 
-    .player-label {
-        background: rgba(15,23,42,0.92);
+    /* Small status icons (sub off, goal, card) pinned to the avatar's
+       edge. Only rendered when the admin's lineup data has that flag. */
+    .player-icon {
+        position: absolute;
+        top: -2px;
+        width: 17px;
+        height: 17px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9px;
         color: white;
-        border-radius: 8px;
-        padding: 5px 7px;
-        font-size: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+        border: 1.5px solid rgba(255,255,255,0.9);
+    }
+
+    .player-icon.sub-off {
+        left: -4px;
+        background: #dc2626;
+    }
+
+    .player-icon.goal {
+        right: -4px;
+        background: #ffffff;
+        color: #111827;
+    }
+
+    .player-rating-pill {
+        position: absolute;
+        left: 50%;
+        bottom: -9px;
+        transform: translateX(-50%);
+        min-width: 27px;
+        text-align: center;
+        padding: 2px 6px;
+        border-radius: 999px;
+        font-size: 10px;
         font-weight: 900;
+        color: white;
+        line-height: 1.3;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.35);
+        border: 1.5px solid rgba(255,255,255,0.95);
+        white-space: nowrap;
+    }
+
+    .rating-green {
+        background: linear-gradient(135deg, #22c55e, #15803d);
+    }
+
+    .rating-amber {
+        background: linear-gradient(135deg, #f7b733, #d97706);
+    }
+
+    .rating-red {
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
+    }
+
+    .player-label {
+        color: #ffffff;
+        font-size: 9.5px;
+        font-weight: 800;
         text-transform: uppercase;
-        line-height: 1.2;
+        letter-spacing: 0.01em;
+        line-height: 1.25;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.6);
     }
 
-    .player-rating {
-        display: inline-block;
-        background: white;
-        color: #111827;
-        border-radius: 5px;
-        padding: 2px 5px;
-        margin-bottom: 3px;
-        font-size: 8px;
-        font-weight: 900;
+    .player-label .player-num {
+        opacity: 0.8;
+        font-weight: 700;
+        margin-right: 1px;
     }
 
     .team-badge {
@@ -332,12 +402,29 @@
         }
 
         .player-marker {
-            width: 82px;
+            width: 72px;
         }
 
-        .player-avatar {
+        .player-avatar-frame {
             width: 42px;
             height: 42px;
+            margin-bottom: 10px;
+        }
+
+        .player-rating-pill {
+            font-size: 9px;
+            padding: 1.5px 5px;
+            bottom: -7px;
+        }
+
+        .player-icon {
+            width: 14px;
+            height: 14px;
+            font-size: 7.5px;
+        }
+
+        .player-label {
+            font-size: 8.5px;
         }
 
         .team-badge {
@@ -793,33 +880,45 @@
                             onclick='openPlayerProfile(<%- JSON.stringify(player) %>)'
                         >
 
-                            <div class="player-avatar">
+                            <div class="player-avatar-frame">
 
-                                <% if (player.image || player.cardImage) { %>
+                                <div class="player-avatar">
 
-                                    <img
-                                        src="<%= player.image || player.cardImage %>"
-                                        alt="<%= player.name %>"
-                                    >
+                                    <% if (player.image || player.cardImage) { %>
 
-                                <% } else { %>
+                                        <img
+                                            src="<%= player.image || player.cardImage %>"
+                                            alt="<%= player.name %>"
+                                        >
 
-                                    <span>
-                                        <%= player.rating || '—' %>
+                                    <% } else { %>
+
+                                        <span>
+                                            <%= (player.name || '?').charAt(0) %>
+                                        </span>
+
+                                    <% } %>
+
+                                </div>
+
+                                <% if (player.subbedOff) { %>
+                                    <span class="player-icon sub-off">↓</span>
+                                <% } %>
+
+                                <% if (player.goals) { %>
+                                    <span class="player-icon goal">⚽</span>
+                                <% } %>
+
+                                <% if (player.rating || player.rating === 0) { %>
+                                    <span class="player-rating-pill <%= ratingPillClass(player.rating) %>">
+                                        <%= player.rating %>
                                     </span>
-
                                 <% } %>
 
                             </div>
 
-                            <% if (player.rating) { %>
-                                <span class="player-rating">
-                                    <%= player.rating %>
-                                </span>
-                            <% } %>
-
                             <div class="player-label">
-                                <%= player.name || 'Player' %>
+                                <% if (player.number) { %><span class="player-num"><%= player.number %></span><% } %><%= player.name || 'Player' %>
                             </div>
 
                         </div>
@@ -853,33 +952,45 @@
                             onclick='openPlayerProfile(<%- JSON.stringify(player) %>)'
                         >
 
-                            <div class="player-avatar">
+                            <div class="player-avatar-frame">
 
-                                <% if (player.image || player.cardImage) { %>
+                                <div class="player-avatar">
 
-                                    <img
-                                        src="<%= player.image || player.cardImage %>"
-                                        alt="<%= player.name %>"
-                                    >
+                                    <% if (player.image || player.cardImage) { %>
 
-                                <% } else { %>
+                                        <img
+                                            src="<%= player.image || player.cardImage %>"
+                                            alt="<%= player.name %>"
+                                        >
 
-                                    <span>
-                                        <%= player.rating || '—' %>
+                                    <% } else { %>
+
+                                        <span>
+                                            <%= (player.name || '?').charAt(0) %>
+                                        </span>
+
+                                    <% } %>
+
+                                </div>
+
+                                <% if (player.subbedOff) { %>
+                                    <span class="player-icon sub-off">↓</span>
+                                <% } %>
+
+                                <% if (player.goals) { %>
+                                    <span class="player-icon goal">⚽</span>
+                                <% } %>
+
+                                <% if (player.rating || player.rating === 0) { %>
+                                    <span class="player-rating-pill <%= ratingPillClass(player.rating) %>">
+                                        <%= player.rating %>
                                     </span>
-
                                 <% } %>
 
                             </div>
 
-                            <% if (player.rating) { %>
-                                <span class="player-rating">
-                                    <%= player.rating %>
-                                </span>
-                            <% } %>
-
                             <div class="player-label">
-                                <%= player.name || 'Player' %>
+                                <% if (player.number) { %><span class="player-num"><%= player.number %></span><% } %><%= player.name || 'Player' %>
                             </div>
 
                         </div>
@@ -1280,7 +1391,8 @@
 
         const name = player.name || 'Unknown Player';
 
-        document.getElementById('profileName').innerText = name;
+        document.getElementById('profileName').innerText =
+            (player.number ? `#${player.number} ` : '') + name;
 
         document.getElementById('profilePosition').innerText =
             player.position ||

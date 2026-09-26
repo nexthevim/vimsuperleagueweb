@@ -865,15 +865,16 @@
                     <% lineupA.forEach((player, index) => { %>
 
                         <%
-                            // 7-a-side shape: GK, DEF1, DEF2, MID1, MID2, FWD1, FWD2
+                            // 7-a-side shape: GK, DEF1, DEF2, MID1, MID2, FWD1, FWD2 —
+                            // wide back line, narrow central pair, wide forward pair
                             // (matches the fixed slot order the admin panel saves).
                             const px = player.x !== undefined
                                 ? player.x
-                                : [50, 20, 80, 32, 68, 38, 62][index] || 50;
+                                : [50, 18, 82, 40, 60, 20, 80][index] || 50;
 
                             const py = player.y !== undefined
                                 ? player.y
-                                : [8, 24, 24, 36, 36, 47, 47][index] || 50;
+                                : [8, 20, 20, 32, 32, 44, 44][index] || 50;
                         %>
 
                         <div
@@ -942,11 +943,11 @@
                             // Mirror of Team A's shape, flipped toward the bottom goal.
                             const px = player.x !== undefined
                                 ? player.x
-                                : [50, 20, 80, 32, 68, 38, 62][index] || 50;
+                                : [50, 18, 82, 40, 60, 20, 80][index] || 50;
 
                             const py = player.y !== undefined
                                 ? player.y
-                                : [92, 76, 76, 64, 64, 53, 53][index] || 50;
+                                : [92, 80, 80, 68, 68, 56, 56][index] || 50;
                         %>
 
                         <div

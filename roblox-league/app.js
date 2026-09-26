@@ -1118,22 +1118,22 @@ const LINEUP_SLOTS = ['gk', 'def1', 'def2', 'mid1', 'mid2', 'fwd1', 'fwd2'];
 
 const LINEUP_SLOT_COORDS = {
     A: {
-        gk:   { x: 50, y: 10 },
-        def1: { x: 26, y: 27 },
-        def2: { x: 74, y: 27 },
-        mid1: { x: 30, y: 42 },
-        mid2: { x: 70, y: 42 },
-        fwd1: { x: 37, y: 47 },
-        fwd2: { x: 63, y: 47 }
+        gk:   { x: 50, y: 8 },
+        def1: { x: 20, y: 24 },
+        def2: { x: 80, y: 24 },
+        mid1: { x: 32, y: 36 },
+        mid2: { x: 68, y: 36 },
+        fwd1: { x: 38, y: 47 },
+        fwd2: { x: 62, y: 47 }
     },
     B: {
-        gk:   { x: 50, y: 90 },
-        def1: { x: 26, y: 73 },
-        def2: { x: 74, y: 73 },
-        mid1: { x: 30, y: 58 },
-        mid2: { x: 70, y: 58 },
-        fwd1: { x: 37, y: 53 },
-        fwd2: { x: 63, y: 53 }
+        gk:   { x: 50, y: 92 },
+        def1: { x: 20, y: 76 },
+        def2: { x: 80, y: 76 },
+        mid1: { x: 32, y: 64 },
+        mid2: { x: 68, y: 64 },
+        fwd1: { x: 38, y: 53 },
+        fwd2: { x: 62, y: 53 }
     }
 };
 

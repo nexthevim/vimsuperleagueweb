@@ -1111,6 +1111,74 @@ app.post('/admin/delete-match', async (req, res) => {
 // MATCH CENTER / LINEUPS
 // ============================================================
 
+// Fixed 7-slot formation (GK + 2 DEF + 2 MID + 2 FWD) used to place
+// lineup cards on the pitch graphic. Team A attacks downward (their own
+// goal sits near the top of the pitch), Team B is the mirror image.
+const LINEUP_SLOTS = ['gk', 'def1', 'def2', 'mid1', 'mid2', 'fwd1', 'fwd2'];
+
+const LINEUP_SLOT_COORDS = {
+    A: {
+        gk:   { x: 50, y: 10 },
+        def1: { x: 26, y: 27 },
+        def2: { x: 74, y: 27 },
+        mid1: { x: 30, y: 42 },
+        mid2: { x: 70, y: 42 },
+        fwd1: { x: 37, y: 47 },
+        fwd2: { x: 63, y: 47 }
+    },
+    B: {
+        gk:   { x: 50, y: 90 },
+        def1: { x: 26, y: 73 },
+        def2: { x: 74, y: 73 },
+        mid1: { x: 30, y: 58 },
+        mid2: { x: 70, y: 58 },
+        fwd1: { x: 37, y: 53 },
+        fwd2: { x: 63, y: 53 }
+    }
+};
+
+function lineupSlotGroup(slot) {
+    if (slot === 'gk') return 'GK';
+    if (slot.startsWith('def')) return 'DEF';
+    if (slot.startsWith('mid')) return 'MID';
+    return 'FWD';
+}
+
+// Turns the 7 raw "lineup{side}_{slot}" / "_number" / "_rating" form
+// fields into the structured array match-details.ejs renders on the
+// pitch (name, position group, jersey number, match rating, card image,
+// and the fixed x/y coordinate for that slot).
+function buildLineupPlayers(side, body, playerMap) {
+    return LINEUP_SLOTS.map(slot => {
+
+        const name = body[`lineup${side}_${slot}`];
+        if (!name || !playerMap.has(name)) return null;
+
+        const playerDoc = playerMap.get(name);
+        const coords = LINEUP_SLOT_COORDS[side][slot];
+
+        const ratingRaw = body[`lineup${side}_${slot}_rating`];
+        const rating =
+            ratingRaw !== undefined && ratingRaw !== null && ratingRaw !== ''
+                ? parseFloat(ratingRaw)
+                : null;
+
+        const number = (body[`lineup${side}_${slot}_number`] || '').toString().trim();
+
+        return {
+            name: playerDoc.name,
+            position: lineupSlotGroup(slot),
+            slot,
+            number,
+            rating: (rating !== null && !Number.isNaN(rating)) ? rating : null,
+            image: playerDoc.cardImage || '',
+            x: coords.x,
+            y: coords.y
+        };
+
+    }).filter(Boolean);
+}
+
 app.post('/admin/update-match-details', async (req, res) => {
 
     if (!requireAdmin(req, res)) return;
@@ -1187,7 +1255,7 @@ app.post('/admin/update-match-details', async (req, res) => {
         const verifiedPlayers =
             await Player.find({
                 verified: true
-            }).select('name position');
+            }).select('name position cardImage');
 
         const validNames =
             new Set(
@@ -1210,6 +1278,15 @@ app.post('/admin/update-match-details', async (req, res) => {
                     validNames.has(p.name)
             );
 
+        // Build the pitch-ready lineup cards (image, jersey number, match
+        // rating, formation coordinates) from the 7 fixed slots per side.
+        const playerMap = new Map(
+            verifiedPlayers.map(p => [p.name, p])
+        );
+
+        const lineupPlayersA = buildLineupPlayers('A', req.body, playerMap);
+        const lineupPlayersB = buildLineupPlayers('B', req.body, playerMap);
+
         existingMatch.status =
             req.body.matchStatus ||
             existingMatch.status ||
@@ -1225,7 +1302,11 @@ app.post('/admin/update-match-details', async (req, res) => {
                 validTeamAPlayers,
 
             teamBPlayers:
-                validTeamBPlayers
+                validTeamBPlayers,
+
+            lineupPlayersA,
+
+            lineupPlayersB
 
         };
 

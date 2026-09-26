@@ -171,9 +171,13 @@
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
     /* TAB ACTIVE STATES */
-    .team-tab.active {
-        background-color: #0f172a;
-        color: #ffffff;
+    .team-tile {
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .team-tile.active {
+        border-color: transparent;
+        box-shadow: 0 0 0 3px hsl(var(--team-hue) 75% 52%), 0 20px 35px -15px rgba(15, 23, 42, 0.2);
+        transform: translateY(-3px);
     }
 </style>
 
@@ -339,164 +343,234 @@
 
     <!-- MODE 2: AUCTION HUB VIEW -->
     <div id="auctionSection" class="hidden max-w-7xl mx-auto px-6 mb-24">
-        <!-- AUCTION TIMER BANNER (IF ACTIVE) -->
+        <%
+            // Deterministic accent color per franchise (IPL-style team color chips)
+            function hueFromName(str) {
+                let h = 0;
+                str = str || 'Team';
+                for (let i = 0; i < str.length; i++) {
+                    h = str.charCodeAt(i) + ((h << 5) - h);
+                }
+                return Math.abs(h) % 360;
+            }
+
+            // Looks up the full player record behind a bid (by id) or a
+            // roster slot (by name) so clicking it can open the same
+            // profile modal used on the main market cards.
+            function findPlayerRecord(idOrName) {
+                if (!idOrName || typeof players === 'undefined') return null;
+                return players.find(p => {
+                    let pid = (p._id || p.id || '').toString();
+                    return pid === idOrName.toString() ||
+                        (p.name && p.name.toLowerCase() === idOrName.toString().toLowerCase());
+                }) || null;
+            }
+
+            let sessionStatus = (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.status) || 'ready';
+            let statusLabel = 'Auction Ready';
+            let statusColor = 'slate';
+            if (sessionStatus === 'live') { statusLabel = 'Live Now'; statusColor = 'emerald'; }
+            else if (sessionStatus === 'ended') { statusLabel = 'Auction Ended'; statusColor = 'rose'; }
+            let squadCap = (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.maxRosterSize) || 7;
+            let sessionName = (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.name) || 'VIM Auction';
+        %>
+
+        <!-- SESSION STATUS BANNER -->
         <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-6 rounded-[32px] border border-slate-800 shadow-2xl mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="flex items-center gap-4">
                 <div class="h-12 w-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 text-2xl font-black">
-                    ⏱️
+                    🏆
                 </div>
                 <div>
-                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Official Auction Window</span>
-                    <h3 class="text-2xl font-black italic uppercase tracking-tight">LIVE AUCTION SESSION</h3>
+                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest"><%= sessionName %></span>
+                    <h3 class="text-2xl font-black italic uppercase tracking-tight">Franchise Auction Hub</h3>
                 </div>
             </div>
-            <div class="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl text-center">
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Auction Status / Timer</span>
-                <span id="auctionTimerDisplay" class="text-xl font-black italic text-emerald-400 uppercase tracking-wider">
-                    <% if (typeof auctionEndTime !== 'undefined' && auctionEndTime) { %>
-                        Active (Ends in: <span id="timeRemaining">--:--:--</span>)
-                    <% } else { %>
-                        Auction Active / Open
-                    <% } %>
-                </span>
+            <div class="flex items-center gap-3">
+                <div class="bg-white/5 border border-white/10 px-5 py-3 rounded-2xl text-center">
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Status</span>
+                    <span class="text-base font-black italic text-<%= statusColor %>-400 uppercase tracking-wider flex items-center justify-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-<%= statusColor %>-400 <%= sessionStatus === 'live' ? 'animate-pulse' : '' %>"></span>
+                        <%= statusLabel %>
+                    </span>
+                </div>
+                <div class="bg-white/5 border border-white/10 px-5 py-3 rounded-2xl text-center">
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Squad Cap</span>
+                    <span class="text-base font-black italic text-white uppercase tracking-wider"><%= squadCap %> Players</span>
+                </div>
             </div>
         </div>
 
         <% if (typeof auctionTeams !== 'undefined' && auctionTeams && auctionTeams.length > 0) { %>
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- LEFT PANEL: TEAMS SELECTOR LIST -->
-                <div class="lg:col-span-4 space-y-4">
-                    <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-2">Participating Teams</h3>
-                    <div class="space-y-3">
-                        <% auctionTeams.forEach((t, i) => { %>
-                            <% let tId = t._id || t.id || ''; %>
-                            <div onclick="selectAuctionTeam('<%= tId %>')" 
-                                 id="teamCard-<%= tId %>" 
-                                 class="team-tab cursor-pointer bg-white border border-slate-200 p-5 rounded-[24px] shadow-sm hover:shadow-md transition-all flex items-center justify-between <%= i === 0 ? 'active' : '' %>">
-                                <div class="flex items-center gap-4">
-                                    <% if (t.logo) { %>
-                                        <img src="<%= t.logo %>" class="w-12 h-12 object-contain rounded-xl bg-slate-50 p-1 border border-slate-100">
-                                    <% } else { %>
-                                        <div class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 font-black text-lg">
-                                            <%= t.name.charAt(0) %>
-                                        </div>
-                                    <% } %>
-                                    <div>
-                                        <h4 class="font-black italic uppercase text-base text-slate-900"><%= t.name %></h4>
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase">Manager: <%= t.manager || 'Unassigned' %></p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-sm font-black text-emerald-600 block"><%= t.budget || 0 %> V</span>
-                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">BUDGET</span>
-                                </div>
+
+            <!-- FRANCHISE TILE GRID (IPL-STYLE ENLARGED LOGOS) -->
+            <h3 class="text-xs font-black uppercase tracking-[0.25em] text-slate-400 mb-4">Registered Franchises &middot; Tap a team</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 mb-10">
+                <% auctionTeams.forEach((t, i) => {
+                    let tId = t._id || t.id || '';
+                    let reserved = (t.bids || []).reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
+                    let remaining = (t.budget || 0) - (t.spent || 0) - reserved;
+                    let committedPct = (t.budget && t.budget > 0) ? Math.min(100, Math.round(((t.spent || 0) + reserved) / t.budget * 100)) : 0;
+                    let hue = hueFromName(t.name);
+                %>
+                    <div onclick="selectAuctionTeam('<%= tId %>')"
+                         id="teamTile-<%= tId %>"
+                         class="team-tile cursor-pointer bg-white border-2 rounded-[28px] p-5 text-center relative overflow-hidden <%= i === 0 ? 'active' : 'border-slate-200' %>"
+                         style="--team-hue: <%= hue %>;">
+
+                        <div class="absolute inset-x-0 top-0 h-1.5" style="background: hsl(<%= hue %> 75% 52%);"></div>
+
+                        <div class="w-24 h-24 mx-auto rounded-3xl bg-slate-50 border border-slate-100 p-2 flex items-center justify-center shadow-sm mb-3 mt-1">
+                            <% if (t.logo) { %>
+                                <img src="<%= t.logo %>" class="w-full h-full object-contain">
+                            <% } else { %>
+                                <span class="text-3xl font-black" style="color: hsl(<%= hue %> 65% 45%);"><%= (t.name || '?').charAt(0) %></span>
+                            <% } %>
+                        </div>
+
+                        <h4 class="font-black italic uppercase text-sm text-slate-900 truncate"><%= t.name %></h4>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase truncate mb-3">Mgr: <%= t.manager || 'Unassigned' %></p>
+
+                        <div class="grid grid-cols-2 gap-1.5 text-left mb-2">
+                            <div class="bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-100">
+                                <span class="block text-[7px] text-slate-400 font-black uppercase tracking-wider">Budget</span>
+                                <span class="text-[11px] font-black text-slate-900"><%= t.budget || 0 %> V</span>
                             </div>
-                        <% }) %>
-                    </div>
-                </div>
-
-                <!-- RIGHT PANEL: TEAM DETAILS & BIDDING/ROSTER TOGGLE -->
-                <div class="lg:col-span-8">
-                    <% auctionTeams.forEach((t, i) => { %>
-                        <% let tId = t._id || t.id || ''; %>
-                        <div id="teamDetails-<%= tId %>" class="team-details-panel <%= i === 0 ? '' : 'hidden' %> bg-white border border-slate-200 rounded-[36px] p-8 shadow-xl">
-                            <!-- TEAM HEADER WITH ENLARGED LOGO & VOLLARS STATS -->
-                            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-slate-100 pb-8 mb-8">
-                                <% if (t.logo) { %>
-                                    <img src="<%= t.logo %>" class="w-28 h-28 object-contain rounded-3xl bg-slate-50 p-2 border border-slate-200 shadow-md flex-shrink-0">
-                                <% } else { %>
-                                    <div class="w-28 h-28 rounded-3xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-300 font-black text-5xl flex-shrink-0">
-                                        <%= t.name.charAt(0) %>
-                                    </div>
-                                <% } %>
-                                <div class="flex-1 text-center sm:text-left">
-                                    <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Official VIM Franchise</span>
-                                    <h2 class="text-4xl font-black italic uppercase text-slate-900 tracking-tight"><%= t.name %></h2>
-                                    <p class="text-xs text-slate-400 font-bold uppercase mt-1">Manager: <span class="text-slate-800"><%= t.manager || 'Unassigned' %></span></p>
-
-                                    <!-- BUDGET SUMMARY TILES (VOLLARS) -->
-                                    <div class="grid grid-cols-3 gap-3 mt-4">
-                                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-center">
-                                            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Total Budget</span>
-                                            <span class="text-base font-black text-slate-900"><%= t.budget || 0 %> Vollars</span>
-                                        </div>
-                                        <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100 text-center">
-                                            <span class="text-[8px] font-black text-emerald-600 uppercase tracking-widest block">Remaining</span>
-                                            <span class="text-base font-black text-emerald-600"><%= (t.budget - (t.spent || 0)) %> Vollars</span>
-                                        </div>
-                                        <div class="bg-blue-50/60 p-3 rounded-2xl border border-blue-100 text-center">
-                                            <span class="text-[8px] font-black text-blue-600 uppercase tracking-widest block">Spent</span>
-                                            <span class="text-base font-black text-blue-600"><%= t.spent || 0 %> Vollars</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- BIDDING VS ROSTER TABS -->
-                            <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
-                                <div class="flex items-center gap-3">
-                                    <button onclick="switchTeamSubTab('<%= tId %>', 'bidding')" id="tabBtn-bidding-<%= tId %>" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 text-white transition">
-                                        Bids In Progress
-                                    </button>
-                                    <button onclick="switchTeamSubTab('<%= tId %>', 'roster')" id="tabBtn-roster-<%= tId %>" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-900 transition">
-                                        Official Roster
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- SUB-TAB 1: BIDDING SIDE -->
-                            <div id="subTab-bidding-<%= tId %>" class="space-y-4">
-                                <% if (t.bids && t.bids.length > 0) { %>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <% t.bids.forEach(b => { %>
-                                            <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between">
-                                                <div>
-                                                    <h5 class="font-black italic uppercase text-slate-900 text-sm"><%= b.playerName %></h5>
-                                                    <p class="text-[10px] text-blue-600 font-black uppercase">Current Bid: <%= b.amount %> Vollars</p>
-                                                </div>
-                                                <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam === tId) { %>
-                                                    <form action="/auction/withdraw" method="POST" onsubmit="return confirm('Withdraw bid for <%= b.playerName %>?')">
-                                                        <input type="hidden" name="playerId" value="<%= b.playerId %>">
-                                                        <input type="hidden" name="teamId" value="<%= tId %>">
-                                                        <button type="submit" class="bg-red-50 text-red-600 border border-red-200 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider transition">
-                                                            Withdraw
-                                                        </button>
-                                                    </form>
-                                                <% } %>
-                                            </div>
-                                        <% }) %>
-                                    </div>
-                                <% } else { %>
-                                    <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                                        <p class="text-xs font-black uppercase text-slate-400 tracking-wider">No active player bids placed by this team yet.</p>
-                                    </div>
-                                <% } %>
-                            </div>
-
-                            <!-- SUB-TAB 2: ROSTER SIDE (EMPTY UNTIL AUCTION ENDS) -->
-                            <div id="subTab-roster-<%= tId %>" class="hidden space-y-4">
-                                <% if (t.roster && t.roster.length > 0) { %>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <% t.roster.forEach(r => { %>
-                                            <div class="p-4 rounded-2xl border border-slate-200 bg-emerald-50/30 flex items-center justify-between">
-                                                <div>
-                                                    <h5 class="font-black italic uppercase text-slate-900 text-sm"><%= r.name %></h5>
-                                                    <p class="text-[10px] text-slate-400 font-bold uppercase"><%= r.position %> | Acquired for <%= r.boughtFor || 0 %> Vollars</p>
-                                                </div>
-                                                <span class="text-[10px] font-black text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-lg uppercase">Signed</span>
-                                            </div>
-                                        <% }) %>
-                                    </div>
-                                <% } else { %>
-                                    <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                                        <p class="text-xs font-black uppercase text-slate-400 tracking-wider">Roster is empty. Player allocations will appear here once the auction ends.</p>
-                                    </div>
-                                <% } %>
+                            <div class="bg-emerald-50 rounded-lg px-2 py-1.5 border border-emerald-100">
+                                <span class="block text-[7px] text-emerald-500 font-black uppercase tracking-wider">Remaining</span>
+                                <span class="text-[11px] font-black text-emerald-600"><%= remaining %> V</span>
                             </div>
                         </div>
-                    <% }) %>
-                </div>
+
+                        <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                            <div class="h-full rounded-full" style="width: <%= committedPct %>%; background: hsl(<%= hue %> 75% 52%);"></div>
+                        </div>
+                        <p class="text-[8px] text-slate-400 font-black uppercase tracking-widest mt-1"><%= committedPct %>% Committed</p>
+                    </div>
+                <% }) %>
             </div>
+
+            <!-- SELECTED FRANCHISE DETAIL PANEL -->
+            <% auctionTeams.forEach((t, i) => {
+                let tId = t._id || t.id || '';
+                let reserved = (t.bids || []).reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
+                let remaining = (t.budget || 0) - (t.spent || 0) - reserved;
+                let hue = hueFromName(t.name);
+            %>
+                <div id="teamDetails-<%= tId %>" class="team-details-panel <%= i === 0 ? '' : 'hidden' %> bg-white border border-slate-200 rounded-[36px] p-8 shadow-xl">
+
+                    <!-- TEAM HEADER WITH ENLARGED LOGO & VOLLARS STATS -->
+                    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-slate-100 pb-8 mb-8">
+                        <div class="w-28 h-28 rounded-3xl bg-slate-50 border border-slate-200 shadow-md flex-shrink-0 p-2 flex items-center justify-center"
+                             style="box-shadow: 0 0 0 3px hsla(<%= hue %>, 75%, 52%, 0.25);">
+                            <% if (t.logo) { %>
+                                <img src="<%= t.logo %>" class="w-full h-full object-contain">
+                            <% } else { %>
+                                <span class="text-5xl font-black" style="color: hsl(<%= hue %> 65% 45%);"><%= (t.name || '?').charAt(0) %></span>
+                            <% } %>
+                        </div>
+                        <div class="flex-1 text-center sm:text-left">
+                            <span class="text-[10px] font-black uppercase tracking-widest" style="color: hsl(<%= hue %> 60% 42%);">Official VIM Franchise</span>
+                            <h2 class="text-4xl font-black italic uppercase text-slate-900 tracking-tight"><%= t.name %></h2>
+                            <p class="text-xs text-slate-400 font-bold uppercase mt-1">Manager: <span class="text-slate-800"><%= t.manager || 'Unassigned' %></span></p>
+
+                            <!-- BUDGET SUMMARY TILES (VOLLARS) -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+                                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-center">
+                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Budget</span>
+                                    <span class="text-base font-black text-slate-900"><%= t.budget || 0 %> V</span>
+                                </div>
+                                <div class="bg-blue-50/60 p-3 rounded-2xl border border-blue-100 text-center">
+                                    <span class="text-[8px] font-black text-blue-600 uppercase tracking-widest block">Locked (Signed)</span>
+                                    <span class="text-base font-black text-blue-600"><%= t.spent || 0 %> V</span>
+                                </div>
+                                <div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-100 text-center">
+                                    <span class="text-[8px] font-black text-amber-600 uppercase tracking-widest block">In Active Bids</span>
+                                    <span class="text-base font-black text-amber-600"><%= reserved %> V</span>
+                                </div>
+                                <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100 text-center">
+                                    <span class="text-[8px] font-black text-emerald-600 uppercase tracking-widest block">Remaining</span>
+                                    <span class="text-base font-black text-emerald-600"><%= remaining %> V</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BIDDING VS ROSTER TABS -->
+                    <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
+                        <div class="flex items-center gap-3">
+                            <button onclick="switchTeamSubTab('<%= tId %>', 'bidding')" id="tabBtn-bidding-<%= tId %>" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 text-white transition">
+                                Bids In Progress
+                            </button>
+                            <button onclick="switchTeamSubTab('<%= tId %>', 'roster')" id="tabBtn-roster-<%= tId %>" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-900 transition">
+                                Official Roster
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SUB-TAB 1: BIDDING SIDE -->
+                    <div id="subTab-bidding-<%= tId %>" class="space-y-4">
+                        <% if (t.bids && t.bids.length > 0) { %>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <% t.bids.forEach(b => {
+                                    let full = findPlayerRecord(b.playerId);
+                                %>
+                                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-3 <%= full ? 'hover:border-blue-300 hover:bg-blue-50/40 transition-colors cursor-pointer' : '' %>"
+                                         <% if (full) { %>
+                                         onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= full.experience || full.bio %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>')"
+                                         <% } %>>
+                                        <div class="min-w-0">
+                                            <h5 class="font-black italic uppercase text-slate-900 text-sm truncate"><%= b.playerName %></h5>
+                                            <p class="text-[10px] text-blue-600 font-black uppercase">Current Bid: <%= b.amount %> Vollars</p>
+                                            <% if (full) { %><p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Tap to view profile →</p><% } %>
+                                        </div>
+                                        <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam === tId) { %>
+                                            <form action="/auction/withdraw" method="POST" onsubmit="return confirm('Withdraw bid for <%= b.playerName %>?')" onclick="event.stopPropagation()" class="flex-shrink-0">
+                                                <input type="hidden" name="playerId" value="<%= b.playerId %>">
+                                                <input type="hidden" name="teamId" value="<%= tId %>">
+                                                <button type="submit" class="bg-red-50 text-red-600 border border-red-200 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider transition">
+                                                    Withdraw
+                                                </button>
+                                            </form>
+                                        <% } %>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } else { %>
+                            <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                <p class="text-xs font-black uppercase text-slate-400 tracking-wider">No active player bids placed by this team yet.</p>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <!-- SUB-TAB 2: ROSTER SIDE (EMPTY UNTIL AUCTION ENDS) -->
+                    <div id="subTab-roster-<%= tId %>" class="hidden space-y-4">
+                        <% if (t.roster && t.roster.length > 0) { %>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <% t.roster.forEach(r => {
+                                    let full = findPlayerRecord(r.name);
+                                %>
+                                    <div class="p-4 rounded-2xl border border-slate-200 bg-emerald-50/30 flex items-center justify-between gap-3 <%= full ? 'hover:border-emerald-300 hover:bg-emerald-50 transition-colors cursor-pointer' : '' %>"
+                                         <% if (full) { %>
+                                         onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= full.experience || full.bio %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>')"
+                                         <% } %>>
+                                        <div class="min-w-0">
+                                            <h5 class="font-black italic uppercase text-slate-900 text-sm truncate"><%= r.name %></h5>
+                                            <p class="text-[10px] text-slate-400 font-bold uppercase"><%= r.position %> | Acquired for <%= r.boughtFor || 0 %> Vollars</p>
+                                        </div>
+                                        <span class="text-[10px] font-black text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-lg uppercase flex-shrink-0">Signed</span>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } else { %>
+                            <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                <p class="text-xs font-black uppercase text-slate-400 tracking-wider">Roster is empty. Player allocations will appear here once the auction ends.</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            <% }) %>
+
         <% } else { %>
             <div class="bg-white p-12 rounded-[36px] border border-slate-200 text-center">
                 <p class="text-sm font-black text-slate-400 uppercase tracking-widest">No auction teams configured by Admin yet.</p>
@@ -1013,14 +1087,21 @@
 
     // AUCTION TEAM SELECTION LOGIC
     function selectAuctionTeam(teamId) {
-        document.querySelectorAll('.team-tab').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.team-tile').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.team-tile').forEach(el => el.classList.add('border-slate-200'));
         document.querySelectorAll('.team-details-panel').forEach(el => el.classList.add('hidden'));
 
-        const targetCard = document.getElementById('teamCard-' + teamId);
+        const targetTile = document.getElementById('teamTile-' + teamId);
         const targetPanel = document.getElementById('teamDetails-' + teamId);
 
-        if(targetCard) targetCard.classList.add('active');
-        if(targetPanel) targetPanel.classList.remove('hidden');
+        if(targetTile) {
+            targetTile.classList.add('active');
+            targetTile.classList.remove('border-slate-200');
+        }
+        if(targetPanel) {
+            targetPanel.classList.remove('hidden');
+            targetPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
     }
 
     // AUCTION TEAM SUB-TAB LOGIC (BIDDING VS ROSTER)

@@ -753,6 +753,36 @@
 
             <!-- USER ACCOUNT BADGE -->
             <div class="flex items-center gap-3 border-l border-slate-200/80 dark:border-slate-800 pl-4 lg:pl-6">
+
+                <!-- LANGUAGE SWITCHER -->
+                <div class="relative notranslate" id="vim-lang-switcher">
+
+                    <button
+                        type="button"
+                        id="vim-lang-button"
+                        onclick="vimToggleLangMenu()"
+                        class="flex items-center gap-1.5 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 px-3 py-1.5 rounded-full border border-slate-200/80 dark:border-slate-700 transition text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-200">
+                        <span aria-hidden="true">🌐</span>
+                        <span id="vim-lang-current" class="hidden sm:inline">EN</span>
+                    </button>
+
+                    <div
+                        id="vim-lang-menu"
+                        class="hidden absolute left-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-3 z-[9999]">
+
+                        <input
+                            type="text"
+                            id="vim-lang-search"
+                            oninput="vimFilterLangList()"
+                            placeholder="Search language..."
+                            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500 mb-2">
+
+                        <div id="vim-lang-list" class="max-h-64 overflow-y-auto space-y-0.5 pr-1"></div>
+
+                    </div>
+
+                </div>
+
                 <% if (typeof user !== 'undefined' && user) { %>
                     <a href="/profile" class="flex items-center gap-2.5 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 px-3 py-1.5 rounded-full border border-slate-200/80 dark:border-slate-700 transition group">
                         <div class="w-6 h-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full flex items-center justify-center font-black text-[10px]">
@@ -784,13 +814,13 @@
 
             <a href="/" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('home') %>">Home</a>
 
-            <a href="/market" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('market') %>">Market</a>
+            <a href="/market" data-tour="market" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('market') %>">Market</a>
 
-            <a href="/matches" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('matches') %>">Matches</a>
+            <a href="/matches" data-tour="matches" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('matches') %>">Matches</a>
 
-            <a href="/metrics" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('metrics') %>">Metrics</a>
+            <a href="/metrics" data-tour="metrics" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('metrics') %>">Metrics</a>
 
-            <a href="/league-records" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('records') %>">Records</a>
+            <a href="/league-records" data-tour="records" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('records') %>">Records</a>
 
             <a href="/info" class="nav-link px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-wider <%= getActive('info') %>">Info</a>
 
@@ -831,19 +861,19 @@
             Home
         </a>
 
-        <a href="/market" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
+        <a href="/market" data-tour="market-mobile" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
             Market
         </a>
 
-        <a href="/matches" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
+        <a href="/matches" data-tour="matches-mobile" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
             Matches
         </a>
 
-        <a href="/metrics" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
+        <a href="/metrics" data-tour="metrics-mobile" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
             Metrics
         </a>
 
-        <a href="/league-records" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
+        <a href="/league-records" data-tour="records-mobile" class="nav-link p-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-500">
             League Records
         </a>
 
@@ -871,6 +901,205 @@
 
 <!-- NAV SPACER -->
 <div class="h-20"></div>
+
+
+<!-- =========================================================
+     VIM LANGUAGE SWITCHER (Google Website Translator)
+     Persists site-wide via the "googtrans" cookie — every page
+     that includes this navbar partial reads/writes the same
+     cookie, so a language choice made here follows the visitor
+     to every other page automatically.
+     ========================================================= -->
+
+<div id="google_translate_element" style="display:none;"></div>
+
+<style>
+    /* Hide Google's own translate banner/UI — we drive everything through
+       our custom picker button, Google just does the actual translating. */
+    .goog-te-banner-frame.skiptranslate,
+    .goog-te-balloon-frame,
+    #goog-gt-tt {
+        display: none !important;
+    }
+
+    body {
+        top: 0px !important;
+    }
+
+    .goog-text-highlight {
+        background: none !important;
+        box-shadow: none !important;
+    }
+
+    .goog-te-gadget-icon {
+        display: none !important;
+    }
+</style>
+
+<script>
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+            { pageLanguage: 'en', autoDisplay: false },
+            'google_translate_element'
+        );
+    }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+(function () {
+
+    // A broad but not exhaustive list of languages Google Translate supports.
+    const VIM_LANGUAGES = [
+        { code: 'en', name: 'English' },
+        { code: 'es', name: 'Spanish' },
+        { code: 'fr', name: 'French' },
+        { code: 'de', name: 'German' },
+        { code: 'it', name: 'Italian' },
+        { code: 'pt', name: 'Portuguese' },
+        { code: 'nl', name: 'Dutch' },
+        { code: 'ru', name: 'Russian' },
+        { code: 'zh-CN', name: 'Chinese (Simplified)' },
+        { code: 'zh-TW', name: 'Chinese (Traditional)' },
+        { code: 'ja', name: 'Japanese' },
+        { code: 'ko', name: 'Korean' },
+        { code: 'ar', name: 'Arabic' },
+        { code: 'hi', name: 'Hindi' },
+        { code: 'bn', name: 'Bengali' },
+        { code: 'ur', name: 'Urdu' },
+        { code: 'tr', name: 'Turkish' },
+        { code: 'vi', name: 'Vietnamese' },
+        { code: 'th', name: 'Thai' },
+        { code: 'id', name: 'Indonesian' },
+        { code: 'ms', name: 'Malay' },
+        { code: 'fil', name: 'Filipino' },
+        { code: 'pl', name: 'Polish' },
+        { code: 'uk', name: 'Ukrainian' },
+        { code: 'ro', name: 'Romanian' },
+        { code: 'el', name: 'Greek' },
+        { code: 'cs', name: 'Czech' },
+        { code: 'sv', name: 'Swedish' },
+        { code: 'da', name: 'Danish' },
+        { code: 'fi', name: 'Finnish' },
+        { code: 'no', name: 'Norwegian' },
+        { code: 'hu', name: 'Hungarian' },
+        { code: 'he', name: 'Hebrew' },
+        { code: 'fa', name: 'Persian' },
+        { code: 'sw', name: 'Swahili' },
+        { code: 'ta', name: 'Tamil' },
+        { code: 'te', name: 'Telugu' },
+        { code: 'mr', name: 'Marathi' },
+        { code: 'gu', name: 'Gujarati' },
+        { code: 'pa', name: 'Punjabi' },
+        { code: 'ml', name: 'Malayalam' },
+        { code: 'kn', name: 'Kannada' },
+        { code: 'si', name: 'Sinhala' },
+        { code: 'ne', name: 'Nepali' },
+        { code: 'my', name: 'Burmese' },
+        { code: 'km', name: 'Khmer' },
+        { code: 'lo', name: 'Lao' },
+        { code: 'am', name: 'Amharic' },
+        { code: 'af', name: 'Afrikaans' },
+        { code: 'sr', name: 'Serbian' },
+        { code: 'hr', name: 'Croatian' },
+        { code: 'bg', name: 'Bulgarian' },
+        { code: 'sk', name: 'Slovak' },
+        { code: 'sl', name: 'Slovenian' },
+        { code: 'lt', name: 'Lithuanian' },
+        { code: 'lv', name: 'Latvian' },
+        { code: 'et', name: 'Estonian' }
+    ];
+
+    const listEl = document.getElementById('vim-lang-list');
+    const searchEl = document.getElementById('vim-lang-search');
+    const currentEl = document.getElementById('vim-lang-current');
+    const menuEl = document.getElementById('vim-lang-menu');
+    const buttonEl = document.getElementById('vim-lang-button');
+
+    if (!listEl || !searchEl || !currentEl || !menuEl || !buttonEl) return;
+
+    function getActiveLangCode() {
+        const match = document.cookie.match(/googtrans=\/en\/([a-zA-Z-]+)/);
+        return match ? match[1] : 'en';
+    }
+
+    function renderList(filterText) {
+        const activeCode = getActiveLangCode();
+        const term = (filterText || '').trim().toLowerCase();
+
+        listEl.innerHTML = '';
+
+        VIM_LANGUAGES
+            .filter(lang => !term || lang.name.toLowerCase().includes(term) || lang.code.toLowerCase().includes(term))
+            .forEach(lang => {
+                const row = document.createElement('button');
+                row.type = 'button';
+                row.className =
+                    'w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition ' +
+                    (lang.code === activeCode
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                        : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800');
+
+                row.innerHTML =
+                    '<span>' + lang.name + '</span>' +
+                    '<span class="opacity-50 uppercase text-[9px]">' + lang.code + '</span>';
+
+                row.addEventListener('click', function () {
+                    vimSetLanguage(lang.code);
+                });
+
+                listEl.appendChild(row);
+            });
+
+        if (!listEl.children.length) {
+            listEl.innerHTML = '<p class="text-[10px] text-slate-400 uppercase font-bold text-center py-4">No matches</p>';
+        }
+    }
+
+    window.vimFilterLangList = function () {
+        renderList(searchEl.value);
+    };
+
+    window.vimSetLanguage = function (code) {
+        const domain = window.location.hostname;
+        const value = 'en|' + code;
+
+        // Set with and without an explicit domain so it sticks whether the
+        // site is served from a bare domain, a subdomain, or localhost.
+        document.cookie = 'googtrans=/en/' + code + '; path=/';
+        document.cookie = 'googtrans=/en/' + code + '; path=/; domain=' + domain;
+        document.cookie = 'googtrans=/en/' + code + '; path=/; domain=.' + domain;
+
+        window.location.reload();
+    };
+
+    window.vimToggleLangMenu = function () {
+        const isHidden = menuEl.classList.contains('hidden');
+
+        if (isHidden) {
+            menuEl.classList.remove('hidden');
+            searchEl.value = '';
+            renderList('');
+            setTimeout(function () { searchEl.focus(); }, 30);
+        } else {
+            menuEl.classList.add('hidden');
+        }
+    };
+
+    document.addEventListener('click', function (event) {
+        const switcher = document.getElementById('vim-lang-switcher');
+        if (switcher && !switcher.contains(event.target)) {
+            menuEl.classList.add('hidden');
+        }
+    });
+
+    // Reflect the currently-active language (if any) in the pill button.
+    const activeLang = VIM_LANGUAGES.find(l => l.code === getActiveLangCode());
+    currentEl.textContent = activeLang ? activeLang.code.toUpperCase() : 'EN';
+
+    renderList('');
+})();
+</script>
 
 
 <!-- =========================================================

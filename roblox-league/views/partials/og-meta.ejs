@@ -1,0 +1,49 @@
+<%
+    /*
+        OPEN GRAPH / DISCORD EMBED TAGS
+        ================================
+        Include this once inside your <head>, on every page:
+
+            <%- include('partials/og-meta') %>
+
+        Every route already passes ogTitle / ogDescription / ogImage / ogUrl
+        (see the defaultOg() / buildMatchOg() helpers in app.js), but the
+        fallbacks below mean this also works safely on any page that
+        doesn't pass them.
+    */
+
+    const metaTitle = typeof ogTitle !== 'undefined' && ogTitle
+        ? ogTitle
+        : 'VIM Super League';
+
+    const metaDescription = typeof ogDescription !== 'undefined' && ogDescription
+        ? ogDescription
+        : 'Competitive Roblox football league — player market, live matches, stats and records.';
+
+    const metaImage = typeof ogImage !== 'undefined' && ogImage
+        ? ogImage
+        : '/images/vimgfx.png';
+
+    const metaUrl = typeof ogUrl !== 'undefined' && ogUrl
+        ? ogUrl
+        : '';
+%>
+<title><%= metaTitle %></title>
+<meta name="description" content="<%= metaDescription %>">
+
+<!-- Open Graph (Discord, Slack, Facebook, iMessage, etc.) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="VIM Super League">
+<meta property="og:title" content="<%= metaTitle %>">
+<meta property="og:description" content="<%= metaDescription %>">
+<meta property="og:image" content="<%= metaImage %>">
+<% if (metaUrl) { %>
+<meta property="og:url" content="<%= metaUrl %>">
+<% } %>
+<meta name="theme-color" content="#0088ff">
+
+<!-- Twitter Card (Discord also reads these as a fallback) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<%= metaTitle %>">
+<meta name="twitter:description" content="<%= metaDescription %>">
+<meta name="twitter:image" content="<%= metaImage %>">

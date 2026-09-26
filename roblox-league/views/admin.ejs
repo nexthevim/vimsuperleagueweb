@@ -942,6 +942,7 @@
                 <select
                     name="matchId"
                     id="matchEditorSelect"
+                    onchange="handleMatchSelect(this.value)"
                     class="w-full bg-white border border-slate-200 p-3.5 rounded-xl text-slate-900 text-xs outline-none focus:border-emerald-500"
                     required>
 
@@ -3155,6 +3156,26 @@
 <script>
 
     /* ============================================================
+       MATCH CENTER DATA
+       (verified players for lineup/MVP/stat selects, and existing
+       match reports so the editor can be pre-filled when an admin
+       picks a match from the dropdown)
+    ============================================================ */
+
+    const ADMIN_VERIFIED_PLAYERS = <%- JSON.stringify(
+        (typeof players !== 'undefined' ? players : [])
+            .filter(p => p.verified)
+            .map(p => ({ name: p.name, position: p.position || 'FWD' }))
+    ).replace(/</g, '\\u003c') %>;
+
+    const ADMIN_MATCHES_DATA = <%- JSON.stringify(
+        (typeof matches !== 'undefined' ? matches : []).map(m => ({
+            id: (m._id || m.id || '').toString(),
+            details: m.details || null
+        }))
+    ).replace(/</g, '\\u003c') %>;
+
+    /* ============================================================
        HELPER FUNCTIONS & SCHEDULE EDITOR
     ============================================================ */
 
@@ -3231,12 +3252,141 @@
     }
 
     /* ============================================================ MATCH CENTER HELPERS ============================================================ */
-    function clearMatchEditor() {
+
+    // Builds the shared <option> list (verified players only, matching
+    // what the backend accepts) for every lineup/MVP/stat-row select.
+    function buildPlayerOptionsHTML(placeholder, selected) {
+        let html = `<option value="">${placeholder}</option>`;
+        ADMIN_VERIFIED_PLAYERS.forEach(p => {
+            const isSelected = selected && selected === p.name ? 'selected' : '';
+            html += `<option value="${p.name}" ${isSelected}>${p.name} (${p.position})</option>`;
+        });
+        return html;
+    }
+
+    // Fills the fixed lineup + MVP selects on the page with real players.
+    function populatePlayerSelects() {
+        document.querySelectorAll('select.player-select[id^="lineup"]').forEach(select => {
+            const current = select.value;
+            select.innerHTML = buildPlayerOptionsHTML('Select player...', current);
+        });
+
+        const mvpSelect = document.getElementById('mvpSelect');
+        if (mvpSelect) {
+            const current = mvpSelect.value;
+            mvpSelect.innerHTML = buildPlayerOptionsHTML('Select MVP...', current);
+        }
+    }
+
+    let statRowCounter = 0;
+
+    // Adds one "player + type + value + assists" row to the match stats
+    // section. team is 'teamA' or 'teamB' and feeds the field names the
+    // /admin/update-match-details route already expects (teamAPlayer,
+    // teamAType, teamAMainValue, teamAAssists — or the teamB equivalents).
+    function addStatRow(team, prefill) {
+        const container = document.getElementById(`statRows-${team}`);
+        if (!container) return;
+
+        prefill = prefill || {};
+        const rowId = `statRow-${team}-${statRowCounter++}`;
+        const fieldPrefix = team === 'teamB' ? 'teamB' : 'teamA';
+
+        const row = document.createElement('div');
+        row.id = rowId;
+        row.className = 'grid grid-cols-12 gap-2 items-center bg-slate-50 border border-slate-200 rounded-xl p-2';
+
+        row.innerHTML = `
+            <div class="col-span-4">
+                <select name="${fieldPrefix}Player" class="player-select text-[11px] p-2">
+                    ${buildPlayerOptionsHTML('Player...', prefill.name || '')}
+                </select>
+            </div>
+            <div class="col-span-3">
+                <select name="${fieldPrefix}Type" class="player-select text-[11px] p-2">
+                    ${['Goal', 'Assist', 'Save', 'Clean Sheet', 'Rating'].map(t =>
+                        `<option value="${t}" ${prefill.type === t ? 'selected' : ''}>${t}</option>`
+                    ).join('')}
+                </select>
+            </div>
+            <div class="col-span-2">
+                <input type="number" name="${fieldPrefix}MainValue" placeholder="Value" value="${prefill.value != null ? prefill.value : ''}" class="admin-input text-[11px] p-2">
+            </div>
+            <div class="col-span-2">
+                <input type="number" name="${fieldPrefix}Assists" placeholder="Assists" value="${prefill.assists != null ? prefill.assists : ''}" class="admin-input text-[11px] p-2">
+            </div>
+            <div class="col-span-1 text-center">
+                <button type="button" onclick="removeStatRow('${rowId}')" class="text-red-500 hover:text-red-700 font-black text-xs" title="Remove player">✕</button>
+            </div>
+        `;
+
+        container.appendChild(row);
+    }
+
+    function removeStatRow(rowId) {
+        const row = document.getElementById(rowId);
+        if (row) row.remove();
+    }
+
+    // Fires when an admin picks a match in the "Select Match" dropdown.
+    // Wires the hidden matchId used by the report form, and — if that
+    // match already has a saved report — pre-fills every field so the
+    // admin is editing the existing report instead of starting blank.
+    function handleMatchSelect(matchId) {
+        const hiddenId = document.getElementById('hiddenMatchId');
+        if (hiddenId) hiddenId.value = matchId || '';
+
+        clearMatchEditor(true);
+
+        const match = ADMIN_MATCHES_DATA.find(m => m.id === matchId);
+        const details = match && match.details ? match.details : null;
+
+        if (!details) return;
+
+        const form = document.querySelector('form[action="/admin/update-match-details"]');
+        if (!form) return;
+
+        const setVal = (name, value) => {
+            const field = form.elements[name];
+            if (field && value !== undefined && value !== null) field.value = value;
+        };
+
+        setVal('narrative', details.narrative);
+        setVal('highlights', details.highlights);
+        setVal('standouts', details.standouts);
+        setVal('possessionA', details.possessionA);
+        setVal('possessionB', details.possessionB);
+        setVal('goalsA', details.goalsA);
+        setVal('goalsB', details.goalsB);
+        setVal('lineupA', details.lineupA);
+        setVal('lineupB', details.lineupB);
+        setVal('mvpCardUrl', details.mvpCardUrl);
+        setVal('assistsA', details.assistsA);
+        setVal('savesA', details.savesA);
+        setVal('assistsB', details.assistsB);
+        setVal('savesB', details.savesB);
+
+        ['A', 'B'].forEach(side => {
+            ['gk', 'def1', 'def2', 'mid1', 'mid2', 'fwd1', 'fwd2'].forEach(slot => {
+                setVal(`lineup${side}_${slot}`, details[`lineup${side}_${slot}`]);
+            });
+        });
+
+        if (details.mvpName) setVal('mvpName', details.mvpName);
+
+        // Re-populate selects now that values are set, keeping selections.
+        populatePlayerSelects();
+
+        (details.teamAPlayers || []).forEach(p => addStatRow('teamA', p));
+        (details.teamBPlayers || []).forEach(p => addStatRow('teamB', p));
+    }
+
+    function clearMatchEditor(keepMatchId) {
         const form = document.querySelector( 'form[action="/admin/update-match-details"]' );
         if (!form) return;
         form.reset();
         const hiddenId = document.getElementById('hiddenMatchId');
-        if (hiddenId) {
+        if (hiddenId && !keepMatchId) {
             hiddenId.value = '';
         }
         document .querySelectorAll('.player-select') .forEach(select => {
@@ -3257,6 +3407,7 @@
     /* ============================================================ ADMIN INITIALIZATION ============================================================ */
     document.addEventListener('DOMContentLoaded', function() {
         formatVimLocalTimes();
+        populatePlayerSelects();
         const defaultTab = document.querySelector('.tab-section:not(.hidden)');
         if (!defaultTab) {
             switchTab('broadcast');

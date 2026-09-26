@@ -375,28 +375,29 @@
             let sessionName = (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.name) || 'VIM Auction';
         %>
 
-        <!-- SESSION STATUS BANNER -->
-        <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-6 rounded-[32px] border border-slate-800 shadow-2xl mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <!-- SESSION STATUS BANNER (LIGHT / IPL-STYLE) -->
+        <div class="relative overflow-hidden bg-white border border-slate-200 p-6 rounded-[32px] shadow-md mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="absolute inset-x-0 top-0 h-1.5 bg-slate-900"></div>
             <div class="flex items-center gap-4">
-                <div class="h-12 w-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 text-2xl font-black">
+                <div class="h-12 w-12 rounded-2xl bg-slate-900 shadow-sm flex items-center justify-center text-white text-2xl font-black">
                     🏆
                 </div>
                 <div>
-                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest"><%= sessionName %></span>
-                    <h3 class="text-2xl font-black italic uppercase tracking-tight">Franchise Auction Hub</h3>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><%= sessionName %></span>
+                    <h3 class="text-2xl font-black italic uppercase tracking-tight text-slate-900">Franchise Auction Hub</h3>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <div class="bg-white/5 border border-white/10 px-5 py-3 rounded-2xl text-center">
+                <div class="bg-slate-50 border border-slate-100 px-5 py-3 rounded-2xl text-center">
                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Status</span>
-                    <span class="text-base font-black italic text-<%= statusColor %>-400 uppercase tracking-wider flex items-center justify-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-<%= statusColor %>-400 <%= sessionStatus === 'live' ? 'animate-pulse' : '' %>"></span>
+                    <span class="text-base font-black italic text-<%= statusColor %>-600 uppercase tracking-wider flex items-center justify-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-<%= statusColor %>-500 <%= sessionStatus === 'live' ? 'animate-pulse' : '' %>"></span>
                         <%= statusLabel %>
                     </span>
                 </div>
-                <div class="bg-white/5 border border-white/10 px-5 py-3 rounded-2xl text-center">
+                <div class="bg-slate-50 border border-slate-100 px-5 py-3 rounded-2xl text-center">
                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Squad Cap</span>
-                    <span class="text-base font-black italic text-white uppercase tracking-wider"><%= squadCap %> Players</span>
+                    <span class="text-base font-black italic text-slate-900 uppercase tracking-wider"><%= squadCap %> Players</span>
                 </div>
             </div>
         </div>
@@ -480,9 +481,9 @@
                                     <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Budget</span>
                                     <span class="text-base font-black text-slate-900"><%= t.budget || 0 %> V</span>
                                 </div>
-                                <div class="bg-blue-50/60 p-3 rounded-2xl border border-blue-100 text-center">
-                                    <span class="text-[8px] font-black text-blue-600 uppercase tracking-widest block">Locked (Signed)</span>
-                                    <span class="text-base font-black text-blue-600"><%= t.spent || 0 %> V</span>
+                                <div class="bg-slate-100 p-3 rounded-2xl border border-slate-200 text-center">
+                                    <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest block">Locked (Signed)</span>
+                                    <span class="text-base font-black text-slate-900"><%= t.spent || 0 %> V</span>
                                 </div>
                                 <div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-100 text-center">
                                     <span class="text-[8px] font-black text-amber-600 uppercase tracking-widest block">In Active Bids</span>
@@ -515,13 +516,13 @@
                                 <% t.bids.forEach(b => {
                                     let full = findPlayerRecord(b.playerId);
                                 %>
-                                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-3 <%= full ? 'hover:border-blue-300 hover:bg-blue-50/40 transition-colors cursor-pointer' : '' %>"
+                                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-3 <%= full ? 'hover:border-amber-300 hover:bg-amber-50/40 transition-colors cursor-pointer' : '' %>"
                                          <% if (full) { %>
                                          onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= full.experience || full.bio %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>')"
                                          <% } %>>
                                         <div class="min-w-0">
                                             <h5 class="font-black italic uppercase text-slate-900 text-sm truncate"><%= b.playerName %></h5>
-                                            <p class="text-[10px] text-blue-600 font-black uppercase">Current Bid: <%= b.amount %> Vollars</p>
+                                            <p class="text-[10px] text-amber-600 font-black uppercase">Current Bid: <%= b.amount %> Vollars</p>
                                             <% if (full) { %><p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Tap to view profile →</p><% } %>
                                         </div>
                                         <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam === tId) { %>
@@ -583,7 +584,7 @@
         <div class="max-w-4xl w-full flex flex-col md:flex-row gap-8 items-center relative" id="modalContainer" onclick="event.stopPropagation()">
             <!-- Player Card Spotlight -->
             <div class="relative group w-[300px] h-[420px] flex-shrink-0">
-                <div class="absolute -inset-2 bg-blue-500/20 blur-2xl rounded-full opacity-70"></div>
+                <div class="absolute -inset-2 bg-slate-300/40 blur-2xl rounded-full opacity-70"></div>
                 <div class="relative w-full h-full bg-white rounded-[36px] overflow-hidden border border-slate-200 shadow-2xl">
                     <img id="modalImg" src="" class="w-full h-full object-cover">
                     <div id="modalImgPlaceholder" class="w-full h-full bg-gradient-to-b from-slate-100 to-slate-200 flex items-center justify-center">
@@ -606,13 +607,13 @@
                 
                 <div class="flex justify-between items-start mb-6 relative z-10">
                     <div>
-                        <p id="modalDiscord" class="text-blue-600 font-black text-xs uppercase tracking-wider mb-0.5"></p>
+                        <p id="modalDiscord" class="text-slate-900 font-black text-xs uppercase tracking-wider mb-0.5"></p>
                         <p id="modalTZ" class="text-[10px] text-slate-400 font-bold uppercase mb-1"></p>
                         <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Official VIM Player Contract</p>
                     </div>
                     <div class="text-right">
                         <p id="modalViews" class="text-4xl font-black italic text-slate-900 leading-none">0</p>
-                        <p class="text-[8px] uppercase font-black text-blue-600 tracking-widest mt-1">PROFILE VIEWS</p>
+                        <p class="text-[8px] uppercase font-black text-slate-400 tracking-widest mt-1">PROFILE VIEWS</p>
                     </div>
                 </div>
 
@@ -620,7 +621,7 @@
                     <div class="stat-badge p-3.5 rounded-2xl text-center"><p class="text-[8px] uppercase font-black text-slate-400 mb-0.5">Goals</p><p id="mGoals" class="text-2xl font-black italic text-slate-900">0</p></div>
                     <div class="stat-badge p-3.5 rounded-2xl text-center"><p class="text-[8px] uppercase font-black text-slate-400 mb-0.5">Assists</p><p id="mAssists" class="text-2xl font-black italic text-slate-900">0</p></div>
                     <div class="stat-badge p-3.5 rounded-2xl text-center"><p class="text-[8px] uppercase font-black text-slate-400 mb-0.5">Saves</p><p id="mSaves" class="text-2xl font-black italic text-slate-900">0</p></div>
-                    <div class="stat-badge p-3.5 rounded-2xl text-center border-blue-200 bg-blue-50/50"><p class="text-[8px] uppercase font-black text-blue-600 mb-0.5">MVP</p><p id="mMvps" class="text-2xl font-black italic text-blue-600">0</p></div>
+                    <div class="stat-badge p-3.5 rounded-2xl text-center border-amber-200 bg-amber-50/50"><p class="text-[8px] uppercase font-black text-amber-600 mb-0.5">MVP</p><p id="mMvps" class="text-2xl font-black italic text-amber-600">0</p></div>
                 </div>
 
                 <div class="relative z-10 mb-4">
@@ -628,24 +629,24 @@
                     <div id="modalBio" class="text-slate-600 leading-relaxed text-xs h-20 overflow-y-auto pr-3 italic bg-slate-50 p-3 rounded-2xl border border-slate-100 custom-scroll"></div>
                 </div>
 
-                <!-- AUCTION BIDDING SECTION INSIDE MODAL -->
-<div class="relative z-10 bg-slate-900 text-white p-4 rounded-2xl border border-slate-800 mb-4">
-    <div class="flex justify-between items-center mb-2">
+                <!-- AUCTION BIDDING SECTION INSIDE MODAL (LIGHT THEME) -->
+<div class="relative z-10 bg-slate-50 text-slate-900 p-4 rounded-2xl border border-slate-200 mb-4">
+    <div class="flex justify-between items-center mb-3 pb-3 border-b border-slate-200">
         <div>
             <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Highest Bid</span>
-            <span id="modalHighestBid" class="text-base font-black italic text-emerald-400">0 Vollars</span>
+            <span id="modalHighestBid" class="text-base font-black italic text-emerald-600">0 Vollars</span>
         </div>
 
         <div class="text-right">
             <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Reserve Price</span>
-            <span id="modalReservePrice" class="text-xs font-black text-slate-300">0 Vollars</span>
+            <span id="modalReservePrice" class="text-xs font-black text-slate-500">0 Vollars</span>
         </div>
     </div>
 
     <% if ((typeof isManager !== 'undefined' && isManager) || (typeof currentManagerTeam !== 'undefined' && currentManagerTeam)) { %>
 
         <!-- ADD / EDIT BID -->
-        <form action="/auction/bid" method="POST" class="mt-3">
+        <form action="/auction/bid" method="POST">
             <input type="hidden" id="modalPlayerId" name="playerId" value="">
 
             <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam) { %>
@@ -660,13 +661,13 @@
                     placeholder="Bid Vollars..."
                     required
                     min="1"
-                    class="flex-1 bg-slate-800 border border-slate-700 text-white text-xs font-bold px-3 py-2 rounded-xl outline-none focus:border-blue-500"
+                    class="flex-1 min-w-0 bg-white border border-slate-300 text-slate-900 text-xs font-bold px-3 py-2.5 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition"
                 >
 
                 <button
                     type="submit"
                     id="modalBidButton"
-                    class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest transition"
+                    class="bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black px-5 py-2.5 rounded-xl uppercase tracking-widest transition shadow-sm whitespace-nowrap"
                 >
                     Place Bid
                 </button>
@@ -680,7 +681,7 @@
             <button
                 type="button"
                 onclick="editCurrentBid()"
-                class="bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-white border border-amber-500/30 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition"
+                class="flex items-center justify-center gap-1.5 bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white border border-amber-200 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition"
             >
                 ✏️ Edit Bid
             </button>
@@ -699,7 +700,7 @@
 
                 <button
                     type="submit"
-                    class="w-full bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition"
+                    class="w-full flex items-center justify-center gap-1.5 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition"
                 >
                     ↩ Withdraw Bid
                 </button>
@@ -1244,6 +1245,15 @@ if(document.getElementById('modalBidInput')) {
     const minNextBid = Math.max(parseInt(hBid) + 1, parseInt(rPrice));
     document.getElementById('modalBidInput').min = minNextBid;
     document.getElementById('modalBidInput').placeholder = `Min bid: ${minNextBid} Vollars`;
+    document.getElementById('modalBidInput').value = '';
+}
+// Reset the bid button back to its default "Place Bid" state every time
+// the modal is opened, so a previous "Update Bid" edit-mode doesn't stick.
+const resetBidBtn = document.getElementById('modalBidButton');
+if (resetBidBtn) {
+    resetBidBtn.innerText = 'Place Bid';
+    resetBidBtn.classList.remove('bg-amber-500', 'hover:bg-amber-400');
+    resetBidBtn.classList.add('bg-slate-900', 'hover:bg-slate-800');
 }
 
 try {
@@ -1278,7 +1288,7 @@ function editCurrentBid() {
     bidInput.select();
 
     bidButton.innerText = 'Update Bid';
-    bidButton.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+    bidButton.classList.remove('bg-slate-900', 'hover:bg-slate-800');
     bidButton.classList.add('bg-amber-500', 'hover:bg-amber-400');
 }
 

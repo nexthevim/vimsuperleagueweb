@@ -222,12 +222,29 @@
                 <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
             <div class="flex items-center bg-white border border-slate-200 p-1 rounded-2xl shadow-sm overflow-x-auto" id="filterWrapper">
-                <button onclick="setFilter('ALL')" class="filter-btn active text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-slate-900 text-white">ALL</button>
-                <button onclick="setFilter('FWD')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">FWD</button>
-                <button onclick="setFilter('MID')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">MID</button>
-                <button onclick="setFilter('DEF')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">DEF</button>
-                <button onclick="setFilter('GK')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">GK</button>
+                <button data-pos-filter="ALL" onclick="setFilter('ALL')" class="filter-btn active text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-slate-900 text-white">ALL</button>
+                <button data-pos-filter="FWD" onclick="setFilter('FWD')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">FWD</button>
+                <button data-pos-filter="MID" onclick="setFilter('MID')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">MID</button>
+                <button data-pos-filter="DEF" onclick="setFilter('DEF')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">DEF</button>
+                <button data-pos-filter="GK" onclick="setFilter('GK')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">GK</button>
             </div>
+            <div class="flex items-center bg-white border border-slate-200 p-1 rounded-2xl shadow-sm overflow-x-auto" id="classFilterWrapper">
+                <button data-class-filter="ALL" onclick="setClassFilter('ALL')" class="filter-btn active text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-slate-900 text-white">ALL CLASS</button>
+                <button data-class-filter="SS" onclick="setClassFilter('SS')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">SS</button>
+                <button data-class-filter="S" onclick="setClassFilter('S')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">S</button>
+                <button data-class-filter="A" onclick="setClassFilter('A')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">A</button>
+                <button data-class-filter="B" onclick="setClassFilter('B')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">B</button>
+                <button data-class-filter="C" onclick="setClassFilter('C')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">C</button>
+            </div>
+            <% if (typeof isManager !== 'undefined' && isManager) { %>
+                <button
+                    id="eligibleFilterBtn"
+                    onclick="toggleEligibleFilter()"
+                    title="Only show players you can currently legally bid on"
+                    class="text-[10px] font-black px-3.5 py-1.5 rounded-xl transition text-emerald-600 hover:bg-emerald-50 bg-white border border-emerald-200 whitespace-nowrap">
+                    ✅ I Can Bid
+                </button>
+            <% } %>
             <div class="bg-blue-50 border border-blue-200 px-4 py-2.5 rounded-2xl" id="countWrapper">
                 <span class="text-[10px] text-blue-600 font-black uppercase tracking-wider">● Players: <%= players.length %></span>
             </div>
@@ -235,18 +252,21 @@
     </div>
 
     <!-- AUCTION OVERRIDE NOTIFICATION BANNER (FOR MANAGERS) -->
-    <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam && typeof overriddenBids !== 'undefined' && overriddenBids && overriddenBids.length > 0) { %>
+    <% if (typeof isManager !== 'undefined' && isManager && typeof myOutbidPlayers !== 'undefined' && myOutbidPlayers && myOutbidPlayers.length > 0) { %>
         <div class="max-w-7xl mx-auto px-6 mb-6">
             <div class="bg-amber-500 text-white p-4 rounded-2xl shadow-lg border border-amber-400 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <span class="text-xl">⚠️</span>
                     <div>
-                        <p class="text-xs font-black uppercase tracking-wider">Auction Alert: Bid Overridden!</p>
-                        <p class="text-[11px] text-amber-100 font-bold">Other teams have outbid you on <%= overriddenBids.length %> player(s). Review your bids in the Auction Hub!</p>
+                        <p class="text-xs font-black uppercase tracking-wider">You've Been Outbid!</p>
+                        <p class="text-[11px] text-amber-100 font-bold">
+                            Other managers are now winning <%= myOutbidPlayers.length %> player(s) you bid on:
+                            <% myOutbidPlayers.slice(0, 3).forEach((p, i) => { %><%= i > 0 ? ', ' : '' %><%= p.name %> (<%= p.highestBid %> Vollars)<% }) %><%= myOutbidPlayers.length > 3 ? ', …' : '' %>
+                        </p>
                     </div>
                 </div>
                 <button onclick="switchMode('auction')" class="bg-white text-amber-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-50 transition shadow-sm">
-                    View Bids
+                    Review Bids
                 </button>
             </div>
         </div>
@@ -287,13 +307,31 @@
                                     else if(rank === 'B') rankClass = 'rank-b';
 
                                     let pId = p._id || p.id || '';
+
+                                    // VSL Season 4: manager accounts are never auctionable, and
+                                    // every other player gets a manager-specific status badge.
+                                    let isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
+
+                                    let myBadge = null;
+                                    if (!isMgrAccount && typeof isManager !== 'undefined' && isManager && typeof myAuctionState !== 'undefined' && myAuctionState) {
+                                        const amWinning = Number(p.highestBid || 0) > 0 && (p.highestBidder || '').toLowerCase() === myAuctionState.team.name.toLowerCase();
+                                        const amOutbid = myAuctionState.outbidPlayerIds.includes(String(pId));
+                                        if (amWinning) myBadge = 'winning';
+                                        else if (amOutbid) myBadge = 'outbid';
+                                        else if (typeof myEligibility !== 'undefined' && myEligibility && myEligibility[String(pId)] === false) myBadge = 'ineligible';
+                                    }
+
+                                    let isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
+                                    let eligibleAttr = (typeof myEligibility !== 'undefined' && myEligibility) ? (myEligibility[String(pId)] === true) : true;
                                 %>
                                 <div class="player-card card-item w-[260px] h-[350px] glass-light rounded-[28px] border border-slate-200 shadow-md flex-shrink-0 relative group"
                                      data-name="<%= p.name.toLowerCase() %>"
                                      data-pos="<%= pos %>"
+                                     data-class="<%= rank %>"
+                                     data-eligible="<%= eligibleAttr %>"
                                      onmousemove="tiltCard(event, this)" 
                                      onmouseleave="resetTilt(this)"
-                                     onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= p.experience || p.bio %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>')">
+                                     onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= p.experience || p.bio %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- isMgrAccount %>, <%- isWatched %>)">
                                     
                                     <!-- Shiny Dynamic Sweeping Glare -->
                                     <div class="card-sheen"></div>
@@ -305,6 +343,38 @@
                                             <span class="absolute top-10 text-[64px] font-black italic text-slate-300/40 select-none uppercase tracking-tighter"><%= p.position || 'PRO' %></span>
                                             <svg class="w-24 h-24 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                                         </div>
+                                    <% } %>
+
+                                    <!-- MANAGER BADGE (not auctionable) -->
+                                    <% if (isMgrAccount) { %>
+                                        <div class="absolute top-4 right-4 z-30">
+                                            <span class="bg-slate-900 text-white text-[9px] font-black px-2.5 py-1 rounded-xl uppercase shadow-lg tracking-wider border border-white/20">👔 MANAGER</span>
+                                        </div>
+                                    <% } else { %>
+                                        <!-- WATCHLIST STAR (managers only) -->
+                                        <% if (typeof isManager !== 'undefined' && isManager) { %>
+                                            <button type="button"
+                                                onclick="event.stopPropagation(); toggleWatchlistStar(this, '<%= pId %>')"
+                                                data-watching="<%= isWatched %>"
+                                                class="watchlist-star-btn absolute top-4 right-4 z-30 w-8 h-8 rounded-full flex items-center justify-center text-base transition-all shadow-lg border border-white/30 <%= isWatched ? 'bg-amber-400 text-white' : 'bg-black/30 text-white/80 hover:bg-black/50' %>">
+                                                <%= isWatched ? '★' : '☆' %>
+                                            </button>
+                                        <% } %>
+
+                                        <!-- MY STATUS BADGE (winning / outbid / ineligible) -->
+                                        <% if (myBadge === 'winning') { %>
+                                            <div class="absolute top-4 left-4 z-30">
+                                                <span class="bg-emerald-500 text-white text-[9px] font-black px-2.5 py-1 rounded-xl uppercase shadow-lg tracking-wider">🟢 Winning</span>
+                                            </div>
+                                        <% } else if (myBadge === 'outbid') { %>
+                                            <div class="absolute top-4 left-4 z-30">
+                                                <span class="bg-rose-500 text-white text-[9px] font-black px-2.5 py-1 rounded-xl uppercase shadow-lg tracking-wider">🔴 Outbid</span>
+                                            </div>
+                                        <% } else if (myBadge === 'ineligible') { %>
+                                            <div class="absolute top-4 left-4 z-30">
+                                                <span class="bg-slate-600 text-white text-[9px] font-black px-2.5 py-1 rounded-xl uppercase shadow-lg tracking-wider">⚠️ Ineligible</span>
+                                            </div>
+                                        <% } %>
                                     <% } %>
 
                                     <!-- RANK BADGE AT BOTTOM RIGHT ON HOVER / ALWAYS VISIBLE -->
@@ -409,6 +479,78 @@
                 </div>
             </div>
         </div>
+
+        <!-- ============================================================
+             MARKET SPOTLIGHT
+             ============================================================ -->
+        <% if (typeof marketSpotlight !== 'undefined' && marketSpotlight) { %>
+            <div class="mb-10">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-xl">🔥</span>
+                    <h3 class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Market Spotlight</h3>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+                    <!-- TOP OVERALL BID — hero tile -->
+                    <div class="lg:col-span-1 relative overflow-hidden rounded-[28px] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white p-6 shadow-lg border border-slate-800">
+                        <div class="absolute -right-6 -top-6 text-[100px] opacity-10 select-none">👑</div>
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-amber-400 mb-2">Top Bid Overall</p>
+                        <% if (marketSpotlight.topOverall) { %>
+                            <h4 class="text-2xl font-black italic uppercase tracking-tight mb-1"><%= marketSpotlight.topOverall.name %></h4>
+                            <p class="text-3xl font-black italic text-emerald-400 mb-2"><%= Number(marketSpotlight.topOverall.highestBid).toLocaleString() %> <span class="text-xs">Vollars</span></p>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-white/10 border border-white/20 text-[9px] font-black px-2 py-1 rounded-lg uppercase"><%= marketSpotlight.topOverall.position || 'PRO' %></span>
+                                <span class="bg-white/10 border border-white/20 text-[9px] font-black px-2 py-1 rounded-lg uppercase"><%= (marketSpotlight.topOverall.rank || 'C').toUpperCase() %> Class</span>
+                                <% if (marketSpotlight.topOverall.highestBidder) { %>
+                                    <span class="text-[9px] text-slate-400 font-bold truncate">by <%= marketSpotlight.topOverall.highestBidder %></span>
+                                <% } %>
+                            </div>
+                        <% } else { %>
+                            <p class="text-sm font-bold text-slate-400 italic mt-4">No bids placed yet — be the first.</p>
+                        <% } %>
+                    </div>
+
+                    <!-- HIGHEST BID PER POSITION -->
+                    <div class="lg:col-span-1 bg-white rounded-[28px] border border-slate-200 shadow-sm p-5">
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Highest Bid by Position</p>
+                        <div class="space-y-2.5">
+                            <% ['FWD','MID','DEF','GK'].forEach(posKey => {
+                                const entry = marketSpotlight.byPosition && marketSpotlight.byPosition[posKey];
+                                let posDotClass = posKey === 'FWD' ? 'bg-rose-500' : posKey === 'MID' ? 'bg-amber-500' : posKey === 'DEF' ? 'bg-blue-500' : 'bg-violet-500';
+                            %>
+                                <div class="flex items-center justify-between gap-3 py-1.5 <%= entry ? 'border-b border-slate-100 last:border-0' : '' %>">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="w-2 h-2 rounded-full <%= posDotClass %> flex-shrink-0"></span>
+                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider w-8 flex-shrink-0"><%= posKey %></span>
+                                        <span class="text-xs font-black text-slate-900 uppercase truncate"><%= entry ? entry.name : '—' %></span>
+                                    </div>
+                                    <span class="text-xs font-black text-emerald-600 flex-shrink-0"><%= entry ? Number(entry.highestBid).toLocaleString() : '—' %></span>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+
+                    <!-- RISING / HOT PLAYERS -->
+                    <div class="lg:col-span-1 bg-white rounded-[28px] border border-slate-200 shadow-sm p-5">
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">📈 Rising Bids</p>
+                        <% if (marketSpotlight.rising && marketSpotlight.rising.length > 0) { %>
+                            <div class="space-y-2.5">
+                                <% marketSpotlight.rising.forEach(r => { %>
+                                    <div class="flex items-center justify-between gap-3 py-1.5 border-b border-slate-100 last:border-0">
+                                        <span class="text-xs font-black text-slate-900 uppercase truncate"><%= r.player.name %></span>
+                                        <span class="bg-rose-50 text-rose-600 text-[9px] font-black px-2 py-1 rounded-lg uppercase flex-shrink-0"><%= r.bidCount %> bids / 2h</span>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } else { %>
+                            <p class="text-xs text-slate-400 italic font-bold">No bidding flurries in the last 2 hours yet.</p>
+                        <% } %>
+                    </div>
+
+                </div>
+            </div>
+        <% } %>
 
         <% if (typeof auctionTeams !== 'undefined' && auctionTeams && auctionTeams.length > 0) { %>
 
@@ -526,7 +668,7 @@
                                 %>
                                     <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-3 <%= full ? 'hover:border-amber-300 hover:bg-amber-50/40 transition-colors cursor-pointer' : '' %>"
                                          <% if (full) { %>
-                                         onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= full.experience || full.bio %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>')"
+                                         onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= full.experience || full.bio %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>', <%- (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((full.name||'').toLowerCase())) %>, <%- !!(typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(full._id||full.id))) %>)"
                                          <% } %>>
                                         <div class="min-w-0">
                                             <h5 class="font-black italic uppercase text-slate-900 text-sm truncate"><%= b.playerName %></h5>
@@ -561,7 +703,7 @@
                                 %>
                                     <div class="p-4 rounded-2xl border border-slate-200 bg-emerald-50/30 flex items-center justify-between gap-3 <%= full ? 'hover:border-emerald-300 hover:bg-emerald-50 transition-colors cursor-pointer' : '' %>"
                                          <% if (full) { %>
-                                         onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= full.experience || full.bio %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>')"
+                                         onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= full.experience || full.bio %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>', <%- (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((full.name||'').toLowerCase())) %>, <%- !!(typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(full._id||full.id))) %>)"
                                          <% } %>>
                                         <div class="min-w-0">
                                             <h5 class="font-black italic uppercase text-slate-900 text-sm truncate"><%= r.name %></h5>
@@ -585,6 +727,56 @@
                 <p class="text-sm font-black text-slate-400 uppercase tracking-widest">No auction teams configured by Admin yet.</p>
             </div>
         <% } %>
+
+        <!-- ============================================================
+             AUDIT LOG
+             ============================================================ -->
+        <% if (typeof auctionActivityFeed !== 'undefined' && auctionActivityFeed && auctionActivityFeed.length > 0) { %>
+            <div class="mt-10">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-xl">📜</span>
+                    <h3 class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Auction Audit Log</h3>
+                </div>
+
+                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm max-h-96 overflow-y-auto custom-scroll">
+                    <% auctionActivityFeed.forEach((ev, idx) => {
+                        let icon = '•';
+                        let label = ev.type;
+                        let colorClass = 'text-slate-500';
+
+                        if (ev.type === 'bid') { icon = '💰'; label = 'Bid placed'; colorClass = 'text-blue-600'; }
+                        else if (ev.type === 'withdraw') { icon = '↩️'; label = 'Bid withdrawn'; colorClass = 'text-amber-600'; }
+                        else if (ev.type === 'won') { icon = '🏆'; label = 'Player won'; colorClass = 'text-emerald-600'; }
+                        else if (ev.type === 'auction_start') { icon = '🚀'; label = 'Auction started'; colorClass = 'text-slate-900'; }
+                        else if (ev.type === 'auction_end') { icon = '🔒'; label = 'Auction ended'; colorClass = 'text-slate-900'; }
+                        else if (ev.type === 'rank_change') { icon = '🎖️'; label = 'Class updated'; colorClass = 'text-violet-600'; }
+                    %>
+                        <div class="flex items-center justify-between gap-3 px-5 py-3 <%= idx !== auctionActivityFeed.length - 1 ? 'border-b border-slate-100' : '' %>">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <span class="text-base flex-shrink-0"><%= icon %></span>
+                                <div class="min-w-0">
+                                    <p class="text-[11px] font-black uppercase <%= colorClass %>">
+                                        <%= label %>
+                                        <% if (ev.playerName) { %><span class="text-slate-900">— <%= ev.playerName %></span><% } %>
+                                    </p>
+                                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider truncate">
+                                        <% if (ev.teamName) { %><%= ev.teamName %><% } %>
+                                        <% if (ev.meta && ev.meta.rank) { %>→ <%= ev.meta.rank %> Class<% } %>
+                                        <% if (ev.meta && ev.meta.playersAssigned !== undefined) { %><%= ev.meta.playersAssigned %> players assigned<% } %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <% if (ev.amount) { %>
+                                    <p class="text-xs font-black text-slate-900"><%= Number(ev.amount).toLocaleString() %> V</p>
+                                <% } %>
+                                <p class="text-[8px] text-slate-400 font-bold uppercase"><%= new Date(ev.createdAt).toLocaleString() %></p>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
     </div>
 
     <!-- LIGHT THEME FIFA MODAL WITH BIDDING CAPABILITY FOR MANAGERS -->
@@ -598,6 +790,17 @@
                     <div id="modalImgPlaceholder" class="w-full h-full bg-gradient-to-b from-slate-100 to-slate-200 flex items-center justify-center">
                         <svg class="w-40 h-40 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                     </div>
+
+                    <!-- WATCHLIST STAR — visible corner of the player profile -->
+                    <% if (typeof isManager !== 'undefined' && isManager) { %>
+                        <button type="button"
+                            id="modalWatchlistStar"
+                            onclick="toggleWatchlistStar(this, window.currentModalPlayerId)"
+                            data-watching="false"
+                            class="hidden absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center text-lg transition-all shadow-lg border border-white/30 bg-black/30 text-white/80 hover:bg-black/50">
+                            ☆
+                        </button>
+                    <% } %>
 
                     <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent">
                         <div class="flex items-center gap-2">
@@ -637,8 +840,18 @@
                     <div id="modalBio" class="text-slate-600 leading-relaxed text-xs h-20 overflow-y-auto pr-3 italic bg-slate-50 p-3 rounded-2xl border border-slate-100 custom-scroll"></div>
                 </div>
 
+                <!-- MANAGER ACCOUNT NOTICE — shown instead of the bid box when the
+                     profile being viewed is a manager's own account -->
+                <div id="modalManagerNotice" class="hidden relative z-10 bg-slate-900 text-white p-4 rounded-2xl mb-4 flex items-center gap-3">
+                    <span class="text-2xl">👔</span>
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-wider">Manager Account</p>
+                        <p class="text-[10px] text-slate-300 font-bold">This is an assigned team manager, not an auctionable player.</p>
+                    </div>
+                </div>
+
                 <!-- AUCTION BIDDING SECTION INSIDE MODAL (LIGHT THEME) -->
-<div class="relative z-10 bg-slate-50 text-slate-900 p-4 rounded-2xl border border-slate-200 mb-4">
+<div id="modalBiddingBox" class="relative z-10 bg-slate-50 text-slate-900 p-4 rounded-2xl border border-slate-200 mb-4">
     <div class="flex justify-between items-center mb-3 pb-3 border-b border-slate-200">
         <div>
             <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Highest Bid</span>
@@ -660,6 +873,9 @@
             <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam) { %>
                 <input type="hidden" name="teamId" value="<%= currentManagerTeam %>">
             <% } %>
+
+            <!-- QUICK BID BUTTONS — fixed increments, no meaningless +1/+2 -->
+            <div id="modalQuickBidRow" class="flex gap-2 mb-2"></div>
 
             <div class="flex gap-2">
                 <input
@@ -1141,16 +1357,41 @@
 
     // SEARCH & POSITION FILTERING LOGIC
     let activePosFilter = 'ALL';
+    let activeClassFilter = 'ALL';
+    let eligibleOnly = false;
 
     function setFilter(pos) {
         activePosFilter = pos;
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            if(btn.innerText === pos) {
+        document.querySelectorAll('.filter-btn[data-pos-filter]').forEach(btn => {
+            if(btn.dataset.posFilter === pos) {
                 btn.className = 'filter-btn active text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-slate-900 text-white';
             } else {
                 btn.className = 'filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition';
             }
         });
+        filterCards();
+    }
+
+    function setClassFilter(cls) {
+        activeClassFilter = cls;
+        document.querySelectorAll('.filter-btn[data-class-filter]').forEach(btn => {
+            if(btn.dataset.classFilter === cls) {
+                btn.className = 'filter-btn active text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-slate-900 text-white';
+            } else {
+                btn.className = 'filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition';
+            }
+        });
+        filterCards();
+    }
+
+    function toggleEligibleFilter() {
+        eligibleOnly = !eligibleOnly;
+        const btn = document.getElementById('eligibleFilterBtn');
+        if (btn) {
+            btn.className = eligibleOnly
+                ? 'text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-emerald-600 text-white'
+                : 'text-[10px] font-black px-3.5 py-1.5 rounded-xl transition text-emerald-600 hover:bg-emerald-50';
+        }
         filterCards();
     }
 
@@ -1161,11 +1402,15 @@
         cards.forEach(card => {
             const name = card.getAttribute('data-name');
             const pos = card.getAttribute('data-pos');
+            const cls = card.getAttribute('data-class') || 'C';
+            const eligible = card.getAttribute('data-eligible');
 
             const matchesSearch = name.includes(query);
             const matchesPos = activePosFilter === 'ALL' || pos.includes(activePosFilter);
+            const matchesClass = activeClassFilter === 'ALL' || cls === activeClassFilter;
+            const matchesEligible = !eligibleOnly || eligible === 'true';
 
-            if (matchesSearch && matchesPos) {
+            if (matchesSearch && matchesPos && matchesClass && matchesEligible) {
                 card.style.display = 'block';
             } else {
                 card.style.display = 'none';
@@ -1190,10 +1435,39 @@
     }
 
     // FIFA MODAL LOGIC WITH POSITION COLOR MAPPING & AUCTION BID DATA
-    async function openBio(el, name, img, bio, discord, g, a, s, m, currentViews, pos, country, tz, highestBid, bidder, playerId, reservePrice) {
+    async function openBio(el, name, img, bio, discord, g, a, s, m, currentViews, pos, country, tz, highestBid, bidder, playerId, reservePrice, isMgrAccount, isWatched) {
         el.classList.add('card-active-anim');
-        
+
+        window.currentModalPlayerId = playerId;
+
         document.getElementById('modalName').innerText = name;
+
+        // MANAGER ACCOUNTS: never auctionable — swap the whole bidding
+        // section for a clear notice instead of a bid form.
+        const mgrNotice = document.getElementById('modalManagerNotice');
+        const biddingBox = document.getElementById('modalBiddingBox');
+        if (mgrNotice && biddingBox) {
+            if (isMgrAccount) {
+                mgrNotice.classList.remove('hidden');
+                biddingBox.classList.add('hidden');
+            } else {
+                mgrNotice.classList.add('hidden');
+                biddingBox.classList.remove('hidden');
+            }
+        }
+
+        const modalStar = document.getElementById('modalWatchlistStar');
+        if (modalStar) {
+            if (isMgrAccount) {
+                modalStar.classList.add('hidden');
+            } else {
+                modalStar.classList.remove('hidden');
+                modalStar.dataset.watching = isWatched ? 'true' : 'false';
+                modalStar.textContent = isWatched ? '★' : '☆';
+                modalStar.className = 'absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center text-lg transition-all shadow-lg border border-white/30 ' +
+                    (isWatched ? 'bg-amber-400 text-white' : 'bg-black/30 text-white/80 hover:bg-black/50');
+            }
+        }
         
         const modalImg = document.getElementById('modalImg');
         const placeholder = document.getElementById('modalImgPlaceholder');
@@ -1250,10 +1524,11 @@ if(document.getElementById('modalWithdrawPlayerId')) {
         (playerId && playerId !== 'undefined' && playerId !== 'null') ? playerId : '';
 }
 if(document.getElementById('modalBidInput')) {
-    const minNextBid = Math.max(parseInt(hBid) + 1, parseInt(rPrice));
+    const minNextBid = computeMinNextBid(parseInt(hBid) || 0, parseInt(rPrice) || 0);
     document.getElementById('modalBidInput').min = minNextBid;
-    document.getElementById('modalBidInput').placeholder = `Min bid: ${minNextBid} Vollars`;
+    document.getElementById('modalBidInput').placeholder = `Min bid: ${minNextBid.toLocaleString()} Vollars`;
     document.getElementById('modalBidInput').value = '';
+    renderQuickBidButtons(minNextBid, parseInt(hBid) || 0);
 }
 // Reset the bid button back to its default "Place Bid" state every time
 // the modal is opened, so a previous "Update Bid" edit-mode doesn't stick.
@@ -1298,6 +1573,77 @@ function editCurrentBid() {
     bidButton.innerText = 'Update Bid';
     bidButton.classList.remove('bg-slate-900', 'hover:bg-slate-800');
     bidButton.classList.add('bg-amber-500', 'hover:bg-amber-400');
+}
+
+// Mirrors the server's BID_INCREMENT_TIERS purely for instant UI feedback
+// (quick-bid buttons, placeholder text) — /auction/bid re-validates for real.
+function getClientMinIncrement(amount) {
+    if (amount < 5000) return 100;
+    if (amount < 20000) return 250;
+    return 500;
+}
+
+function computeMinNextBid(currentHigh, reservePrice) {
+    if (currentHigh > 0) {
+        const step = getClientMinIncrement(currentHigh);
+        return Math.ceil((currentHigh + step) / step) * step;
+    }
+    return reservePrice;
+}
+
+function renderQuickBidButtons(minNextBid, currentHigh) {
+    const wrap = document.getElementById('modalQuickBidRow');
+    if (!wrap) return;
+
+    const step = getClientMinIncrement(currentHigh || minNextBid);
+    const options = [minNextBid, minNextBid + step, minNextBid + step * 2];
+
+    wrap.innerHTML = options.map(amt =>
+        `<button type="button" onclick="setBidAmount(${amt})" class="flex-1 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-700 text-[10px] font-black py-2 rounded-lg uppercase tracking-wider transition">+${(amt - currentHigh).toLocaleString()}<span class="block text-[8px] opacity-70">${amt.toLocaleString()}</span></button>`
+    ).join('');
+}
+
+function setBidAmount(amount) {
+    const input = document.getElementById('modalBidInput');
+    if (input) input.value = amount;
+}
+
+// WATCHLIST — works from both the market grid star and the modal star.
+async function toggleWatchlistStar(btn, playerId) {
+    try {
+        const res = await fetch('/auction/watchlist/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playerId })
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.error || 'Could not update watchlist.');
+            return;
+        }
+
+        const watching = data.watching;
+
+        // Update every star for this player on the page (grid can have
+        // duplicate cards from the scrolling conveyor effect).
+        document.querySelectorAll(`.watchlist-star-btn[onclick*="'${playerId}'"]`).forEach(el => {
+            el.dataset.watching = watching ? 'true' : 'false';
+            el.textContent = watching ? '★' : '☆';
+            el.className = 'watchlist-star-btn absolute top-4 right-4 z-30 w-8 h-8 rounded-full flex items-center justify-center text-base transition-all shadow-lg border border-white/30 ' +
+                (watching ? 'bg-amber-400 text-white' : 'bg-black/30 text-white/80 hover:bg-black/50');
+        });
+
+        if (btn && btn.id === 'modalWatchlistStar') {
+            btn.dataset.watching = watching ? 'true' : 'false';
+            btn.textContent = watching ? '★' : '☆';
+            btn.className = 'absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center text-lg transition-all shadow-lg border border-white/30 ' +
+                (watching ? 'bg-amber-400 text-white' : 'bg-black/30 text-white/80 hover:bg-black/50');
+        }
+
+    } catch (e) {
+        console.error('Watchlist toggle failed', e);
+    }
 }
 
 function closeBio() { 

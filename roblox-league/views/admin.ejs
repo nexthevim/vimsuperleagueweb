@@ -2687,6 +2687,10 @@
                             <span class="text-[9px] font-black uppercase text-red-600 bg-red-50 border border-red-100 px-2 py-1 rounded-lg animate-pulse">
                                 LIVE
                             </span>
+                        <% } else if (auctionStatus === 'processing') { %>
+                            <span class="text-[9px] font-black uppercase text-blue-600 bg-blue-50 border border-blue-100 px-2 py-1 rounded-lg animate-pulse">
+                                FINALIZING…
+                            </span>
                         <% } else if (auctionStatus === 'ended' || auctionStatus === 'closed') { %>
                             <span class="text-[9px] font-black uppercase text-slate-500 bg-slate-100 border border-slate-200 px-2 py-1 rounded-lg">
                                 ENDED
@@ -2700,7 +2704,7 @@
                     </div>
 
 
-                    <div class="grid grid-cols-2 gap-3 mt-4">
+                    <div class="grid grid-cols-3 gap-3 mt-4">
 
                         <div class="bg-white rounded-xl border border-slate-200 p-3">
                             <p class="text-[8px] font-black uppercase text-slate-400">Teams</p>
@@ -2710,14 +2714,37 @@
                         </div>
 
                         <div class="bg-white rounded-xl border border-slate-200 p-3">
+                            <p class="text-[8px] font-black uppercase text-slate-400">Min Squad</p>
+                            <p class="text-lg font-black text-purple-600 mt-1">
+                                <%= typeof auctionSession !== 'undefined' && auctionSession && auctionSession.minRosterSize ? auctionSession.minRosterSize : 10 %>
+                            </p>
+                        </div>
+
+                        <div class="bg-white rounded-xl border border-slate-200 p-3">
                             <p class="text-[8px] font-black uppercase text-slate-400">Max Squad</p>
                             <p class="text-lg font-black text-purple-600 mt-1">
-                                <%= typeof auctionSession !== 'undefined' && auctionSession && auctionSession.maxRosterSize ? auctionSession.maxRosterSize : 7 %>
+                                <%= typeof auctionSession !== 'undefined' && auctionSession && auctionSession.maxRosterSize ? auctionSession.maxRosterSize : 16 %>
                             </p>
                         </div>
 
                     </div>
 
+                </div>
+
+                <div class="bg-fuchsia-50 border border-fuchsia-100 rounded-2xl p-4 space-y-1.5">
+                    <p class="text-[9px] font-black uppercase tracking-wider text-fuchsia-700">
+                        VSL Class Reserve Prices
+                    </p>
+                    <div class="grid grid-cols-5 gap-1.5 text-center">
+                        <div class="bg-white rounded-lg py-1.5"><p class="text-[8px] font-black text-slate-400">SS</p><p class="text-[10px] font-black text-fuchsia-700">10,000</p></div>
+                        <div class="bg-white rounded-lg py-1.5"><p class="text-[8px] font-black text-slate-400">S</p><p class="text-[10px] font-black text-fuchsia-700">8,000</p></div>
+                        <div class="bg-white rounded-lg py-1.5"><p class="text-[8px] font-black text-slate-400">A</p><p class="text-[10px] font-black text-fuchsia-700">6,000</p></div>
+                        <div class="bg-white rounded-lg py-1.5"><p class="text-[8px] font-black text-slate-400">B</p><p class="text-[10px] font-black text-fuchsia-700">4,000</p></div>
+                        <div class="bg-white rounded-lg py-1.5"><p class="text-[8px] font-black text-slate-400">C</p><p class="text-[10px] font-black text-fuchsia-700">2,500</p></div>
+                    </div>
+                    <p class="text-[9px] text-fuchsia-600/80 font-semibold leading-relaxed pt-1">
+                        Assigned automatically from each player's class the moment you press Start Auction.
+                    </p>
                 </div>
 
 
@@ -2729,24 +2756,39 @@
                         <input
                             name="name"
                             value="<%= typeof auctionSession !== 'undefined' && auctionSession ? (auctionSession.name || '') : '' %>"
-                            placeholder="e.g. VSL Season 3 Auction"
+                            placeholder="e.g. VSL Season 4 Auction"
                             class="admin-input">
                     </div>
 
-                    <div>
-                        <label class="admin-label">Maximum Final Squad Size</label>
-                        <input
-                            type="number"
-                            name="maxRosterSize"
-                            min="1"
-                            max="50"
-                            value="<%= typeof auctionSession !== 'undefined' && auctionSession && auctionSession.maxRosterSize ? auctionSession.maxRosterSize : 7 %>"
-                            class="admin-input"
-                            required>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase mt-1.5">
-                            If a team wins more players than this, its manager will choose which players become the final roster.
-                        </p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="admin-label">Min Roster Size</label>
+                            <input
+                                type="number"
+                                name="minRosterSize"
+                                min="1"
+                                max="50"
+                                value="<%= typeof auctionSession !== 'undefined' && auctionSession && auctionSession.minRosterSize ? auctionSession.minRosterSize : 10 %>"
+                                class="admin-input"
+                                required>
+                        </div>
+
+                        <div>
+                            <label class="admin-label">Max Roster Size</label>
+                            <input
+                                type="number"
+                                name="maxRosterSize"
+                                min="1"
+                                max="50"
+                                value="<%= typeof auctionSession !== 'undefined' && auctionSession && auctionSession.maxRosterSize ? auctionSession.maxRosterSize : 16 %>"
+                                class="admin-input"
+                                required>
+                        </div>
                     </div>
+
+                    <p class="text-[9px] text-slate-400 font-bold uppercase mt-1.5">
+                        VSL Season 4 defaults: 10–16 players. The bidding system already blocks any bid that would make a team's roster impossible to complete within these limits.
+                    </p>
 
                     <button
                         type="submit"
@@ -2763,7 +2805,7 @@
                     <form
                         action="/admin/auction/start"
                         method="POST"
-                        onsubmit="return confirm('Start the auction session now for all enrolled teams?');">
+                        onsubmit="return confirm('Start the auction? This CLOSES player registration, LOCKS all classes/ratings for the season, and assigns reserve prices from each player\\'s class. This cannot be undone.');">
 
                         <button
                             type="submit"
@@ -2776,7 +2818,7 @@
                     <form
                         action="/admin/auction/end"
                         method="POST"
-                        onsubmit="return confirm('End the auction session now? This will begin roster finalization for teams over the squad limit.');">
+                        onsubmit="return confirm('End the auction now? This immediately finalizes every player\\'s highest bidder as the winner, deducts budgets, and assigns rosters. This cannot be undone.');">
 
                         <button
                             type="submit"
@@ -2794,7 +2836,7 @@
                         How this works
                     </p>
                     <p class="text-[10px] text-purple-600/80 font-semibold mt-1 leading-relaxed">
-                        All enrolled teams share the same auction state. Admin starts and ends the session whenever needed. There are no individual team start/end times.
+                        All enrolled teams share the same auction state. Starting the auction locks classes and closes registration; ending it automatically assigns every player to whoever actually holds the highest bid — no manual per-team roster picking needed anymore.
                     </p>
                 </div>
 
@@ -2855,14 +2897,16 @@
 
 
                         <div>
-                            <label class="admin-label">Starting Budget</label>
+                            <label class="admin-label">Starting Budget (Vollars)</label>
                             <input
                                 type="number"
                                 name="budget"
                                 min="0"
-                                placeholder="e.g. 100000000"
+                                value="100000"
+                                placeholder="e.g. 100000"
                                 class="admin-input"
                                 required>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">VSL Season 4 default: 100,000</p>
                         </div>
 
 
@@ -2894,6 +2938,13 @@
 
                     </div>
 
+                    <label class="flex items-center gap-2.5 bg-white border border-slate-200 rounded-xl px-4 py-3 cursor-pointer">
+                        <input type="checkbox" name="allowTwoSS" value="true" class="w-4 h-4 accent-fuchsia-600">
+                        <span class="text-xs font-bold text-slate-700">
+                            Grant <span class="font-black text-fuchsia-600">2-SS Exception</span>
+                            <span class="block text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Allows 2 SS players, but tightens caps to 2 S / 3 A for this team</span>
+                        </span>
+                    </label>
 
                     <button
                         type="submit"
@@ -2972,6 +3023,39 @@
                                         </p>
                                     </div>
 
+                                </div>
+
+                                <!-- 2-SS EXCEPTION TOGGLE + CLASS BREAKDOWN -->
+                                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
+
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[9px] font-black uppercase text-slate-400">2-SS Exception</span>
+
+                                        <form action="/admin/auction/toggle-two-ss" method="POST">
+                                            <input type="hidden" name="teamId" value="<%= aTeam.id || aTeam._id %>">
+                                            <button type="submit" class="text-[9px] font-black uppercase px-2.5 py-1 rounded-lg border transition <%= aTeam.allowTwoSS ? 'bg-fuchsia-600 text-white border-fuchsia-600' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-fuchsia-300' %>">
+                                                <%= aTeam.allowTwoSS ? 'ON (2 SS / 2 S / 3 A)' : 'OFF (1 SS / 3-4 S / 5 A)' %>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <% if (Array.isArray(aTeam.roster) && aTeam.roster.length > 0) { %>
+                                        <%
+                                            const classCounts = { SS: 0, S: 0, A: 0, B: 0, C: 0 };
+                                            aTeam.roster.forEach(r => {
+                                                const rc = (r.rank || 'C').toUpperCase();
+                                                if (classCounts[rc] !== undefined) classCounts[rc]++;
+                                            });
+                                        %>
+                                        <div class="grid grid-cols-5 gap-1 pt-1">
+                                            <% ['SS','S','A','B','C'].forEach(k => { %>
+                                                <div class="text-center bg-slate-50 rounded-lg py-1">
+                                                    <p class="text-[7px] font-black text-slate-400"><%= k %></p>
+                                                    <p class="text-[11px] font-black text-slate-900"><%= classCounts[k] %></p>
+                                                </div>
+                                            <% }) %>
+                                        </div>
+                                    <% } %>
                                 </div>
 
 

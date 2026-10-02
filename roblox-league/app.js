@@ -97,10 +97,6 @@ const AuctionTeam = mongoose.model('AuctionTeam', new mongoose.Schema({
     spent: { type: Number, default: 0 },
     manager: { type: String, default: "" },
 
-    // The existing VSL exception that lets a team carry 2 SS players
-    // (tightening their S/A caps in exchange). Admin-granted per team.
-    allowTwoSS: { type: Boolean, default: false },
-
     bids: [{
         playerId: mongoose.Schema.Types.ObjectId,
         playerName: String,
@@ -242,33 +238,26 @@ function getReservePriceForClass(cls) {
     return CLASS_RESERVE_PRICES[cls] || CLASS_RESERVE_PRICES.C;
 }
 
-// The 2-SS exception tightens S/A caps in exchange for a 2nd SS slot.
-// Every other team follows the normal caps (with the "0 SS -> 4 S" bump).
-function getClassCaps(team) {
-    if (team && team.allowTwoSS) {
-        return { SS: 2, S: 2, A: 3 };
-    }
-    return { SS: 1, S: 3, A: 5 };
+// Dynamic class caps driven by how many SS the team currently holds
+// (including the manager if they are SS). No admin-granted exception —
+// signing a 2nd SS automatically tightens S/A.
+//
+//   0 SS → SS max 2, S max 4, A max 6
+//   1 SS → SS max 2, S max 3, A max 5
+//   2 SS → SS max 2, S max 2, A max 3
+function getClassCapsFromCounts(counts) {
+    const ss = (counts && counts.SS) || 0;
+    if (ss >= 2) return { SS: 2, S: 2, A: 3 };
+    if (ss === 1) return { SS: 2, S: 3, A: 5 };
+    return { SS: 2, S: 4, A: 6 };
 }
 
-function getEffectiveSCap(team, counts) {
-    const caps = getClassCaps(team);
-    if (!(team && team.allowTwoSS) && (counts.SS || 0) === 0) {
-        return 4;
-    }
-    return caps.S;
+function getEffectiveSCap(_team, counts) {
+    return getClassCapsFromCounts(counts).S;
 }
 
-// Per the official VSL rules post: A cap is 5, but bumps to 6 when the
-// team has NO SS players — the same "no SS" condition that bumps S to 4,
-// not a separate "no S" condition. Doesn't apply to 2-SS exception teams,
-// whose A cap is fixed at 3.
-function getEffectiveACap(team, counts) {
-    const caps = getClassCaps(team);
-    if (!(team && team.allowTwoSS) && (counts.SS || 0) === 0) {
-        return caps.A + 1;
-    }
-    return caps.A;
+function getEffectiveACap(_team, counts) {
+    return getClassCapsFromCounts(counts).A;
 }
 
 // A "manager account" is any verified Player whose name matches an
@@ -288,16 +277,37 @@ function findTeamForManagerName(allTeams, name) {
 // holds the current highest bid on them (players aren't "won" for real
 // until the admin ends the auction, but for roster-legality purposes a
 // bid you're currently winning has to be treated as a committed slot).
+//
+// The assigned manager ALWAYS occupies one of the 16 roster slots and
+// counts toward their own class cap (SS manager → 1 SS already used, etc.).
 function getProvisionalRoster(team, playersById) {
     const roster = [];
+
+    // Manager slot first — free (not paid via auction), but occupies class + total.
+    if (team && team.manager) {
+        const mgrLower = String(team.manager).toLowerCase();
+        let managerPlayer = null;
+        for (const p of playersById.values()) {
+            if ((p.name || '').toLowerCase() === mgrLower) {
+                managerPlayer = p;
+                break;
+            }
+        }
+        if (managerPlayer) {
+            roster.push({ player: managerPlayer, amount: 0, isManager: true });
+        }
+    }
+
     for (const bid of (team.bids || [])) {
         const player = playersById.get(String(bid.playerId));
         if (!player) continue;
+        // Don't double-count the manager if someone somehow bid on them.
+        if (roster.some(r => r.isManager && String(r.player._id) === String(player._id))) continue;
         const isWinning =
             (player.highestBidder || '').toLowerCase() === (team.name || '').toLowerCase() &&
             Number(player.highestBid || 0) === Number(bid.amount || 0);
         if (isWinning) {
-            roster.push({ player, amount: Number(bid.amount) || 0 });
+            roster.push({ player, amount: Number(bid.amount) || 0, isManager: false });
         }
     }
     return roster;
@@ -319,9 +329,9 @@ function computeManagerAuctionState(team, playersById) {
     const availableBudget = budget - spent - committed;
 
     const totalPlayers = provisional.length;
-    const caps = getClassCaps(team);
-    const sCap = getEffectiveSCap(team, counts);
-    const aCap = getEffectiveACap(team, counts);
+    const caps = getClassCapsFromCounts(counts);
+    const sCap = caps.S;
+    const aCap = caps.A;
 
     return {
         team,
@@ -458,9 +468,12 @@ function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersByI
         };
     }
 
+    // Caps recompute from the *post-bid* SS count so a 2nd SS automatically
+    // tightens S/A for the legality check.
+    const postCaps = getClassCapsFromCounts(counts);
     const legality = canStillLegallyCompleteRoster({
         counts,
-        caps: { SS: state.caps.SS, S: getEffectiveSCap(team, counts), A: getEffectiveACap(team, counts) },
+        caps: { SS: postCaps.SS, S: postCaps.S, A: postCaps.A },
         totalPlayers,
         availableBudget
     });
@@ -897,14 +910,28 @@ app.get('/admin-login', (req, res) => {
     });
 });
 
-app.get('/profile', (req, res) => {
+app.get('/profile', async (req, res) => {
     if (!req.session.playerId) {
         return res.redirect('/market?error=Please login first');
     }
 
+    let myRecentBids = [];
+    try {
+        myRecentBids = await AuctionActivity.find({
+            type: 'bid',
+            playerId: req.session.playerId
+        })
+            .sort({ createdAt: -1 })
+            .limit(25)
+            .lean();
+    } catch (err) {
+        console.error('Profile recent bids error:', err);
+    }
+
     res.render('profile', {
         page: 'profile',
-        error: req.query.error || null
+        error: req.query.error || null,
+        myRecentBids
     });
 });
 
@@ -1503,8 +1530,7 @@ app.get('/api/manager/context', async (req, res) => {
                 rosterMax: state.rosterMax,
                 counts: state.counts,
                 caps: state.caps,
-                remainingSlots: state.remainingSlots,
-                allowTwoSS: !!team.allowTwoSS
+                remainingSlots: state.remainingSlots
             },
             winning,
             outbid,
@@ -1522,6 +1548,37 @@ app.get('/api/manager/context', async (req, res) => {
     } catch (err) {
         console.error("Manager Context Error:", err);
         res.status(500).json({ success: false, error: 'ManagerContextFailed' });
+    }
+});
+
+// Public: recent bid history for a single player (market modal expand + profile).
+app.get('/api/player/:id/bids', async (req, res) => {
+    try {
+        const playerId = req.params.id;
+        if (!playerId) {
+            return res.json({ success: false, error: 'Missing player id' });
+        }
+
+        const bids = await AuctionActivity.find({
+            type: 'bid',
+            playerId: playerId
+        })
+            .sort({ createdAt: -1 })
+            .limit(40)
+            .lean();
+
+        res.json({
+            success: true,
+            bids: bids.map(b => ({
+                teamName: b.teamName || 'Unknown',
+                managerName: b.managerName || '',
+                amount: Number(b.amount) || 0,
+                createdAt: b.createdAt
+            }))
+        });
+    } catch (err) {
+        console.error('Player Bids API Error:', err);
+        res.status(500).json({ success: false, error: 'PlayerBidsFailed' });
     }
 });
 
@@ -2079,10 +2136,6 @@ app.post('/admin/approve-player', async (req, res) => {
 
     try {
 
-        const info = await getInfo();
-        const auctionStatus = (info.auction && info.auction.status) || 'ready';
-        const ranksLocked = auctionStatus === 'live' || auctionStatus === 'ended';
-
         const allowedRanks = ['C', 'B', 'A', 'S', 'SS'];
         const submittedRank = (req.body.rank || '').toUpperCase();
 
@@ -2092,12 +2145,8 @@ app.post('/admin/approve-player', async (req, res) => {
                 req.body.cardImage
         };
 
-        // Classes/ratings are locked the instant the auction starts — an
-        // admin can still approve NEW registrations before that point
-        // (registration itself closes on auction start, so in practice
-        // this only matters up until then), but can't change a class
-        // once the season's auction is live or over.
-        if (!ranksLocked && allowedRanks.includes(submittedRank)) {
+        // Ratings can always be changed by admin — no auction lock.
+        if (allowedRanks.includes(submittedRank)) {
             updatePayload.rank = submittedRank;
         }
 
@@ -2106,7 +2155,7 @@ app.post('/admin/approve-player', async (req, res) => {
             updatePayload
         );
 
-        if (!ranksLocked && allowedRanks.includes(submittedRank)) {
+        if (allowedRanks.includes(submittedRank)) {
             await AuctionActivity.create({
                 type: 'rank_change',
                 playerId: req.body.playerId,
@@ -2146,10 +2195,6 @@ app.post('/admin/update-market-player', async (req, res) => {
             rank
         } = req.body;
 
-        const info = await getInfo();
-        const auctionStatus = (info.auction && info.auction.status) || 'ready';
-        const ranksLocked = auctionStatus === 'live' || auctionStatus === 'ended';
-
         const allowedRanks = ['C', 'B', 'A', 'S', 'SS'];
         const submittedRank = (rank || '').toUpperCase();
 
@@ -2173,10 +2218,8 @@ app.post('/admin/update-market-player', async (req, res) => {
 
         };
 
-        // Player classes are LOCKED for the whole season once the auction
-        // starts — current-season performance only feeds into next
-        // season's ratings, never a live rewrite of this season's class.
-        if (!ranksLocked && allowedRanks.includes(submittedRank)) {
+        // Ratings can always be changed by admin — no auction lock.
+        if (allowedRanks.includes(submittedRank)) {
             updatePayload.rank = submittedRank;
         }
 
@@ -2187,7 +2230,7 @@ app.post('/admin/update-market-player', async (req, res) => {
             updatePayload
         );
 
-        if (!ranksLocked && allowedRanks.includes(submittedRank)) {
+        if (allowedRanks.includes(submittedRank)) {
             await AuctionActivity.create({
                 type: 'rank_change',
                 playerName: username,
@@ -2195,11 +2238,7 @@ app.post('/admin/update-market-player', async (req, res) => {
             });
         }
 
-        res.redirect(
-            ranksLocked && allowedRanks.includes(submittedRank)
-                ? '/admin?error=Classes are locked for the season — the auction has already started'
-                : '/admin'
-        );
+        res.redirect('/admin');
 
     } catch (err) {
 
@@ -2362,8 +2401,7 @@ app.post('/admin/add-auction-team', async (req, res) => {
             teamName,
             logo,
             budget,
-            managerName,
-            allowTwoSS
+            managerName
         } = req.body;
 
         if (!teamName) {
@@ -2371,8 +2409,6 @@ app.post('/admin/add-auction-team', async (req, res) => {
                 '/admin?error=TeamNameRequired'
             );
         }
-
-        const twoSSFlag = allowTwoSS === 'true' || allowTwoSS === 'on';
 
         let teamLogo =
             logo || "";
@@ -2425,8 +2461,6 @@ app.post('/admin/add-auction-team', async (req, res) => {
                 existing.manager ||
                 "";
 
-            existing.allowTwoSS = twoSSFlag;
-
             await existing.save();
 
             return res.redirect('/admin');
@@ -2443,8 +2477,6 @@ app.post('/admin/add-auction-team', async (req, res) => {
 
             manager:
                 managerName || "",
-
-            allowTwoSS: twoSSFlag,
 
             spent: 0,
 
@@ -3102,43 +3134,18 @@ app.post('/admin/auction/update-session', async (req, res) => {
     }
 });
 
-// TOGGLE THE 2-SS EXCEPTION FOR A SPECIFIC TEAM
-
-app.post('/admin/auction/toggle-two-ss', async (req, res) => {
-
-    if (!requireAdmin(req, res)) return;
-
-    try {
-
-        const team = await AuctionTeam.findById(req.body.teamId);
-
-        if (!team) {
-            return res.redirect('/admin?error=AuctionTeamNotFound');
-        }
-
-        team.allowTwoSS = !team.allowTwoSS;
-        await team.save();
-
-        res.redirect('/admin');
-
-    } catch (err) {
-        console.error("Toggle 2-SS Error:", err);
-        res.redirect('/admin?error=ToggleTwoSSFailed');
-    }
-});
-
 // START AUCTION SESSION
 //
 // 1. Registration closes (enforced in /register by checking status).
-// 2. Classes/ratings lock (enforced in the player-edit routes).
-// 3. Reserve prices are assigned from each verified player's class.
-// 4. Every player is reset to "available" so a re-run never carries over
+// 2. Reserve prices are assigned from each verified player's class.
+// 3. Every player is reset to "available" so a re-run never carries over
 //    stale sold/bid state from a previous session.
+// (Ratings remain editable by admin at all times.)
 
 // SAFETY VALVE: undo an accidental/test "Start Auction" and go back to
-// "ready" so ranks become editable again. Deliberately refuses to touch
-// an already-ENDED auction (players sold, budgets deducted) — that's a
-// real result, not something a button should silently unwind.
+// "ready". Deliberately refuses to touch an already-ENDED auction
+// (players sold, budgets deducted) — that's a real result, not something
+// a button should silently unwind.
 app.post('/admin/auction/reset', async (req, res) => {
 
     if (!requireAdmin(req, res)) return;
@@ -3335,12 +3342,37 @@ app.post('/admin/auction/end', async (req, res) => {
         // Any bid left dangling on a team for a player who DIDN'T end up
         // "sold" to them (i.e. they were outbid but the record never
         // refreshed) is stale — clear all remaining bids now that the
-        // auction is closed.
+        // auction is closed. Also ensure the assigned manager is on the
+        // final roster (they occupy a free slot and count toward class caps).
         for (const team of await AuctionTeam.find()) {
+            let dirty = false;
+
             if ((team.bids || []).length > 0) {
                 team.bids = [];
-                await team.save();
+                dirty = true;
             }
+
+            if (team.manager) {
+                const mgrLower = String(team.manager).toLowerCase();
+                const alreadyOnRoster = (team.roster || []).some(
+                    r => (r.name || '').toLowerCase() === mgrLower
+                );
+                if (!alreadyOnRoster) {
+                    const mgrPlayer = await Player.findOne({
+                        name: new RegExp(`^${team.manager.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i')
+                    });
+                    team.roster = team.roster || [];
+                    team.roster.unshift({
+                        name: team.manager,
+                        position: (mgrPlayer && mgrPlayer.position) || 'MID',
+                        rank: getPlayerClass(mgrPlayer || { rank: 'C' }),
+                        boughtFor: 0
+                    });
+                    dirty = true;
+                }
+            }
+
+            if (dirty) await team.save();
         }
 
         // Sync every team's final roster into the actual League Team

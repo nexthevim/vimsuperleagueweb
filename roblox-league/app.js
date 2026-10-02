@@ -215,6 +215,26 @@ function getRosterLimits(auctionSettings) {
     return { rosterMin: minR, rosterMax: maxR };
 }
 
+function getAuctionStatus(info) {
+    return (info && info.auction && info.auction.status) || 'ready';
+}
+
+// Bidding only while LIVE. PAUSED freezes bids/registration/ranks.
+function isBiddingOpen(status) {
+    return status === 'live';
+}
+
+// Rank edits blocked while LIVE or PAUSED.
+function isRankFrozen(status) {
+    return status === 'live' || status === 'paused';
+}
+
+// Registration blocked while LIVE or PAUSED.
+function isRegistrationClosed(status) {
+    return status === 'live' || status === 'paused';
+}
+
+
 // Fixed minimum bid increments — no meaningless +1/+2 bidding.
 // Configurable in one place if the league wants different tiers later.
 const BID_INCREMENT_TIERS = [
@@ -336,7 +356,10 @@ function computeManagerAuctionState(team, playersById, rosterLimits) {
         counts[getPlayerClass(player)]++;
     }
 
-    const committed = provisional.reduce((sum, p) => sum + p.amount, 0);
+    // ALL active bids lock money — including losing ones. Outbid managers
+    // stay locked until the higher bidder withdraws (or admin force-drops).
+    // Roster slots still only count WINNING bids (provisional above).
+    const committed = (team.bids || []).reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
     const spent = Number(team.spent || 0);
     const budget = Number(team.budget || 0);
     const availableBudget = budget - spent - committed;
@@ -413,6 +436,9 @@ function canStillLegallyCompleteRoster(stateAfterBid) {
 // biddable in the UI when the server would actually reject the bid.
 function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersById, rosterLimits }) {
 
+    if (auctionStatus === 'paused') {
+        return { ok: false, reason: 'The auction is paused — bidding is temporarily frozen.' };
+    }
     if (auctionStatus !== 'live') {
         return { ok: false, reason: 'The auction is not currently live.' };
     }
@@ -459,28 +485,41 @@ function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersByI
     const existingOwnBid = (team.bids || []).find(b => String(b.playerId) === String(player._id));
     const existingOwnAmount = existingOwnBid ? Number(existingOwnBid.amount) || 0 : 0;
 
-    // Simulate the roster/budget position AFTER this bid replaces any
-    // existing bid this manager has on the same player.
+    // All bids lock money (winning or losing). Replacing our own bid on this
+    // player frees the old amount and locks the new one.
+    const alreadyWinningThisPlayer = !!(existingOwnBid &&
+        (player.highestBidder || '').toLowerCase() === (team.name || '').toLowerCase() &&
+        Number(player.highestBid || 0) === existingOwnAmount);
+    const freedFromCommitted = existingOwnAmount; // own bid always counted in committed
+
+    // Simulate roster/budget AFTER this bid replaces any existing bid on same player.
+    // Roster slot only changes if we were not already the winning bidder.
     const cls = getPlayerClass(player);
     const counts = { ...state.counts };
     let totalPlayers = state.totalPlayers;
-    let committed = state.committed - existingOwnAmount + amount;
+    let committed = state.committed - freedFromCommitted + amount;
 
-    const alreadyCountedThisPlayer = (existingOwnBid &&
-        (player.highestBidder || '').toLowerCase() === (team.name || '').toLowerCase() &&
-        Number(player.highestBid || 0) === existingOwnAmount);
-
-    if (!alreadyCountedThisPlayer) {
-        counts[cls] = (counts[cls] || 0) + 1;
-        totalPlayers += 1;
+    if (!alreadyWinningThisPlayer) {
+        // Becoming / staying a non-winner doesn't add a slot until we actually lead.
+        // If this amount will take the lead, count the slot.
+        const wouldLead = amount > (Number(player.highestBid) || 0) ||
+            (amount === (Number(player.highestBid) || 0) && alreadyWinningThisPlayer);
+        // Simpler: if amount > current high, we become the leader and need a slot
+        // unless we already had the winning slot.
+        const becomesLeader = amount > (Number(player.highestBid) || 0);
+        if (becomesLeader) {
+            counts[cls] = (counts[cls] || 0) + 1;
+            totalPlayers += 1;
+        }
     }
 
+    const maxAffordable = state.budget - state.spent - (state.committed - freedFromCommitted);
     const availableBudget = state.budget - state.spent - committed;
 
-    if (amount > (state.budget - state.spent - (state.committed - existingOwnAmount))) {
+    if (amount > maxAffordable) {
         return {
             ok: false,
-            reason: `Bid exceeds your available budget of ${(state.budget - state.spent - (state.committed - existingOwnAmount)).toLocaleString()} Vollars.`,
+            reason: `Bid exceeds your available budget of ${Math.max(0, maxAffordable).toLocaleString()} Vollars.`,
             minNextBid
         };
     }
@@ -1010,8 +1049,8 @@ app.post('/register', async (req, res) => {
     const info = await getInfo();
     const auctionStatus = (info.auction && info.auction.status) || 'ready';
 
-    if (auctionStatus === 'live') {
-        return res.redirect('/market?error=Player registration is closed while the auction is live');
+    if (isRegistrationClosed(auctionStatus)) {
+        return res.redirect('/market?error=Player registration is closed while the auction is live or paused');
     }
 
     const exists = await Player.findOne({
@@ -1111,26 +1150,28 @@ async function refreshPlayerHighestBid(playerId) {
     let highestBid = Number(player.reservePrice) || 0;
     let highestBidder = "";
 
+    // Losing bids are INTENTIONALLY kept. They stay on the team and keep
+    // locking budget until that manager is allowed to withdraw (only if no
+    // rival bid after them — i.e. they become sole high again after a
+    // higher bidder withdraws) or an admin force-drops the bid.
     for (const team of teams) {
-
-        const bid = team.bids.find(
-            b =>
-                b.playerId &&
-                b.playerId.toString() === playerId.toString()
+        const bid = (team.bids || []).find(
+            b => b.playerId && b.playerId.toString() === playerId.toString()
         );
 
-        if (
-            bid &&
-            Number(bid.amount) > highestBid
-        ) {
+        if (bid && Number(bid.amount) > highestBid) {
             highestBid = Number(bid.amount);
             highestBidder = team.name;
         }
     }
 
+    // If every bid was withdrawn, fall back to reserve with no holder.
+    if (!highestBidder) {
+        highestBid = Number(player.reservePrice) || 0;
+    }
+
     player.highestBid = highestBid;
     player.highestBidder = highestBidder;
-
     await player.save();
 }
 
@@ -2175,8 +2216,13 @@ app.post('/admin/approve-player', async (req, res) => {
                 req.body.cardImage
         };
 
-        // Ratings can always be changed by admin — no auction lock.
+        const info = await getInfo();
+        const auctionStatus = getAuctionStatus(info);
+
         if (allowedRanks.includes(submittedRank)) {
+            if (isRankFrozen(auctionStatus)) {
+                return res.redirect('/admin?error=Ranks are frozen while the auction is live or paused. End or keep the auction in Ready/Ended to change ranks.');
+            }
             updatePayload.rank = submittedRank;
         }
 
@@ -2248,8 +2294,13 @@ app.post('/admin/update-market-player', async (req, res) => {
 
         };
 
-        // Ratings can always be changed by admin — no auction lock.
+        const info = await getInfo();
+        const auctionStatus = getAuctionStatus(info);
+
         if (allowedRanks.includes(submittedRank)) {
+            if (isRankFrozen(auctionStatus)) {
+                return res.redirect('/admin?error=Ranks are frozen while the auction is live or paused. End or keep the auction in Ready/Ended to change ranks.');
+            }
             updatePayload.rank = submittedRank;
         }
 
@@ -3258,6 +3309,84 @@ app.post('/admin/auction/reset-bids', async (req, res) => {
     }
 });
 
+
+// PAUSE AUCTION — freezes bids, registration, and rank edits. Does not finalize.
+app.post('/admin/auction/pause', async (req, res) => {
+    if (!requireAdmin(req, res)) return;
+    try {
+        const info = await getInfo();
+        info.auction = info.auction || {};
+        if (info.auction.status !== 'live') {
+            return res.redirect('/admin?error=Can only pause a live auction');
+        }
+        info.auction.status = 'paused';
+        info.markModified('auction');
+        await info.save();
+        res.redirect('/admin');
+    } catch (err) {
+        console.error('Pause Auction Error:', err);
+        res.redirect('/admin?error=PauseAuctionFailed');
+    }
+});
+
+// RESUME AUCTION — paused → live
+app.post('/admin/auction/resume', async (req, res) => {
+    if (!requireAdmin(req, res)) return;
+    try {
+        const info = await getInfo();
+        info.auction = info.auction || {};
+        if (info.auction.status !== 'paused') {
+            return res.redirect('/admin?error=Can only resume a paused auction');
+        }
+        info.auction.status = 'live';
+        info.markModified('auction');
+        await info.save();
+        res.redirect('/admin');
+    } catch (err) {
+        console.error('Resume Auction Error:', err);
+        res.redirect('/admin?error=ResumeAuctionFailed');
+    }
+});
+
+// FORCE-DROP a single bid (admin mercy / correction). Then recompute highest.
+app.post('/admin/auction/force-drop-bid', async (req, res) => {
+    if (!requireAdmin(req, res)) return;
+    try {
+        const { teamId, playerId } = req.body;
+        if (!teamId || !playerId) {
+            return res.redirect('/admin?error=Team and player are required to drop a bid');
+        }
+        const team = await AuctionTeam.findById(teamId);
+        if (!team) return res.redirect('/admin?error=Team not found');
+
+        const before = (team.bids || []).length;
+        const dropped = (team.bids || []).find(b => b.playerId && String(b.playerId) === String(playerId));
+        team.bids = (team.bids || []).filter(b => !(b.playerId && String(b.playerId) === String(playerId)));
+        if (team.bids.length === before) {
+            return res.redirect('/admin?error=That team has no bid on this player');
+        }
+        await team.save();
+        await refreshPlayerHighestBid(playerId);
+
+        const player = await Player.findById(playerId);
+        await AuctionActivity.create({
+            type: 'withdraw',
+            playerId,
+            playerName: (player && player.name) || (dropped && dropped.playerName) || '',
+            teamId: team._id,
+            teamName: team.name,
+            managerName: 'ADMIN',
+            amount: dropped ? dropped.amount : 0,
+            meta: { forced: true }
+        });
+
+        res.redirect('/admin');
+    } catch (err) {
+        console.error('Force Drop Bid Error:', err);
+        res.redirect('/admin?error=ForceDropBidFailed');
+    }
+});
+
 app.post('/admin/auction/start', async (req, res) => {
 
     if (!requireAdmin(req, res)) return;
@@ -3344,8 +3473,27 @@ app.post('/admin/auction/end', async (req, res) => {
         const info = await getInfo();
         info.auction = info.auction || {};
 
-        if (info.auction.status !== 'live') {
-            return res.redirect('/admin?error=Auction is not currently live');
+        if (info.auction.status !== 'live' && info.auction.status !== 'paused') {
+            return res.redirect('/admin?error=Auction must be live (or paused) to end');
+        }
+
+        // Hard gate: every enrolled team must hold at least minRosterSize
+        // provisional players (manager + current winning bids) before End.
+        const rosterLimits = getRosterLimits(info.auction);
+        const allTeamsCheck = await AuctionTeam.find();
+        const allPlayersCheck = await Player.find();
+        const playersByIdCheck = new Map(allPlayersCheck.map(p => [String(p._id), p]));
+        const shortTeams = [];
+        for (const team of allTeamsCheck) {
+            const state = computeManagerAuctionState(team, playersByIdCheck, rosterLimits);
+            if (state.totalPlayers < rosterLimits.rosterMin) {
+                shortTeams.push(`${team.name} (${state.totalPlayers}/${rosterLimits.rosterMin})`);
+            }
+        }
+        if (shortTeams.length > 0) {
+            return res.redirect('/admin?error=' + encodeURIComponent(
+                `Cannot end yet — ${shortTeams.length} team(s) below the ${rosterLimits.rosterMin}-player minimum: ${shortTeams.join(', ')}`
+            ));
         }
 
         // Flip immediately so a repeat request (double click, retry) is a

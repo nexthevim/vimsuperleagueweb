@@ -276,140 +276,181 @@
     <div id="marketSection">
 
         <!-- ============================================================
-             MARKET SPOTLIGHT — card podium (top 3) + expand to top 10
+             MARKET SPOTLIGHT — 3 hover-card leaderboards + expand top 10
              ============================================================ -->
         <% if (typeof marketSpotlight !== 'undefined' && marketSpotlight) { %>
-            <div class="max-w-7xl mx-auto px-6 mb-10">
-                <div class="bg-white rounded-[28px] border border-slate-200 shadow-xl shadow-slate-200/60 p-5 md:p-6 -mt-2 relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-6 mb-12">
+                <div class="flex items-center justify-between gap-3 mb-5">
+                    <div class="flex items-center gap-2">
+                        <span class="h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">Market Spotlight</h3>
+                    </div>
+                    <button type="button" id="spotlightExpandBtn" onclick="toggleSpotlightExpand()"
+                        class="text-[10px] font-black uppercase tracking-wider text-white bg-slate-900 hover:bg-blue-600 px-4 py-2 rounded-xl transition shadow-sm">
+                        Show Top 10 →
+                    </button>
+                </div>
 
-                    <div class="flex items-center justify-between gap-3 mb-5">
-                        <div class="flex items-center gap-2">
-                            <span class="text-lg">🔥</span>
-                            <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Market Spotlight</h3>
+                <!-- ════ TOP BIDS ════ -->
+                <div class="mb-8">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-3">👑 Top Bids</p>
+                    <% if (marketSpotlight.topBids && marketSpotlight.topBids.length > 0) { %>
+                        <div id="spotlightTopPodium" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <% marketSpotlight.topBids.slice(0, 3).forEach((p, i) => {
+                                const medals = ['🥇','🥈','🥉'];
+                                const lifts = ['sm:translate-y-0','sm:translate-y-3','sm:translate-y-5'];
+                                const glows = [
+                                    'hover:shadow-[0_20px_50px_-12px_rgba(251,191,36,0.45)] ring-2 ring-amber-400/80',
+                                    'hover:shadow-[0_20px_50px_-12px_rgba(148,163,184,0.4)] ring-2 ring-slate-300',
+                                    'hover:shadow-[0_20px_50px_-12px_rgba(180,83,9,0.35)] ring-2 ring-amber-700/50'
+                                ];
+                            %>
+                                <div class="group relative <%= lifts[i] %> bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-[24px] overflow-hidden text-white transition-all duration-300 hover:-translate-y-2 <%= glows[i] %> cursor-default">
+                                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_30%_20%,rgba(251,191,36,0.15),transparent_55%)]"></div>
+                                    <% if (p.cardImage && String(p.cardImage).trim()) { %>
+                                        <div class="h-36 overflow-hidden">
+                                            <img src="<%= p.cardImage %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="">
+                                            <div class="absolute inset-x-0 top-0 h-36 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent pointer-events-none"></div>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="h-28 bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
+                                            <span class="text-4xl opacity-40"><%= medals[i] %></span>
+                                        </div>
+                                    <% } %>
+                                    <div class="relative p-4 pt-2">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="text-xl"><%= medals[i] %></span>
+                                            <span class="text-sm font-black text-emerald-400"><%= Number(p.highestBid).toLocaleString() %> <span class="text-[9px] text-emerald-500/70">V</span></span>
+                                        </div>
+                                        <p class="text-base font-black uppercase italic tracking-tight truncate"><%= p.name %></p>
+                                        <p class="text-[9px] text-slate-400 font-bold uppercase mt-0.5 truncate"><%= p.position || 'PRO' %> · <%= p.highestBidder || 'No holder' %></p>
+                                    </div>
+                                </div>
+                            <% }) %>
                         </div>
-                        <button type="button" id="spotlightExpandBtn" onclick="toggleSpotlightExpand()"
-                            class="text-[10px] font-black uppercase tracking-wider text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-xl transition">
-                            Show Top 10 →
-                        </button>
-                    </div>
-
-                    <!-- TOP BIDS PODIUM (card hover) -->
-                    <div class="mb-6">
-                        <p class="text-[9px] font-black uppercase tracking-[0.15em] text-amber-500 mb-3 flex items-center gap-1.5">👑 Top Bids</p>
-                        <% if (marketSpotlight.topBids && marketSpotlight.topBids.length > 0) { %>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="spotlightTopPodium">
-                                <% marketSpotlight.topBids.slice(0, 3).forEach((p, i) => {
-                                    const medals = ['🥇', '🥈', '🥉'];
-                                    const ring = i === 0 ? 'ring-2 ring-amber-400' : i === 1 ? 'ring-2 ring-slate-300' : 'ring-2 ring-amber-700/40';
-                                %>
-                                    <div class="group relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-4 text-white transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-amber-500/20 <%= ring %> cursor-default">
-                                        <div class="flex items-start justify-between gap-2 mb-3">
-                                            <span class="text-2xl leading-none"><%= medals[i] %></span>
-                                            <span class="text-[10px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg"><%= Number(p.highestBid).toLocaleString() %></span>
-                                        </div>
-                                        <div class="flex items-center gap-3">
-                                            <% if (p.cardImage && String(p.cardImage).trim()) { %>
-                                                <img src="<%= p.cardImage %>" class="w-12 h-12 rounded-xl object-cover border border-white/20 group-hover:scale-105 transition-transform" alt="">
-                                            <% } else { %>
-                                                <div class="w-12 h-12 rounded-xl bg-slate-700 flex items-center justify-center text-xs font-black text-slate-400"><%= (p.position || '?').toString().slice(0,3) %></div>
-                                            <% } %>
-                                            <div class="min-w-0">
-                                                <p class="text-sm font-black uppercase truncate"><%= p.name %></p>
-                                                <p class="text-[9px] text-slate-400 font-bold uppercase truncate"><%= p.position || 'PRO' %> · <%= p.highestBidder || '—' %></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <% }) %>
-                            </div>
-                            <div id="spotlightTopFull" class="hidden mt-3 space-y-1.5 max-h-72 overflow-y-auto custom-scroll pr-1">
-                                <% marketSpotlight.topBids.forEach((p, i) => { %>
-                                    <div class="flex items-center justify-between gap-3 bg-slate-50 hover:bg-slate-100 rounded-xl px-3 py-2 border border-slate-100 transition">
-                                        <div class="flex items-center gap-2.5 min-w-0">
-                                            <span class="text-[10px] font-black text-slate-400 w-5 text-center">#<%= i + 1 %></span>
-                                            <% if (p.cardImage && String(p.cardImage).trim()) { %>
-                                                <img src="<%= p.cardImage %>" class="w-8 h-8 rounded-lg object-cover" alt="">
-                                            <% } %>
-                                            <div class="min-w-0">
-                                                <p class="text-[11px] font-black text-slate-900 uppercase truncate"><%= p.name %></p>
-                                                <p class="text-[8px] text-slate-400 font-bold uppercase truncate"><%= p.position || 'PRO' %> · <%= p.highestBidder || '—' %></p>
-                                            </div>
-                                        </div>
-                                        <span class="text-[11px] font-black text-emerald-600 flex-shrink-0"><%= Number(p.highestBid).toLocaleString() %></span>
-                                    </div>
-                                <% }) %>
-                            </div>
-                        <% } else { %>
-                            <p class="text-[10px] text-slate-400 italic font-bold">No bids placed yet.</p>
-                        <% } %>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        <!-- POSITION LEADERS -->
-                        <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
-                            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 mb-3">Position Leaders</p>
-                            <div class="grid grid-cols-2 gap-2">
-                                <% ['FWD','MID','DEF','GK'].forEach(posKey => {
-                                    const entry = marketSpotlight.byPosition && marketSpotlight.byPosition[posKey];
-                                    let posBg = posKey === 'FWD' ? 'from-rose-500 to-red-600' : posKey === 'MID' ? 'from-amber-500 to-orange-600' : posKey === 'DEF' ? 'from-blue-500 to-indigo-600' : 'from-violet-500 to-purple-600';
-                                %>
-                                    <div class="group bg-white rounded-xl border border-slate-100 p-3 hover:-translate-y-0.5 hover:shadow-md transition-all">
-                                        <span class="inline-block text-[8px] font-black text-white bg-gradient-to-r <%= posBg %> px-1.5 py-0.5 rounded mb-2"><%= posKey %></span>
-                                        <% if (entry) { %>
-                                            <div class="flex items-center gap-2">
-                                                <% if (entry.cardImage && String(entry.cardImage).trim()) { %>
-                                                    <img src="<%= entry.cardImage %>" class="w-9 h-9 rounded-lg object-cover group-hover:scale-105 transition-transform" alt="">
-                                                <% } else { %>
-                                                    <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-[9px] font-black text-slate-400"><%= posKey %></div>
-                                                <% } %>
-                                                <div class="min-w-0">
-                                                    <p class="text-[11px] font-black text-slate-900 uppercase truncate"><%= entry.name %></p>
-                                                    <p class="text-[10px] font-black text-emerald-600"><%= Number(entry.highestBid).toLocaleString() %></p>
-                                                </div>
-                                            </div>
-                                        <% } else { %>
-                                            <p class="text-[10px] text-slate-300 font-bold">—</p>
+                        <div id="spotlightTopFull" class="hidden mt-3 bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden">
+                            <% marketSpotlight.topBids.forEach((p, i) => { %>
+                                <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50 transition">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <span class="text-xs font-black text-slate-400 w-6">#<%= i + 1 %></span>
+                                        <% if (p.cardImage && String(p.cardImage).trim()) { %>
+                                            <img src="<%= p.cardImage %>" class="w-9 h-9 rounded-lg object-cover" alt="">
                                         <% } %>
+                                        <div class="min-w-0">
+                                            <p class="text-xs font-black text-slate-900 uppercase truncate"><%= p.name %></p>
+                                            <p class="text-[9px] text-slate-400 font-bold uppercase truncate"><%= p.position || 'PRO' %> · <%= p.highestBidder || '—' %></p>
+                                        </div>
                                     </div>
-                                <% }) %>
+                                    <span class="text-sm font-black text-emerald-600 flex-shrink-0"><%= Number(p.highestBid).toLocaleString() %></span>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-xs text-slate-400 italic font-bold py-6 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">No bids placed yet.</p>
+                    <% } %>
+                </div>
+
+                <!-- ════ POSITION LEADERS ════ -->
+                <div class="mb-8">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">⚡ Position Leaders</p>
+                    <div id="spotlightPosPodium" class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                        <% ['FWD','MID','DEF','GK'].forEach(posKey => {
+                            const entry = marketSpotlight.byPosition && marketSpotlight.byPosition[posKey];
+                            const grads = {
+                                FWD: 'from-rose-600 to-red-700',
+                                MID: 'from-amber-500 to-orange-600',
+                                DEF: 'from-blue-600 to-indigo-700',
+                                GK: 'from-violet-600 to-purple-700'
+                            };
+                            const g = grads[posKey] || 'from-slate-600 to-slate-800';
+                        %>
+                            <div class="group relative rounded-[22px] overflow-hidden bg-gradient-to-br <%= g %> text-white transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-default">
+                                <% if (entry && entry.cardImage && String(entry.cardImage).trim()) { %>
+                                    <div class="h-28 overflow-hidden">
+                                        <img src="<%= entry.cardImage %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-90" alt="">
+                                        <div class="absolute inset-x-0 top-0 h-28 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"></div>
+                                    </div>
+                                <% } else { %>
+                                    <div class="h-20 flex items-center justify-center opacity-30 text-3xl font-black"><%= posKey %></div>
+                                <% } %>
+                                <div class="relative p-3">
+                                    <span class="text-[8px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-md"><%= posKey %></span>
+                                    <p class="text-sm font-black uppercase italic mt-1.5 truncate"><%= entry ? entry.name : '—' %></p>
+                                    <p class="text-[11px] font-black text-white/90"><%= entry ? Number(entry.highestBid).toLocaleString() + ' V' : 'No bids' %></p>
+                                </div>
                             </div>
-                        </div>
-
-                        <!-- RISING BIDS -->
-                        <div class="rounded-2xl bg-rose-50 border border-rose-100 p-4">
-                            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-rose-500 mb-3 flex items-center gap-1.5">📈 Rising Bids <span class="text-rose-300 font-bold normal-case tracking-normal">(last 2h)</span></p>
-                            <% if (marketSpotlight.rising && marketSpotlight.rising.length > 0) { %>
-                                <div class="space-y-2" id="spotlightRisingPodium">
-                                    <% marketSpotlight.rising.slice(0, 3).forEach((r, i) => { %>
-                                        <div class="flex items-center justify-between gap-2 bg-white rounded-xl px-3 py-2 border border-rose-100 hover:-translate-y-0.5 hover:shadow-md transition-all">
-                                            <div class="flex items-center gap-2 min-w-0">
-                                                <span class="text-[9px] font-black text-rose-300 w-3"><%= i + 1 %></span>
-                                                <% if (r.player.cardImage && String(r.player.cardImage).trim()) { %>
-                                                    <img src="<%= r.player.cardImage %>" class="w-8 h-8 rounded-lg object-cover" alt="">
-                                                <% } %>
-                                                <span class="text-[11px] font-black text-slate-900 uppercase truncate"><%= r.player.name %></span>
-                                            </div>
-                                            <span class="bg-rose-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase flex-shrink-0"><%= r.bidCount %>×</span>
-                                        </div>
-                                    <% }) %>
-                                </div>
-                                <div id="spotlightRisingFull" class="hidden space-y-1.5 max-h-56 overflow-y-auto custom-scroll pr-1">
-                                    <% marketSpotlight.rising.forEach((r, i) => { %>
-                                        <div class="flex items-center justify-between gap-2 bg-white rounded-xl px-3 py-2 border border-rose-100">
-                                            <div class="flex items-center gap-2 min-w-0">
-                                                <span class="text-[9px] font-black text-rose-300 w-4">#<%= i + 1 %></span>
-                                                <span class="text-[11px] font-black text-slate-900 uppercase truncate"><%= r.player.name %></span>
-                                            </div>
-                                            <span class="bg-rose-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase flex-shrink-0"><%= r.bidCount %>×</span>
-                                        </div>
-                                    <% }) %>
-                                </div>
-                            <% } else { %>
-                                <p class="text-[10px] text-rose-400 italic font-bold">No bidding flurries recently.</p>
-                            <% } %>
-                        </div>
-
+                        <% }) %>
                     </div>
+                    <div id="spotlightPosFull" class="hidden mt-3 bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                        <% ['FWD','MID','DEF','GK'].forEach(posKey => {
+                            const list = (marketSpotlight.byPositionTop && marketSpotlight.byPositionTop[posKey]) || [];
+                        %>
+                            <div class="border-b border-slate-100 last:border-0">
+                                <p class="text-[9px] font-black uppercase tracking-wider text-slate-400 px-4 pt-3 pb-1"><%= posKey %></p>
+                                <% if (list.length === 0) { %>
+                                    <p class="text-[10px] text-slate-300 px-4 pb-3 italic">No bids</p>
+                                <% } else { %>
+                                    <% list.forEach((p, i) => { %>
+                                        <div class="flex items-center justify-between gap-3 px-4 py-2 hover:bg-slate-50">
+                                            <div class="flex items-center gap-2 min-w-0">
+                                                <span class="text-[9px] font-black text-slate-400 w-5">#<%= i + 1 %></span>
+                                                <span class="text-[11px] font-black text-slate-900 uppercase truncate"><%= p.name %></span>
+                                            </div>
+                                            <span class="text-[11px] font-black text-emerald-600"><%= Number(p.highestBid).toLocaleString() %></span>
+                                        </div>
+                                    <% }) %>
+                                <% } %>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- ════ RISING BIDS ════ -->
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-3">📈 Rising Bids <span class="text-rose-300 normal-case tracking-normal font-bold">(last 2h)</span></p>
+                    <% if (marketSpotlight.rising && marketSpotlight.rising.length > 0) { %>
+                        <div id="spotlightRisingPodium" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <% marketSpotlight.rising.slice(0, 3).forEach((r, i) => { %>
+                                <div class="group relative bg-white rounded-[24px] border border-rose-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-rose-200/60 cursor-default">
+                                    <% if (r.player.cardImage && String(r.player.cardImage).trim()) { %>
+                                        <div class="h-32 overflow-hidden">
+                                            <img src="<%= r.player.cardImage %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="">
+                                            <div class="absolute inset-x-0 top-0 h-32 bg-gradient-to-t from-white via-white/20 to-transparent pointer-events-none"></div>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="h-20 bg-rose-50 flex items-center justify-center text-2xl">📈</div>
+                                    <% } %>
+                                    <div class="relative p-4 pt-1">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="text-[10px] font-black text-rose-400">#<%= i + 1 %></span>
+                                            <span class="bg-rose-600 text-white text-[9px] font-black px-2 py-0.5 rounded-lg uppercase"><%= r.bidCount %> bids</span>
+                                        </div>
+                                        <p class="text-sm font-black uppercase italic text-slate-900 truncate"><%= r.player.name %></p>
+                                        <p class="text-[9px] text-slate-400 font-bold uppercase mt-0.5"><%= r.player.position || 'PRO' %> · <%= Number(r.player.highestBid || 0).toLocaleString() %> V</p>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                        <div id="spotlightRisingFull" class="hidden mt-3 bg-white rounded-2xl border border-rose-100 divide-y divide-rose-50 overflow-hidden">
+                            <% marketSpotlight.rising.forEach((r, i) => { %>
+                                <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-rose-50/50 transition">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <span class="text-xs font-black text-rose-300 w-6">#<%= i + 1 %></span>
+                                        <% if (r.player.cardImage && String(r.player.cardImage).trim()) { %>
+                                            <img src="<%= r.player.cardImage %>" class="w-9 h-9 rounded-lg object-cover" alt="">
+                                        <% } %>
+                                        <div class="min-w-0">
+                                            <p class="text-xs font-black text-slate-900 uppercase truncate"><%= r.player.name %></p>
+                                            <p class="text-[9px] text-slate-400 font-bold uppercase"><%= r.player.position || 'PRO' %></p>
+                                        </div>
+                                    </div>
+                                    <span class="bg-rose-600 text-white text-[9px] font-black px-2 py-0.5 rounded-lg uppercase flex-shrink-0"><%= r.bidCount %>×</span>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-xs text-rose-300 italic font-bold py-6 text-center bg-rose-50 rounded-2xl border border-dashed border-rose-100">No bidding flurries recently.</p>
+                    <% } %>
                 </div>
             </div>
         <% } %>
@@ -909,8 +950,7 @@
                     <div id="modalBio" class="text-slate-600 leading-relaxed text-xs h-20 overflow-y-auto pr-3 italic bg-slate-50 p-3 rounded-2xl border border-slate-100 custom-scroll"></div>
                 </div>
 
-                <!-- MANAGER ACCOUNT NOTICE — shown instead of the bid box when the
-                     profile being viewed is a manager's own account -->
+                <!-- MANAGER ACCOUNT NOTICE -->
                 <div id="modalManagerNotice" class="hidden relative z-10 bg-slate-900 text-white p-4 rounded-2xl mb-4 flex items-center gap-3">
                     <span class="text-2xl">👔</span>
                     <div>
@@ -919,117 +959,101 @@
                     </div>
                 </div>
 
-                <!-- AUCTION BIDDING SECTION INSIDE MODAL (LIGHT THEME) -->
-<div id="modalBiddingBox" class="relative z-10 bg-slate-50 text-slate-900 p-4 rounded-2xl border border-slate-200 mb-4">
-    <div class="flex justify-between items-center mb-3 pb-3 border-b border-slate-200">
-        <div>
-            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Highest Bid</span>
-            <span id="modalHighestBid" class="text-base font-black italic text-emerald-600">0 Vollars</span>
-        </div>
-
-        <div class="text-right">
-            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Reserve Price</span>
-            <span id="modalReservePrice" class="text-xs font-black text-slate-500">0 Vollars</span>
-        </div>
-    </div>
-
-    <% if ((typeof isManager !== 'undefined' && isManager) || (typeof currentManagerTeam !== 'undefined' && currentManagerTeam)) { %>
-
-        <!-- ADD / EDIT BID -->
-        <form action="/auction/bid" method="POST">
-            <input type="hidden" id="modalPlayerId" name="playerId" value="">
-
-            <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam) { %>
-                <input type="hidden" name="teamId" value="<%= currentManagerTeam %>">
-            <% } %>
-
-            <!-- QUICK BID BUTTONS — fixed increments, no meaningless +1/+2 -->
-            <div id="modalQuickBidRow" class="flex gap-2 mb-2"></div>
-
-            <div class="flex gap-2">
-                <input
-                    type="number"
-                    id="modalBidInput"
-                    name="bidAmount"
-                    placeholder="Bid Vollars..."
-                    required
-                    min="1"
-                    class="flex-1 min-w-0 bg-white border border-slate-300 text-slate-900 text-xs font-bold px-3 py-2.5 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition"
-                >
-
-                <button
-                    type="submit"
-                    id="modalBidButton"
-                    class="bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black px-5 py-2.5 rounded-xl uppercase tracking-widest transition shadow-sm whitespace-nowrap"
-                >
-                    Place Bid
+                <!-- RECENT BIDS TOGGLE (always visible arrow / button on the right of modal) -->
+                <button type="button" id="modalExpandBidsBtn" onclick="toggleModalBidHistory()"
+                    class="relative z-10 w-full mb-3 flex items-center justify-between gap-3 bg-slate-900 hover:bg-blue-600 text-white px-4 py-3 rounded-2xl transition shadow-sm group">
+                    <div class="text-left">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-slate-400 group-hover:text-blue-200">Auction Activity</p>
+                        <p class="text-xs font-black uppercase tracking-wider">Recent Bids by Teams</p>
+                    </div>
+                    <span id="modalExpandBidsArrow" class="text-xl font-black transition-transform duration-200">›</span>
                 </button>
-            </div>
-        </form>
+                <div id="modalBidHistoryPanel" class="hidden relative z-10 mb-4 bg-white rounded-2xl border border-slate-200 p-3 max-h-44 overflow-y-auto custom-scroll">
+                    <div id="modalBidHistoryList" class="space-y-2">
+                        <p class="text-[10px] text-slate-400 italic font-bold">Loading…</p>
+                    </div>
+                </div>
 
-        <!-- BID MANAGEMENT BUTTONS -->
-        <div class="grid grid-cols-2 gap-2 mt-2">
+                <!-- CLEAN BIDDING BOX -->
+                <div id="modalBiddingBox" class="relative z-10 bg-white text-slate-900 p-4 rounded-2xl border border-slate-200 mb-4 shadow-sm">
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3">
+                            <span class="text-[8px] font-black text-emerald-600/70 uppercase tracking-widest block">Highest Bid</span>
+                            <span id="modalHighestBid" class="text-lg font-black italic text-emerald-600 leading-tight">0 Vollars</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 rounded-xl p-3">
+                            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Reserve</span>
+                            <span id="modalReservePrice" class="text-lg font-black italic text-slate-700 leading-tight">0 Vollars</span>
+                        </div>
+                    </div>
 
-            <!-- EDIT BID -->
-            <button
-                type="button"
-                onclick="editCurrentBid()"
-                class="flex items-center justify-center gap-1.5 bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white border border-amber-200 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition"
-            >
-                ✏️ Edit Bid
-            </button>
+                    <% if ((typeof isManager !== 'undefined' && isManager) || (typeof currentManagerTeam !== 'undefined' && currentManagerTeam)) { %>
+                        <form action="/auction/bid" method="POST" class="space-y-3">
+                            <input type="hidden" id="modalPlayerId" name="playerId" value="">
+                            <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam) { %>
+                                <input type="hidden" name="teamId" value="<%= currentManagerTeam %>">
+                            <% } %>
 
-            <!-- WITHDRAW BID -->
-            <form
-                action="/auction/withdraw"
-                method="POST"
-                onsubmit="return confirm('Withdraw your bid for this player?')"
-            >
-                <input type="hidden" id="modalWithdrawPlayerId" name="playerId" value="">
+                            <div>
+                                <p class="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Quick amounts</p>
+                                <div id="modalQuickBidRow" class="grid grid-cols-3 gap-2"></div>
+                            </div>
 
-                <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam) { %>
-                    <input type="hidden" name="teamId" value="<%= currentManagerTeam %>">
-                <% } %>
+                            <div>
+                                <p class="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Or type your bid</p>
+                                <input
+                                    type="number"
+                                    id="modalBidInput"
+                                    name="bidAmount"
+                                    placeholder="Amount in Vollars"
+                                    required
+                                    min="1"
+                                    class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold px-4 py-3 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition"
+                                >
+                            </div>
 
-                <button
-                    type="submit"
-                    class="w-full flex items-center justify-center gap-1.5 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition"
-                >
-                    ↩ Withdraw Bid
-                </button>
-            </form>
+                            <button
+                                type="submit"
+                                id="modalBidButton"
+                                class="w-full bg-slate-900 hover:bg-blue-600 text-white text-xs font-black py-3.5 rounded-xl uppercase tracking-widest transition shadow-md"
+                            >
+                                Place Bid
+                            </button>
+                        </form>
 
-        </div>
-
-    <% } else { %>
-
-        <p class="text-[9px] text-slate-400 italic text-center mt-1">
-            Only authorized Team Managers can place bids.
-        </p>
-
-    <% } %>
-</div>
+                        <div class="grid grid-cols-2 gap-2 mt-3">
+                            <button
+                                type="button"
+                                onclick="editCurrentBid()"
+                                class="bg-amber-50 hover:bg-amber-500 text-amber-700 hover:text-white border border-amber-200 px-3 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition"
+                            >
+                                Edit My Bid
+                            </button>
+                            <form
+                                action="/auction/withdraw"
+                                method="POST"
+                                onsubmit="return confirm('Withdraw your bid for this player?')"
+                            >
+                                <input type="hidden" id="modalWithdrawPlayerId" name="playerId" value="">
+                                <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam) { %>
+                                    <input type="hidden" name="teamId" value="<%= currentManagerTeam %>">
+                                <% } %>
+                                <button
+                                    type="submit"
+                                    class="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 px-3 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition"
+                                >
+                                    Withdraw
+                                </button>
+                            </form>
+                        </div>
+                    <% } else { %>
+                        <p class="text-[10px] text-slate-400 italic text-center py-2">
+                            Only authorized team managers can place bids.
+                        </p>
+                    <% } %>
+                </div>
 
                 <button onclick="closeBio()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-900 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300">Return to Market</button>
-            </div>
-
-            <!-- Expand arrow + recent bids side panel -->
-            <button type="button" id="modalExpandBidsBtn" onclick="toggleModalBidHistory()"
-                title="Show recent bids"
-                class="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-40 w-8 h-14 items-center justify-center rounded-l-xl bg-slate-900 text-white shadow-lg hover:bg-blue-600 transition">
-                <span id="modalExpandBidsArrow" class="text-sm font-black">›</span>
-            </button>
-            <button type="button" onclick="toggleModalBidHistory()"
-                class="md:hidden w-full mt-2 flex items-center justify-center gap-2 bg-slate-900 text-white py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest">
-                <span>Recent Bids</span>
-                <span id="modalExpandBidsArrowMobile">›</span>
-            </button>
-
-            <div id="modalBidHistoryPanel" class="hidden w-full md:w-[260px] flex-shrink-0 bg-white rounded-[28px] border border-slate-200 shadow-2xl p-4 max-h-[420px] overflow-hidden flex flex-col">
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Recent Bids</p>
-                <div id="modalBidHistoryList" class="space-y-2 overflow-y-auto custom-scroll flex-1 pr-1">
-                    <p class="text-[10px] text-slate-400 italic font-bold">Loading…</p>
-                </div>
             </div>
         </div>
     </div>
@@ -1369,21 +1393,23 @@
 </main>
 
 <script>
-    // MARKET SPOTLIGHT — expand top 3 podium into full top 10 list
+    // MARKET SPOTLIGHT — expand top 3 cards into full top 10 lists
     let spotlightExpanded = false;
     function toggleSpotlightExpand() {
         spotlightExpanded = !spotlightExpanded;
         const btn = document.getElementById('spotlightExpandBtn');
-        const topPodium = document.getElementById('spotlightTopPodium');
-        const topFull = document.getElementById('spotlightTopFull');
-        const risePodium = document.getElementById('spotlightRisingPodium');
-        const riseFull = document.getElementById('spotlightRisingFull');
-
-        if (btn) btn.textContent = spotlightExpanded ? '← Show Top 3' : 'Show Top 10 →';
-        if (topPodium) topPodium.classList.toggle('hidden', spotlightExpanded);
-        if (topFull) topFull.classList.toggle('hidden', !spotlightExpanded);
-        if (risePodium) risePodium.classList.toggle('hidden', spotlightExpanded);
-        if (riseFull) riseFull.classList.toggle('hidden', !spotlightExpanded);
+        const pairs = [
+            ['spotlightTopPodium', 'spotlightTopFull'],
+            ['spotlightPosPodium', 'spotlightPosFull'],
+            ['spotlightRisingPodium', 'spotlightRisingFull']
+        ];
+        if (btn) btn.textContent = spotlightExpanded ? '← Show Cards' : 'Show Top 10 →';
+        pairs.forEach(([podiumId, fullId]) => {
+            const podium = document.getElementById(podiumId);
+            const full = document.getElementById(fullId);
+            if (podium) podium.classList.toggle('hidden', spotlightExpanded);
+            if (full) full.classList.toggle('hidden', !spotlightExpanded);
+        });
     }
 
     // MODE SWITCHER LOGIC (MARKET vs AUCTION HUB)
@@ -1654,15 +1680,12 @@ try {
     console.error("View count update failed", e);
 }
 
-// Reset bid-history side panel when opening a different player
+// Reset bid-history panel when opening a different player
 modalBidHistoryOpen = false;
 const histPanel = document.getElementById('modalBidHistoryPanel');
-if (histPanel) {
-    histPanel.classList.add('hidden');
-    histPanel.classList.remove('flex');
-}
+if (histPanel) histPanel.classList.add('hidden');
 const histArrow = document.getElementById('modalExpandBidsArrow');
-if (histArrow) histArrow.textContent = '›';
+if (histArrow) { histArrow.textContent = '›'; histArrow.style.transform = ''; }
 
 setTimeout(() => {
     const modal = document.getElementById('bioModal');
@@ -1712,9 +1735,13 @@ function renderQuickBidButtons(minNextBid, currentHigh) {
 
     const step = getClientMinIncrement(currentHigh || minNextBid);
     const options = [minNextBid, minNextBid + step, minNextBid + step * 2];
+    const labels = ['Min', '+1 step', '+2 steps'];
 
-    wrap.innerHTML = options.map(amt =>
-        `<button type="button" onclick="setBidAmount(${amt})" class="flex-1 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-700 text-[10px] font-black py-2 rounded-lg uppercase tracking-wider transition">+${(amt - currentHigh).toLocaleString()}<span class="block text-[8px] opacity-70">${amt.toLocaleString()}</span></button>`
+    wrap.innerHTML = options.map((amt, i) =>
+        `<button type="button" onclick="setBidAmount(${amt})" class="bg-slate-50 hover:bg-slate-900 hover:text-white text-slate-800 border border-slate-200 hover:border-slate-900 text-[11px] font-black py-2.5 rounded-xl transition">
+            <span class="block text-[8px] uppercase tracking-wider opacity-60 mb-0.5">${labels[i]}</span>
+            ${amt.toLocaleString()}
+        </button>`
     ).join('');
 }
 
@@ -1766,21 +1793,22 @@ let modalBidHistoryOpen = false;
 function toggleModalBidHistory() {
     const panel = document.getElementById('modalBidHistoryPanel');
     const arrow = document.getElementById('modalExpandBidsArrow');
-    const arrowM = document.getElementById('modalExpandBidsArrowMobile');
     if (!panel) return;
 
     modalBidHistoryOpen = !modalBidHistoryOpen;
     if (modalBidHistoryOpen) {
         panel.classList.remove('hidden');
-        panel.classList.add('flex');
-        if (arrow) arrow.textContent = '‹';
-        if (arrowM) arrowM.textContent = '‹';
+        if (arrow) {
+            arrow.textContent = '‹';
+            arrow.style.transform = 'rotate(90deg)';
+        }
         loadModalBidHistory(window.currentModalPlayerId);
     } else {
         panel.classList.add('hidden');
-        panel.classList.remove('flex');
-        if (arrow) arrow.textContent = '›';
-        if (arrowM) arrowM.textContent = '›';
+        if (arrow) {
+            arrow.textContent = '›';
+            arrow.style.transform = '';
+        }
     }
 }
 
@@ -1815,20 +1843,16 @@ async function loadModalBidHistory(playerId) {
     }
 }
 
-function closeBio() { 
+function closeBio() {
     const modal = document.getElementById('bioModal');
     const container = document.getElementById('modalContainer');
     container.classList.remove('show');
     modal.classList.remove('active');
-    // collapse bid history panel
     modalBidHistoryOpen = false;
     const panel = document.getElementById('modalBidHistoryPanel');
-    if (panel) {
-        panel.classList.add('hidden');
-        panel.classList.remove('flex');
-    }
+    if (panel) panel.classList.add('hidden');
     const arrow = document.getElementById('modalExpandBidsArrow');
-    if (arrow) arrow.textContent = '›';
+    if (arrow) { arrow.textContent = '›'; arrow.style.transform = ''; }
     setTimeout(() => { modal.style.display = 'none'; }, 350);
 }
 

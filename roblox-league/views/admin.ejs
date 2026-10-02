@@ -3008,13 +3008,12 @@
 
                     </div>
 
-                    <label class="flex items-center gap-2.5 bg-white border border-slate-200 rounded-xl px-4 py-3 cursor-pointer">
-                        <input type="checkbox" name="allowTwoSS" value="true" class="w-4 h-4 accent-fuchsia-600">
-                        <span class="text-xs font-bold text-slate-700">
-                            Grant <span class="font-black text-fuchsia-600">2-SS Exception</span>
-                            <span class="block text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Allows 2 SS players, but tightens caps to 2 S / 3 A for this team</span>
-                        </span>
-                    </label>
+                    <p class="text-[10px] text-slate-500 font-semibold leading-relaxed bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                        Class caps adjust automatically: <span class="font-black text-slate-700">0 SS → 4 S / 6 A</span>,
+                        <span class="font-black text-slate-700">1 SS → 3 S / 5 A</span>,
+                        <span class="font-black text-slate-700">2 SS → 2 S / 3 A</span>.
+                        The assigned manager counts as 1 roster slot and toward their class.
+                    </p>
 
                     <button
                         type="submit"
@@ -3095,20 +3094,9 @@
 
                                 </div>
 
-                                <!-- 2-SS EXCEPTION TOGGLE + CLASS BREAKDOWN -->
+                                <!-- CLASS BREAKDOWN (auto caps from SS count) -->
                                 <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
-
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-[9px] font-black uppercase text-slate-400">2-SS Exception</span>
-
-                                        <form action="/admin/auction/toggle-two-ss" method="POST">
-                                            <input type="hidden" name="teamId" value="<%= aTeam.id || aTeam._id %>">
-                                            <button type="submit" class="text-[9px] font-black uppercase px-2.5 py-1 rounded-lg border transition <%= aTeam.allowTwoSS ? 'bg-fuchsia-600 text-white border-fuchsia-600' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-fuchsia-300' %>">
-                                                <%= aTeam.allowTwoSS ? 'ON (2 SS / 2 S / 3 A)' : 'OFF (1 SS / 3-4 S / 5-6 A)' %>
-                                            </button>
-                                        </form>
-                                    </div>
-
+                                    <span class="text-[9px] font-black uppercase text-slate-400">Class Breakdown</span>
                                     <% if (Array.isArray(aTeam.roster) && aTeam.roster.length > 0) { %>
                                         <%
                                             const classCounts = { SS: 0, S: 0, A: 0, B: 0, C: 0 };
@@ -3116,6 +3104,9 @@
                                                 const rc = (r.rank || 'C').toUpperCase();
                                                 if (classCounts[rc] !== undefined) classCounts[rc]++;
                                             });
+                                            const ssN = classCounts.SS;
+                                            const sCapHint = ssN >= 2 ? 2 : (ssN === 1 ? 3 : 4);
+                                            const aCapHint = ssN >= 2 ? 3 : (ssN === 1 ? 5 : 6);
                                         %>
                                         <div class="grid grid-cols-5 gap-1 pt-1">
                                             <% ['SS','S','A','B','C'].forEach(k => { %>
@@ -3125,6 +3116,9 @@
                                                 </div>
                                             <% }) %>
                                         </div>
+                                        <p class="text-[8px] text-slate-400 font-bold uppercase">Caps now: SS 2 · S <%= sCapHint %> · A <%= aCapHint %></p>
+                                    <% } else { %>
+                                        <p class="text-[9px] text-slate-400 font-bold">No roster yet — caps start at SS 2 / S 4 / A 6</p>
                                     <% } %>
                                 </div>
 

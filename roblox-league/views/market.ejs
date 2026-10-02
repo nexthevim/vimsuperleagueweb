@@ -218,7 +218,7 @@
             </div>
 
             <div class="relative flex-1 md:w-64" id="searchWrapper">
-                <input type="text" id="searchInput" onkeyup="filterCards()" placeholder="Search players..." class="w-full bg-white border border-slate-200 px-4 py-2.5 pl-9 rounded-2xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500 transition shadow-sm">
+                <input type="text" id="searchInput" onkeyup="filterCards()" placeholder="Search name, Discord, country..." class="w-full bg-white border border-slate-200 px-4 py-2.5 pl-9 rounded-2xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500 transition shadow-sm">
                 <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
             <div class="flex items-center bg-white border border-slate-200 p-1 rounded-2xl shadow-sm overflow-x-auto" id="filterWrapper">
@@ -274,6 +274,83 @@
 
     <!-- MODE 1: STANDARD MARKET VIEW -->
     <div id="marketSection">
+
+        <!-- ============================================================
+             MARKET SPOTLIGHT — floating widget, top 3 per category
+             ============================================================ -->
+        <% if (typeof marketSpotlight !== 'undefined' && marketSpotlight) { %>
+            <div class="max-w-7xl mx-auto px-6 mb-10">
+                <div class="bg-white rounded-[28px] border border-slate-200 shadow-xl shadow-slate-200/60 p-5 md:p-6 -mt-2 relative">
+
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-lg">🔥</span>
+                        <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Market Spotlight</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <!-- TOP 3 BIDS -->
+                        <div class="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white p-4">
+                            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-amber-400 mb-2.5 flex items-center gap-1.5">👑 Top Bids</p>
+                            <% if (marketSpotlight.topBids && marketSpotlight.topBids.length > 0) { %>
+                                <div class="space-y-2">
+                                    <% marketSpotlight.topBids.forEach((p, i) => { %>
+                                        <div class="flex items-center justify-between gap-2">
+                                            <div class="flex items-center gap-2 min-w-0">
+                                                <span class="text-[9px] font-black text-slate-500 w-3 flex-shrink-0"><%= i + 1 %></span>
+                                                <span class="text-[11px] font-black uppercase truncate"><%= p.name %></span>
+                                            </div>
+                                            <span class="text-[11px] font-black text-emerald-400 flex-shrink-0"><%= Number(p.highestBid).toLocaleString() %></span>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            <% } else { %>
+                                <p class="text-[10px] text-slate-400 italic font-bold">No bids placed yet.</p>
+                            <% } %>
+                        </div>
+
+                        <!-- POSITION LEADERS -->
+                        <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+                            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 mb-2.5">Position Leaders</p>
+                            <div class="space-y-2">
+                                <% ['FWD','MID','DEF','GK'].forEach(posKey => {
+                                    const entry = marketSpotlight.byPosition && marketSpotlight.byPosition[posKey];
+                                    let posDotClass = posKey === 'FWD' ? 'bg-rose-500' : posKey === 'MID' ? 'bg-amber-500' : posKey === 'DEF' ? 'bg-blue-500' : 'bg-violet-500';
+                                %>
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <span class="w-1.5 h-1.5 rounded-full <%= posDotClass %> flex-shrink-0"></span>
+                                            <span class="text-[8px] font-black text-slate-400 uppercase w-7 flex-shrink-0"><%= posKey %></span>
+                                            <span class="text-[11px] font-black text-slate-900 uppercase truncate"><%= entry ? entry.name : '—' %></span>
+                                        </div>
+                                        <span class="text-[11px] font-black text-slate-600 flex-shrink-0"><%= entry ? Number(entry.highestBid).toLocaleString() : '—' %></span>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+
+                        <!-- RISING BIDS -->
+                        <div class="rounded-2xl bg-rose-50 border border-rose-100 p-4">
+                            <p class="text-[9px] font-black uppercase tracking-[0.15em] text-rose-500 mb-2.5 flex items-center gap-1.5">📈 Rising Bids</p>
+                            <% if (marketSpotlight.rising && marketSpotlight.rising.length > 0) { %>
+                                <div class="space-y-2">
+                                    <% marketSpotlight.rising.forEach(r => { %>
+                                        <div class="flex items-center justify-between gap-2">
+                                            <span class="text-[11px] font-black text-slate-900 uppercase truncate"><%= r.player.name %></span>
+                                            <span class="bg-rose-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase flex-shrink-0"><%= r.bidCount %>×/2h</span>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            <% } else { %>
+                                <p class="text-[10px] text-rose-400 italic font-bold">No bidding flurries recently.</p>
+                            <% } %>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        <% } %>
+
         <!-- MULTI-TIER DUAL CONVEYOR CARDS DISPLAY -->
         <% if(players.length > 0) { %>
             <% 
@@ -326,6 +403,7 @@
                                 %>
                                 <div class="player-card card-item w-[260px] h-[350px] glass-light rounded-[28px] border border-slate-200 shadow-md flex-shrink-0 relative group"
                                      data-name="<%= p.name.toLowerCase() %>"
+                                     data-search="<%= ((p.name || '') + ' ' + (p.discord || '') + ' ' + (p.country || '')).toLowerCase() %>"
                                      data-pos="<%= pos %>"
                                      data-class="<%= rank %>"
                                      data-eligible="<%= eligibleAttr %>"
@@ -479,78 +557,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- ============================================================
-             MARKET SPOTLIGHT
-             ============================================================ -->
-        <% if (typeof marketSpotlight !== 'undefined' && marketSpotlight) { %>
-            <div class="mb-10">
-                <div class="flex items-center gap-3 mb-4">
-                    <span class="text-xl">🔥</span>
-                    <h3 class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Market Spotlight</h3>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
-                    <!-- TOP OVERALL BID — hero tile -->
-                    <div class="lg:col-span-1 relative overflow-hidden rounded-[28px] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white p-6 shadow-lg border border-slate-800">
-                        <div class="absolute -right-6 -top-6 text-[100px] opacity-10 select-none">👑</div>
-                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-amber-400 mb-2">Top Bid Overall</p>
-                        <% if (marketSpotlight.topOverall) { %>
-                            <h4 class="text-2xl font-black italic uppercase tracking-tight mb-1"><%= marketSpotlight.topOverall.name %></h4>
-                            <p class="text-3xl font-black italic text-emerald-400 mb-2"><%= Number(marketSpotlight.topOverall.highestBid).toLocaleString() %> <span class="text-xs">Vollars</span></p>
-                            <div class="flex items-center gap-2">
-                                <span class="bg-white/10 border border-white/20 text-[9px] font-black px-2 py-1 rounded-lg uppercase"><%= marketSpotlight.topOverall.position || 'PRO' %></span>
-                                <span class="bg-white/10 border border-white/20 text-[9px] font-black px-2 py-1 rounded-lg uppercase"><%= (marketSpotlight.topOverall.rank || 'C').toUpperCase() %> Class</span>
-                                <% if (marketSpotlight.topOverall.highestBidder) { %>
-                                    <span class="text-[9px] text-slate-400 font-bold truncate">by <%= marketSpotlight.topOverall.highestBidder %></span>
-                                <% } %>
-                            </div>
-                        <% } else { %>
-                            <p class="text-sm font-bold text-slate-400 italic mt-4">No bids placed yet — be the first.</p>
-                        <% } %>
-                    </div>
-
-                    <!-- HIGHEST BID PER POSITION -->
-                    <div class="lg:col-span-1 bg-white rounded-[28px] border border-slate-200 shadow-sm p-5">
-                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Highest Bid by Position</p>
-                        <div class="space-y-2.5">
-                            <% ['FWD','MID','DEF','GK'].forEach(posKey => {
-                                const entry = marketSpotlight.byPosition && marketSpotlight.byPosition[posKey];
-                                let posDotClass = posKey === 'FWD' ? 'bg-rose-500' : posKey === 'MID' ? 'bg-amber-500' : posKey === 'DEF' ? 'bg-blue-500' : 'bg-violet-500';
-                            %>
-                                <div class="flex items-center justify-between gap-3 py-1.5 <%= entry ? 'border-b border-slate-100 last:border-0' : '' %>">
-                                    <div class="flex items-center gap-2 min-w-0">
-                                        <span class="w-2 h-2 rounded-full <%= posDotClass %> flex-shrink-0"></span>
-                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider w-8 flex-shrink-0"><%= posKey %></span>
-                                        <span class="text-xs font-black text-slate-900 uppercase truncate"><%= entry ? entry.name : '—' %></span>
-                                    </div>
-                                    <span class="text-xs font-black text-emerald-600 flex-shrink-0"><%= entry ? Number(entry.highestBid).toLocaleString() : '—' %></span>
-                                </div>
-                            <% }) %>
-                        </div>
-                    </div>
-
-                    <!-- RISING / HOT PLAYERS -->
-                    <div class="lg:col-span-1 bg-white rounded-[28px] border border-slate-200 shadow-sm p-5">
-                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">📈 Rising Bids</p>
-                        <% if (marketSpotlight.rising && marketSpotlight.rising.length > 0) { %>
-                            <div class="space-y-2.5">
-                                <% marketSpotlight.rising.forEach(r => { %>
-                                    <div class="flex items-center justify-between gap-3 py-1.5 border-b border-slate-100 last:border-0">
-                                        <span class="text-xs font-black text-slate-900 uppercase truncate"><%= r.player.name %></span>
-                                        <span class="bg-rose-50 text-rose-600 text-[9px] font-black px-2 py-1 rounded-lg uppercase flex-shrink-0"><%= r.bidCount %> bids / 2h</span>
-                                    </div>
-                                <% }) %>
-                            </div>
-                        <% } else { %>
-                            <p class="text-xs text-slate-400 italic font-bold">No bidding flurries in the last 2 hours yet.</p>
-                        <% } %>
-                    </div>
-
-                </div>
-            </div>
-        <% } %>
 
         <% if (typeof auctionTeams !== 'undefined' && auctionTeams && auctionTeams.length > 0) { %>
 
@@ -1396,16 +1402,16 @@
     }
 
     function filterCards() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
+        const query = document.getElementById('searchInput').value.toLowerCase().trim().replace(/^@/, '');
         const cards = document.querySelectorAll('.card-item');
 
         cards.forEach(card => {
-            const name = card.getAttribute('data-name');
+            const searchBlob = card.getAttribute('data-search') || card.getAttribute('data-name') || '';
             const pos = card.getAttribute('data-pos');
             const cls = card.getAttribute('data-class') || 'C';
             const eligible = card.getAttribute('data-eligible');
 
-            const matchesSearch = name.includes(query);
+            const matchesSearch = searchBlob.includes(query);
             const matchesPos = activePosFilter === 'ALL' || pos.includes(activePosFilter);
             const matchesClass = activeClassFilter === 'ALL' || cls === activeClassFilter;
             const matchesEligible = !eligibleOnly || eligible === 'true';

@@ -3,6 +3,23 @@
 <main class="py-12 px-4 md:px-8 max-w-7xl mx-auto space-y-8 bg-slate-50 text-slate-900 min-h-screen">
 
     <!-- ========================================================= -->
+    <!-- ERROR / STATUS BANNER
+         Every admin action redirects back here with ?error=... on
+         failure, but it was never actually shown anywhere — so failed
+         saves (locked ranks, validation errors, etc.) looked like they
+         silently did nothing. This surfaces it. -->
+    <!-- ========================================================= -->
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div id="adminErrorBanner" class="bg-rose-50 border border-rose-200 text-rose-700 px-5 py-4 rounded-2xl flex items-start justify-between gap-4 shadow-sm">
+            <div class="flex items-start gap-3">
+                <span class="text-lg leading-none">⚠️</span>
+                <p class="text-xs font-bold leading-relaxed"><%= error %></p>
+            </div>
+            <button type="button" onclick="document.getElementById('adminErrorBanner').remove()" class="text-rose-400 hover:text-rose-600 text-sm font-black flex-shrink-0">✕</button>
+        </div>
+    <% } %>
+
+    <!-- ========================================================= -->
     <!-- HEADER -->
     <!-- ========================================================= -->
     <div class="border-b border-slate-200 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -2142,7 +2159,7 @@
                 <input
                     type="text"
                     onkeyup="filterQueue(this)"
-                    placeholder="Filter applications..."
+                    placeholder="Filter by name or Discord..."
                     class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl text-xs text-slate-900 outline-none w-full md:w-64 focus:border-amber-500 transition-all">
 
             </div>
@@ -2157,6 +2174,7 @@
                     <% pending.forEach(player => { %>
 
                         <details
+                            data-search="<%= ((player.name || '') + ' ' + (player.discord || '')).toLowerCase() %>"
                             class="queue-card group bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden hover:border-amber-400 transition">
 
                             <summary class="p-4 cursor-pointer flex items-center justify-between list-none">
@@ -2351,7 +2369,7 @@
                     type="text"
                     id="playerSearch"
                     onkeyup="filterPlayers()"
-                    placeholder="Search players..."
+                    placeholder="Search name, Discord, position, rank..."
                     class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl text-xs text-slate-900 outline-none w-full md:w-64 focus:border-blue-500 transition-all">
 
             </div>
@@ -2369,7 +2387,8 @@
 
                         <details
                             class="player-card group bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-400 transition"
-                            data-name="<%= (player.name || '').toLowerCase() %>">
+                            data-name="<%= (player.name || '').toLowerCase() %>"
+                            data-search="<%= ((player.name || '') + ' ' + (player.discord || '') + ' ' + (player.position || '') + ' ' + (player.rank || '')).toLowerCase() %>">
 
                             <summary class="p-4 cursor-pointer flex items-center justify-between list-none">
 
@@ -2799,6 +2818,43 @@
                 </form>
 
 
+                <!-- PRE-END-AUCTION ROSTER READINESS CHECK -->
+                <% if (typeof rosterReadiness !== 'undefined' && rosterReadiness && rosterReadiness.length > 0) { %>
+                    <%
+                        const shortTeams = rosterReadiness.filter(t => t.belowMinimum);
+                    %>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <p class="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                Pre-End Roster Check <span class="text-slate-300">(min <%= typeof auctionSession !== 'undefined' && auctionSession && auctionSession.minRosterSize ? auctionSession.minRosterSize : 10 %> players)</span>
+                            </p>
+                            <% if (shortTeams.length > 0) { %>
+                                <span class="text-[9px] font-black uppercase bg-rose-100 text-rose-700 px-2 py-1 rounded-lg">⚠️ <%= shortTeams.length %> team(s) short</span>
+                            <% } else { %>
+                                <span class="text-[9px] font-black uppercase bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg">✓ All teams ready</span>
+                            <% } %>
+                        </div>
+
+                        <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                            <% rosterReadiness.forEach(t => { %>
+                                <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl <%= t.belowMinimum ? 'bg-rose-50 border border-rose-100' : 'bg-emerald-50/50 border border-emerald-100' %>">
+                                    <span class="text-[11px] font-black uppercase text-slate-800 truncate"><%= t.teamName %></span>
+                                    <span class="text-[10px] font-black flex-shrink-0 <%= t.belowMinimum ? 'text-rose-600' : 'text-emerald-600' %>">
+                                        <%= t.provisionalCount %> players
+                                        <% if (t.belowMinimum) { %> (needs <%= t.shortfall %> more)<% } %>
+                                    </span>
+                                </div>
+                            <% }) %>
+                        </div>
+
+                        <% if (shortTeams.length > 0) { %>
+                            <p class="text-[9px] text-rose-500 font-bold uppercase tracking-wider leading-relaxed">
+                                Ending the auction now will lock these teams in under the minimum. Consider waiting, or nudging their managers to keep bidding before pressing End Auction.
+                            </p>
+                        <% } %>
+                    </div>
+                <% } %>
+
                 <!-- START / END -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
 
@@ -2829,6 +2885,20 @@
                     </form>
 
                 </div>
+
+                <% if (auctionStatus === 'live') { %>
+                    <form
+                        action="/admin/auction/reset"
+                        method="POST"
+                        onsubmit="return confirm('Reset the auction back to READY? This un-locks classes/ratings and re-closes bidding, but does NOT touch any bids already placed. Only use this if the auction was started by mistake.');">
+
+                        <button
+                            type="submit"
+                            class="w-full bg-white hover:bg-slate-100 text-slate-500 border border-slate-200 py-2.5 rounded-xl font-black uppercase text-[9px] transition">
+                            ↺ Reset To "Ready" (undo an accidental start — unlocks classes again)
+                        </button>
+                    </form>
+                <% } %>
 
 
                 <div class="bg-purple-50 border border-purple-100 rounded-2xl p-4">
@@ -3034,7 +3104,7 @@
                                         <form action="/admin/auction/toggle-two-ss" method="POST">
                                             <input type="hidden" name="teamId" value="<%= aTeam.id || aTeam._id %>">
                                             <button type="submit" class="text-[9px] font-black uppercase px-2.5 py-1 rounded-lg border transition <%= aTeam.allowTwoSS ? 'bg-fuchsia-600 text-white border-fuchsia-600' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-fuchsia-300' %>">
-                                                <%= aTeam.allowTwoSS ? 'ON (2 SS / 2 S / 3 A)' : 'OFF (1 SS / 3-4 S / 5 A)' %>
+                                                <%= aTeam.allowTwoSS ? 'ON (2 SS / 2 S / 3 A)' : 'OFF (1 SS / 3-4 S / 5-6 A)' %>
                                             </button>
                                         </form>
                                     </div>
@@ -3694,6 +3764,29 @@
 
     }
 
+
+    /* ============================================================
+       SEARCH — Verification Queue & Player Market
+       (data-search on each card already includes name + discord, so a
+       partial Discord handle match works the same as a name match)
+    ============================================================ */
+
+    function filterQueue(inputEl) {
+        const query = (inputEl.value || '').toLowerCase().trim();
+        document.querySelectorAll('#queueList .queue-card').forEach(card => {
+            const haystack = card.getAttribute('data-search') || '';
+            card.style.display = haystack.includes(query) ? '' : 'none';
+        });
+    }
+
+    function filterPlayers() {
+        const input = document.getElementById('playerSearch');
+        const query = (input ? input.value : '').toLowerCase().trim();
+        document.querySelectorAll('#marketList .player-card').forEach(card => {
+            const haystack = card.getAttribute('data-search') || card.getAttribute('data-name') || '';
+            card.style.display = haystack.includes(query) ? '' : 'none';
+        });
+    }
 
     /* ============================================================
        PASSWORD VIEW

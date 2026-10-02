@@ -186,6 +186,16 @@
         box-shadow: 0 0 0 3px hsl(var(--team-hue) 75% 52%), 0 20px 35px -15px rgba(15, 23, 42, 0.2);
         transform: translateY(-3px);
     }
+
+    /* Spotlight dark-stage expand lists */
+    #spotlightTopFull .text-slate-900,
+    #spotlightPosFull .text-slate-900,
+    #spotlightRisingFull .text-slate-900 { color: #f8fafc !important; }
+    #spotlightTopFull .text-slate-400,
+    #spotlightPosFull .text-slate-400,
+    #spotlightRisingFull .text-slate-400 { color: #94a3b8 !important; }
+    #spotlightTopFull:hover .hover\:bg-slate-50:hover,
+    #spotlightTopFull .hover\:bg-slate-50:hover { background: rgba(255,255,255,0.05) !important; }
 </style>
 
 <% if (typeof error !== 'undefined' && error) { %>
@@ -299,20 +309,30 @@
                 }
             %>
             <div class="max-w-7xl mx-auto px-6 mb-14">
-                <div class="flex items-center justify-between gap-3 mb-6">
-                    <div class="flex items-center gap-2">
-                        <span class="h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                        <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">Market Spotlight</h3>
+                <div class="relative rounded-[32px] overflow-hidden border border-slate-700/80 shadow-2xl shadow-slate-900/20">
+                    <!-- Stage background -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800"></div>
+                    <div class="absolute inset-0 opacity-40" style="background-image: radial-gradient(circle at 20% 20%, rgba(251,191,36,0.12), transparent 40%), radial-gradient(circle at 80% 60%, rgba(16,185,129,0.1), transparent 45%), radial-gradient(circle at 50% 100%, rgba(59,130,246,0.08), transparent 50%);"></div>
+                    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/50 to-transparent"></div>
+
+                    <div class="relative p-6 md:p-8">
+                <div class="flex items-center justify-between gap-3 mb-8">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-lg">🔥</div>
+                        <div>
+                            <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-amber-400/90">Market Spotlight</h3>
+                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Live auction heat · hover the cards</p>
+                        </div>
                     </div>
                     <button type="button" id="spotlightExpandBtn" onclick="toggleSpotlightExpand()"
-                        class="text-[10px] font-black uppercase tracking-wider text-white bg-slate-900 hover:bg-blue-600 px-4 py-2 rounded-xl transition shadow-sm">
+                        class="text-[10px] font-black uppercase tracking-wider text-slate-900 bg-white hover:bg-amber-400 px-4 py-2.5 rounded-xl transition shadow-lg">
                         Show Top 10 →
                     </button>
                 </div>
 
                 <!-- ════ TOP BIDS — real hovering player cards ════ -->
                 <div class="mb-10">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-4">👑 Top Bids</p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>👑 Top Bids</p>
                     <% if (marketSpotlight.topBids && marketSpotlight.topBids.length > 0) { %>
                         <div id="spotlightTopPodium" class="flex flex-wrap justify-center gap-6 py-4" style="perspective: 1200px;">
                             <% marketSpotlight.topBids.slice(0, 3).forEach((p, i) => {
@@ -352,7 +372,7 @@
                                 </div>
                             <% }) %>
                         </div>
-                        <div id="spotlightTopFull" class="hidden mt-3 bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden max-w-2xl mx-auto">
+                        <div id="spotlightTopFull" class="hidden mt-3 bg-slate-950/80 rounded-2xl border border-white/10 divide-y divide-white/5 overflow-hidden max-w-2xl mx-auto">
                             <% marketSpotlight.topBids.forEach((p, i) => { %>
                                 <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50 transition cursor-pointer"
                                      onclick="document.querySelectorAll('.player-card').forEach(c=>{if((c.getAttribute('data-name')||'')==='<%= (p.name||'').toLowerCase() %>'){c.click();}})">
@@ -371,18 +391,18 @@
                             <% }) %>
                         </div>
                     <% } else { %>
-                        <p class="text-xs text-slate-400 italic font-bold py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">No bids placed yet.</p>
+                        <p class="text-xs text-slate-500 italic font-bold py-10 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">No bids placed yet.</p>
                     <% } %>
                 </div>
 
                 <!-- ════ POSITION LEADERS — real cards ════ -->
                 <div class="mb-10">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">⚡ Position Leaders</p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>⚡ Position Leaders</p>
                     <div id="spotlightPosPodium" class="flex flex-wrap justify-center gap-5 py-4" style="perspective: 1200px;">
                         <% ['FWD','MID','DEF','GK'].forEach(posKey => {
                             const p = marketSpotlight.byPosition && marketSpotlight.byPosition[posKey];
                             if (!p) { %>
-                                <div class="w-[200px] h-[280px] rounded-[28px] border border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center text-slate-300">
+                                <div class="w-[200px] h-[280px] rounded-[28px] border border-dashed border-white/15 bg-white/5 flex flex-col items-center justify-center text-slate-500">
                                     <span class="text-[10px] font-black uppercase"><%= posKey %></span>
                                     <span class="text-xs font-bold mt-1">No bids</span>
                                 </div>
@@ -415,7 +435,7 @@
                             </div>
                         <% }) %>
                     </div>
-                    <div id="spotlightPosFull" class="hidden mt-3 bg-white rounded-2xl border border-slate-200 overflow-hidden max-w-2xl mx-auto">
+                    <div id="spotlightPosFull" class="hidden mt-3 bg-slate-950/80 rounded-2xl border border-white/10 overflow-hidden max-w-2xl mx-auto">
                         <% ['FWD','MID','DEF','GK'].forEach(posKey => {
                             const list = (marketSpotlight.byPositionTop && marketSpotlight.byPositionTop[posKey]) || [];
                         %>
@@ -439,7 +459,7 @@
 
                 <!-- ════ RISING BIDS — real cards ════ -->
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-4">📈 Rising Bids <span class="text-rose-300 normal-case tracking-normal font-bold">(last 2h)</span></p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>📈 Rising Bids <span class="text-rose-400/60 normal-case tracking-normal font-bold">(last 2h)</span></p>
                     <% if (marketSpotlight.rising && marketSpotlight.rising.length > 0) { %>
                         <div id="spotlightRisingPodium" class="flex flex-wrap justify-center gap-6 py-4" style="perspective: 1200px;">
                             <% marketSpotlight.rising.slice(0, 3).forEach((r, i) => {
@@ -476,7 +496,7 @@
                                 </div>
                             <% }) %>
                         </div>
-                        <div id="spotlightRisingFull" class="hidden mt-3 bg-white rounded-2xl border border-rose-100 divide-y divide-rose-50 overflow-hidden max-w-2xl mx-auto">
+                        <div id="spotlightRisingFull" class="hidden mt-3 bg-slate-950/80 rounded-2xl border border-rose-500/20 divide-y divide-white/5 overflow-hidden max-w-2xl mx-auto">
                             <% marketSpotlight.rising.forEach((r, i) => { %>
                                 <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-rose-50/50 transition">
                                     <div class="flex items-center gap-3 min-w-0">
@@ -494,9 +514,11 @@
                             <% }) %>
                         </div>
                     <% } else { %>
-                        <p class="text-xs text-rose-300 italic font-bold py-8 text-center bg-rose-50 rounded-2xl border border-dashed border-rose-100">No bidding flurries recently.</p>
+                        <p class="text-xs text-rose-400/70 italic font-bold py-10 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">No bidding flurries recently.</p>
                     <% } %>
                 </div>
+                    </div><!-- /relative pad -->
+                </div><!-- /stage -->
             </div>
         <% } %>
 
@@ -649,7 +671,6 @@
     <!-- MODE 2: AUCTION HUB VIEW -->
     <div id="auctionSection" class="hidden max-w-7xl mx-auto px-6 mb-24">
         <%
-            // Deterministic accent color per franchise (IPL-style team color chips)
             function hueFromName(str) {
                 let h = 0;
                 str = str || 'Team';
@@ -658,10 +679,6 @@
                 }
                 return Math.abs(h) % 360;
             }
-
-            // Looks up the full player record behind a bid (by id) or a
-            // roster slot (by name) so clicking it can open the same
-            // profile modal used on the main market cards.
             function findPlayerRecord(idOrName) {
                 if (!idOrName || typeof players === 'undefined') return null;
                 return players.find(p => {
@@ -672,252 +689,295 @@
             }
 
             let sessionStatus = (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.status) || 'ready';
-            let statusLabel = 'Auction Ready';
-            let statusColor = 'slate';
-            if (sessionStatus === 'live') { statusLabel = 'Live Now'; statusColor = 'emerald'; }
-            else if (sessionStatus === 'ended') { statusLabel = 'Auction Ended'; statusColor = 'rose'; }
-            let squadCap = (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.maxRosterSize) || 7;
+            let statusLabel = 'READY';
+            let statusDot = 'bg-slate-400';
+            let statusRing = 'border-slate-200 bg-slate-50 text-slate-600';
+            if (sessionStatus === 'live') {
+                statusLabel = 'LIVE';
+                statusDot = 'bg-emerald-400 animate-pulse';
+                statusRing = 'border-emerald-200 bg-emerald-50 text-emerald-700';
+            } else if (sessionStatus === 'ended') {
+                statusLabel = 'ENDED';
+                statusDot = 'bg-rose-400';
+                statusRing = 'border-rose-200 bg-rose-50 text-rose-700';
+            }
+            let squadCap = (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.maxRosterSize) || 16;
+            let squadMin = (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.minRosterSize) || 10;
             let sessionName = (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.name) || 'VIM Auction';
         %>
 
-        <!-- SESSION STATUS BANNER (LIGHT / IPL-STYLE) -->
-        <div class="relative overflow-hidden bg-white border border-slate-200 p-6 rounded-[32px] shadow-md mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="absolute inset-x-0 top-0 h-1.5 bg-slate-900"></div>
-            <div class="flex items-center gap-4">
-                <div class="h-12 w-12 rounded-2xl bg-slate-900 shadow-sm flex items-center justify-center text-white text-2xl font-black">
-                    🏆
+        <!-- HERO STATUS -->
+        <div class="relative overflow-hidden rounded-[32px] mb-8 border border-slate-800 shadow-xl">
+            <div class="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800"></div>
+            <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 10% 50%, rgba(16,185,129,0.15), transparent 40%), radial-gradient(circle at 90% 20%, rgba(251,191,36,0.12), transparent 35%);"></div>
+            <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+
+            <div class="relative p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-3xl shadow-inner">🏆</div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400"><%= sessionName %></p>
+                        <h3 class="text-3xl font-black italic uppercase tracking-tighter text-white mt-1">Auction Hub</h3>
+                        <p class="text-[11px] text-slate-400 font-bold mt-1">Franchise bids · live roster pressure · full audit trail</p>
+                    </div>
                 </div>
-                <div>
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><%= sessionName %></span>
-                    <h3 class="text-2xl font-black italic uppercase tracking-tight text-slate-900">Franchise Auction Hub</h3>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="bg-slate-50 border border-slate-100 px-5 py-3 rounded-2xl text-center">
-                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Status</span>
-                    <span class="text-base font-black italic text-<%= statusColor %>-600 uppercase tracking-wider flex items-center justify-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-<%= statusColor %>-500 <%= sessionStatus === 'live' ? 'animate-pulse' : '' %>"></span>
-                        <%= statusLabel %>
-                    </span>
-                </div>
-                <div class="bg-slate-50 border border-slate-100 px-5 py-3 rounded-2xl text-center">
-                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Squad Cap</span>
-                    <span class="text-base font-black italic text-slate-900 uppercase tracking-wider"><%= squadCap %> Players</span>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="<%= statusRing %> border px-4 py-2.5 rounded-2xl flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full <%= statusDot %>"></span>
+                        <div>
+                            <p class="text-[8px] font-black uppercase tracking-widest opacity-70">Status</p>
+                            <p class="text-sm font-black uppercase tracking-wider leading-none"><%= statusLabel %></p>
+                        </div>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded-2xl">
+                        <p class="text-[8px] font-black uppercase tracking-widest text-slate-400">Roster</p>
+                        <p class="text-sm font-black"><%= squadMin %>–<%= squadCap %> <span class="text-slate-400 font-bold text-[10px]">players</span></p>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded-2xl">
+                        <p class="text-[8px] font-black uppercase tracking-widest text-slate-400">Franchises</p>
+                        <p class="text-sm font-black"><%= typeof auctionTeams !== 'undefined' ? auctionTeams.length : 0 %></p>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <% if (typeof isManager !== 'undefined' && isManager && typeof myAuctionState !== 'undefined' && myAuctionState) { %>
+            <div class="mb-8 grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                    <p class="text-[9px] font-black uppercase text-slate-400">Your budget left</p>
+                    <p class="text-xl font-black text-emerald-600 mt-1"><%= Number(myAuctionState.availableBudget).toLocaleString() %></p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                    <p class="text-[9px] font-black uppercase text-slate-400">Roster slots</p>
+                    <p class="text-xl font-black text-slate-900 mt-1"><%= myAuctionState.totalPlayers %><span class="text-sm text-slate-400">/<%= myAuctionState.rosterMax %></span></p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                    <p class="text-[9px] font-black uppercase text-slate-400">Winning</p>
+                    <p class="text-xl font-black text-emerald-600 mt-1"><%= (myAuctionState.provisional || []).filter(x => !x.isManager).length %></p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                    <p class="text-[9px] font-black uppercase text-slate-400">Outbid</p>
+                    <p class="text-xl font-black text-rose-600 mt-1"><%= typeof myOutbidPlayers !== 'undefined' ? myOutbidPlayers.length : 0 %></p>
+                </div>
+            </div>
+        <% } %>
+
         <% if (typeof auctionTeams !== 'undefined' && auctionTeams && auctionTeams.length > 0) { %>
 
-            <!-- FRANCHISE TILE GRID (IPL-STYLE ENLARGED LOGOS) -->
-            <h3 class="text-xs font-black uppercase tracking-[0.25em] text-slate-400 mb-4">Registered Franchises &middot; Tap a team</h3>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 mb-10">
+            <div class="flex items-center justify-between gap-3 mb-4">
+                <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">Registered Franchises</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Tap a team to inspect bids</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
                 <% auctionTeams.forEach((t, i) => {
                     let tId = t._id || t.id || '';
                     let reserved = (t.bids || []).reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
                     let remaining = (t.budget || 0) - (t.spent || 0) - reserved;
                     let committedPct = (t.budget && t.budget > 0) ? Math.min(100, Math.round(((t.spent || 0) + reserved) / t.budget * 100)) : 0;
                     let hue = hueFromName(t.name);
+                    let bidCount = (t.bids || []).length;
+                    let rosterCount = (t.roster || []).length;
                 %>
                     <div onclick="selectAuctionTeam('<%= tId %>')"
                          id="teamTile-<%= tId %>"
-                         class="team-tile cursor-pointer bg-white border-2 rounded-[28px] p-5 text-center relative overflow-hidden <%= i === 0 ? 'active' : 'border-slate-200' %>"
+                         class="team-tile cursor-pointer bg-white border-2 rounded-[24px] p-4 text-center relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl <%= i === 0 ? 'active' : 'border-slate-200' %>"
                          style="--team-hue: <%= hue %>;">
+                        <div class="absolute inset-x-0 top-0 h-1.5" style="background: hsl(<%= hue %> 75% 48%);"></div>
+                        <div class="absolute -right-6 -top-6 w-20 h-20 rounded-full opacity-10" style="background: hsl(<%= hue %> 75% 48%);"></div>
 
-                        <div class="absolute inset-x-0 top-0 h-1.5" style="background: hsl(<%= hue %> 75% 52%);"></div>
-
-                        <div class="w-24 h-24 mx-auto rounded-3xl bg-slate-50 border border-slate-100 p-2 flex items-center justify-center shadow-sm mb-3 mt-1">
+                        <div class="w-20 h-20 mx-auto rounded-2xl bg-slate-50 border border-slate-100 p-2 flex items-center justify-center shadow-sm mb-3 mt-1">
                             <% if (t.logo) { %>
                                 <img src="<%= t.logo %>" class="w-full h-full object-contain">
                             <% } else { %>
-                                <span class="text-3xl font-black" style="color: hsl(<%= hue %> 65% 45%);"><%= (t.name || '?').charAt(0) %></span>
+                                <span class="text-2xl font-black" style="color: hsl(<%= hue %> 65% 42%);"><%= (t.name || '?').charAt(0) %></span>
                             <% } %>
                         </div>
 
                         <h4 class="font-black italic uppercase text-sm text-slate-900 truncate"><%= t.name %></h4>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase truncate mb-3">Mgr: <%= t.manager || 'Unassigned' %></p>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase truncate mb-3">Mgr · <%= t.manager || 'Unassigned' %></p>
 
                         <div class="grid grid-cols-2 gap-1.5 text-left mb-2">
-                            <div class="bg-slate-50 rounded-lg px-2 py-1.5 border border-slate-100">
-                                <span class="block text-[7px] text-slate-400 font-black uppercase tracking-wider">Budget</span>
-                                <span class="text-[11px] font-black text-slate-900"><%= t.budget || 0 %> V</span>
+                            <div class="bg-slate-50 rounded-xl px-2 py-1.5 border border-slate-100">
+                                <span class="block text-[7px] text-slate-400 font-black uppercase">Left</span>
+                                <span class="text-[11px] font-black text-emerald-600"><%= Number(remaining).toLocaleString() %></span>
                             </div>
-                            <div class="bg-emerald-50 rounded-lg px-2 py-1.5 border border-emerald-100">
-                                <span class="block text-[7px] text-emerald-500 font-black uppercase tracking-wider">Remaining</span>
-                                <span class="text-[11px] font-black text-emerald-600"><%= remaining %> V</span>
+                            <div class="bg-slate-50 rounded-xl px-2 py-1.5 border border-slate-100">
+                                <span class="block text-[7px] text-slate-400 font-black uppercase">Bids</span>
+                                <span class="text-[11px] font-black text-slate-900"><%= bidCount %></span>
                             </div>
                         </div>
 
                         <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                            <div class="h-full rounded-full" style="width: <%= committedPct %>%; background: hsl(<%= hue %> 75% 52%);"></div>
+                            <div class="h-full rounded-full transition-all" style="width: <%= committedPct %>%; background: hsl(<%= hue %> 75% 48%);"></div>
                         </div>
-                        <p class="text-[8px] text-slate-400 font-black uppercase tracking-widest mt-1"><%= committedPct %>% Committed</p>
+                        <p class="text-[8px] font-bold text-slate-400 mt-1.5 uppercase"><%= committedPct %>% committed · <%= rosterCount %> signed</p>
                     </div>
                 <% }) %>
             </div>
 
-            <!-- SELECTED FRANCHISE DETAIL PANEL -->
+            <!-- TEAM DETAIL PANELS -->
             <% auctionTeams.forEach((t, i) => {
                 let tId = t._id || t.id || '';
                 let reserved = (t.bids || []).reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
                 let remaining = (t.budget || 0) - (t.spent || 0) - reserved;
                 let hue = hueFromName(t.name);
             %>
-                <div id="teamDetails-<%= tId %>" class="team-details-panel <%= i === 0 ? '' : 'hidden' %> bg-white border border-slate-200 rounded-[36px] p-8 shadow-xl">
+                <div id="teamDetails-<%= tId %>" class="team-details-panel <%= i === 0 ? '' : 'hidden' %> mb-8">
+                    <div class="bg-white rounded-[28px] border border-slate-200 shadow-lg overflow-hidden">
+                        <div class="px-6 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100" style="background: linear-gradient(135deg, hsl(<%= hue %> 40% 97%), white);">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 p-1.5 flex items-center justify-center shadow-sm">
+                                    <% if (t.logo) { %>
+                                        <img src="<%= t.logo %>" class="w-full h-full object-contain">
+                                    <% } else { %>
+                                        <span class="text-xl font-black" style="color: hsl(<%= hue %> 65% 42%);"><%= (t.name || '?').charAt(0) %></span>
+                                    <% } %>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-black italic uppercase text-slate-900 tracking-tight"><%= t.name %></h4>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Manager · <%= t.manager || 'Unassigned' %></p>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <div class="bg-slate-900 text-white px-3 py-2 rounded-xl">
+                                    <p class="text-[7px] font-black uppercase text-slate-400">Budget</p>
+                                    <p class="text-sm font-black"><%= Number(t.budget || 0).toLocaleString() %></p>
+                                </div>
+                                <div class="bg-emerald-50 border border-emerald-100 text-emerald-700 px-3 py-2 rounded-xl">
+                                    <p class="text-[7px] font-black uppercase text-emerald-500">Remaining</p>
+                                    <p class="text-sm font-black"><%= Number(remaining).toLocaleString() %></p>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
+                                    <p class="text-[7px] font-black uppercase text-slate-400">Spent</p>
+                                    <p class="text-sm font-black text-slate-900"><%= Number(t.spent || 0).toLocaleString() %></p>
+                                </div>
+                            </div>
+                        </div>
 
-                    <!-- TEAM HEADER WITH ENLARGED LOGO & VOLLARS STATS -->
-                    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-slate-100 pb-8 mb-8">
-                        <div class="w-28 h-28 rounded-3xl bg-slate-50 border border-slate-200 shadow-md flex-shrink-0 p-2 flex items-center justify-center"
-                             style="box-shadow: 0 0 0 3px hsla(<%= hue %>, 75%, 52%, 0.25);">
-                            <% if (t.logo) { %>
-                                <img src="<%= t.logo %>" class="w-full h-full object-contain">
+                        <div class="px-6 pt-4 flex gap-2">
+                            <button type="button" id="tabBtn-bidding-<%= tId %>" onclick="switchTeamSubTab('<%= tId %>', 'bidding')"
+                                class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 text-white transition">
+                                Live Bids
+                            </button>
+                            <button type="button" id="tabBtn-roster-<%= tId %>" onclick="switchTeamSubTab('<%= tId %>', 'roster')"
+                                class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-900 transition">
+                                Final Roster
+                            </button>
+                        </div>
+
+                        <div id="subTab-bidding-<%= tId %>" class="p-6">
+                            <% if (t.bids && t.bids.length > 0) { %>
+                                <div class="space-y-2">
+                                    <% t.bids.forEach(b => {
+                                        const full = findPlayerRecord(b.playerId || b.playerName);
+                                        const isWinning = full && (full.highestBidder || '').toLowerCase() === (t.name || '').toLowerCase()
+                                            && Number(full.highestBid || 0) === Number(b.amount || 0);
+                                    %>
+                                        <div class="flex items-center justify-between gap-3 bg-slate-50 hover:bg-slate-100 border border-slate-100 rounded-2xl px-4 py-3 transition cursor-pointer"
+                                             <% if (full) { %>
+                                             onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= (full.experience || full.bio || '').toString().replace(/`/g,'') %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>', <%- (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((full.name||'').toLowerCase())) %>, <%- !!(typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(full._id||full.id))) %>)"
+                                             <% } %>>
+                                            <div class="flex items-center gap-3 min-w-0">
+                                                <% if (full && full.cardImage) { %>
+                                                    <img src="<%= full.cardImage %>" class="w-11 h-11 rounded-xl object-cover border border-slate-200" alt="">
+                                                <% } else { %>
+                                                    <div class="w-11 h-11 rounded-xl bg-slate-200 flex items-center justify-center text-[10px] font-black text-slate-400"><%= (b.playerName || '?').charAt(0) %></div>
+                                                <% } %>
+                                                <div class="min-w-0">
+                                                    <h5 class="font-black italic uppercase text-slate-900 text-sm truncate"><%= b.playerName || (full && full.name) || 'Player' %></h5>
+                                                    <p class="text-[9px] text-slate-400 font-bold uppercase"><%= full ? (full.position || 'PRO') : '—' %> · <%= full ? (full.rank || 'C') : '' %></p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right flex-shrink-0">
+                                                <p class="text-sm font-black text-slate-900"><%= Number(b.amount || 0).toLocaleString() %> V</p>
+                                                <% if (isWinning) { %>
+                                                    <span class="text-[8px] font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Winning</span>
+                                                <% } else { %>
+                                                    <span class="text-[8px] font-black uppercase text-rose-500 bg-rose-50 px-2 py-0.5 rounded-md">Outbid</span>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                </div>
                             <% } else { %>
-                                <span class="text-5xl font-black" style="color: hsl(<%= hue %> 65% 45%);"><%= (t.name || '?').charAt(0) %></span>
+                                <div class="text-center py-14 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                    <p class="text-xs font-black uppercase text-slate-400 tracking-wider">No active bids from this franchise yet</p>
+                                </div>
                             <% } %>
                         </div>
-                        <div class="flex-1 text-center sm:text-left">
-                            <span class="text-[10px] font-black uppercase tracking-widest" style="color: hsl(<%= hue %> 60% 42%);">Official VIM Franchise</span>
-                            <h2 class="text-4xl font-black italic uppercase text-slate-900 tracking-tight"><%= t.name %></h2>
-                            <p class="text-xs text-slate-400 font-bold uppercase mt-1">Manager: <span class="text-slate-800"><%= t.manager || 'Unassigned' %></span></p>
 
-                            <!-- BUDGET SUMMARY TILES (VOLLARS) -->
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-                                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-center">
-                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Budget</span>
-                                    <span class="text-base font-black text-slate-900"><%= t.budget || 0 %> V</span>
-                                </div>
-                                <div class="bg-slate-100 p-3 rounded-2xl border border-slate-200 text-center">
-                                    <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest block">Locked (Signed)</span>
-                                    <span class="text-base font-black text-slate-900"><%= t.spent || 0 %> V</span>
-                                </div>
-                                <div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-100 text-center">
-                                    <span class="text-[8px] font-black text-amber-600 uppercase tracking-widest block">In Active Bids</span>
-                                    <span class="text-base font-black text-amber-600"><%= reserved %> V</span>
-                                </div>
-                                <div class="bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100 text-center">
-                                    <span class="text-[8px] font-black text-emerald-600 uppercase tracking-widest block">Remaining</span>
-                                    <span class="text-base font-black text-emerald-600"><%= remaining %> V</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- BIDDING VS ROSTER TABS -->
-                    <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
-                        <div class="flex items-center gap-3">
-                            <button onclick="switchTeamSubTab('<%= tId %>', 'bidding')" id="tabBtn-bidding-<%= tId %>" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 text-white transition">
-                                Bids In Progress
-                            </button>
-                            <button onclick="switchTeamSubTab('<%= tId %>', 'roster')" id="tabBtn-roster-<%= tId %>" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-900 transition">
-                                Official Roster
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- SUB-TAB 1: BIDDING SIDE -->
-                    <div id="subTab-bidding-<%= tId %>" class="space-y-4">
-                        <% if (t.bids && t.bids.length > 0) { %>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <% t.bids.forEach(b => {
-                                    let full = findPlayerRecord(b.playerId);
-                                %>
-                                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-3 <%= full ? 'hover:border-amber-300 hover:bg-amber-50/40 transition-colors cursor-pointer' : '' %>"
-                                         <% if (full) { %>
-                                         onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= full.experience || full.bio %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>', <%- (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((full.name||'').toLowerCase())) %>, <%- !!(typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(full._id||full.id))) %>)"
-                                         <% } %>>
-                                        <div class="min-w-0">
-                                            <h5 class="font-black italic uppercase text-slate-900 text-sm truncate"><%= b.playerName %></h5>
-                                            <p class="text-[10px] text-amber-600 font-black uppercase">Current Bid: <%= b.amount %> Vollars</p>
-                                            <% if (full) { %><p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Tap to view profile →</p><% } %>
+                        <div id="subTab-roster-<%= tId %>" class="p-6 hidden">
+                            <% if (t.roster && t.roster.length > 0) { %>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <% t.roster.forEach(r => {
+                                        const full = findPlayerRecord(r.name);
+                                    %>
+                                        <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3"
+                                             <% if (full) { %>
+                                             onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= (full.experience || full.bio || '').toString().replace(/`/g,'') %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>', false, false)"
+                                             class="cursor-pointer hover:bg-slate-100"
+                                             <% } %>>
+                                            <div class="min-w-0">
+                                                <h5 class="font-black italic uppercase text-slate-900 text-sm truncate"><%= r.name %></h5>
+                                                <p class="text-[10px] text-slate-400 font-bold uppercase"><%= r.position || 'PRO' %> · <%= r.rank || '' %> · <%= Number(r.boughtFor || 0).toLocaleString() %> V</p>
+                                            </div>
+                                            <span class="text-[9px] font-black text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg uppercase flex-shrink-0">Signed</span>
                                         </div>
-                                        <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam === tId) { %>
-                                            <form action="/auction/withdraw" method="POST" onsubmit="return confirm('Withdraw bid for <%= b.playerName %>?')" onclick="event.stopPropagation()" class="flex-shrink-0">
-                                                <input type="hidden" name="playerId" value="<%= b.playerId %>">
-                                                <input type="hidden" name="teamId" value="<%= tId %>">
-                                                <button type="submit" class="bg-red-50 text-red-600 border border-red-200 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider transition">
-                                                    Withdraw
-                                                </button>
-                                            </form>
-                                        <% } %>
-                                    </div>
-                                <% }) %>
-                            </div>
-                        <% } else { %>
-                            <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                                <p class="text-xs font-black uppercase text-slate-400 tracking-wider">No active player bids placed by this team yet.</p>
-                            </div>
-                        <% } %>
-                    </div>
-
-                    <!-- SUB-TAB 2: ROSTER SIDE (EMPTY UNTIL AUCTION ENDS) -->
-                    <div id="subTab-roster-<%= tId %>" class="hidden space-y-4">
-                        <% if (t.roster && t.roster.length > 0) { %>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <% t.roster.forEach(r => {
-                                    let full = findPlayerRecord(r.name);
-                                %>
-                                    <div class="p-4 rounded-2xl border border-slate-200 bg-emerald-50/30 flex items-center justify-between gap-3 <%= full ? 'hover:border-emerald-300 hover:bg-emerald-50 transition-colors cursor-pointer' : '' %>"
-                                         <% if (full) { %>
-                                         onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= full.experience || full.bio %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>', <%- (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((full.name||'').toLowerCase())) %>, <%- !!(typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(full._id||full.id))) %>)"
-                                         <% } %>>
-                                        <div class="min-w-0">
-                                            <h5 class="font-black italic uppercase text-slate-900 text-sm truncate"><%= r.name %></h5>
-                                            <p class="text-[10px] text-slate-400 font-bold uppercase"><%= r.position %> | Acquired for <%= r.boughtFor || 0 %> Vollars</p>
-                                        </div>
-                                        <span class="text-[10px] font-black text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-lg uppercase flex-shrink-0">Signed</span>
-                                    </div>
-                                <% }) %>
-                            </div>
-                        <% } else { %>
-                            <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                                <p class="text-xs font-black uppercase text-slate-400 tracking-wider">Roster is empty. Player allocations will appear here once the auction ends.</p>
-                            </div>
-                        <% } %>
+                                    <% }) %>
+                                </div>
+                            <% } else { %>
+                                <div class="text-center py-14 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                    <p class="text-xs font-black uppercase text-slate-400 tracking-wider">Roster fills when the admin ends the auction</p>
+                                </div>
+                            <% } %>
+                        </div>
                     </div>
                 </div>
             <% }) %>
 
         <% } else { %>
-            <div class="bg-white p-12 rounded-[36px] border border-slate-200 text-center">
-                <p class="text-sm font-black text-slate-400 uppercase tracking-widest">No auction teams configured by Admin yet.</p>
+            <div class="bg-white p-12 rounded-[32px] border border-dashed border-slate-200 text-center">
+                <p class="text-sm font-black text-slate-400 uppercase tracking-widest">No auction teams configured yet</p>
+                <p class="text-[11px] text-slate-400 font-bold mt-2">Admin can enroll franchises from the Auction Control tab</p>
             </div>
         <% } %>
 
-        <!-- ============================================================
-             AUDIT LOG
-             ============================================================ -->
+        <!-- AUDIT LOG -->
         <% if (typeof auctionActivityFeed !== 'undefined' && auctionActivityFeed && auctionActivityFeed.length > 0) { %>
             <div class="mt-10">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="text-xl">📜</span>
-                    <h3 class="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Auction Audit Log</h3>
+                    <div class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center text-sm">📜</div>
+                    <div>
+                        <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">Auction Feed</h3>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase">Public trail of bids, wins & session events</p>
+                    </div>
                 </div>
 
-                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm max-h-96 overflow-y-auto custom-scroll">
-                    <% auctionActivityFeed.forEach((ev, idx) => {
+                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm max-h-96 overflow-y-auto custom-scroll divide-y divide-slate-100">
+                    <% auctionActivityFeed.forEach((ev) => {
                         let icon = '•';
                         let label = ev.type;
                         let colorClass = 'text-slate-500';
-
-                        if (ev.type === 'bid') { icon = '💰'; label = 'Bid placed'; colorClass = 'text-blue-600'; }
-                        else if (ev.type === 'withdraw') { icon = '↩️'; label = 'Bid withdrawn'; colorClass = 'text-amber-600'; }
-                        else if (ev.type === 'won') { icon = '🏆'; label = 'Player won'; colorClass = 'text-emerald-600'; }
-                        else if (ev.type === 'auction_start') { icon = '🚀'; label = 'Auction started'; colorClass = 'text-slate-900'; }
-                        else if (ev.type === 'auction_end') { icon = '🔒'; label = 'Auction ended'; colorClass = 'text-slate-900'; }
-                        else if (ev.type === 'rank_change') { icon = '🎖️'; label = 'Class updated'; colorClass = 'text-violet-600'; }
+                        if (ev.type === 'bid') { icon = '💰'; label = 'Bid'; colorClass = 'text-emerald-600'; }
+                        else if (ev.type === 'withdraw') { icon = '↩️'; label = 'Withdraw'; colorClass = 'text-amber-600'; }
+                        else if (ev.type === 'won') { icon = '🏆'; label = 'Won'; colorClass = 'text-emerald-700'; }
+                        else if (ev.type === 'auction_start') { icon = '🚀'; label = 'Started'; colorClass = 'text-slate-900'; }
+                        else if (ev.type === 'auction_end') { icon = '🔒'; label = 'Ended'; colorClass = 'text-rose-600'; }
+                        else if (ev.type === 'rank_change') { icon = '🎖️'; label = 'Class'; colorClass = 'text-violet-600'; }
                     %>
-                        <div class="flex items-center justify-between gap-3 px-5 py-3 <%= idx !== auctionActivityFeed.length - 1 ? 'border-b border-slate-100' : '' %>">
+                        <div class="flex items-center justify-between gap-3 px-5 py-3.5 hover:bg-slate-50/80 transition">
                             <div class="flex items-center gap-3 min-w-0">
-                                <span class="text-base flex-shrink-0"><%= icon %></span>
+                                <span class="text-base flex-shrink-0 w-7 text-center"><%= icon %></span>
                                 <div class="min-w-0">
                                     <p class="text-[11px] font-black uppercase <%= colorClass %>">
-                                        <%= label %>
-                                        <% if (ev.playerName) { %><span class="text-slate-900">— <%= ev.playerName %></span><% } %>
+                                        <%= label %><% if (ev.playerName) { %> <span class="text-slate-900">· <%= ev.playerName %></span><% } %>
                                     </p>
                                     <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider truncate">
                                         <% if (ev.teamName) { %><%= ev.teamName %><% } %>
-                                        <% if (ev.meta && ev.meta.rank) { %>→ <%= ev.meta.rank %> Class<% } %>
-                                        <% if (ev.meta && ev.meta.playersAssigned !== undefined) { %><%= ev.meta.playersAssigned %> players assigned<% } %>
+                                        <% if (ev.managerName) { %> · <%= ev.managerName %><% } %>
+                                        <% if (ev.meta && ev.meta.rank) { %> · → <%= ev.meta.rank %><% } %>
                                     </p>
                                 </div>
                             </div>
@@ -925,7 +985,7 @@
                                 <% if (ev.amount) { %>
                                     <p class="text-xs font-black text-slate-900"><%= Number(ev.amount).toLocaleString() %> V</p>
                                 <% } %>
-                                <p class="text-[8px] text-slate-400 font-bold uppercase"><%= new Date(ev.createdAt).toLocaleString() %></p>
+                                <p class="text-[8px] text-slate-400 font-bold uppercase"><%= ev.createdAt ? new Date(ev.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '' %></p>
                             </div>
                         </div>
                     <% }) %>

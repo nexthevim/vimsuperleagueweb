@@ -1222,7 +1222,7 @@
         <button
             type="button"
             class="vim-ai-suggestion"
-            onclick="askVimAI('What is the Player Market?')"
+            onclick="askVimAI('Recommend cheap players I can bid on')"
         >
             Player Market
         </button>
@@ -1230,7 +1230,7 @@
         <button
             type="button"
             class="vim-ai-suggestion"
-            onclick="askVimAI('How do matches work?')"
+            onclick="askVimAI('How does the auction work?')"
         >
             Matches
         </button>
@@ -1238,7 +1238,7 @@
         <button
             type="button"
             class="vim-ai-suggestion"
-            onclick="askVimAI('What are Metrics?')"
+            onclick="askVimAI('Show top bids right now')"
         >
             Metrics
         </button>
@@ -1246,7 +1246,7 @@
         <button
             type="button"
             class="vim-ai-suggestion"
-            onclick="askVimAI('How do I join VIM?')"
+            onclick="askVimAI('Explain withdraw rules')"
         >
             Join VIM
         </button>
@@ -1318,174 +1318,435 @@
 
 
     /* ---------------------------------------------------------
-       KNOWLEDGE BASE
+       KNOWLEDGE BASE + LIVE MARKET BRAIN
        --------------------------------------------------------- */
 
-    const knowledgeBase = [
+    const SYNONYMS = {
+        'budgt': 'budget', 'budjet': 'budget', 'mony': 'money', 'cash': 'budget',
+        'rosters': 'roster', 'sqaud': 'squad', 'team': 'roster',
+        'out bided': 'outbid', 'outbidded': 'outbid', 'outbiden': 'outbid',
+        'widraw': 'withdraw', 'withraw': 'withdraw', 'widthdraw': 'withdraw',
+        'bidd': 'bid', 'biding': 'bidding', 'auciton': 'auction', 'aution': 'auction',
+        'recomend': 'recommend', 'reccomend': 'recommend', 'suggst': 'suggest',
+        'forwards': 'fwd', 'strikers': 'fwd', 'strikers': 'fwd', 'attackers': 'fwd',
+        'midfielders': 'mid', 'mids': 'mid', 'defenders': 'def', 'cbs': 'def',
+        'goalkeepers': 'gk', 'keepers': 'gk', 'glk': 'gk',
+        'superstar': 'ss', 's class': 's', 'a class': 'a',
+        'eligable': 'eligible', 'ilegal': 'illegal', 'cant': "can't",
+        'watlist': 'watchlist', 'wathclist': 'watchlist',
+        'cheep': 'cheap', 'cheapest': 'cheap', 'bargain': 'cheap',
+        'expensive': 'top', 'best': 'recommend', 'who should': 'recommend',
+        'what should': 'recommend', 'who do i': 'recommend', 'pick': 'recommend',
+        'target': 'recommend', 'go for': 'recommend', 'sign': 'recommend'
+    };
 
-        {
-            keywords: ['market', 'player market', 'player card', 'players', 'buy player', 'scout'],
-            response: `The <strong>Player Market</strong> is where registered VIM players can be viewed, scouted and evaluated. Player cards contain information such as position, stats, experience and market-related details.<br><br><a href="/market">Open Player Market →</a>`
-        },
-
-        {
-            keywords: ['match', 'matches', 'fixture', 'fixtures', 'game', 'games', 'schedule'],
-            response: `The <strong>Matches</strong> section is your fixture hub. You can check upcoming fixtures, completed matches and open individual match reports.<br><br><a href="/matches">Open Matches →</a>`
-        },
-
-        {
-            keywords: ['metric', 'metrics', 'stats', 'statistics', 'stat'],
-            response: `<strong>Metrics</strong> is the league performance area. It's designed for tracking player performance and league-wide statistics.<br><br><a href="/metrics">Open Metrics →</a>`
-        },
-
-        {
-            keywords: ['record', 'records', 'history', 'historic', 'achievement'],
-            response: `<strong>League Records</strong> is where VIM's historical achievements and notable records can be explored.<br><br><a href="/league-records">Open Records →</a>`
-        },
-
-        {
-            keywords: ['info', 'information', 'rules', 'league', 'how does vim work', 'what is vim'],
-            response: `<strong>VIM Super League</strong> is the main league hub. This website brings together the player market, fixtures, statistics, records, league information and community links in one place.<br><br><a href="/info">Open League Info →</a>`
-        },
-
-        {
-            keywords: ['join', 'register', 'registration', 'free agent', 'become player', 'play'],
-            response: `Want to get involved? Start by checking the league information and joining the VIM community. Player registration and recruitment happen around the league's player ecosystem.<br><br><a href="/info">League Information →</a>`
-        },
-
-        {
-            keywords: ['discord', 'community', 'server'],
-            response: `The VIM Discord is the community hub where players, teams and league members can connect.<br><br><a href="https://discord.gg/9Jz2d5PkwB" target="_blank">Join the Discord →</a>`
-        },
-
-        {
-            keywords: ['handbook', 'rulebook', 'rules book'],
-            response: `The official VIM Handbook contains the league's rules and regulations.<br><br><a href="https://vimsuperleague-rulebook.base44.app/" target="_blank">Open Official Handbook →</a>`
-        },
-
-        {
-            keywords: ['home', 'homepage', 'main page'],
-            response: `You're already on the VIM home base 😭. The homepage gives you quick access to fixtures, broadcasts, recent results, league stories and the main navigation.`
-        },
-
-        {
-            keywords: ['admin', 'administrator', 'dashboard'],
-            response: `The <strong>Admin</strong> area is for authorised league management and administrative tools. If you're not a league administrator, you probably won't need to use it.`
-        },
-
-        {
-            keywords: ['goal', 'goals', 'scoring'],
-            response: `Goals are one of the core player performance statistics tracked across VIM. For the current player numbers, check the <strong>Metrics</strong> section or individual player information.<br><br><a href="/metrics">Open Metrics →</a>`
-        },
-
-        {
-            keywords: ['assist', 'assists'],
-            response: `Assists are tracked as part of player performance statistics. The Metrics section is the place to inspect league-wide performance data.<br><br><a href="/metrics">Open Metrics →</a>`
-        },
-
-        {
-            keywords: ['save', 'saves', 'goalkeeper', 'keeper', 'gk'],
-            response: `Saves are tracked as a player statistic, particularly useful for evaluating goalkeepers. Check the Metrics section for league performance data.<br><br><a href="/metrics">Open Metrics →</a>`
-        },
-
-        {
-            keywords: ['mvp', 'most valuable', 'valuable player'],
-            response: `MVPs are tracked as a player achievement/performance statistic. You can use Metrics to explore player performance data.`
-        },
-
-        {
-            keywords: ['position', 'positions', 'fwd', 'mid', 'def', 'forward', 'defender', 'midfielder'],
-            response: `Player positions describe their role on the pitch. VIM player cards can contain position information alongside their other player details. Check the <strong>Player Market</strong> to scout the available cards.<br><br><a href="/market">Open Player Market →</a>`
-        },
-
-        {
-            keywords: ['profile', 'account', 'login', 'sign in'],
-            response: `Your player/account area is available through the profile button in the navbar. If you're signed in, you'll see your account badge there.`
-        },
-
-        {
-            keywords: ['hello', 'hi', 'hey', 'yo', 'sup', 'wassup', 'wsp'],
-            response: `Yooo 😭 What's good? I'm the VIM Assistant. Ask me about the Market, Matches, Metrics, Records, rules or how the league works.`
-        },
-
-        {
-            keywords: ['who are you', 'what are you', 'ai', 'assistant'],
-            response: `I'm the <strong>VIM Assistant</strong> ✦. Right now I'm a local knowledge assistant built directly into the VIM website. I'm not connected to a real AI model yet — that's the next evolution 👀.`
-        },
-
-        {
-            keywords: ['help', 'what can you do', 'commands'],
-            response: `I can currently explain the main VIM sections, including:<br><br>• Player Market<br>• Matches & fixtures<br>• Metrics & stats<br>• League Records<br>• League information<br>• Community & Handbook<br>• Player registration basics<br><br>Try asking me something naturally!`
-        }
-
-    ];
-
-
-    /* ---------------------------------------------------------
-       RESPONSE ENGINE
-       --------------------------------------------------------- */
-
-    function generateResponse(question) {
-
-        const normalized = question
+    function normalizeQuestion(q) {
+        let n = String(q || '')
             .toLowerCase()
-            .replace(/[?!.,]/g, ' ')
+            .replace(/[?!.,;:'"]+/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
+        Object.keys(SYNONYMS).forEach(bad => {
+            if (n.includes(bad)) n = n.replace(new RegExp(bad, 'g'), SYNONYMS[bad]);
+        });
+        return n;
+    }
 
-        if (!normalized) {
-            return `Ask me something about VIM 👀`;
+    function fuzzyIncludes(hay, needle) {
+        if (!needle) return false;
+        if (hay.includes(needle)) return true;
+        // allow missing 1 char for short words / typo tolerance
+        if (needle.length >= 4) {
+            const parts = needle.split(' ');
+            return parts.every(p => p.length < 3 || hay.includes(p) || hay.split(' ').some(h => {
+                if (Math.abs(h.length - p.length) > 2) return false;
+                let miss = 0;
+                for (let i = 0, j = 0; i < h.length && j < p.length; ) {
+                    if (h[i] === p[j]) { i++; j++; }
+                    else { miss++; i++; if (miss > 1) return false; }
+                }
+                return miss <= 1;
+            }));
         }
+        return false;
+    }
 
+    const knowledgeBase = [
+        {
+            keywords: ['market', 'player market', 'scout', 'player card', 'cards', 'browse players'],
+            response: `The <strong>Player Market</strong> is where every verified free agent lives. Open a card to see class (SS/S/A/B/C), position, stats, highest bid, and (if you're a manager) place bids.<br><br><a href="/market">Open Player Market →</a>`
+        },
+        {
+            keywords: ['auction', 'bidding', 'how auction works', 'how does auction', 'franchise auction'],
+            response: `<strong>Auction basics</strong><br>
+            • Only assigned <strong>team managers</strong> can bid while the auction is <strong>LIVE</strong>.<br>
+            • Bids lock budget. You only pay at the end if you still hold the highest bid.<br>
+            • Class caps tighten if you take 2 SS (S/A limits drop).<br>
+            • Your manager account already occupies 1 roster slot + their class.<br>
+            • You must still be able to reach the <strong>minimum roster</strong> after any bid.<br>
+            • Outbid money stays locked until you raise, they withdraw, or admin force-drops.<br><br>
+            Ask me things like “who should I buy”, “cheap SS mid”, “my budget”, “why can't I bid”.`
+        },
+        {
+            keywords: ['withdraw', 'withdrawal', 'take back bid', 'cancel bid', 'remove bid'],
+            response: `<strong>Withdraw rules</strong><br>
+            • You <em>can</em> withdraw only if <strong>nobody bid after you</strong> on that player.<br>
+            • If someone outbid you, your amount stays <strong>locked</strong> (you can't withdraw it).<br>
+            • Raise to a new highest amount to replace your old bid on that player.<br>
+            • Locked money frees if the higher bidder withdraws or admin force-drops.`
+        },
+        {
+            keywords: ['reserve', 'reserve price', 'minimum bid', 'starting price', 'increment', 'bid step'],
+            response: `<strong>Reserves & increments</strong><br>
+            Typical class reserves: SS higher, then S, A, B, C lowest.<br>
+            Bids must clear the current high (or reserve) and land on valid increment steps (tiers like 100 / 250 / 500 depending on price). The bid box on a player card shows the next legal amount.`
+        },
+        {
+            keywords: ['class', 'rank', 'ss', 's class', 'rating', 'tier'],
+            response: `Player <strong>class/rank</strong> is SS, S, A, B, or C. Caps depend on how many SS you already hold (including if your manager is SS). Taking a 2nd SS tightens S and A limits. Caps are enforced live on every bid.`
+        },
+        {
+            keywords: ['roster', 'minimum roster', 'max roster', 'squad size', 'squad'],
+            response: `Roster size is set by admin (min and max). Your manager counts as one slot from the start. The site blocks bids that would make it impossible to still hit the minimum with remaining budget (assuming cheapest C fills).`
+        },
+        {
+            keywords: ['match', 'matches', 'fixture', 'fixtures', 'schedule', 'game'],
+            response: `The <strong>Matches</strong> hub covers fixtures, live scores, and reports.<br><br><a href="/matches">Open Matches →</a>`
+        },
+        {
+            keywords: ['metric', 'metrics', 'stats', 'statistics', 'leaderboard'],
+            response: `<strong>Metrics</strong> tracks league performance and leaderboards.<br><br><a href="/metrics">Open Metrics →</a>`
+        },
+        {
+            keywords: ['record', 'records', 'history', 'achievement'],
+            response: `<strong>League Records</strong> holds historic awards and milestones.<br><br><a href="/league-records">Open Records →</a>`
+        },
+        {
+            keywords: ['info', 'information', 'rules', 'handbook', 'what is vim', 'how does vim'],
+            response: `<strong>VIM Super League</strong> — market, fixtures, stats, records, and community in one place.<br><br><a href="/info">League Info →</a>`
+        },
+        {
+            keywords: ['join', 'register', 'registration', 'free agent', 'sign up', 'become a player'],
+            response: `Register from the Market when the auction is <strong>not live/paused</strong>. Registration closes during a live (or paused) auction and reopens after it ends.<br><br><a href="/market">Go to Market →</a>`
+        },
+        {
+            keywords: ['discord', 'community', 'server'],
+            response: `VIM Discord is the community hub for players and managers. Use the Discord button in the top navbar to join.`
+        },
+        {
+            keywords: ['profile', 'my account', 'password', 'settings'],
+            response: `Your profile is in the navbar account area — stats, theme, and (for managers) auction dashboard bits.`
+        },
+        {
+            keywords: ['hello', 'hi', 'hey', 'yo', 'sup', 'wassup', 'wsp', 'hola'],
+            response: `Yooo 👋 I'm the <strong>VIM Assistant</strong>. I can talk Market, Auction strategy, specific players, budget, eligibility, matches, and league stuff — even if you type it messy. Try: “cheap A mid I can afford” or “who's going expensive”.`
+        },
+        {
+            keywords: ['who are you', 'what are you', 'assistant'],
+            response: `I'm the <strong>VIM Assistant</strong> built into the site. I read live market + manager context (if you're a manager) and explain auction rules, players, and recommendations.`
+        },
+        {
+            keywords: ['help', 'what can you do', 'commands', 'how to use'],
+            response: `Ask me anything like:<br>
+            • “recommend a GK under 8k”<br>
+            • “my budget / roster / outbids”<br>
+            • “tell me about [player name]”<br>
+            • “who's the top bid right now”<br>
+            • “how withdraw works”<br>
+            • Market, Matches, Metrics, Records, join/register`
+        }
+    ];
+
+    let cachedSnapshot = null;
+    let cachedSnapshotAt = 0;
+
+    async function fetchMarketSnapshot(force) {
+        const stale = !cachedSnapshot || (Date.now() - cachedSnapshotAt) > 20000;
+        if (!force && !stale) return cachedSnapshot;
+        try {
+            const res = await fetch('/api/market/snapshot');
+            const data = await res.json();
+            if (data && data.success) {
+                cachedSnapshot = data;
+                cachedSnapshotAt = Date.now();
+                return data;
+            }
+        } catch (e) {
+            console.error('snapshot fetch failed', e);
+        }
+        return cachedSnapshot;
+    }
+
+    function scoreNameMatch(query, name) {
+        const q = query.toLowerCase();
+        const n = String(name || '').toLowerCase();
+        if (!n) return 0;
+        if (q.includes(n)) return 100 + n.length;
+        // token overlap
+        const qTokens = q.split(' ').filter(Boolean);
+        const nTokens = n.split(' ').filter(Boolean);
+        let score = 0;
+        nTokens.forEach(nt => {
+            if (qTokens.some(qt => qt === nt || (nt.length > 3 && qt.includes(nt)) || (qt.length > 3 && nt.includes(qt)))) {
+                score += nt.length * 2;
+            }
+        });
+        return score;
+    }
+
+    function findPlayersInQuestion(question, players) {
+        if (!players || !players.length) return [];
+        const scored = players.map(p => ({ p, s: scoreNameMatch(question, p.name) }))
+            .filter(x => x.s >= 6)
+            .sort((a, b) => b.s - a.s);
+        // de-dupe
+        const seen = new Set();
+        const out = [];
+        for (const x of scored) {
+            if (seen.has(x.p.id)) continue;
+            seen.add(x.p.id);
+            out.push(x.p);
+            if (out.length >= 5) break;
+        }
+        return out;
+    }
+
+    function detectPos(n) {
+        if (/\b(fwd|forward|striker|attacker|st)\b/.test(n)) return 'FWD';
+        if (/\b(mid|midfielder|cm|cam|cdm)\b/.test(n)) return 'MID';
+        if (/\b(def|defender|cb|lb|rb|centre back|center back)\b/.test(n)) return 'DEF';
+        if (/\b(gk|goalkeeper|keeper|glk)\b/.test(n)) return 'GK';
+        return null;
+    }
+
+    function detectClass(n) {
+        if (/\b(ss|super\s*star)\b/.test(n)) return 'SS';
+        if (/\b\bs\b class\b|\bs-class\b|\brank s\b|\bclass s\b/.test(n) || n.includes(' s class')) return 'S';
+        if (/\ba class\b|\ba-class\b|\brank a\b|\bclass a\b/.test(n)) return 'A';
+        if (/\bb class\b|\brank b\b/.test(n)) return 'B';
+        if (/\bc class\b|\brank c\b/.test(n)) return 'C';
+        // lone tokens carefully
+        if (n.split(' ').includes('ss')) return 'SS';
+        return null;
+    }
+
+    function detectBudgetCap(n) {
+        const m = n.match(/(?:under|below|max|less than|upto|up to|<)\s*(\d[\d,]*)/);
+        if (m) return Number(String(m[1]).replace(/,/g, ''));
+        const m2 = n.match(/(\d[\d,]*)\s*(?:or less|max|budget)/);
+        if (m2) return Number(String(m2[1]).replace(/,/g, ''));
+        return null;
+    }
+
+    function fmt(n) {
+        return Number(n || 0).toLocaleString();
+    }
+
+    function describePlayer(p) {
+        const bid = p.highestBid || p.currentBid || p.reservePrice || 0;
+        const holder = p.highestBidder ? ` (held by ${p.highestBidder})` : '';
+        return `<strong>${p.name}</strong> · ${p.position || 'PRO'} · ${p.class || p.rank || '?'} · ${fmt(bid)} V${holder}`;
+    }
+
+    function generateResponse(question) {
+        const normalized = normalizeQuestion(question);
+        if (!normalized) return `Ask me something about VIM 👀`;
 
         let bestMatch = null;
         let bestScore = 0;
-
         knowledgeBase.forEach(item => {
-
             let score = 0;
-
             item.keywords.forEach(keyword => {
-
-                if (normalized.includes(keyword)) {
-
-                    score += keyword.length >= 8 ? 3 : 2;
-
+                if (fuzzyIncludes(normalized, keyword)) {
+                    score += keyword.length >= 8 ? 4 : 2;
                 }
-
             });
-
             if (score > bestScore) {
                 bestScore = score;
                 bestMatch = item;
             }
-
         });
-
-
-        if (bestMatch && bestScore > 0) {
-            return bestMatch.response;
-        }
-
-
-        /* Basic navigation detection */
+        if (bestMatch && bestScore > 0) return bestMatch.response;
 
         if (normalized.includes('where') && normalized.includes('market')) {
-            return `The Player Market is in the main navigation at the top of the site.<br><br><a href="/market">Go to Market →</a>`;
+            return `Player Market is in the top nav.<br><br><a href="/market">Go to Market →</a>`;
+        }
+        if (normalized.includes('where') && (normalized.includes('match') || normalized.includes('fixture'))) {
+            return `Matches are in the top nav.<br><br><a href="/matches">Go to Matches →</a>`;
         }
 
-        if (normalized.includes('where') && normalized.includes('match')) {
-            return `Matches are available from the main navigation.<br><br><a href="/matches">Go to Matches →</a>`;
-        }
-
-
-        /* Unknown question fallback */
-
-        return `Hmm, I don't have that one in my VIM knowledge base yet 😭.<br><br>
-        Try asking about the <strong>Player Market</strong>, <strong>Matches</strong>, <strong>Metrics</strong>, <strong>League Records</strong>, the <strong>Handbook</strong>, or how to <strong>join VIM</strong>.`;
+        return `I can dig into live market data for that — try naming a player, a position (FWD/MID/DEF/GK), a class (SS/S/A), or ask “recommend cheap mid”, “top bids”, “my budget”.`;
     }
 
+    function generateMarketResponse(question, snap, mgrCtx) {
+        const n = normalizeQuestion(question);
+        const players = (snap && snap.players) || [];
+        const named = findPlayersInQuestion(question, players);
 
+        if (named.length) {
+            const lines = named.map(p => {
+                const status = p.auctionStatus === 'sold'
+                    ? `SOLD to ${p.soldToTeam || 'a team'} for ${fmt(p.highestBid)}`
+                    : (p.highestBid > 0
+                        ? `Live bid ${fmt(p.highestBid)} V by ${p.highestBidder || '—'}`
+                        : `No bids yet · reserve around ${fmt(p.reservePrice)} V`);
+                return `• ${describePlayer(p)}<br>&nbsp;&nbsp;${status} · G${p.goals}/A${p.assists}/S${p.saves}/MVP${p.mvps}`;
+            }).join('<br>');
+            return `Here's what I've got:<br>${lines}<br><br><a href="/market">Open Market to bid →</a>`;
+        }
+
+        if (/\b(top bid|highest bid|most expensive|leaderboard|who's high|who is high)\b/.test(n)) {
+            const top = (snap.topBids || []).slice(0, 8);
+            if (!top.length) return `No live bids recorded yet. Auction status: <strong>${snap.auctionStatus}</strong>.`;
+            return `Top live bids right now:<br>` + top.map((p, i) => `${i + 1}. ${describePlayer(p)}`).join('<br>');
+        }
+
+        const wantRec = /\b(recommend|suggest|who should|what should|target|go for|best|steal|value|cheap|bargain|need a|looking for|find me|give me)\b/.test(n);
+        const pos = detectPos(n);
+        const cls = detectClass(n);
+        let budgetCap = detectBudgetCap(n);
+        if (mgrCtx && mgrCtx.team && budgetCap == null && wantRec) {
+            budgetCap = Number(mgrCtx.team.availableBudget) || null;
+        }
+
+        if (wantRec || pos || cls) {
+            let pool = players.filter(p => p.auctionStatus !== 'sold');
+            if (mgrCtx && mgrCtx.eligiblePlayers && mgrCtx.eligiblePlayers.length) {
+                const eligIds = new Set(mgrCtx.eligiblePlayers.map(p => p.id));
+                // Prefer eligible when manager
+                const elig = pool.filter(p => eligIds.has(p.id));
+                if (elig.length) pool = elig;
+            }
+            if (pos) pool = pool.filter(p => String(p.position || '').toUpperCase() === pos);
+            if (cls) pool = pool.filter(p => String(p.rank || p.class || '').toUpperCase() === cls);
+            if (budgetCap != null) {
+                pool = pool.filter(p => {
+                    const price = p.highestBid > 0 ? p.highestBid : (p.reservePrice || 0);
+                    // must be able to at least meet next bid-ish
+                    return price <= budgetCap;
+                });
+            }
+
+            // Rank: prefer lower price for "cheap", higher stats for "best"
+            const wantCheap = /\b(cheap|bargain|value|steal|budget)\b/.test(n);
+            pool = [...pool].sort((a, b) => {
+                const pa = a.highestBid > 0 ? a.highestBid : (a.reservePrice || 0);
+                const pb = b.highestBid > 0 ? b.highestBid : (b.reservePrice || 0);
+                if (wantCheap) return pa - pb;
+                const sa = (a.goals || 0) * 3 + (a.assists || 0) * 2 + (a.mvps || 0) * 4 + (a.saves || 0);
+                const sb = (b.goals || 0) * 3 + (b.assists || 0) * 2 + (b.mvps || 0) * 4 + (b.saves || 0);
+                if (sb !== sa) return sb - sa;
+                return pa - pb;
+            });
+
+            if (!pool.length) {
+                return `Couldn't find matches${pos ? ' at ' + pos : ''}${cls ? ' class ' + cls : ''}${budgetCap != null ? ' under ' + fmt(budgetCap) + ' V' : ''}. Try relaxing class/budget, or open the <a href="/market">Market</a>.`;
+            }
+
+            const lines = pool.slice(0, 8).map((p, i) => `${i + 1}. ${describePlayer(p)}`).join('<br>');
+            const tip = mgrCtx && mgrCtx.team
+                ? `<br><br>Your free budget ~ <strong>${fmt(mgrCtx.team.availableBudget)} V</strong> · roster ${mgrCtx.team.totalPlayers}/${mgrCtx.team.rosterMax} · slots SS/S/A left ${mgrCtx.team.remainingSlots.SS}/${mgrCtx.team.remainingSlots.S}/${mgrCtx.team.remainingSlots.A}.`
+                : '';
+            return `Targets${pos ? ' · ' + pos : ''}${cls ? ' · ' + cls : ''}${budgetCap != null ? ' · ≤ ' + fmt(budgetCap) + ' V' : ''}:<br>${lines}${tip}<br><br><a href="/market">Open Market →</a>`;
+        }
+
+        if (/\b(auction status|is auction|auction live|paused)\b/.test(n) && snap) {
+            return `Auction status: <strong>${String(snap.auctionStatus).toUpperCase()}</strong>. Roster window ${snap.rosterMin}–${snap.rosterMax}. ${snap.playerCount} verified market players loaded.`;
+        }
+
+        return null;
+    }
+
+    const MANAGER_INTENT_KEYWORDS = [
+        'afford', 'can i bid', 'can i legally', "why can't i bid", 'why cant i bid',
+        'eligible', 'legal bid', 'how much can i', 'my budget', 'my roster',
+        'my watchlist', 'outbid', 'i am winning', "i'm winning", 'low-bid', 'low bid',
+        'what positions should i', 'affect my roster', 'eligible players',
+        'remaining slots', 'class limit', 'class limits', 'ss limit', 's limit', 'a limit',
+        'roster slots', 'recommend', 'suggest', 'who should', 'what should', 'target',
+        'go for', 'cheap', 'bargain', 'need a', 'looking for', 'withdraw', 'locked',
+        'committed', 'available', 'winning', 'watchlist', 'budget', 'roster', 'cap',
+        'ss', 'bid on', 'sign', 'fwd', 'mid', 'def', 'gk', 'keeper'
+    ];
+
+    function isManagerQuestion(normalized) {
+        if (!window.VIM_IS_MANAGER) return false;
+        return MANAGER_INTENT_KEYWORDS.some(k => fuzzyIncludes(normalized, k));
+    }
+
+    let cachedManagerContext = null;
+    let cachedManagerContextAt = 0;
+
+    async function fetchManagerContext(force) {
+        const isStale = !cachedManagerContext || (Date.now() - cachedManagerContextAt) > 15000;
+        if (!force && !isStale) return cachedManagerContext;
+        try {
+            const res = await fetch('/api/manager/context');
+            const data = await res.json();
+            if (data && data.success && data.isManager) {
+                cachedManagerContext = data;
+                cachedManagerContextAt = Date.now();
+                return data;
+            }
+        } catch (e) {
+            console.error('Manager context fetch failed', e);
+        }
+        return null;
+    }
+
+    function generateManagerResponse(question, ctx, snap) {
+        const normalized = normalizeQuestion(question);
+        const team = ctx.team;
+
+        // Prefer live recommendations using eligible + snapshot
+        const marketAns = generateMarketResponse(question, snap || { players: ctx.eligiblePlayers.map(p => ({
+            ...p, rank: p.class, reservePrice: p.reservePrice || p.currentBid, auctionStatus: 'available'
+        })), topBids: [], auctionStatus: ctx.auctionStatus }, ctx);
+        if (marketAns && (/\b(recommend|suggest|who should|cheap|target|go for|need|looking|find|best|eligible|fwd|mid|def|gk)\b/.test(normalized) || findPlayersInQuestion(question, (snap && snap.players) || ctx.eligiblePlayers).length)) {
+            return marketAns;
+        }
+
+        if (normalized.includes('afford') || normalized.includes('how much can i') || normalized.includes('legal bid') || normalized.includes('available')) {
+            return `You have <strong>${fmt(team.availableBudget)} Vollars</strong> free right now (${fmt(team.budget)} total · ${fmt(team.committed)} locked in active bids · ${fmt(team.spent)} spent).
+                <br><br>Your max on one player is also limited by class caps and still being able to reach the <strong>${team.rosterMin}</strong>-player minimum afterward. Use the player's bid box for the exact legal minimum.`;
+        }
+
+        if (normalized.includes("why can't i bid") || normalized.includes('why cant i bid') || normalized.includes('ineligible') || normalized.includes('blocked')) {
+            return `Bids fail when: under increment/reserve, over a class cap (${team.caps.SS} SS / ${team.caps.S} S / ${team.caps.A} A), over ${team.rosterMax} roster, not enough left to still hit min ${team.rosterMin}, auction not live, or the player is a manager/sold.
+                <br><br>Slots left — SS ${team.remainingSlots.SS}, S ${team.remainingSlots.S}, A ${team.remainingSlots.A}, total ${team.remainingSlots.total}.`;
+        }
+
+        if (normalized.includes('my roster') || normalized.includes('remaining slots') || normalized.includes('roster slots') || normalized.includes('class limit') || normalized.includes('cap')) {
+            return `Roster <strong>${team.totalPlayers}/${team.rosterMax}</strong> (min ${team.rosterMin}).
+                <br>Counts — SS ${team.counts.SS}/${team.caps.SS}, S ${team.counts.S}/${team.caps.S}, A ${team.counts.A}/${team.caps.A}, B ${team.counts.B}, C ${team.counts.C}.
+                <br>Remember: manager already occupies a slot + their class.`;
+        }
+
+        if (normalized.includes('outbid')) {
+            if (!ctx.outbid.length) return `You're not sitting outbid on anyone right now 🎉`;
+            return `Outbid on ${ctx.outbid.length}:<br>` + ctx.outbid.map(p => `• <strong>${p.name}</strong> (${p.class}) — ${fmt(p.currentBid)} by ${p.currentBidder}`).join('<br>');
+        }
+
+        if (normalized.includes('watchlist') || normalized.includes('watching') || normalized.includes("i'm winning") || normalized.includes('i am winning') || normalized.includes('winning')) {
+            if (normalized.includes('winning')) {
+                const w = (ctx.winning || []).filter(x => true);
+                if (!w.length) return `You're not currently the highest bidder on anyone.`;
+                return `Currently winning:<br>` + w.map(p => `• <strong>${p.name}</strong> (${p.class}) — ${fmt(p.amount)} V`).join('<br>');
+            }
+            if (!ctx.watchlist.length) return `Watchlist empty — star players on the Market to track them.`;
+            return `Watchlist (${ctx.watchlist.length}):<br>` + ctx.watchlist.map(p => `• <strong>${p.name}</strong> — ${fmt(p.currentBid)} V${p.isWinning ? ' · you lead' : ''}`).join('<br>');
+        }
+
+        if (normalized.includes('withdraw') || normalized.includes('locked')) {
+            return `If someone bid after you, that bid is locked — you can't withdraw it. Raise to retake the lead (replaces your amount), wait for them to withdraw, or ask admin to force-drop. Free budget is total − locked − spent.`;
+        }
+
+        return `Snapshot for <strong>${team.name}</strong>: ${fmt(team.availableBudget)} V free · roster ${team.totalPlayers}/${team.rosterMax} · SS/S/A left ${team.remainingSlots.SS}/${team.remainingSlots.S}/${team.remainingSlots.A} · ${ctx.eligibleCount} eligible players.
+            <br>Ask “recommend cheap MID”, “top bids”, a player name, or “why can't I bid”.`;
+    }
+
+    /* ---------------------------------------------------------
+       ADD MESSAGE
     /* ---------------------------------------------------------
        ADD MESSAGE
        --------------------------------------------------------- */
@@ -1669,37 +1930,35 @@
 
         showTyping();
 
-        const normalized = cleanQuestion.toLowerCase();
+        const normalized = normalizeQuestion(cleanQuestion);
 
-        // Manager-only questions get answered from the manager's own live
-        // auction context. Everyone else (and every other question) keeps
-        // using the original local knowledge base untouched.
-        if (isManagerQuestion(normalized)) {
-
-            const ctx = await fetchManagerContext(false);
-
-            removeTyping();
-
-            if (ctx) {
-                addMessage(generateManagerResponse(cleanQuestion, ctx), 'bot');
-            } else {
-                addMessage(generateResponse(cleanQuestion), 'bot');
+        try {
+            const snap = await fetchMarketSnapshot(false);
+            let ctx = null;
+            if (window.VIM_IS_MANAGER) {
+                ctx = await fetchManagerContext(false);
             }
 
-            return;
-        }
-
-        const delay = 500 + Math.random() * 650;
-
-        setTimeout(() => {
-
             removeTyping();
 
-            const response = generateResponse(cleanQuestion);
+            // Manager brain first when it looks auction/strategy related
+            if (ctx && isManagerQuestion(normalized)) {
+                addMessage(generateManagerResponse(cleanQuestion, ctx, snap), 'bot');
+                return;
+            }
 
-            addMessage(response, 'bot');
+            // Live market / player lookup for everyone
+            const marketAns = generateMarketResponse(cleanQuestion, snap, ctx);
+            if (marketAns) {
+                addMessage(marketAns, 'bot');
+                return;
+            }
 
-        }, delay);
+            addMessage(generateResponse(cleanQuestion), 'bot');
+        } catch (err) {
+            removeTyping();
+            addMessage(generateResponse(cleanQuestion), 'bot');
+        }
 
     };
 

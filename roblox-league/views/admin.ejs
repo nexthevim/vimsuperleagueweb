@@ -1,98 +1,60 @@
 <%- include('partials/navbar') %>
 
-<main class="py-12 px-4 md:px-8 max-w-7xl mx-auto space-y-8 bg-slate-50 text-slate-900 min-h-screen">
+<main class="admin-shell min-h-screen bg-[#f4f5f7] text-slate-900">
 
-    <!-- ========================================================= -->
-    <!-- ERROR / STATUS BANNER
-         Every admin action redirects back here with ?error=... on
-         failure, but it was never actually shown anywhere — so failed
-         saves (locked ranks, validation errors, etc.) looked like they
-         silently did nothing. This surfaces it. -->
-    <!-- ========================================================= -->
+    <div class="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-10 space-y-6">
+
+    <!-- Error banner -->
     <% if (typeof error !== 'undefined' && error) { %>
-        <div id="adminErrorBanner" class="bg-rose-50 border border-rose-200 text-rose-700 px-5 py-4 rounded-2xl flex items-start justify-between gap-4 shadow-sm">
-            <div class="flex items-start gap-3">
-                <span class="text-lg leading-none">⚠️</span>
-                <p class="text-xs font-bold leading-relaxed"><%= error %></p>
+        <div id="adminErrorBanner" class="admin-alert admin-alert-error flex items-start justify-between gap-4">
+            <div class="flex items-start gap-3 min-w-0">
+                <span class="admin-alert-icon">!</span>
+                <div class="min-w-0">
+                    <p class="text-[11px] font-semibold uppercase tracking-wide text-rose-700 mb-0.5">Action failed</p>
+                    <p class="text-sm text-rose-800/90 leading-relaxed break-words"><%= error %></p>
+                </div>
             </div>
-            <button type="button" onclick="document.getElementById('adminErrorBanner').remove()" class="text-rose-400 hover:text-rose-600 text-sm font-black flex-shrink-0">✕</button>
+            <button type="button" onclick="document.getElementById('adminErrorBanner').remove()" class="text-rose-400 hover:text-rose-700 text-lg leading-none px-1" aria-label="Dismiss">×</button>
         </div>
     <% } %>
 
-    <!-- ========================================================= -->
-    <!-- HEADER -->
-    <!-- ========================================================= -->
-    <div class="border-b border-slate-200 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <!-- Header -->
+    <header class="admin-header flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
-            <span class="text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-100 px-3 py-1 rounded-full border border-blue-200">
-                Control Center
-            </span>
-
-            <h1 class="text-3xl md:text-4xl font-black italic uppercase tracking-tighter text-slate-900 mt-2">
-                ADMIN <span class="text-blue-600">DASHBOARD</span>
-            </h1>
-
-            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">
-                League management • matches • players • teams • auctions
-            </p>
+            <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">VIM League</p>
+            <h1 class="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900 mt-1">Admin</h1>
+            <p class="text-sm text-slate-500 mt-1">Broadcast, matches, tables, players, and auction controls.</p>
         </div>
-    </div>
+        <div class="flex flex-wrap gap-2 text-[11px] text-slate-500">
+            <span class="admin-chip"><%= typeof players !== 'undefined' ? players.filter(p => p.verified).length : 0 %> verified</span>
+            <span class="admin-chip"><%= typeof auctionTeams !== 'undefined' ? auctionTeams.length : 0 %> auction teams</span>
+            <span class="admin-chip"><%= typeof matches !== 'undefined' ? matches.length : 0 %> matches</span>
+        </div>
+    </header>
 
+    <!-- Primary tabs -->
+    <nav id="adminTabs" class="admin-tabs sticky top-0 z-30 -mx-1 px-1 py-2 bg-[#f4f5f7]/backdrop-blur supports-[backdrop-filter]:bg-[#f4f5f7]/90" role="tablist">
+        <button type="button" onclick="switchTab('broadcast')" id="tab-broadcast" data-tab="broadcast" class="tab-btn is-active" role="tab">Broadcast</button>
+        <button type="button" onclick="switchTab('reports')" id="tab-reports" data-tab="reports" class="tab-btn" role="tab">Matches</button>
+        <button type="button" onclick="switchTab('tables')" id="tab-tables" data-tab="tables" class="tab-btn" role="tab">Tables & Rosters</button>
+        <button type="button" onclick="switchTab('queue')" id="tab-queue" data-tab="queue" class="tab-btn" role="tab">Verify Queue</button>
+        <button type="button" onclick="switchTab('market')" id="tab-market" data-tab="market" class="tab-btn" role="tab">Players</button>
+        <button type="button" onclick="switchTab('auction')" id="tab-auction" data-tab="auction" class="tab-btn" role="tab">Auction</button>
+    </nav>
 
-    <!-- ========================================================= -->
-    <!-- MAIN NAVIGATION -->
-    <!-- ========================================================= -->
-    <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-4" id="adminTabs">
-
-        <button
-            onclick="switchTab('broadcast')"
-            id="tab-broadcast"
-            class="tab-btn active px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-blue-600 text-white border-blue-600 shadow-md">
-            Broadcast & Schedule
-        </button>
-
-        <button
-            onclick="switchTab('reports')"
-            id="tab-reports"
-            class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-100">
-            Match Center
-        </button>
-
-        <button
-            onclick="switchTab('tables')"
-            id="tab-tables"
-            class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-100">
-            Tables & Roster
-        </button>
-
-        <button
-            onclick="switchTab('queue')"
-            id="tab-queue"
-            class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-100">
-            Verification Queue
-        </button>
-
-        <button
-            onclick="switchTab('market')"
-            id="tab-market"
-            class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-100">
-            Player Market
-        </button>
-
-        <button
-            onclick="switchTab('auction')"
-            id="tab-auction"
-            class="tab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-100">
-            Auction Control
-        </button>
-
-    </div>
 
 
     <!-- ========================================================= -->
     <!-- CATEGORY 1: BROADCAST & SCHEDULE -->
     <!-- ========================================================= -->
     <section id="section-broadcast" class="tab-section space-y-8">
+        <div class="admin-section-title">
+            <div>
+                <h2>Broadcast & schedule</h2>
+                <p>Live link, fixtures, stories, and league records.</p>
+            </div>
+        </div>
+
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
@@ -926,6 +888,13 @@
 <!-- CATEGORY 2: MATCH CENTER -->
     <!-- ========================================================= -->
     <section id="section-reports" class="tab-section hidden space-y-8">
+        <div class="admin-section-title">
+            <div>
+                <h2>Match center</h2>
+                <p>Live scores, lineups, events, and match reports.</p>
+            </div>
+        </div>
+
 
         <div class="bg-white p-6 md:p-10 rounded-3xl border border-slate-200 shadow-sm space-y-8">
 
@@ -1792,6 +1761,13 @@
     <!-- CATEGORY 3: TABLES & ROSTER -->
     <!-- ========================================================= -->
     <section id="section-tables" class="tab-section hidden space-y-8">
+        <div class="admin-section-title">
+            <div>
+                <h2>Tables & rosters</h2>
+                <p>Standings, group tables, and team squads.</p>
+            </div>
+        </div>
+
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -2138,6 +2114,13 @@
 <!-- CATEGORY 4: VERIFICATION QUEUE -->
     <!-- ========================================================= -->
     <section id="section-queue" class="tab-section hidden space-y-8">
+        <div class="admin-section-title">
+            <div>
+                <h2>Verification queue</h2>
+                <p>Approve new player applications and set class.</p>
+            </div>
+        </div>
+
 
         <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 shadow-sm">
 
@@ -2343,6 +2326,13 @@
     <!-- CATEGORY 5: PLAYER MARKET -->
     <!-- ========================================================= -->
     <section id="section-market" class="tab-section hidden space-y-8">
+        <div class="admin-section-title">
+            <div>
+                <h2>Player market</h2>
+                <p>Edit verified players, stats, ranks, and cards.</p>
+            </div>
+        </div>
+
 
         <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 shadow-sm">
 
@@ -2660,11 +2650,23 @@
     <!-- CATEGORY 6: AUCTION CONTROL -->
     <!-- ========================================================= -->
     <section id="section-auction" class="tab-section hidden space-y-8">
+        <div class="admin-section-title">
+            <div>
+                <h2>Auction control</h2>
+                <p>Session state, enrolled franchises, bids, and force tools.</p>
+            </div>
+        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="admin-subtabs" role="tablist">
+            <button type="button" class="admin-subtab is-active" data-subtab-btn-group="auction" data-subtab-btn="session" onclick="switchAdminSubtab('auction','session')">Session</button>
+            <button type="button" class="admin-subtab" data-subtab-btn-group="auction" data-subtab-btn="teams" onclick="switchAdminSubtab('auction','teams')">Teams & budgets</button>
+        </div>
+
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
 
             <!-- SESSION CONTROL -->
-            <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 lg:col-span-1 shadow-sm">
+            <div data-subtab-group="auction" data-subtab="session" class="admin-subpanel bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 lg:col-span-1 shadow-sm">
 
                 <div>
                     <span class="text-xs font-black uppercase tracking-widest text-purple-600 bg-purple-100 px-3 py-1 rounded-full border border-purple-200">
@@ -2955,7 +2957,7 @@
 
 
             <!-- TEAM SETUP -->
-            <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 lg:col-span-2 shadow-sm">
+            <div data-subtab-group="auction" data-subtab="teams" class="admin-subpanel hidden bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 lg:col-span-2 shadow-sm">
 
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-200 pb-4">
 
@@ -3313,82 +3315,206 @@
         </div>
 
     </section>
+    </div><!-- /.max-w admin content -->
+</main>
+
 <!-- SHARED ADMIN STYLES -->
-<!-- ============================================================= -->
 <style>
+    .admin-shell { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+
+    .admin-header { padding-bottom: 0.25rem; }
+
+    .admin-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        color: #64748b;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    .admin-alert {
+        border-radius: 14px;
+        padding: 0.9rem 1rem;
+        border: 1px solid transparent;
+    }
+    .admin-alert-error {
+        background: #fff1f2;
+        border-color: #fecdd3;
+    }
+    .admin-alert-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 999px;
+        background: #e11d48;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    /* Tabs */
+    .admin-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.65rem !important;
+    }
+    .tab-btn {
+        appearance: none;
+        border: 1px solid transparent;
+        background: transparent;
+        color: #64748b;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        padding: 0.55rem 0.95rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .tab-btn:hover {
+        background: #fff;
+        color: #0f172a;
+        border-color: #e5e7eb;
+    }
+    .tab-btn.is-active {
+        background: #0f172a;
+        color: #fff;
+        border-color: #0f172a;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+    }
+
+    /* Soften dense panel cards site-wide inside admin */
+    .tab-section > .grid > div,
+    .tab-section .bg-white.border.border-slate-200 {
+        border-radius: 16px !important;
+    }
+    .tab-section .shadow-sm {
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.03) !important;
+    }
+
+    /* Section intro */
+    .admin-section-title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.85rem;
+        border-bottom: 1px solid #e8eaed;
+    }
+    .admin-section-title h2 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #0f172a;
+        letter-spacing: -0.01em;
+    }
+    .admin-section-title p {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 0.2rem;
+    }
+
+    /* Sub-tabs inside a section */
+    .admin-subtabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-bottom: 1rem;
+        padding: 0.3rem;
+        background: #eef0f3;
+        border-radius: 12px;
+        width: fit-content;
+        max-width: 100%;
+    }
+    .admin-subtab {
+        border: none;
+        background: transparent;
+        color: #64748b;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.45rem 0.85rem;
+        border-radius: 9px;
+        cursor: pointer;
+    }
+    .admin-subtab.is-active {
+        background: #fff;
+        color: #0f172a;
+        box-shadow: 0 1px 2px rgba(15,23,42,0.08);
+    }
+    .admin-subpanel.hidden { display: none !important; }
 
     .admin-label {
         display: block;
-        margin-bottom: 0.3rem;
-        font-size: 10px;
+        margin-bottom: 0.35rem;
+        font-size: 11px;
         line-height: 1rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: rgb(100 116 139);
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: #64748b;
     }
 
-    .admin-input {
+    .admin-input, .player-select {
         width: 100%;
-        background: rgb(248 250 252);
-        border: 1px solid rgb(226 232 240);
-        padding: 0.75rem;
-        border-radius: 0.75rem;
-        color: rgb(15 23 42);
-        font-size: 0.75rem;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        padding: 0.7rem 0.8rem;
+        border-radius: 10px;
+        color: #0f172a;
+        font-size: 0.8125rem;
         outline: none;
-        transition: all 0.15s ease;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
-
-    .admin-input:focus {
-        border-color: rgb(59 130 246);
-        background: white;
-    }
-
-    .player-select {
-        width: 100%;
-        background: rgb(248 250 252);
-        border: 1px solid rgb(226 232 240);
-        padding: 0.75rem;
-        border-radius: 0.75rem;
-        color: rgb(15 23 42);
-        font-size: 0.75rem;
-        outline: none;
-        transition: all 0.15s ease;
-    }
-
-    .player-select:focus {
-        border-color: rgb(16 185 129);
-        background: white;
+    .admin-input:focus, .player-select:focus {
+        border-color: #94a3b8;
+        box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.25);
+        background: #fff;
     }
 
     .table-label {
         font-size: 9px;
-        color: rgb(148 163 184);
+        color: #94a3b8;
         text-transform: uppercase;
+        letter-spacing: 0.04em;
         display: block;
         margin-bottom: 2px;
+        font-weight: 600;
     }
-
     .table-input {
         width: 100%;
-        background: rgb(248 250 252);
-        border: 1px solid rgb(226 232 240);
-        border-radius: 0.25rem;
-        padding: 0.375rem;
-        color: rgb(15 23 42);
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 0.35rem;
+        color: #0f172a;
         text-align: center;
         font-size: 0.75rem;
         outline: none;
     }
-
     .table-input:focus {
-        border-color: rgb(59 130 246);
+        border-color: #94a3b8;
         background: white;
     }
 
-    /* =========================================================
-       ADMIN MODALS
-       ========================================================= */
+    /* Primary buttons inside admin: slightly quieter */
+    .tab-section button[type="submit"].bg-blue-600,
+    .tab-section button[type="submit"].bg-emerald-600,
+    .tab-section button[type="submit"].bg-red-600,
+    .tab-section button[type="submit"].bg-purple-600,
+    .tab-section button[type="submit"].bg-amber-500 {
+        border-radius: 10px !important;
+        font-weight: 650 !important;
+        letter-spacing: 0.03em;
+    }
 
     .admin-modal {
         position: fixed;
@@ -3399,80 +3525,53 @@
         justify-content: center;
         padding: 1rem;
     }
-
-    .admin-modal.hidden {
-        display: none;
-    }
-
+    .admin-modal.hidden { display: none; }
     .admin-modal-backdrop {
         position: absolute;
         inset: 0;
-        background: rgba(15, 23, 42, 0.55);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(6px);
     }
-
     .admin-modal-card {
         position: relative;
         width: 100%;
         max-height: calc(100vh - 2rem);
         overflow-y: auto;
         background: white;
-        border: 1px solid rgb(226 232 240);
-        border-radius: 1.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
         padding: 1.5rem;
-        box-shadow: 0 30px 90px rgba(15, 23, 42, 0.25);
-        animation: adminModalIn 0.22s ease-out;
+        box-shadow: 0 24px 80px rgba(15, 23, 42, 0.22);
+        animation: adminModalIn 0.2s ease-out;
     }
-
     .admin-modal-close {
         width: 34px;
         height: 34px;
-        border: 1px solid rgb(226 232 240);
-        background: rgb(248 250 252);
-        color: rgb(100 116 139);
+        border: 1px solid #e5e7eb;
+        background: #f8fafc;
+        color: #64748b;
         border-radius: 10px;
         font-size: 20px;
         line-height: 1;
-        font-weight: 900;
+        font-weight: 700;
         cursor: pointer;
-        transition: all 0.15s ease;
     }
-
     .admin-modal-close:hover {
-        background: rgb(241 245 249);
-        color: rgb(15 23 42);
-        transform: scale(1.04);
+        background: #f1f5f9;
+        color: #0f172a;
     }
-
     @keyframes adminModalIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px) scale(0.98);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-
     @media (max-width: 640px) {
-        .admin-modal {
-            padding: 0.6rem;
-            align-items: flex-end;
-        }
-
-        .admin-modal-card {
-            max-height: calc(100vh - 1.2rem);
-            border-radius: 1.25rem;
-            padding: 1.1rem;
-        }
+        .admin-modal { padding: 0.6rem; align-items: flex-end; }
+        .admin-modal-card { max-height: calc(100vh - 1.2rem); border-radius: 14px; }
+        .admin-tabs { gap: 0.25rem; }
+        .tab-btn { padding: 0.45rem 0.7rem; font-size: 0.7rem; }
     }
-
 </style>
 
-
-<!-- ============================================================= -->
 <!-- ADMIN JAVASCRIPT -->
 <!-- ============================================================= -->
 <script>
@@ -3732,9 +3831,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         formatVimLocalTimes();
         populatePlayerSelects();
-        const defaultTab = document.querySelector('.tab-section:not(.hidden)');
-        if (!defaultTab) {
-            switchTab('broadcast');
+        const hash = (location.hash || '').replace('#', '').trim();
+        const valid = ['broadcast','reports','tables','queue','market','auction'];
+        if (hash && valid.includes(hash)) {
+            switchTab(hash);
+        } else {
+            const defaultTab = document.querySelector('.tab-section:not(.hidden)');
+            if (!defaultTab) switchTab('broadcast');
         }
     });
 
@@ -3743,60 +3846,37 @@
     ============================================================ */
 
     function switchTab(tabName) {
-
-        const sections = document.querySelectorAll('.tab-section');
-
-        sections.forEach(section => {
+        document.querySelectorAll('.tab-section').forEach(section => {
             section.classList.add('hidden');
         });
-
-
-        const tabs = document.querySelectorAll('.tab-btn');
-
-        tabs.forEach(tab => {
-
-            tab.classList.remove(
-                'bg-blue-600',
-                'text-white',
-                'border-blue-600',
-                'shadow-md'
-            );
-
-            tab.classList.add(
-                'bg-white',
-                'text-slate-700',
-                'border-slate-200'
-            );
-
+        document.querySelectorAll('.tab-btn').forEach(tab => {
+            tab.classList.remove('is-active');
         });
 
+        const activeSection = document.getElementById('section-' + tabName);
+        if (activeSection) activeSection.classList.remove('hidden');
 
-        const activeSection = document.getElementById(`section-${tabName}`);
+        const activeTab = document.getElementById('tab-' + tabName);
+        if (activeTab) activeTab.classList.add('is-active');
 
-        if (activeSection) {
-            activeSection.classList.remove('hidden');
-        }
+        try {
+            if (history.replaceState) {
+                history.replaceState(null, '', '#' + tabName);
+            } else {
+                location.hash = tabName;
+            }
+        } catch (e) {}
+    }
 
-
-        const activeTab = document.getElementById(`tab-${tabName}`);
-
-        if (activeTab) {
-
-            activeTab.classList.remove(
-                'bg-white',
-                'text-slate-700',
-                'border-slate-200'
-            );
-
-            activeTab.classList.add(
-                'bg-blue-600',
-                'text-white',
-                'border-blue-600',
-                'shadow-md'
-            );
-
-        }
-
+    function switchAdminSubtab(group, name) {
+        document.querySelectorAll('[data-subtab-group="' + group + '"]').forEach(el => {
+            el.classList.add('hidden');
+        });
+        document.querySelectorAll('[data-subtab-btn-group="' + group + '"]').forEach(btn => {
+            btn.classList.toggle('is-active', btn.getAttribute('data-subtab-btn') === name);
+        });
+        const panel = document.querySelector('[data-subtab-group="' + group + '"][data-subtab="' + name + '"]');
+        if (panel) panel.classList.remove('hidden');
     }
 
 

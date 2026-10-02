@@ -203,9 +203,17 @@ const CLASS_RESERVE_PRICES = {
     C: 2500
 };
 
-const ROSTER_MAX = 16;
-const ROSTER_MIN = 10;
+const ROSTER_MAX_DEFAULT = 16;
+const ROSTER_MIN_DEFAULT = 10;
 const CHEAPEST_RESERVE = CLASS_RESERVE_PRICES.C;
+
+// Prefer the admin-configured auction session sizes; fall back to defaults.
+function getRosterLimits(auctionSettings) {
+    const a = auctionSettings || {};
+    const maxR = Math.max(1, Number(a.maxRosterSize) || ROSTER_MAX_DEFAULT);
+    const minR = Math.max(1, Math.min(maxR, Number(a.minRosterSize) || ROSTER_MIN_DEFAULT));
+    return { rosterMin: minR, rosterMax: maxR };
+}
 
 // Fixed minimum bid increments — no meaningless +1/+2 bidding.
 // Configurable in one place if the league wants different tiers later.
@@ -315,7 +323,12 @@ function getProvisionalRoster(team, playersById) {
 
 // Everything a manager needs to know about their own auction position —
 // used by the market badges, the manager dashboard, and the AI assistant.
-function computeManagerAuctionState(team, playersById) {
+// rosterLimits: { rosterMin, rosterMax } from getRosterLimits(info.auction).
+function computeManagerAuctionState(team, playersById, rosterLimits) {
+    const limits = rosterLimits || { rosterMin: ROSTER_MIN_DEFAULT, rosterMax: ROSTER_MAX_DEFAULT };
+    const rosterMin = limits.rosterMin;
+    const rosterMax = limits.rosterMax;
+
     const provisional = getProvisionalRoster(team, playersById);
 
     const counts = { SS: 0, S: 0, A: 0, B: 0, C: 0 };
@@ -347,10 +360,10 @@ function computeManagerAuctionState(team, playersById) {
             SS: Math.max(0, caps.SS - counts.SS),
             S: Math.max(0, sCap - counts.S),
             A: Math.max(0, aCap - counts.A),
-            total: Math.max(0, ROSTER_MAX - totalPlayers)
+            total: Math.max(0, rosterMax - totalPlayers)
         },
-        rosterMin: ROSTER_MIN,
-        rosterMax: ROSTER_MAX,
+        rosterMin,
+        rosterMax,
         outbidPlayerIds: (team.bids || [])
             .filter(b => {
                 const player = playersById.get(String(b.playerId));
@@ -367,25 +380,27 @@ function computeManagerAuctionState(team, playersById) {
 // The heart of the "don't let a manager spend themselves into an
 // impossible roster" requirement. Given a manager's state AFTER a
 // hypothetical bid, checks whether at least one legal way remains to
-// reach a full (10-16 player) roster under the class caps.
+// reach a full roster under the class caps + configured min/max sizes.
 function canStillLegallyCompleteRoster(stateAfterBid) {
     const { counts, caps, totalPlayers, availableBudget } = stateAfterBid;
+    const rosterMax = stateAfterBid.rosterMax || ROSTER_MAX_DEFAULT;
+    const rosterMin = stateAfterBid.rosterMin || ROSTER_MIN_DEFAULT;
 
     if (counts.SS > caps.SS) return { ok: false, reason: `Exceeds the ${caps.SS} SS-player limit for your team.` };
     if (counts.S > caps.S) return { ok: false, reason: `Exceeds the ${caps.S} S-player limit for your team.` };
     if (counts.A > caps.A) return { ok: false, reason: `Exceeds the ${caps.A} A-player limit for your team.` };
-    if (totalPlayers > ROSTER_MAX) return { ok: false, reason: `Exceeds the ${ROSTER_MAX}-player roster limit.` };
+    if (totalPlayers > rosterMax) return { ok: false, reason: `Exceeds the ${rosterMax}-player roster limit.` };
 
     // B/C fill the rest freely, so the only remaining question is whether
-    // there's enough money left to reach the 10-player minimum at all —
+    // there's enough money left to reach the configured minimum at all —
     // worst case, every remaining slot costs the cheapest reserve (C).
-    const stillNeeded = Math.max(0, ROSTER_MIN - totalPlayers);
+    const stillNeeded = Math.max(0, rosterMin - totalPlayers);
     const minCostToFinish = stillNeeded * CHEAPEST_RESERVE;
 
     if (availableBudget < minCostToFinish) {
         return {
             ok: false,
-            reason: `Would leave you unable to reach the ${ROSTER_MIN}-player minimum — you'd need at least ${minCostToFinish.toLocaleString()} Vollars free for ${stillNeeded} more player(s), but only ${Math.max(0, availableBudget).toLocaleString()} would remain.`
+            reason: `Would leave you unable to reach the ${rosterMin}-player minimum — you'd need at least ${minCostToFinish.toLocaleString()} Vollars free for ${stillNeeded} more player(s), but only ${Math.max(0, availableBudget).toLocaleString()} would remain.`
         };
     }
 
@@ -396,7 +411,7 @@ function canStillLegallyCompleteRoster(stateAfterBid) {
 // the single source of truth used by the /auction/bid route AND the
 // market "ELIGIBLE" filter / badges, so a player can never be shown as
 // biddable in the UI when the server would actually reject the bid.
-function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersById }) {
+function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersById, rosterLimits }) {
 
     if (auctionStatus !== 'live') {
         return { ok: false, reason: 'The auction is not currently live.' };
@@ -409,6 +424,8 @@ function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersByI
     if (player.auctionStatus === 'sold') {
         return { ok: false, reason: 'This player has already been sold.' };
     }
+
+    const limits = rosterLimits || { rosterMin: ROSTER_MIN_DEFAULT, rosterMax: ROSTER_MAX_DEFAULT };
 
     const reservePrice = getReservePriceForClass(getPlayerClass(player));
     const currentHigh = Number(player.highestBid) || 0;
@@ -437,7 +454,7 @@ function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersByI
         };
     }
 
-    const state = computeManagerAuctionState(team, playersById);
+    const state = computeManagerAuctionState(team, playersById, limits);
 
     const existingOwnBid = (team.bids || []).find(b => String(b.playerId) === String(player._id));
     const existingOwnAmount = existingOwnBid ? Number(existingOwnBid.amount) || 0 : 0;
@@ -475,7 +492,9 @@ function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersByI
         counts,
         caps: { SS: postCaps.SS, S: postCaps.S, A: postCaps.A },
         totalPlayers,
-        availableBudget
+        availableBudget,
+        rosterMin: limits.rosterMin,
+        rosterMax: limits.rosterMax
     });
 
     if (!legality.ok) {
@@ -544,8 +563,9 @@ app.use(async (req, res, next) => {
 
         if (isManager && myTeamDoc) {
             const playersById = new Map(players.map(p => [String(p._id), p]));
+            const rosterLimits = getRosterLimits(info.auction);
 
-            myAuctionState = computeManagerAuctionState(myTeamDoc, playersById);
+            myAuctionState = computeManagerAuctionState(myTeamDoc, playersById, rosterLimits);
 
             myOutbidPlayers = myAuctionState.outbidPlayerIds
                 .map(id => playersById.get(id))
@@ -718,20 +738,22 @@ async function buildMarketSpotlight(players, allTeams) {
         Number(p.highestBid) > 0
     );
 
+    // Top 10 by highest bid — UI shows top 3 by default, expands to 10.
     const topBids = [...biddable]
         .sort((a, b) => Number(b.highestBid) - Number(a.highestBid))
-        .slice(0, 3);
+        .slice(0, 10);
 
     const byPosition = {};
+    const byPositionTop = {};
     for (const posKey of ['FWD', 'MID', 'DEF', 'GK']) {
-        const top = biddable
+        const ranked = biddable
             .filter(p => (p.position || '').toUpperCase() === posKey)
-            .sort((a, b) => Number(b.highestBid) - Number(a.highestBid))[0];
-        if (top) byPosition[posKey] = top;
+            .sort((a, b) => Number(b.highestBid) - Number(a.highestBid));
+        if (ranked[0]) byPosition[posKey] = ranked[0];
+        byPositionTop[posKey] = ranked.slice(0, 10);
     }
 
-    // "Rising" = players with a recent flurry of bid activity (3+ bids in
-    // the last 2 hours), ranked by how many bids came in during that window.
+    // "Rising" = players with a recent flurry of bid activity in the last 2 hours.
     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
     const recentBids = await AuctionActivity.find({
         type: 'bid',
@@ -747,14 +769,14 @@ async function buildMarketSpotlight(players, allTeams) {
     const rising = [...activityCount.entries()]
         .filter(([, count]) => count >= 2)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
+        .slice(0, 10)
         .map(([playerId, count]) => {
             const player = players.find(p => String(p._id) === playerId);
             return player ? { player, bidCount: count } : null;
         })
         .filter(Boolean);
 
-    return { topBids, byPosition, rising };
+    return { topBids, byPosition, byPositionTop, rising };
 }
 
 app.get('/market', async (req, res) => {
@@ -781,6 +803,7 @@ app.get('/market', async (req, res) => {
             const auctionStatus = (info.auction && info.auction.status) || 'ready';
             const playersById = new Map(players.map(p => [String(p._id), p]));
             const myTeam = res.locals.myAuctionState.team;
+            const rosterLimits = getRosterLimits(info.auction);
 
             myEligibility = {};
             for (const p of players) {
@@ -793,7 +816,8 @@ app.get('/market', async (req, res) => {
                         ? roundUpToIncrement(p.highestBid + getMinIncrement(p.highestBid), getMinIncrement(p.highestBid))
                         : getReservePriceForClass(getPlayerClass(p)),
                     allTeams,
-                    playersById
+                    playersById,
+                    rosterLimits
                 });
                 myEligibility[String(p._id)] = verdict.ok;
             }
@@ -947,20 +971,22 @@ app.get('/admin', async (req, res) => {
     let rosterReadiness = [];
 
     try {
+        const infoForRoster = await getInfo();
+        const rosterLimits = getRosterLimits(infoForRoster.auction);
         const allTeams = await AuctionTeam.find();
         const allPlayers = await Player.find();
         const playersById = new Map(allPlayers.map(p => [String(p._id), p]));
 
         rosterReadiness = allTeams.map(team => {
-            const state = computeManagerAuctionState(team, playersById);
+            const state = computeManagerAuctionState(team, playersById, rosterLimits);
             return {
                 teamId: String(team._id),
                 teamName: team.name,
                 manager: team.manager,
                 provisionalCount: state.totalPlayers,
                 availableBudget: state.availableBudget,
-                belowMinimum: state.totalPlayers < ROSTER_MIN,
-                shortfall: Math.max(0, ROSTER_MIN - state.totalPlayers)
+                belowMinimum: state.totalPlayers < rosterLimits.rosterMin,
+                shortfall: Math.max(0, rosterLimits.rosterMin - state.totalPlayers)
             };
         });
     } catch (err) {
@@ -1179,6 +1205,7 @@ app.post('/auction/bid', async (req, res) => {
 
         const info = await getInfo();
         const auctionStatus = (info.auction && info.auction.status) || 'ready';
+        const rosterLimits = getRosterLimits(info.auction);
 
         const allTeams = await AuctionTeam.find();
         const allPlayers = await Player.find();
@@ -1190,7 +1217,8 @@ app.post('/auction/bid', async (req, res) => {
             player,
             amount,
             allTeams,
-            playersById
+            playersById,
+            rosterLimits
         });
 
         if (!verdict.ok) {
@@ -1463,12 +1491,13 @@ app.get('/api/manager/context', async (req, res) => {
 
         const info = await getInfo();
         const auctionStatus = (info.auction && info.auction.status) || 'ready';
+        const rosterLimits = getRosterLimits(info.auction);
 
         const allPlayers = await Player.find();
         const allTeams = await AuctionTeam.find();
         const playersById = new Map(allPlayers.map(p => [String(p._id), p]));
 
-        const state = computeManagerAuctionState(team, playersById);
+        const state = computeManagerAuctionState(team, playersById, rosterLimits);
 
         const eligiblePlayers = allPlayers.filter(p => {
             if (p.auctionStatus === 'sold') return false;
@@ -1480,7 +1509,8 @@ app.get('/api/manager/context', async (req, res) => {
                 player: p,
                 amount: getReservePriceForClass(getPlayerClass(p)),
                 allTeams,
-                playersById
+                playersById,
+                rosterLimits
             });
             return verdict.ok || (verdict.minNextBid && verdict.reason && verdict.reason.startsWith('Bid must be at least'));
         });
@@ -3075,7 +3105,7 @@ app.post('/admin/auction/update-session', async (req, res) => {
                 parseInt(
                     req.body.maxRosterSize,
                     10
-                ) || ROSTER_MAX
+                ) || ROSTER_MAX_DEFAULT
             );
 
         const minRosterSize =
@@ -3086,7 +3116,7 @@ app.post('/admin/auction/update-session', async (req, res) => {
                     parseInt(
                         req.body.minRosterSize,
                         10
-                    ) || ROSTER_MIN
+                    ) || ROSTER_MIN_DEFAULT
                 )
             );
 
@@ -3175,6 +3205,56 @@ app.post('/admin/auction/reset', async (req, res) => {
     } catch (err) {
         console.error("Reset Auction Session Error:", err);
         res.redirect('/admin?error=ResetAuctionSessionFailed');
+    }
+});
+
+// RESET TOP BIDS / AUCTION LEADERBOARD
+// Clears live bid amounts on every still-available player and empties every
+// team's active bid list so Market Spotlight (top bids / rising) starts fresh.
+// Does NOT touch sold players, spent budgets, or final rosters.
+app.post('/admin/auction/reset-bids', async (req, res) => {
+
+    if (!requireAdmin(req, res)) return;
+
+    try {
+
+        const allTeams = await AuctionTeam.find();
+        const players = await Player.find({
+            verified: true,
+            auctionStatus: { $ne: 'sold' }
+        });
+
+        let clearedPlayers = 0;
+        for (const player of players) {
+            if (isManagerAccount(player, allTeams)) continue;
+            if (Number(player.highestBid) > 0 || player.highestBidder) {
+                player.highestBid = 0;
+                player.highestBidder = '';
+                await player.save();
+                clearedPlayers++;
+            }
+        }
+
+        for (const team of allTeams) {
+            if ((team.bids || []).length > 0) {
+                team.bids = [];
+                await team.save();
+            }
+        }
+
+        // Clear recent bid activity so "Rising" board also empties.
+        await AuctionActivity.deleteMany({ type: 'bid' });
+
+        await AuctionActivity.create({
+            type: 'auction_start',
+            meta: { resetBids: true, playersCleared: clearedPlayers }
+        });
+
+        res.redirect('/admin');
+
+    } catch (err) {
+        console.error('Reset Top Bids Error:', err);
+        res.redirect('/admin?error=ResetTopBidsFailed');
     }
 });
 
@@ -3468,7 +3548,7 @@ app.post('/admin/auction/finalize-roster', async (req, res) => {
                 Number(
                     info.auction &&
                     info.auction.maxRosterSize
-                ) || ROSTER_MAX
+                ) || ROSTER_MAX_DEFAULT
             );
 
         // The checkboxes on the roster-selection form are named

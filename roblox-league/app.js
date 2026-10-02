@@ -259,6 +259,18 @@ function getEffectiveSCap(team, counts) {
     return caps.S;
 }
 
+// Per the official VSL rules post: A cap is 5, but bumps to 6 when the
+// team has NO SS players — the same "no SS" condition that bumps S to 4,
+// not a separate "no S" condition. Doesn't apply to 2-SS exception teams,
+// whose A cap is fixed at 3.
+function getEffectiveACap(team, counts) {
+    const caps = getClassCaps(team);
+    if (!(team && team.allowTwoSS) && (counts.SS || 0) === 0) {
+        return caps.A + 1;
+    }
+    return caps.A;
+}
+
 // A "manager account" is any verified Player whose name matches an
 // AuctionTeam's assigned manager. Manager accounts are never auctionable.
 function isManagerAccount(player, allTeams) {
@@ -309,6 +321,7 @@ function computeManagerAuctionState(team, playersById) {
     const totalPlayers = provisional.length;
     const caps = getClassCaps(team);
     const sCap = getEffectiveSCap(team, counts);
+    const aCap = getEffectiveACap(team, counts);
 
     return {
         team,
@@ -319,11 +332,11 @@ function computeManagerAuctionState(team, playersById) {
         spent,
         committed,
         availableBudget,
-        caps: { SS: caps.SS, S: sCap, A: caps.A },
+        caps: { SS: caps.SS, S: sCap, A: aCap },
         remainingSlots: {
             SS: Math.max(0, caps.SS - counts.SS),
             S: Math.max(0, sCap - counts.S),
-            A: Math.max(0, caps.A - counts.A),
+            A: Math.max(0, aCap - counts.A),
             total: Math.max(0, ROSTER_MAX - totalPlayers)
         },
         rosterMin: ROSTER_MIN,
@@ -447,7 +460,7 @@ function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersByI
 
     const legality = canStillLegallyCompleteRoster({
         counts,
-        caps: { SS: state.caps.SS, S: getEffectiveSCap(team, counts), A: state.caps.A },
+        caps: { SS: state.caps.SS, S: getEffectiveSCap(team, counts), A: getEffectiveACap(team, counts) },
         totalPlayers,
         availableBudget
     });
@@ -692,8 +705,9 @@ async function buildMarketSpotlight(players, allTeams) {
         Number(p.highestBid) > 0
     );
 
-    const topOverall = [...biddable]
-        .sort((a, b) => Number(b.highestBid) - Number(a.highestBid))[0] || null;
+    const topBids = [...biddable]
+        .sort((a, b) => Number(b.highestBid) - Number(a.highestBid))
+        .slice(0, 3);
 
     const byPosition = {};
     for (const posKey of ['FWD', 'MID', 'DEF', 'GK']) {
@@ -720,14 +734,14 @@ async function buildMarketSpotlight(players, allTeams) {
     const rising = [...activityCount.entries()]
         .filter(([, count]) => count >= 2)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 4)
+        .slice(0, 3)
         .map(([playerId, count]) => {
             const player = players.find(p => String(p._id) === playerId);
             return player ? { player, bidCount: count } : null;
         })
         .filter(Boolean);
 
-    return { topOverall, byPosition, rising };
+    return { topBids, byPosition, rising };
 }
 
 app.get('/market', async (req, res) => {
@@ -894,14 +908,42 @@ app.get('/profile', (req, res) => {
     });
 });
 
-app.get('/admin', (req, res) => {
+app.get('/admin', async (req, res) => {
     if (!req.session.isAdmin) {
         return res.redirect('/admin-login');
     }
 
+    // Pre-End-Auction roster check: for every enrolled team, how many
+    // players are they CURRENTLY winning right now? Ending the auction
+    // while a team sits below the roster minimum locks them in under-
+    // sized, so this is surfaced before the admin presses End Auction.
+    let rosterReadiness = [];
+
+    try {
+        const allTeams = await AuctionTeam.find();
+        const allPlayers = await Player.find();
+        const playersById = new Map(allPlayers.map(p => [String(p._id), p]));
+
+        rosterReadiness = allTeams.map(team => {
+            const state = computeManagerAuctionState(team, playersById);
+            return {
+                teamId: String(team._id),
+                teamName: team.name,
+                manager: team.manager,
+                provisionalCount: state.totalPlayers,
+                availableBudget: state.availableBudget,
+                belowMinimum: state.totalPlayers < ROSTER_MIN,
+                shortfall: Math.max(0, ROSTER_MIN - state.totalPlayers)
+            };
+        });
+    } catch (err) {
+        console.error("Roster Readiness Check Error:", err);
+    }
+
     res.render('admin', {
         page: 'admin',
-        error: req.query.error || null
+        error: req.query.error || null,
+        rosterReadiness
     });
 });
 
@@ -3092,6 +3134,42 @@ app.post('/admin/auction/toggle-two-ss', async (req, res) => {
 // 3. Reserve prices are assigned from each verified player's class.
 // 4. Every player is reset to "available" so a re-run never carries over
 //    stale sold/bid state from a previous session.
+
+// SAFETY VALVE: undo an accidental/test "Start Auction" and go back to
+// "ready" so ranks become editable again. Deliberately refuses to touch
+// an already-ENDED auction (players sold, budgets deducted) — that's a
+// real result, not something a button should silently unwind.
+app.post('/admin/auction/reset', async (req, res) => {
+
+    if (!requireAdmin(req, res)) return;
+
+    try {
+
+        const info = await getInfo();
+        info.auction = info.auction || {};
+
+        if (info.auction.status === 'ended') {
+            return res.redirect('/admin?error=Cannot reset an auction that has already ended — players have been sold and budgets deducted. Fix mistakes directly instead.');
+        }
+
+        info.auction.status = 'ready';
+        info.auction.sessionStartedAt = null;
+        info.auction.sessionEndedAt = null;
+        info.markModified('auction');
+        await info.save();
+
+        await AuctionActivity.create({
+            type: 'auction_start',
+            meta: { reset: true }
+        });
+
+        res.redirect('/admin');
+
+    } catch (err) {
+        console.error("Reset Auction Session Error:", err);
+        res.redirect('/admin?error=ResetAuctionSessionFailed');
+    }
+});
 
 app.post('/admin/auction/start', async (req, res) => {
 

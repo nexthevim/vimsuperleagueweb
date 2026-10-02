@@ -2861,7 +2861,7 @@
                     <form
                         action="/admin/auction/start"
                         method="POST"
-                        onsubmit="return confirm('Start the auction? This CLOSES player registration, LOCKS all classes/ratings for the season, and assigns reserve prices from each player\\'s class. This cannot be undone.');">
+                        onsubmit="return confirm('Start the auction? This CLOSES player registration and assigns reserve prices from each player\\'s class.');">
 
                         <button
                             type="submit"
@@ -2886,16 +2886,28 @@
 
                 </div>
 
+                <form
+                    action="/admin/auction/reset-bids"
+                    method="POST"
+                    onsubmit="return confirm('Reset ALL live bids and clear the auction leaderboard (Top Bids / Rising)? Sold players and final rosters are NOT touched. Team bid lists will be emptied.');">
+
+                    <button
+                        type="submit"
+                        class="w-full bg-amber-500 hover:bg-amber-600 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
+                        🔄 Reset Top Bids / Leaderboard
+                    </button>
+                </form>
+
                 <% if (auctionStatus === 'live') { %>
                     <form
                         action="/admin/auction/reset"
                         method="POST"
-                        onsubmit="return confirm('Reset the auction back to READY? This un-locks classes/ratings and re-closes bidding, but does NOT touch any bids already placed. Only use this if the auction was started by mistake.');">
+                        onsubmit="return confirm('Reset the auction back to READY? This re-closes bidding but does NOT clear bids already placed. Only use this if the auction was started by mistake.');">
 
                         <button
                             type="submit"
                             class="w-full bg-white hover:bg-slate-100 text-slate-500 border border-slate-200 py-2.5 rounded-xl font-black uppercase text-[9px] transition">
-                            ↺ Reset To "Ready" (undo an accidental start — unlocks classes again)
+                            ↺ Reset To "Ready" (undo accidental start)
                         </button>
                     </form>
                 <% } %>

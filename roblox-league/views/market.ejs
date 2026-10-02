@@ -276,11 +276,30 @@
     <div id="marketSection">
 
         <!-- ============================================================
-             MARKET SPOTLIGHT — 3 hover-card leaderboards + expand top 10
+             MARKET SPOTLIGHT — real player cards (same hover tilt/sheen)
              ============================================================ -->
         <% if (typeof marketSpotlight !== 'undefined' && marketSpotlight) { %>
-            <div class="max-w-7xl mx-auto px-6 mb-12">
-                <div class="flex items-center justify-between gap-3 mb-5">
+            <%
+                // Shared helper bits for spotlight cards
+                function spotPosClass(pos) {
+                    const u = (pos || 'PRO').toUpperCase();
+                    if (u === 'FWD' || u === 'FORWARD') return 'pos-fwd';
+                    if (u === 'MID' || u === 'MIDFIELD') return 'pos-mid';
+                    if (u === 'DEF' || u === 'DEFENSE') return 'pos-def';
+                    if (u === 'GK' || u === 'GOALKEEPER') return 'pos-gk';
+                    return 'pos-pro';
+                }
+                function spotRankClass(rank) {
+                    const u = (rank || 'C').toUpperCase();
+                    if (u === 'SS') return 'rank-ss';
+                    if (u === 'S') return 'rank-s';
+                    if (u === 'A') return 'rank-a';
+                    if (u === 'B') return 'rank-b';
+                    return 'rank-c';
+                }
+            %>
+            <div class="max-w-7xl mx-auto px-6 mb-14">
+                <div class="flex items-center justify-between gap-3 mb-6">
                     <div class="flex items-center gap-2">
                         <span class="h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse"></span>
                         <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">Market Spotlight</h3>
@@ -291,50 +310,56 @@
                     </button>
                 </div>
 
-                <!-- ════ TOP BIDS ════ -->
-                <div class="mb-8">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-3">👑 Top Bids</p>
+                <!-- ════ TOP BIDS — real hovering player cards ════ -->
+                <div class="mb-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 mb-4">👑 Top Bids</p>
                     <% if (marketSpotlight.topBids && marketSpotlight.topBids.length > 0) { %>
-                        <div id="spotlightTopPodium" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div id="spotlightTopPodium" class="flex flex-wrap justify-center gap-6 py-4" style="perspective: 1200px;">
                             <% marketSpotlight.topBids.slice(0, 3).forEach((p, i) => {
                                 const medals = ['🥇','🥈','🥉'];
-                                const lifts = ['sm:translate-y-0','sm:translate-y-3','sm:translate-y-5'];
-                                const glows = [
-                                    'hover:shadow-[0_20px_50px_-12px_rgba(251,191,36,0.45)] ring-2 ring-amber-400/80',
-                                    'hover:shadow-[0_20px_50px_-12px_rgba(148,163,184,0.4)] ring-2 ring-slate-300',
-                                    'hover:shadow-[0_20px_50px_-12px_rgba(180,83,9,0.35)] ring-2 ring-amber-700/50'
-                                ];
+                                const pos = (p.position || 'PRO').toUpperCase();
+                                const rank = (p.rank || 'C').toUpperCase();
+                                const pId = p._id || p.id || '';
+                                const isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
+                                const isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
                             %>
-                                <div class="group relative <%= lifts[i] %> bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-[24px] overflow-hidden text-white transition-all duration-300 hover:-translate-y-2 <%= glows[i] %> cursor-default">
-                                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_30%_20%,rgba(251,191,36,0.15),transparent_55%)]"></div>
-                                    <% if (p.cardImage && String(p.cardImage).trim()) { %>
-                                        <div class="h-36 overflow-hidden">
-                                            <img src="<%= p.cardImage %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="">
-                                            <div class="absolute inset-x-0 top-0 h-36 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent pointer-events-none"></div>
+                                <div class="relative flex flex-col items-center">
+                                    <span class="absolute -top-3 z-30 text-2xl drop-shadow-lg"><%= medals[i] %></span>
+                                    <div class="player-card w-[220px] h-[300px] glass-light rounded-[28px] border border-slate-200 shadow-lg relative group"
+                                         onmousemove="tiltCard(event, this)"
+                                         onmouseleave="resetTilt(this)"
+                                         onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
+                                        <div class="card-sheen"></div>
+                                        <% if (p.cardImage && String(p.cardImage).trim()) { %>
+                                            <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover rounded-[28px]">
+                                        <% } else { %>
+                                            <div class="card-img w-full h-full bg-gradient-to-b from-slate-100 to-slate-200 flex items-center justify-center rounded-[28px]">
+                                                <span class="text-[48px] font-black italic text-slate-300/50 uppercase"><%= pos %></span>
+                                            </div>
+                                        <% } %>
+                                        <div class="absolute top-3 left-3 z-20 flex gap-1.5">
+                                            <span class="<%= spotPosClass(pos) %> text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= pos %></span>
+                                            <span class="<%= spotRankClass(rank) %> text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= rank %></span>
                                         </div>
-                                    <% } else { %>
-                                        <div class="h-28 bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
-                                            <span class="text-4xl opacity-40"><%= medals[i] %></span>
+                                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent rounded-b-[28px] z-20">
+                                            <h3 class="font-black text-xl italic uppercase tracking-tighter text-white drop-shadow-md truncate"><%= p.name %></h3>
+                                            <div class="mt-1 flex items-center justify-between text-[9px] font-black text-emerald-400">
+                                                <span><%= Number(p.highestBid || 0).toLocaleString() %> V</span>
+                                                <span class="text-slate-300 text-[8px] uppercase truncate max-w-[90px]"><%= p.highestBidder || '—' %></span>
+                                            </div>
                                         </div>
-                                    <% } %>
-                                    <div class="relative p-4 pt-2">
-                                        <div class="flex items-center justify-between mb-1">
-                                            <span class="text-xl"><%= medals[i] %></span>
-                                            <span class="text-sm font-black text-emerald-400"><%= Number(p.highestBid).toLocaleString() %> <span class="text-[9px] text-emerald-500/70">V</span></span>
-                                        </div>
-                                        <p class="text-base font-black uppercase italic tracking-tight truncate"><%= p.name %></p>
-                                        <p class="text-[9px] text-slate-400 font-bold uppercase mt-0.5 truncate"><%= p.position || 'PRO' %> · <%= p.highestBidder || 'No holder' %></p>
                                     </div>
                                 </div>
                             <% }) %>
                         </div>
-                        <div id="spotlightTopFull" class="hidden mt-3 bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden">
+                        <div id="spotlightTopFull" class="hidden mt-3 bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden max-w-2xl mx-auto">
                             <% marketSpotlight.topBids.forEach((p, i) => { %>
-                                <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50 transition">
+                                <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50 transition cursor-pointer"
+                                     onclick="document.querySelectorAll('.player-card').forEach(c=>{if((c.getAttribute('data-name')||'')==='<%= (p.name||'').toLowerCase() %>'){c.click();}})">
                                     <div class="flex items-center gap-3 min-w-0">
                                         <span class="text-xs font-black text-slate-400 w-6">#<%= i + 1 %></span>
                                         <% if (p.cardImage && String(p.cardImage).trim()) { %>
-                                            <img src="<%= p.cardImage %>" class="w-9 h-9 rounded-lg object-cover" alt="">
+                                            <img src="<%= p.cardImage %>" class="w-10 h-10 rounded-lg object-cover" alt="">
                                         <% } %>
                                         <div class="min-w-0">
                                             <p class="text-xs font-black text-slate-900 uppercase truncate"><%= p.name %></p>
@@ -346,98 +371,118 @@
                             <% }) %>
                         </div>
                     <% } else { %>
-                        <p class="text-xs text-slate-400 italic font-bold py-6 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">No bids placed yet.</p>
+                        <p class="text-xs text-slate-400 italic font-bold py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">No bids placed yet.</p>
                     <% } %>
                 </div>
 
-                <!-- ════ POSITION LEADERS ════ -->
-                <div class="mb-8">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">⚡ Position Leaders</p>
-                    <div id="spotlightPosPodium" class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <!-- ════ POSITION LEADERS — real cards ════ -->
+                <div class="mb-10">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">⚡ Position Leaders</p>
+                    <div id="spotlightPosPodium" class="flex flex-wrap justify-center gap-5 py-4" style="perspective: 1200px;">
                         <% ['FWD','MID','DEF','GK'].forEach(posKey => {
-                            const entry = marketSpotlight.byPosition && marketSpotlight.byPosition[posKey];
-                            const grads = {
-                                FWD: 'from-rose-600 to-red-700',
-                                MID: 'from-amber-500 to-orange-600',
-                                DEF: 'from-blue-600 to-indigo-700',
-                                GK: 'from-violet-600 to-purple-700'
-                            };
-                            const g = grads[posKey] || 'from-slate-600 to-slate-800';
+                            const p = marketSpotlight.byPosition && marketSpotlight.byPosition[posKey];
+                            if (!p) { %>
+                                <div class="w-[200px] h-[280px] rounded-[28px] border border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center text-slate-300">
+                                    <span class="text-[10px] font-black uppercase"><%= posKey %></span>
+                                    <span class="text-xs font-bold mt-1">No bids</span>
+                                </div>
+                            <% return; }
+                            const pos = (p.position || posKey).toUpperCase();
+                            const rank = (p.rank || 'C').toUpperCase();
+                            const pId = p._id || p.id || '';
+                            const isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
+                            const isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
                         %>
-                            <div class="group relative rounded-[22px] overflow-hidden bg-gradient-to-br <%= g %> text-white transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-default">
-                                <% if (entry && entry.cardImage && String(entry.cardImage).trim()) { %>
-                                    <div class="h-28 overflow-hidden">
-                                        <img src="<%= entry.cardImage %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-90" alt="">
-                                        <div class="absolute inset-x-0 top-0 h-28 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"></div>
+                            <div class="relative flex flex-col items-center">
+                                <span class="<%= spotPosClass(posKey) %> text-white text-[9px] font-black px-2.5 py-1 rounded-lg uppercase absolute -top-2 z-30 shadow"><%= posKey %></span>
+                                <div class="player-card w-[200px] h-[280px] glass-light rounded-[28px] border border-slate-200 shadow-lg relative group"
+                                     onmousemove="tiltCard(event, this)"
+                                     onmouseleave="resetTilt(this)"
+                                     onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
+                                    <div class="card-sheen"></div>
+                                    <% if (p.cardImage && String(p.cardImage).trim()) { %>
+                                        <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover rounded-[28px]">
+                                    <% } else { %>
+                                        <div class="card-img w-full h-full bg-gradient-to-b from-slate-100 to-slate-200 flex items-center justify-center rounded-[28px]">
+                                            <span class="text-[40px] font-black italic text-slate-300/50 uppercase"><%= posKey %></span>
+                                        </div>
+                                    <% } %>
+                                    <div class="absolute bottom-0 left-0 right-0 p-3.5 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent rounded-b-[28px] z-20">
+                                        <h3 class="font-black text-lg italic uppercase tracking-tighter text-white truncate"><%= p.name %></h3>
+                                        <p class="text-[9px] font-black text-emerald-400 mt-0.5"><%= Number(p.highestBid || 0).toLocaleString() %> Vollars</p>
                                     </div>
-                                <% } else { %>
-                                    <div class="h-20 flex items-center justify-center opacity-30 text-3xl font-black"><%= posKey %></div>
-                                <% } %>
-                                <div class="relative p-3">
-                                    <span class="text-[8px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-md"><%= posKey %></span>
-                                    <p class="text-sm font-black uppercase italic mt-1.5 truncate"><%= entry ? entry.name : '—' %></p>
-                                    <p class="text-[11px] font-black text-white/90"><%= entry ? Number(entry.highestBid).toLocaleString() + ' V' : 'No bids' %></p>
                                 </div>
                             </div>
                         <% }) %>
                     </div>
-                    <div id="spotlightPosFull" class="hidden mt-3 bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                    <div id="spotlightPosFull" class="hidden mt-3 bg-white rounded-2xl border border-slate-200 overflow-hidden max-w-2xl mx-auto">
                         <% ['FWD','MID','DEF','GK'].forEach(posKey => {
                             const list = (marketSpotlight.byPositionTop && marketSpotlight.byPositionTop[posKey]) || [];
                         %>
                             <div class="border-b border-slate-100 last:border-0">
                                 <p class="text-[9px] font-black uppercase tracking-wider text-slate-400 px-4 pt-3 pb-1"><%= posKey %></p>
-                                <% if (list.length === 0) { %>
+                                <% if (!list.length) { %>
                                     <p class="text-[10px] text-slate-300 px-4 pb-3 italic">No bids</p>
-                                <% } else { %>
-                                    <% list.forEach((p, i) => { %>
-                                        <div class="flex items-center justify-between gap-3 px-4 py-2 hover:bg-slate-50">
-                                            <div class="flex items-center gap-2 min-w-0">
-                                                <span class="text-[9px] font-black text-slate-400 w-5">#<%= i + 1 %></span>
-                                                <span class="text-[11px] font-black text-slate-900 uppercase truncate"><%= p.name %></span>
-                                            </div>
-                                            <span class="text-[11px] font-black text-emerald-600"><%= Number(p.highestBid).toLocaleString() %></span>
+                                <% } else { list.forEach((p, i) => { %>
+                                    <div class="flex items-center justify-between gap-3 px-4 py-2 hover:bg-slate-50">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="text-[9px] font-black text-slate-400 w-5">#<%= i + 1 %></span>
+                                            <span class="text-[11px] font-black text-slate-900 uppercase truncate"><%= p.name %></span>
                                         </div>
-                                    <% }) %>
-                                <% } %>
+                                        <span class="text-[11px] font-black text-emerald-600"><%= Number(p.highestBid).toLocaleString() %></span>
+                                    </div>
+                                <% }) } %>
                             </div>
                         <% }) %>
                     </div>
                 </div>
 
-                <!-- ════ RISING BIDS ════ -->
+                <!-- ════ RISING BIDS — real cards ════ -->
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-3">📈 Rising Bids <span class="text-rose-300 normal-case tracking-normal font-bold">(last 2h)</span></p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-4">📈 Rising Bids <span class="text-rose-300 normal-case tracking-normal font-bold">(last 2h)</span></p>
                     <% if (marketSpotlight.rising && marketSpotlight.rising.length > 0) { %>
-                        <div id="spotlightRisingPodium" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <% marketSpotlight.rising.slice(0, 3).forEach((r, i) => { %>
-                                <div class="group relative bg-white rounded-[24px] border border-rose-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-rose-200/60 cursor-default">
-                                    <% if (r.player.cardImage && String(r.player.cardImage).trim()) { %>
-                                        <div class="h-32 overflow-hidden">
-                                            <img src="<%= r.player.cardImage %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="">
-                                            <div class="absolute inset-x-0 top-0 h-32 bg-gradient-to-t from-white via-white/20 to-transparent pointer-events-none"></div>
+                        <div id="spotlightRisingPodium" class="flex flex-wrap justify-center gap-6 py-4" style="perspective: 1200px;">
+                            <% marketSpotlight.rising.slice(0, 3).forEach((r, i) => {
+                                const p = r.player;
+                                const pos = (p.position || 'PRO').toUpperCase();
+                                const rank = (p.rank || 'C').toUpperCase();
+                                const pId = p._id || p.id || '';
+                                const isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
+                                const isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
+                            %>
+                                <div class="relative flex flex-col items-center">
+                                    <span class="absolute -top-3 z-30 bg-rose-600 text-white text-[9px] font-black px-2.5 py-1 rounded-full shadow uppercase"><%= r.bidCount %>× bids</span>
+                                    <div class="player-card w-[220px] h-[300px] glass-light rounded-[28px] border border-rose-200 shadow-lg relative group"
+                                         onmousemove="tiltCard(event, this)"
+                                         onmouseleave="resetTilt(this)"
+                                         onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
+                                        <div class="card-sheen"></div>
+                                        <% if (p.cardImage && String(p.cardImage).trim()) { %>
+                                            <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover rounded-[28px]">
+                                        <% } else { %>
+                                            <div class="card-img w-full h-full bg-gradient-to-b from-rose-50 to-slate-200 flex items-center justify-center rounded-[28px]">
+                                                <span class="text-[48px] font-black italic text-rose-200 uppercase"><%= pos %></span>
+                                            </div>
+                                        <% } %>
+                                        <div class="absolute top-3 left-3 z-20 flex gap-1.5">
+                                            <span class="<%= spotPosClass(pos) %> text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= pos %></span>
+                                            <span class="<%= spotRankClass(rank) %> text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= rank %></span>
                                         </div>
-                                    <% } else { %>
-                                        <div class="h-20 bg-rose-50 flex items-center justify-center text-2xl">📈</div>
-                                    <% } %>
-                                    <div class="relative p-4 pt-1">
-                                        <div class="flex items-center justify-between mb-1">
-                                            <span class="text-[10px] font-black text-rose-400">#<%= i + 1 %></span>
-                                            <span class="bg-rose-600 text-white text-[9px] font-black px-2 py-0.5 rounded-lg uppercase"><%= r.bidCount %> bids</span>
+                                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent rounded-b-[28px] z-20">
+                                            <h3 class="font-black text-xl italic uppercase tracking-tighter text-white drop-shadow-md truncate"><%= p.name %></h3>
+                                            <p class="text-[9px] font-black text-emerald-400 mt-1"><%= Number(p.highestBid || 0).toLocaleString() %> V · #<%= i + 1 %> rising</p>
                                         </div>
-                                        <p class="text-sm font-black uppercase italic text-slate-900 truncate"><%= r.player.name %></p>
-                                        <p class="text-[9px] text-slate-400 font-bold uppercase mt-0.5"><%= r.player.position || 'PRO' %> · <%= Number(r.player.highestBid || 0).toLocaleString() %> V</p>
                                     </div>
                                 </div>
                             <% }) %>
                         </div>
-                        <div id="spotlightRisingFull" class="hidden mt-3 bg-white rounded-2xl border border-rose-100 divide-y divide-rose-50 overflow-hidden">
+                        <div id="spotlightRisingFull" class="hidden mt-3 bg-white rounded-2xl border border-rose-100 divide-y divide-rose-50 overflow-hidden max-w-2xl mx-auto">
                             <% marketSpotlight.rising.forEach((r, i) => { %>
                                 <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-rose-50/50 transition">
                                     <div class="flex items-center gap-3 min-w-0">
                                         <span class="text-xs font-black text-rose-300 w-6">#<%= i + 1 %></span>
                                         <% if (r.player.cardImage && String(r.player.cardImage).trim()) { %>
-                                            <img src="<%= r.player.cardImage %>" class="w-9 h-9 rounded-lg object-cover" alt="">
+                                            <img src="<%= r.player.cardImage %>" class="w-10 h-10 rounded-lg object-cover" alt="">
                                         <% } %>
                                         <div class="min-w-0">
                                             <p class="text-xs font-black text-slate-900 uppercase truncate"><%= r.player.name %></p>
@@ -449,7 +494,7 @@
                             <% }) %>
                         </div>
                     <% } else { %>
-                        <p class="text-xs text-rose-300 italic font-bold py-6 text-center bg-rose-50 rounded-2xl border border-dashed border-rose-100">No bidding flurries recently.</p>
+                        <p class="text-xs text-rose-300 italic font-bold py-8 text-center bg-rose-50 rounded-2xl border border-dashed border-rose-100">No bidding flurries recently.</p>
                     <% } %>
                 </div>
             </div>

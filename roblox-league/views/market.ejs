@@ -664,6 +664,19 @@
         <% } %>
     </div>
 
+
+    <% if (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.status === 'paused') { %>
+        <div class="max-w-7xl mx-auto px-6 mb-4">
+            <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-sm">
+                <span class="text-xl">⏸</span>
+                <div>
+                    <p class="text-xs font-black uppercase tracking-wider">Auction Paused</p>
+                    <p class="text-[10px] font-bold">Bidding, registration, and rank changes are frozen until an admin resumes.</p>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
     <!-- MODE 2: AUCTION HUB VIEW -->
     <div id="auctionSection" class="hidden max-w-7xl mx-auto px-6 mb-24">
         <%
@@ -1089,7 +1102,7 @@
                     </div>
 
                     <% if ((typeof isManager !== 'undefined' && isManager) || (typeof currentManagerTeam !== 'undefined' && currentManagerTeam)) { %>
-                        <form action="/auction/bid" method="POST" class="space-y-3">
+                        <form action="/auction/bid" method="POST" class="space-y-3" id="modalBidForm" onsubmit="return confirmBidSubmit(event)">
                             <input type="hidden" id="modalPlayerId" name="playerId" value="">
                             <% if (typeof currentManagerTeam !== 'undefined' && currentManagerTeam) { %>
                                 <input type="hidden" name="teamId" value="<%= currentManagerTeam %>">
@@ -1651,6 +1664,12 @@
     }
 
     // 3D DYNAMIC MOUSE TILT & INSPECT SHINE EFFECT
+
+    window.managerAvailableBudget = <%= (typeof myAuctionState !== 'undefined' && myAuctionState) ? Number(myAuctionState.availableBudget) : 0 %>;
+    window.managerCommitted = <%= (typeof myAuctionState !== 'undefined' && myAuctionState) ? Number(myAuctionState.committed) : 0 %>;
+    window.managerBudget = <%= (typeof myAuctionState !== 'undefined' && myAuctionState) ? Number(myAuctionState.budget) : 0 %>;
+    window.managerSpent = <%= (typeof myAuctionState !== 'undefined' && myAuctionState) ? Number(myAuctionState.spent) : 0 %>;
+
     function tiltCard(e, el) {
         const rect = el.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -1844,6 +1863,35 @@ function renderQuickBidButtons(minNextBid, currentHigh) {
             ${amt.toLocaleString()}
         </button>`
     ).join('');
+}
+
+
+function confirmBidSubmit(e) {
+    const input = document.getElementById('modalBidInput');
+    const nameEl = document.getElementById('modalName');
+    const amount = Number(input && input.value);
+    const playerName = (nameEl && nameEl.textContent) || 'this player';
+    if (!amount || amount <= 0) {
+        alert('Enter a valid bid amount.');
+        return false;
+    }
+    // Approximate remaining: free current win on this player if we're leading at same amount isn't known client-side easily —
+    // use availableBudget from server snapshot (page load). Server still validates for real.
+    const avail = Number(window.managerAvailableBudget) || 0;
+    // If already winning this player, roughly free that amount (modalHighestBid may be ours)
+    let freed = 0;
+    try {
+        const high = document.getElementById('modalHighestBid');
+        const highText = high ? high.textContent : '';
+        // not reliable to know if we're the holder; keep simple
+    } catch (_) {}
+    const remainingAfter = avail - amount + freed;
+    const msg =
+        'Confirm bid of ' + amount.toLocaleString() + ' Vollars on ' + playerName + '?\n\n' +
+        'Available budget now: ' + avail.toLocaleString() + ' V\n' +
+        'After this bid (approx): ' + Math.max(0, remainingAfter).toLocaleString() + ' V left for other targets.\n\n' +
+        'Server will still reject if over budget or illegal.';
+    return confirm(msg);
 }
 
 function setBidAmount(amount) {

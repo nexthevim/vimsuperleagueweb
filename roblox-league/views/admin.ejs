@@ -2706,6 +2706,10 @@
                             <span class="text-[9px] font-black uppercase text-red-600 bg-red-50 border border-red-100 px-2 py-1 rounded-lg animate-pulse">
                                 LIVE
                             </span>
+                        <% } else if (auctionStatus === 'paused') { %>
+                            <span class="text-[9px] font-black uppercase text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg">
+                                ⏸ PAUSED
+                            </span>
                         <% } else if (auctionStatus === 'processing') { %>
                             <span class="text-[9px] font-black uppercase text-blue-600 bg-blue-50 border border-blue-100 px-2 py-1 rounded-lg animate-pulse">
                                 FINALIZING…
@@ -2829,61 +2833,86 @@
                                 Pre-End Roster Check <span class="text-slate-300">(min <%= typeof auctionSession !== 'undefined' && auctionSession && auctionSession.minRosterSize ? auctionSession.minRosterSize : 10 %> players)</span>
                             </p>
                             <% if (shortTeams.length > 0) { %>
-                                <span class="text-[9px] font-black uppercase bg-rose-100 text-rose-700 px-2 py-1 rounded-lg">⚠️ <%= shortTeams.length %> team(s) short</span>
-                            <% } else { %>
-                                <span class="text-[9px] font-black uppercase bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg">✓ All teams ready</span>
-                            <% } %>
-                        </div>
-
-                        <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                            <% rosterReadiness.forEach(t => { %>
-                                <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl <%= t.belowMinimum ? 'bg-rose-50 border border-rose-100' : 'bg-emerald-50/50 border border-emerald-100' %>">
-                                    <span class="text-[11px] font-black uppercase text-slate-800 truncate"><%= t.teamName %></span>
-                                    <span class="text-[10px] font-black flex-shrink-0 <%= t.belowMinimum ? 'text-rose-600' : 'text-emerald-600' %>">
-                                        <%= t.provisionalCount %> players
-                                        <% if (t.belowMinimum) { %> (needs <%= t.shortfall %> more)<% } %>
-                                    </span>
-                                </div>
-                            <% }) %>
-                        </div>
-
-                        <% if (shortTeams.length > 0) { %>
                             <p class="text-[9px] text-rose-500 font-bold uppercase tracking-wider leading-relaxed">
-                                Ending the auction now will lock these teams in under the minimum. Consider waiting, or nudging their managers to keep bidding before pressing End Auction.
+                                End is blocked until every team has at least the minimum roster (manager + winning bids).
+                            </p>
+                        <% } else { %>
+                            <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider leading-relaxed">
+                                All teams meet the minimum — End Auction is available.
                             </p>
                         <% } %>
                     </div>
                 <% } %>
 
-                <!-- START / END -->
+                <!-- START / PAUSE / RESUME / END -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
 
                     <form
                         action="/admin/auction/start"
                         method="POST"
-                        onsubmit="return confirm('Start the auction? This CLOSES player registration and assigns reserve prices from each player\\'s class.');">
-
-                        <button
-                            type="submit"
-                            class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
+                        onsubmit="return confirm('Start the auction? Registration closes and ranks freeze while live.');">
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
                             ▶ Start Auction
                         </button>
-
                     </form>
 
-                    <form
-                        action="/admin/auction/end"
-                        method="POST"
-                        onsubmit="return confirm('End the auction now? This immediately finalizes every player\\'s highest bidder as the winner, deducts budgets, and assigns rosters. This cannot be undone.');">
-
-                        <button
-                            type="submit"
-                            class="w-full bg-red-600 hover:bg-red-700 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
-                            ■ End Auction
+                    <% if (auctionStatus === 'live' || auctionStatus === 'active') { %>
+                        <form action="/admin/auction/pause" method="POST"
+                            onsubmit="return confirm('Pause the auction? Bidding, registration, and rank edits freeze until you resume.');">
+                            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
+                                ⏸ Pause Auction
+                            </button>
+                        </form>
+                    <% } else if (auctionStatus === 'paused') { %>
+                        <form action="/admin/auction/resume" method="POST">
+                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
+                                ▶ Resume Auction
+                            </button>
+                        </form>
+                    <% } else { %>
+                        <button type="button" disabled class="w-full bg-slate-100 text-slate-400 py-3 rounded-xl font-black uppercase text-[10px] cursor-not-allowed">
+                            ⏸ Pause (start first)
                         </button>
+                    <% } %>
 
+                    <%
+                        const canEndAuction = (auctionStatus === 'live' || auctionStatus === 'active' || auctionStatus === 'paused')
+                            && !(typeof rosterReadiness !== 'undefined' && rosterReadiness.some(t => t.belowMinimum));
+                    %>
+                    <form action="/admin/auction/end" method="POST" class="sm:col-span-2"
+                        onsubmit="return confirm('End the auction now? Finalizes winners, deducts budgets, assigns rosters. Cannot be undone.');">
+                        <button type="submit" <%= canEndAuction ? '' : 'disabled' %>
+                            class="w-full py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm <%= canEndAuction ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-300 cursor-not-allowed' %>">
+                            ■ End Auction<%= canEndAuction ? '' : ' (blocked — under minimum)' %>
+                        </button>
                     </form>
+                </div>
 
+
+                <!-- FORCE DROP A BID (admin mercy) -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Force-Drop Bid</p>
+                        <p class="text-[9px] text-slate-400 font-bold mt-0.5">Remove one team's bid on a player (e.g. accidental lock). Highest bid recalculates.</p>
+                    </div>
+                    <form action="/admin/auction/force-drop-bid" method="POST" class="space-y-2"
+                        onsubmit="return confirm('Force-drop this bid? The player\'s highest bidder will be recalculated.');">
+                        <select name="teamId" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800">
+                            <option value="">Select team…</option>
+                            <% if (typeof auctionTeams !== 'undefined') { auctionTeams.forEach(t => { %>
+                                <option value="<%= t._id || t.id %>"><%= t.name %></option>
+                            <% }) } %>
+                        </select>
+                        <select name="playerId" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800">
+                            <option value="">Select player…</option>
+                            <% if (typeof players !== 'undefined') { players.filter(p => p.verified && Number(p.highestBid||0) > 0).forEach(p => { %>
+                                <option value="<%= p._id || p.id %>"><%= p.name %> — <%= Number(p.highestBid||0).toLocaleString() %> V (<%= p.highestBidder || '—' %>)</option>
+                            <% }) } %>
+                        </select>
+                        <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-2.5 rounded-xl font-black uppercase text-[10px] transition">
+                            ↩ Force-Drop Bid
+                        </button>
+                    </form>
                 </div>
 
                 <form
@@ -2898,7 +2927,7 @@
                     </button>
                 </form>
 
-                <% if (auctionStatus === 'live') { %>
+                <% if (auctionStatus === 'live' || auctionStatus === 'paused') { %>
                     <form
                         action="/admin/auction/reset"
                         method="POST"

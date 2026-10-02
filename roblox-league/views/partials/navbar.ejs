@@ -268,7 +268,7 @@
         position: fixed;
         right: 22px;
         bottom: 22px;
-        z-index: 100000;
+        z-index: 2147482900;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -380,7 +380,7 @@
         bottom: 82px;
         width: min(390px, calc(100vw - 32px));
         height: min(570px, calc(100vh - 110px));
-        z-index: 100001;
+        z-index: 2147483000;
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -1314,7 +1314,18 @@
     const input = document.getElementById('vim-ai-input');
     const messages = document.getElementById('vim-ai-messages');
 
-    if (!panel || !input || !messages) return;
+    // Always expose a toggle so the button never "does nothing"
+    window.toggleVimAI = function(forceState) {
+        if (!panel) return;
+        const open = typeof forceState === 'boolean' ? forceState : !panel.classList.contains('active');
+        panel.classList.toggle('active', open);
+        if (open && input) setTimeout(() => { try { input.focus(); } catch(e) {} }, 180);
+    };
+
+    if (!panel || !input || !messages) {
+        console.warn('VIM AI: panel elements missing');
+        return;
+    }
 
 
     /* ---------------------------------------------------------
@@ -1798,118 +1809,6 @@
             typing.remove();
         }
 
-    }
-
-
-    /* ---------------------------------------------------------
-       MANAGER AUCTION CONTEXT (VSL Season 4)
-
-       For assigned managers only. Pulls their own private auction state
-       from /api/manager/context (the server re-checks the session, so
-       this can never return another manager's data) and answers the
-       specific auction questions the manager dashboard spec calls out.
-       This never places a bid — it only reads and explains.
-       --------------------------------------------------------- */
-
-    const MANAGER_INTENT_KEYWORDS = [
-        'afford', 'can i bid', 'can i legally', "why can't i bid", 'why cant i bid',
-        'eligible', 'legal bid', 'how much can i', 'my budget', 'my roster',
-        'my watchlist', 'outbid', 'i am winning', "i'm winning", 'low-bid', 'low bid',
-        'what positions should i', 'affect my roster', 'eligible players', 'eligible def',
-        'eligible fwd', 'eligible mid', 'eligible gk', 'remaining slots', 'class limit',
-        'class limits', 'ss limit', 's limit', 'a limit', 'roster slots'
-    ];
-
-    function isManagerQuestion(normalized) {
-        if (!window.VIM_IS_MANAGER) return false;
-        return MANAGER_INTENT_KEYWORDS.some(k => normalized.includes(k));
-    }
-
-    let cachedManagerContext = null;
-    let cachedManagerContextAt = 0;
-
-    async function fetchManagerContext(force) {
-        const isStale = !cachedManagerContext || (Date.now() - cachedManagerContextAt) > 15000;
-        if (!force && !isStale) return cachedManagerContext;
-
-        try {
-            const res = await fetch('/api/manager/context');
-            const data = await res.json();
-            if (data && data.success && data.isManager) {
-                cachedManagerContext = data;
-                cachedManagerContextAt = Date.now();
-                return data;
-            }
-        } catch (e) {
-            console.error('Manager context fetch failed', e);
-        }
-        return null;
-    }
-
-    function fmt(n) {
-        return Number(n || 0).toLocaleString();
-    }
-
-    function generateManagerResponse(question, ctx) {
-        const normalized = question.toLowerCase();
-        const team = ctx.team;
-
-        // "Can I afford / bid on X" needs a specific player name we don't
-        // reliably have from free text, so give the numbers that answer
-        // it either way rather than guessing a player.
-        if (normalized.includes('afford') || normalized.includes('how much can i') || normalized.includes('legal bid')) {
-            return `You have <strong>${fmt(team.availableBudget)} Vollars</strong> available right now (${fmt(team.budget)} total, ${fmt(team.budget - team.availableBudget)} committed to active bids).
-                <br><br>That's not the same as your max legal bid though — the system also checks you can still reach the ${team.rosterMin}-player minimum afterward, so your actual ceiling on any one player is usually lower than your full available budget. Open the player's profile in the Market and the bid box there will show you the true minimum/maximum for that specific player.`;
-        }
-
-        if (normalized.includes("why can't i bid") || normalized.includes('why cant i bid') || normalized.includes('ineligible')) {
-            return `A bid gets blocked for one of these reasons: the amount is below the required increment, it would push you over a class cap (${team.caps.SS} SS / ${team.caps.S} S / ${team.caps.A} A for your team), it would exceed the ${team.rosterMax}-player roster limit, or it would leave you without enough money to still reach the ${team.rosterMin}-player minimum.
-                <br><br>Your current slots: SS ${team.remainingSlots.SS} left, S ${team.remainingSlots.S} left, A ${team.remainingSlots.A} left, ${team.remainingSlots.total} roster slot(s) overall. The exact reason shows as an error when you try the bid.`;
-        }
-
-        if (normalized.includes('my roster') || normalized.includes('remaining slots') || normalized.includes('roster slots') || normalized.includes('class limit')) {
-            return `Roster: <strong>${team.totalPlayers}/${team.rosterMax}</strong> (minimum ${team.rosterMin}).
-                <br>Class counts — SS: ${team.counts.SS}/${team.caps.SS}, S: ${team.counts.S}/${team.caps.S}, A: ${team.counts.A}/${team.caps.A}, B: ${team.counts.B}, C: ${team.counts.C}.
-                <br>${team.allowTwoSS ? '✨ Your team has the 2-SS exception active.' : ''}`;
-        }
-
-        if (normalized.includes('affect my roster')) {
-            return `Winning a player adds 1 to your roster count and locks in that class slot. Right now you're at ${team.totalPlayers}/${team.rosterMax} with ${team.remainingSlots.total} slot(s) left — check the player's class against your remaining SS/S/A slots (${team.remainingSlots.SS}/${team.remainingSlots.S}/${team.remainingSlots.A}) before bidding.`;
-        }
-
-        if (normalized.includes('outbid')) {
-            if (!ctx.outbid.length) return `You haven't been outbid on anything right now. 🎉`;
-            const lines = ctx.outbid.map(p => `• <strong>${p.name}</strong> (${p.class}) — now at ${fmt(p.currentBid)} by ${p.currentBidder}`).join('<br>');
-            return `You've been outbid on ${ctx.outbid.length} player(s):<br>${lines}`;
-        }
-
-        if (normalized.includes('watching') || normalized.includes('watchlist') || normalized.includes("i'm winning") || normalized.includes('i am winning')) {
-            if (!ctx.watchlist.length) return `Your watchlist is empty — star a player's profile in the Market to track them here.`;
-            const winning = ctx.watchlist.filter(p => p.isWinning);
-            if (normalized.includes('winning')) {
-                if (!winning.length) return `You're not currently winning any of your ${ctx.watchlist.length} watched player(s).`;
-                return `You're currently winning ${winning.length} watched player(s): ${winning.map(p => p.name).join(', ')}.`;
-            }
-            const lines = ctx.watchlist.map(p => `• <strong>${p.name}</strong> (${p.class}) — ${fmt(p.currentBid)} Vollars${p.isWinning ? ' (you\'re winning)' : ''}`).join('<br>');
-            return `Your watchlist (${ctx.watchlist.length}):<br>${lines}`;
-        }
-
-        if (normalized.includes('eligible') || normalized.includes('low-bid') || normalized.includes('low bid') || normalized.includes('what positions')) {
-            let pool = ctx.eligiblePlayers;
-            const posMatch = ['fwd', 'mid', 'def', 'gk'].find(p => normalized.includes(p));
-            if (posMatch) {
-                pool = pool.filter(p => (p.position || '').toLowerCase() === posMatch);
-            }
-            if (normalized.includes('low-bid') || normalized.includes('low bid')) {
-                pool = [...pool].sort((a, b) => a.currentBid - b.currentBid);
-            }
-            if (!pool.length) return `No eligible ${posMatch ? posMatch.toUpperCase() + ' ' : ''}players found for your current budget/roster right now.`;
-            const lines = pool.slice(0, 8).map(p => `• <strong>${p.name}</strong> (${p.position}, ${p.class}) — ${fmt(p.currentBid)} Vollars`).join('<br>');
-            return `${ctx.eligibleCount} player(s) you can legally bid on right now${posMatch ? ' at ' + posMatch.toUpperCase() : ''}:<br>${lines}${pool.length > 8 ? '<br>…and more in the Market.' : ''}`;
-        }
-
-        // Generic fallback with the headline numbers.
-        return `Quick snapshot for <strong>${team.name}</strong>: ${fmt(team.availableBudget)} Vollars available, ${team.totalPlayers}/${team.rosterMax} roster, ${team.remainingSlots.SS}/${team.remainingSlots.S}/${team.remainingSlots.A} SS/S/A slots left, ${ctx.eligibleCount} eligible players on the Market. Ask me something more specific — budget, eligibility, watchlist, or outbids.`;
     }
 
 

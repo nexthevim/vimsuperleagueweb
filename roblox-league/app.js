@@ -1004,14 +1004,14 @@ app.get('/admin', async (req, res) => {
 
 app.post('/register', async (req, res) => {
 
-    // Player registration closes the moment the admin starts the auction —
-    // classes/ratings are locked at that point, so a brand-new unrated
-    // player can't be entered mid-auction.
+    // Registration is only blocked while the auction is LIVE.
+    // Once the admin ends it (status = ended) — or before it starts (ready) —
+    // new players can register again.
     const info = await getInfo();
     const auctionStatus = (info.auction && info.auction.status) || 'ready';
 
-    if (auctionStatus === 'live' || auctionStatus === 'ended') {
-        return res.redirect('/market?error=Player registration is closed while the auction is in progress');
+    if (auctionStatus === 'live') {
+        return res.redirect('/market?error=Player registration is closed while the auction is live');
     }
 
     const exists = await Player.findOne({
@@ -3166,7 +3166,7 @@ app.post('/admin/auction/update-session', async (req, res) => {
 
 // START AUCTION SESSION
 //
-// 1. Registration closes (enforced in /register by checking status).
+// 1. Registration closes only while status is live (enforced in /register).
 // 2. Reserve prices are assigned from each verified player's class.
 // 3. Every player is reset to "available" so a re-run never carries over
 //    stale sold/bid state from a previous session.

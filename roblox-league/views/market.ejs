@@ -187,10 +187,6 @@
         transform: translateY(-3px);
     }
 
-    /* Spotlight dark-stage expand lists */
-    #spotlightTopFull .text-slate-900,
-    #spotlightPosFull .text-slate-900,
-    #spotlightRisingFull .text-slate-900 { color: #f8fafc !important; }
     #spotlightTopFull .text-slate-400,
     #spotlightPosFull .text-slate-400,
     #spotlightRisingFull .text-slate-400 { color: #94a3b8 !important; }
@@ -309,30 +305,30 @@
                 }
             %>
             <div class="max-w-7xl mx-auto px-6 mb-14">
-                <div class="relative rounded-[32px] overflow-hidden border border-slate-700/80 shadow-2xl shadow-slate-900/20">
-                    <!-- Stage background -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800"></div>
-                    <div class="absolute inset-0 opacity-40" style="background-image: radial-gradient(circle at 20% 20%, rgba(251,191,36,0.12), transparent 40%), radial-gradient(circle at 80% 60%, rgba(16,185,129,0.1), transparent 45%), radial-gradient(circle at 50% 100%, rgba(59,130,246,0.08), transparent 50%);"></div>
-                    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/50 to-transparent"></div>
+                <div class="relative rounded-[32px] overflow-hidden border border-slate-200/90 shadow-xl shadow-slate-200/60">
+                    <!-- Soft white plate with gentle gradient -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-amber-50/40"></div>
+                    <div class="absolute inset-0 opacity-70" style="background-image: radial-gradient(circle at 15% 10%, rgba(251,191,36,0.12), transparent 42%), radial-gradient(circle at 85% 70%, rgba(16,185,129,0.08), transparent 45%), radial-gradient(circle at 50% 100%, rgba(148,163,184,0.1), transparent 50%);"></div>
+                    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300/80 to-transparent"></div>
 
                     <div class="relative p-6 md:p-8">
                 <div class="flex items-center justify-between gap-3 mb-8">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-lg">🔥</div>
+                        <div class="w-10 h-10 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center text-lg shadow-sm">🔥</div>
                         <div>
-                            <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-amber-400/90">Market Spotlight</h3>
-                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Live auction heat · hover the cards</p>
+                            <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500">Market Spotlight</h3>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Live auction heat · hover the cards</p>
                         </div>
                     </div>
                     <button type="button" id="spotlightExpandBtn" onclick="toggleSpotlightExpand()"
-                        class="text-[10px] font-black uppercase tracking-wider text-slate-900 bg-white hover:bg-amber-400 px-4 py-2.5 rounded-xl transition shadow-lg">
+                        class="text-[10px] font-black uppercase tracking-wider text-white bg-slate-900 hover:bg-amber-500 px-4 py-2.5 rounded-xl transition shadow-md">
                         Show Top 10 →
                     </button>
                 </div>
 
                 <!-- ════ TOP BIDS — real hovering player cards ════ -->
                 <div class="mb-10">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>👑 Top Bids</p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>👑 Top Bids</p>
                     <% if (marketSpotlight.topBids && marketSpotlight.topBids.length > 0) { %>
                         <div id="spotlightTopPodium" class="flex flex-wrap justify-center gap-6 py-4" style="perspective: 1200px;">
                             <% marketSpotlight.topBids.slice(0, 3).forEach((p, i) => {
@@ -372,7 +368,7 @@
                                 </div>
                             <% }) %>
                         </div>
-                        <div id="spotlightTopFull" class="hidden mt-3 bg-slate-950/80 rounded-2xl border border-white/10 divide-y divide-white/5 overflow-hidden max-w-2xl mx-auto">
+                        <div id="spotlightTopFull" class="hidden mt-3 bg-white/90 rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden max-w-2xl mx-auto">
                             <% marketSpotlight.topBids.forEach((p, i) => { %>
                                 <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50 transition cursor-pointer"
                                      onclick="document.querySelectorAll('.player-card').forEach(c=>{if((c.getAttribute('data-name')||'')==='<%= (p.name||'').toLowerCase() %>'){c.click();}})">
@@ -391,18 +387,18 @@
                             <% }) %>
                         </div>
                     <% } else { %>
-                        <p class="text-xs text-slate-500 italic font-bold py-10 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">No bids placed yet.</p>
+                        <p class="text-xs text-slate-400 italic font-bold py-10 text-center bg-white/70 rounded-2xl border border-dashed border-slate-200">No bids placed yet.</p>
                     <% } %>
                 </div>
 
                 <!-- ════ POSITION LEADERS — real cards ════ -->
                 <div class="mb-10">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>⚡ Position Leaders</p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>⚡ Position Leaders</p>
                     <div id="spotlightPosPodium" class="flex flex-wrap justify-center gap-5 py-4" style="perspective: 1200px;">
                         <% ['FWD','MID','DEF','GK'].forEach(posKey => {
                             const p = marketSpotlight.byPosition && marketSpotlight.byPosition[posKey];
                             if (!p) { %>
-                                <div class="w-[200px] h-[280px] rounded-[28px] border border-dashed border-white/15 bg-white/5 flex flex-col items-center justify-center text-slate-500">
+                                <div class="w-[200px] h-[280px] rounded-[28px] border border-dashed border-slate-200 bg-white/80 flex flex-col items-center justify-center text-slate-400">
                                     <span class="text-[10px] font-black uppercase"><%= posKey %></span>
                                     <span class="text-xs font-bold mt-1">No bids</span>
                                 </div>
@@ -435,7 +431,7 @@
                             </div>
                         <% }) %>
                     </div>
-                    <div id="spotlightPosFull" class="hidden mt-3 bg-slate-950/80 rounded-2xl border border-white/10 overflow-hidden max-w-2xl mx-auto">
+                    <div id="spotlightPosFull" class="hidden mt-3 bg-white/90 rounded-2xl border border-slate-200 overflow-hidden max-w-2xl mx-auto">
                         <% ['FWD','MID','DEF','GK'].forEach(posKey => {
                             const list = (marketSpotlight.byPositionTop && marketSpotlight.byPositionTop[posKey]) || [];
                         %>
@@ -459,7 +455,7 @@
 
                 <!-- ════ RISING BIDS — real cards ════ -->
                 <div>
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>📈 Rising Bids <span class="text-rose-400/60 normal-case tracking-normal font-bold">(last 2h)</span></p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>📈 Rising Bids <span class="text-rose-400 normal-case tracking-normal font-bold">(last 2h)</span></p>
                     <% if (marketSpotlight.rising && marketSpotlight.rising.length > 0) { %>
                         <div id="spotlightRisingPodium" class="flex flex-wrap justify-center gap-6 py-4" style="perspective: 1200px;">
                             <% marketSpotlight.rising.slice(0, 3).forEach((r, i) => {
@@ -496,7 +492,7 @@
                                 </div>
                             <% }) %>
                         </div>
-                        <div id="spotlightRisingFull" class="hidden mt-3 bg-slate-950/80 rounded-2xl border border-rose-500/20 divide-y divide-white/5 overflow-hidden max-w-2xl mx-auto">
+                        <div id="spotlightRisingFull" class="hidden mt-3 bg-white/90 rounded-2xl border border-rose-100 divide-y divide-rose-50 overflow-hidden max-w-2xl mx-auto">
                             <% marketSpotlight.rising.forEach((r, i) => { %>
                                 <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-rose-50/50 transition">
                                     <div class="flex items-center gap-3 min-w-0">
@@ -514,7 +510,7 @@
                             <% }) %>
                         </div>
                     <% } else { %>
-                        <p class="text-xs text-rose-400/70 italic font-bold py-10 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">No bidding flurries recently.</p>
+                        <p class="text-xs text-rose-400 italic font-bold py-10 text-center bg-rose-50/80 rounded-2xl border border-dashed border-rose-100">No bidding flurries recently.</p>
                     <% } %>
                 </div>
                     </div><!-- /relative pad -->
@@ -707,34 +703,34 @@
         %>
 
         <!-- HERO STATUS -->
-        <div class="relative overflow-hidden rounded-[32px] mb-8 border border-slate-800 shadow-xl">
-            <div class="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800"></div>
-            <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at 10% 50%, rgba(16,185,129,0.15), transparent 40%), radial-gradient(circle at 90% 20%, rgba(251,191,36,0.12), transparent 35%);"></div>
-            <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+        <div class="relative overflow-hidden rounded-[32px] mb-8 border border-slate-200 shadow-xl shadow-slate-200/50">
+            <div class="absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-emerald-50/50"></div>
+            <div class="absolute inset-0 opacity-80" style="background-image: radial-gradient(circle at 12% 40%, rgba(16,185,129,0.1), transparent 42%), radial-gradient(circle at 88% 15%, rgba(251,191,36,0.1), transparent 38%);"></div>
+            <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-slate-900 via-emerald-500 to-slate-900"></div>
 
             <div class="relative p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div class="flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-3xl shadow-inner">🏆</div>
+                    <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-3xl shadow-sm">🏆</div>
                     <div>
                         <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400"><%= sessionName %></p>
-                        <h3 class="text-3xl font-black italic uppercase tracking-tighter text-white mt-1">Auction Hub</h3>
-                        <p class="text-[11px] text-slate-400 font-bold mt-1">Franchise bids · live roster pressure · full audit trail</p>
+                        <h3 class="text-3xl font-black italic uppercase tracking-tighter text-slate-900 mt-1">Auction Hub</h3>
+                        <p class="text-[11px] text-slate-500 font-bold mt-1">Franchise bids · live roster pressure · full audit trail</p>
                     </div>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3">
-                    <div class="<%= statusRing %> border px-4 py-2.5 rounded-2xl flex items-center gap-2">
+                    <div class="<%= statusRing %> border px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-sm">
                         <span class="w-2 h-2 rounded-full <%= statusDot %>"></span>
                         <div>
                             <p class="text-[8px] font-black uppercase tracking-widest opacity-70">Status</p>
                             <p class="text-sm font-black uppercase tracking-wider leading-none"><%= statusLabel %></p>
                         </div>
                     </div>
-                    <div class="bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded-2xl">
+                    <div class="bg-white border border-slate-200 text-slate-900 px-4 py-2.5 rounded-2xl shadow-sm">
                         <p class="text-[8px] font-black uppercase tracking-widest text-slate-400">Roster</p>
                         <p class="text-sm font-black"><%= squadMin %>–<%= squadCap %> <span class="text-slate-400 font-bold text-[10px]">players</span></p>
                     </div>
-                    <div class="bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded-2xl">
+                    <div class="bg-white border border-slate-200 text-slate-900 px-4 py-2.5 rounded-2xl shadow-sm">
                         <p class="text-[8px] font-black uppercase tracking-widest text-slate-400">Franchises</p>
                         <p class="text-sm font-black"><%= typeof auctionTeams !== 'undefined' ? auctionTeams.length : 0 %></p>
                     </div>

@@ -1507,6 +1507,72 @@ app.post('/auction/watchlist/toggle', async (req, res) => {
 // Powers the private manager dashboard refresh and the AI assistant's
 // manager-only answers. Never returns another manager's data.
 
+
+// Public market snapshot for the site AI assistant + light clients.
+// No private team budgets — just verified player cards + auction status.
+app.get('/api/market/snapshot', async (req, res) => {
+    try {
+        const info = await getInfo();
+        const auctionStatus = (info.auction && info.auction.status) || 'ready';
+        const rosterLimits = getRosterLimits(info.auction);
+        const allTeams = await AuctionTeam.find().lean();
+        const managerNames = new Set(
+            allTeams.map(t => String(t.manager || '').toLowerCase()).filter(Boolean)
+        );
+
+        const players = await Player.find({ verified: true }).lean();
+        const list = players
+            .filter(p => !managerNames.has(String(p.name || '').toLowerCase()))
+            .map(p => {
+                const cls = getPlayerClass(p);
+                return {
+                    id: String(p._id),
+                    name: p.name,
+                    position: p.position || 'PRO',
+                    rank: cls,
+                    country: p.country || '',
+                    goals: p.goals || 0,
+                    assists: p.assists || 0,
+                    saves: p.saves || 0,
+                    mvps: p.mvps || 0,
+                    highestBid: Number(p.highestBid) || 0,
+                    highestBidder: p.highestBidder || '',
+                    reservePrice: Number(p.reservePrice) || getReservePriceForClass(cls),
+                    auctionStatus: p.auctionStatus || 'available',
+                    soldToTeam: p.soldToTeam || ''
+                };
+            });
+
+        const topBids = [...list]
+            .filter(p => p.highestBid > 0 && p.auctionStatus !== 'sold')
+            .sort((a, b) => b.highestBid - a.highestBid)
+            .slice(0, 15);
+
+        res.json({
+            success: true,
+            auctionStatus,
+            rosterMin: rosterLimits.rosterMin,
+            rosterMax: rosterLimits.rosterMax,
+            reserves: CLASS_RESERVE_PRICES,
+            increments: BID_INCREMENT_TIERS,
+            playerCount: list.length,
+            players: list,
+            topBids,
+            teams: allTeams.map(t => ({
+                name: t.name,
+                manager: t.manager || '',
+                budget: t.budget,
+                spent: t.spent || 0,
+                bidCount: (t.bids || []).length,
+                rosterCount: (t.roster || []).length
+            }))
+        });
+    } catch (err) {
+        console.error('Market snapshot error:', err);
+        res.status(500).json({ success: false, error: 'SnapshotFailed' });
+    }
+});
+
 app.get('/api/manager/context', async (req, res) => {
 
     if (!req.session.playerId) {
@@ -1607,12 +1673,19 @@ app.get('/api/manager/context', async (req, res) => {
             outbid,
             watchlist,
             eligibleCount: eligiblePlayers.length,
-            eligiblePlayers: eligiblePlayers.slice(0, 50).map(p => ({
+            eligiblePlayers: eligiblePlayers.slice(0, 120).map(p => ({
                 id: String(p._id),
                 name: p.name,
                 class: getPlayerClass(p),
-                position: p.position,
-                currentBid: p.highestBid || getReservePriceForClass(getPlayerClass(p))
+                position: p.position || 'PRO',
+                country: p.country || '',
+                goals: p.goals || 0,
+                assists: p.assists || 0,
+                saves: p.saves || 0,
+                mvps: p.mvps || 0,
+                currentBid: Number(p.highestBid) || getReservePriceForClass(getPlayerClass(p)),
+                highestBidder: p.highestBidder || '',
+                reservePrice: Number(p.reservePrice) || getReservePriceForClass(getPlayerClass(p))
             }))
         });
 

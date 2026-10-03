@@ -3607,6 +3607,81 @@ app.post('/admin/auction/resume', async (req, res) => {
 
 // RECONCILE: recompute every player's highestBid from real team.bids only.
 // Fixes ghost highs after broken withdraws. Does NOT invent bids.
+
+// FIX ALL — one-click repair during live auction.
+// Does NOT wipe real bids, change budgets, or end the session.
+// 1) Strip empty/invalid bid rows from teams
+// 2) Recompute every non-sold player's highest from remaining bids
+// 3) Clear ghost highs where no team holds that player
+app.post('/admin/auction/fix-all', async (req, res) => {
+    if (!requireAdmin(req, res)) return;
+    try {
+        const teams = await AuctionTeam.find();
+        let bidsCleaned = 0;
+
+        for (const team of teams) {
+            const before = (team.bids || []).length;
+            team.bids = (team.bids || []).filter(b => {
+                if (!b || !b.playerId) return false;
+                const amt = Number(b.amount);
+                if (!Number.isFinite(amt) || amt <= 0) return false;
+                return true;
+            });
+            // de-dupe by playerId keep highest amount
+            const byPlayer = new Map();
+            for (const b of team.bids) {
+                const id = String(b.playerId);
+                const prev = byPlayer.get(id);
+                if (!prev || Number(b.amount) > Number(prev.amount)) {
+                    byPlayer.set(id, b);
+                }
+            }
+            team.bids = Array.from(byPlayer.values());
+            if (team.bids.length !== before) {
+                bidsCleaned += before - team.bids.length;
+                team.markModified('bids');
+                await team.save();
+            } else if (byPlayer.size !== before) {
+                bidsCleaned += before - byPlayer.size;
+                team.markModified('bids');
+                await team.save();
+            }
+        }
+
+        const players = await Player.find({ verified: true });
+        let highsFixed = 0;
+        for (const player of players) {
+            if (player.auctionStatus === 'sold') continue;
+            const beforeBid = Number(player.highestBid) || 0;
+            const beforeName = player.highestBidder || '';
+            await refreshPlayerHighestBid(player._id);
+            const after = await Player.findById(player._id);
+            if (!after) continue;
+            if (Number(after.highestBid) !== beforeBid || (after.highestBidder || '') !== beforeName) {
+                highsFixed++;
+            }
+        }
+
+        await AuctionActivity.create({
+            type: 'rank_change',
+            playerName: '',
+            managerName: 'ADMIN',
+            meta: {
+                reason: 'fix_all',
+                bidsCleaned,
+                highsFixed
+            }
+        });
+
+        res.redirect('/admin?error=' + encodeURIComponent(
+            'Fix All done: cleaned ' + bidsCleaned + ' bad/duplicate bid row(s), updated ' + highsFixed + ' player high(s). Real bids kept. Auction still live.'
+        ));
+    } catch (err) {
+        console.error('Fix All error:', err);
+        res.redirect('/admin?error=FixAllFailed');
+    }
+});
+
 app.post('/admin/auction/reconcile-highs', async (req, res) => {
     if (!requireAdmin(req, res)) return;
     try {

@@ -1383,22 +1383,37 @@ app.post('/auction/withdraw', async (req, res) => {
             );
         }
 
-        // THE WITHDRAWAL RULE: a manager may withdraw ONLY if no other
-        // manager has placed a bid on this player after their own most
-        // recent bid. Once someone else responds, the bid is locked.
+        // THE WITHDRAWAL RULE: locked only while a RIVAL still has an
+        // ACTIVE bid placed after yours. If they withdraw, their activity
+        // log stays, but the lock lifts — you become highest again and
+        // can withdraw (until someone else bids after you).
         const myLastBid = await AuctionActivity
             .findOne({ type: 'bid', playerId: playerId, teamId: team._id })
             .sort({ createdAt: -1 });
 
         if (myLastBid) {
-            const laterRivalBid = await AuctionActivity.findOne({
+            const laterRivalBids = await AuctionActivity.find({
                 type: 'bid',
                 playerId: playerId,
                 teamId: { $ne: team._id },
                 createdAt: { $gt: myLastBid.createdAt }
-            });
+            }).sort({ createdAt: -1 });
 
-            if (laterRivalBid) {
+            let rivalStillActive = false;
+            for (const rivalAct of laterRivalBids) {
+                if (!rivalAct.teamId) continue;
+                const rivalTeam = await AuctionTeam.findById(rivalAct.teamId);
+                if (!rivalTeam) continue;
+                const stillHasBid = (rivalTeam.bids || []).some(
+                    b => b.playerId && b.playerId.toString() === playerId.toString()
+                );
+                if (stillHasBid) {
+                    rivalStillActive = true;
+                    break;
+                }
+            }
+
+            if (rivalStillActive) {
                 return res.redirect(
                     '/market?error=Another manager has already bid since your last bid — this bid is now locked and cannot be withdrawn'
                 );

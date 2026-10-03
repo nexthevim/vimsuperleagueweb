@@ -462,9 +462,12 @@ function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersByI
 
     const reservePrice = getReservePriceForClass(getPlayerClass(player));
     const currentHigh = Number(player.highestBid) || 0;
-    const minIncrement = getMinIncrement(currentHigh || reservePrice);
+    // Real open bid only if someone is actually named as highest bidder
+    const hasOpenBid = currentHigh > 0 && !!(player.highestBidder || '').trim();
+    const minIncrement = getMinIncrement(hasOpenBid ? currentHigh : reservePrice);
 
-    const minNextBid = currentHigh > 0
+    // No real bids yet → start at reserve (not reserve + step)
+    const minNextBid = hasOpenBid
         ? roundUpToIncrement(currentHigh + minIncrement, minIncrement)
         : reservePrice;
 
@@ -854,10 +857,12 @@ app.get('/', async (req, res) => {
 // ("rising"). Pure read — never mutates anything.
 async function buildMarketSpotlight(players, allTeams) {
 
+    // Must have a real bid (amount + named bidder) — reserve alone does not count
     const biddable = players.filter(p =>
         p.verified &&
         !isManagerAccount(p, allTeams) &&
-        Number(p.highestBid) > 0
+        Number(p.highestBid) > 0 &&
+        !!(p.highestBidder || '').toString().trim()
     );
 
     // Top 10 by highest bid — UI shows top 3 by default, expands to 10.
@@ -934,7 +939,7 @@ app.get('/market', async (req, res) => {
                     auctionStatus,
                     team: myTeam,
                     player: p,
-                    amount: p.highestBid > 0
+                    amount: (Number(p.highestBid) > 0 && (p.highestBidder || '').trim())
                         ? roundUpToIncrement(p.highestBid + getMinIncrement(p.highestBid), getMinIncrement(p.highestBid))
                         : getReservePriceForClass(getPlayerClass(p)),
                     allTeams,
@@ -1280,27 +1285,22 @@ async function refreshPlayerHighestBid(playerId) {
 
     const teams = await AuctionTeam.find();
 
-    let highestBid = Number(player.reservePrice) || 0;
+    // Only REAL team bids count. Never seed highestBid from reserve —
+    // that made "min next bid" = reserve + increment after a full withdraw,
+    // and flooded Top Bids with unbid players.
+    let highestBid = 0;
     let highestBidder = "";
 
-    // Losing bids are INTENTIONALLY kept. They stay on the team and keep
-    // locking budget until that manager is allowed to withdraw (only if no
-    // rival bid after them — i.e. they become sole high again after a
-    // higher bidder withdraws) or an admin force-drops the bid.
     for (const team of teams) {
         const bid = (team.bids || []).find(
-            b => b.playerId && b.playerId.toString() === playerId.toString()
+            b => b.playerId && String(b.playerId) === String(playerId)
         );
 
-        if (bid && Number(bid.amount) > highestBid) {
-            highestBid = Number(bid.amount);
-            highestBidder = team.name;
+        const amt = bid ? Number(bid.amount) || 0 : 0;
+        if (amt > highestBid) {
+            highestBid = amt;
+            highestBidder = team.name || "";
         }
-    }
-
-    // If every bid was withdrawn, fall back to reserve with no holder.
-    if (!highestBidder) {
-        highestBid = Number(player.reservePrice) || 0;
     }
 
     player.highestBid = highestBid;
@@ -1773,7 +1773,7 @@ app.get('/api/market/snapshot', async (req, res) => {
             });
 
         const topBids = [...list]
-            .filter(p => p.highestBid > 0 && p.auctionStatus !== 'sold')
+            .filter(p => p.highestBid > 0 && (p.highestBidder || '').trim() && p.auctionStatus !== 'sold')
             .sort((a, b) => b.highestBid - a.highestBid)
             .slice(0, 15);
 

@@ -619,11 +619,18 @@ app.use(async (req, res, next) => {
         // Most recent auction events, for the audit log under the Auction
         // tab. Admins get the full feed; everyone else still sees a public
         // trail of bids/wins (no private budget figures leak through this).
-        const auctionActivityFeed = await AuctionActivity
-            .find()
-            .sort({ createdAt: -1 })
-            .limit(80)
-            .lean();
+        let auctionActivityFeed = [];
+        try {
+            auctionActivityFeed = await AuctionActivity
+                .find({ type: { $in: ['bid', 'withdraw', 'won', 'auction_start', 'auction_end', 'rank_change'] } })
+                .sort({ createdAt: -1 })
+                .limit(120)
+                .select('type playerName teamName managerName amount meta createdAt')
+                .lean();
+        } catch (feedErr) {
+            console.error('Auction activity feed failed:', feedErr.message);
+            auctionActivityFeed = [];
+        }
 
         res.locals = {
             ...res.locals,
@@ -2781,6 +2788,53 @@ app.post('/admin/add-auction-team', async (req, res) => {
         res.redirect(
             '/admin?error=AddAuctionTeamFailed'
         );
+    }
+});
+
+
+// Edit total budget (and optional spent) for an enrolled auction team.
+// Available money = budget - spent - sum(active bids). Raising budget
+// increases what they can still bid with; does not wipe bids.
+app.post('/admin/auction/update-team-budget', async (req, res) => {
+    if (!requireAdmin(req, res)) return;
+    try {
+        const { teamId, budget, spent } = req.body;
+        if (!teamId) {
+            return res.redirect('/admin?error=Team required');
+        }
+        const team = await AuctionTeam.findById(teamId);
+        if (!team) {
+            return res.redirect('/admin?error=Team not found');
+        }
+
+        if (budget !== undefined && budget !== '') {
+            const b = Number(budget);
+            if (!Number.isFinite(b) || b < 0) {
+                return res.redirect('/admin?error=Invalid budget amount');
+            }
+            team.budget = b;
+        }
+        if (spent !== undefined && spent !== '') {
+            const s = Number(spent);
+            if (!Number.isFinite(s) || s < 0) {
+                return res.redirect('/admin?error=Invalid spent amount');
+            }
+            team.spent = s;
+        }
+
+        await team.save();
+
+        const locked = (team.bids || []).reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
+        const available = Number(team.budget || 0) - Number(team.spent || 0) - locked;
+
+        res.redirect('/admin?error=' + encodeURIComponent(
+            team.name + ': budget ' + Number(team.budget).toLocaleString() +
+            ' · locked ' + locked.toLocaleString() +
+            ' · available ~' + available.toLocaleString() + ' V'
+        ));
+    } catch (err) {
+        console.error('Update team budget error:', err);
+        res.redirect('/admin?error=UpdateBudgetFailed');
     }
 });
 

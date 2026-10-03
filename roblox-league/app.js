@@ -219,14 +219,15 @@ function getAuctionStatus(info) {
     return (info && info.auction && info.auction.status) || 'ready';
 }
 
-// Bidding only while LIVE. PAUSED freezes bids/registration/ranks.
+// Bidding only while LIVE. PAUSED freezes bids + registration.
 function isBiddingOpen(status) {
     return status === 'live';
 }
 
-// Rank edits blocked while LIVE or PAUSED.
+// Rank edits blocked only while LIVE.
+// While PAUSED, admin may re-rank players; active bids on that player are wiped.
 function isRankFrozen(status) {
-    return status === 'live' || status === 'paused';
+    return status === 'live';
 }
 
 // Registration blocked while LIVE or PAUSED.
@@ -1139,6 +1140,56 @@ app.get('/auth/discord/callback', async (req, res) => {
 // ============================================================
 // AUCTION BIDDING ROUTES
 // ============================================================
+
+
+// When a player's rank changes mid-session, every active bid on them is
+// reverted so managers must re-price under the new class/caps/reserve.
+// Money is unlocked automatically (bid rows removed from team.bids).
+async function revertBidsAfterRankChange(player, oldRank, newRank) {
+    if (!player || !player._id) return { cleared: 0 };
+    const playerId = player._id;
+    const teams = await AuctionTeam.find();
+    let cleared = 0;
+
+    for (const team of teams) {
+        const removed = (team.bids || []).filter(
+            b => b.playerId && b.playerId.toString() === playerId.toString()
+        );
+        if (!removed.length) continue;
+
+        team.bids = (team.bids || []).filter(
+            b => !(b.playerId && b.playerId.toString() === playerId.toString())
+        );
+        await team.save();
+        cleared += removed.length;
+
+        for (const bid of removed) {
+            await AuctionActivity.create({
+                type: 'withdraw',
+                playerId: player._id,
+                playerName: player.name || '',
+                teamId: team._id,
+                teamName: team.name || '',
+                managerName: team.manager || '',
+                amount: Number(bid.amount) || 0,
+                meta: {
+                    reason: 'rank_change_revert',
+                    oldRank: oldRank || '',
+                    newRank: newRank || ''
+                }
+            });
+        }
+    }
+
+    // Reset market high to the new class reserve.
+    player.reservePrice = getReservePriceForClass(newRank || getPlayerClass(player));
+    player.highestBid = 0;
+    player.highestBidder = '';
+    await player.save();
+    await refreshPlayerHighestBid(player._id);
+
+    return { cleared };
+}
 
 async function refreshPlayerHighestBid(playerId) {
     const player = await Player.findById(playerId);
@@ -2307,24 +2358,46 @@ app.post('/admin/approve-player', async (req, res) => {
         const info = await getInfo();
         const auctionStatus = getAuctionStatus(info);
 
+        let rankChanged = false;
+        let oldRank = '';
+        const playerBefore = await Player.findById(req.body.playerId);
+
         if (allowedRanks.includes(submittedRank)) {
             if (isRankFrozen(auctionStatus)) {
-                return res.redirect('/admin?error=Ranks are frozen while the auction is live or paused. End or keep the auction in Ready/Ended to change ranks.');
+                return res.redirect('/admin?error=Ranks are frozen while the auction is LIVE. Pause the auction to edit ranks (bids on that player will be reverted).');
             }
-            updatePayload.rank = submittedRank;
+            oldRank = playerBefore ? getPlayerClass(playerBefore) : '';
+            if (oldRank !== submittedRank) {
+                rankChanged = true;
+                updatePayload.rank = submittedRank;
+                updatePayload.reservePrice = getReservePriceForClass(submittedRank);
+            }
         }
 
-        await Player.findByIdAndUpdate(
+        const playerAfter = await Player.findByIdAndUpdate(
             req.body.playerId,
-            updatePayload
+            updatePayload,
+            { new: true }
         );
 
-        if (allowedRanks.includes(submittedRank)) {
+        if (rankChanged && playerAfter) {
+            const result = await revertBidsAfterRankChange(playerAfter, oldRank, submittedRank);
             await AuctionActivity.create({
                 type: 'rank_change',
-                playerId: req.body.playerId,
-                meta: { rank: submittedRank, via: 'approval' }
+                playerId: playerAfter._id,
+                playerName: playerAfter.name || '',
+                meta: {
+                    rank: submittedRank,
+                    oldRank,
+                    via: 'approval',
+                    bidsReverted: result.cleared
+                }
             });
+            return res.redirect(
+                '/admin?error=' + encodeURIComponent(
+                    `Rank set to ${submittedRank}. ${result.cleared} active bid(s) on this player were reverted — managers must re-bid.`
+                )
+            );
         }
 
         res.redirect('/admin');
@@ -2385,26 +2458,46 @@ app.post('/admin/update-market-player', async (req, res) => {
         const info = await getInfo();
         const auctionStatus = getAuctionStatus(info);
 
+        let rankChanged = false;
+        let oldRank = '';
+        const playerBefore = await Player.findOne({ name: username });
+
         if (allowedRanks.includes(submittedRank)) {
             if (isRankFrozen(auctionStatus)) {
-                return res.redirect('/admin?error=Ranks are frozen while the auction is live or paused. End or keep the auction in Ready/Ended to change ranks.');
+                return res.redirect('/admin?error=Ranks are frozen while the auction is LIVE. Pause the auction to edit ranks (bids on that player will be reverted).');
             }
-            updatePayload.rank = submittedRank;
+            oldRank = playerBefore ? getPlayerClass(playerBefore) : '';
+            if (oldRank !== submittedRank) {
+                rankChanged = true;
+                updatePayload.rank = submittedRank;
+                updatePayload.reservePrice = getReservePriceForClass(submittedRank);
+            }
         }
 
-        await Player.findOneAndUpdate(
-            {
-                name: username
-            },
-            updatePayload
+        const playerAfter = await Player.findOneAndUpdate(
+            { name: username },
+            updatePayload,
+            { new: true }
         );
 
-        if (allowedRanks.includes(submittedRank)) {
+        if (rankChanged && playerAfter) {
+            const result = await revertBidsAfterRankChange(playerAfter, oldRank, submittedRank);
             await AuctionActivity.create({
                 type: 'rank_change',
-                playerName: username,
-                meta: { rank: submittedRank, via: 'edit' }
+                playerId: playerAfter._id,
+                playerName: playerAfter.name || username,
+                meta: {
+                    rank: submittedRank,
+                    oldRank,
+                    via: 'edit',
+                    bidsReverted: result.cleared
+                }
             });
+            return res.redirect(
+                '/admin?error=' + encodeURIComponent(
+                    `Rank ${oldRank || '?'} → ${submittedRank}. ${result.cleared} active bid(s) reverted — managers must re-bid at the new class.`
+                )
+            );
         }
 
         res.redirect('/admin');

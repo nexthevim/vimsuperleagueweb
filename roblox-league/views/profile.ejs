@@ -61,7 +61,7 @@
 
                 <!-- CLASS SLOTS -->
                 <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
-                    <p class="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3">Class Slots Remaining</p>
+                    <p class="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3">Class Slots (you + winning bids)</p>
                     <div class="grid grid-cols-5 gap-2">
                         <% ['SS','S','A','B','C'].forEach(k => {
                             const has = myAuctionState.caps[k] !== undefined;
@@ -76,9 +76,9 @@
                             </div>
                         <% }) %>
                     </div>
-                    <% if (myAuctionState.team.allowTwoSS) { %>
-                        <p class="text-[9px] font-bold text-fuchsia-600 uppercase tracking-wider mt-2">✨ 2-SS Exception active for your team</p>
-                    <% } %>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-2">
+                        Caps auto-adjust: 0 SS → 4S/6A · 1 SS → 3S/5A · 2 SS → 2S/3A. Manager = 1 roster slot.
+                    </p>
                 </div>
 
                 <!-- WARNINGS -->
@@ -108,10 +108,12 @@
                         <p class="text-[10px] font-black uppercase tracking-wider text-emerald-600 mb-3">🟢 Currently Winning (<%= myAuctionState.provisional.length %>)</p>
                         <% if (myAuctionState.provisional.length > 0) { %>
                             <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
-                                <% myAuctionState.provisional.forEach(({player, amount}) => { %>
+                                <% myAuctionState.provisional.forEach(({player, amount, isManager}) => { %>
                                     <div class="flex items-center justify-between gap-2 bg-emerald-50/50 dark:bg-emerald-950/10 rounded-xl px-3 py-2">
-                                        <span class="text-xs font-black text-slate-900 dark:text-white truncate"><%= player.name %></span>
-                                        <span class="text-xs font-black text-emerald-600 flex-shrink-0"><%= Number(amount).toLocaleString() %></span>
+                                        <span class="text-xs font-black text-slate-900 dark:text-white truncate">
+                                            <%= player.name %><% if (isManager) { %> <span class="text-[8px] text-slate-400 uppercase">mgr</span><% } %>
+                                        </span>
+                                        <span class="text-xs font-black text-emerald-600 flex-shrink-0"><%= isManager ? '—' : Number(amount).toLocaleString() %></span>
                                     </div>
                                 <% }) %>
                             </div>
@@ -122,19 +124,47 @@
 
                     <!-- OUTBID -->
                     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
-                        <p class="text-[10px] font-black uppercase tracking-wider text-rose-600 mb-3">🔴 You've Been Outbid (<%= typeof myOutbidPlayers !== 'undefined' ? myOutbidPlayers.length : 0 %>)</p>
+                        <p class="text-[10px] font-black uppercase tracking-wider text-rose-600 mb-3">🔴 Outbid / locked bids (<%= typeof myOutbidPlayers !== 'undefined' ? myOutbidPlayers.length : 0 %>)</p>
                         <% if (typeof myOutbidPlayers !== 'undefined' && myOutbidPlayers.length > 0) { %>
-                            <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+                            <% const readyWithdraw = myOutbidPlayers.filter(x => x.canWithdraw); %>
+                            <% if (readyWithdraw.length > 0) { %>
+                                <div class="mb-3 rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-950/20 dark:border-emerald-800 px-3 py-2.5">
+                                    <p class="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400">You can withdraw now if you wish</p>
+                                    <p class="text-[10px] text-emerald-800/80 dark:text-emerald-300/80 font-semibold mt-1">
+                                        <%= readyWithdraw.map(x => x.name).join(', ') %> — 12h lock finished. Free your money on the Market.
+                                    </p>
+                                </div>
+                            <% } %>
+                            <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
                                 <% myOutbidPlayers.forEach(p => { %>
-                                    <div class="flex items-center justify-between gap-2 bg-rose-50/50 dark:bg-rose-950/10 rounded-xl px-3 py-2">
+                                    <div class="flex items-center justify-between gap-2 <%= p.canWithdraw ? 'bg-emerald-50/80 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900' : 'bg-rose-50/50 dark:bg-rose-950/10' %> rounded-xl px-3 py-2.5">
                                         <div class="min-w-0">
                                             <p class="text-xs font-black text-slate-900 dark:text-white truncate"><%= p.name %></p>
-                                            <p class="text-[9px] text-slate-400 font-bold uppercase truncate">by <%= p.highestBidder %></p>
+                                            <p class="text-[9px] text-slate-400 font-bold uppercase truncate">
+                                                Your bid <%= Number(p.myBidAmount || 0).toLocaleString() %> V · now <%= Number(p.highestBid || 0).toLocaleString() %> by <%= p.highestBidder || '—' %>
+                                            </p>
+                                            <% if (p.canWithdraw) { %>
+                                                <p class="text-[9px] font-black uppercase text-emerald-600 mt-1">Unlocked — withdraw anytime</p>
+                                            <% } else { %>
+                                                <p class="text-[9px] font-black uppercase text-amber-600 mt-1 outbid-countdown" data-remaining="<%= Number(p.remainingMs) || 0 %>">
+                                                    Unlock in <span class="countdown-text">…</span>
+                                                </p>
+                                            <% } %>
                                         </div>
-                                        <span class="text-xs font-black text-rose-600 flex-shrink-0"><%= Number(p.highestBid).toLocaleString() %></span>
+                                        <div class="text-right flex-shrink-0">
+                                            <span class="text-xs font-black <%= p.canWithdraw ? 'text-emerald-600' : 'text-rose-600' %>"><%= Number(p.myBidAmount || p.highestBid || 0).toLocaleString() %></span>
+                                            <% if (p.canWithdraw) { %>
+                                                <p class="text-[8px] font-bold text-emerald-600 uppercase mt-0.5">Ready</p>
+                                            <% } else { %>
+                                                <p class="text-[8px] font-bold text-slate-400 uppercase mt-0.5">Locked</p>
+                                            <% } %>
+                                        </div>
                                     </div>
                                 <% }) %>
                             </div>
+                            <p class="text-[9px] text-slate-400 font-semibold mt-2 leading-relaxed">
+                                Highest bids: withdraw anytime. Outbid: money locked 12 hours, then you can withdraw.
+                            </p>
                         <% } else { %>
                             <p class="text-xs text-slate-400 italic font-bold">You haven't been outbid on anything.</p>
                         <% } %>
@@ -170,6 +200,36 @@
                     </a>
                 </div>
 
+            </div>
+        <% } %>
+
+        <!-- RECENT BIDS ON YOU (player tracking during auction) -->
+        <% if (typeof myRecentBids !== 'undefined' && myRecentBids && myRecentBids.length > 0) { %>
+            <div class="mb-10 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 md:p-6 shadow-sm">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="text-lg">📈</span>
+                    <div>
+                        <h2 class="text-sm font-black italic uppercase tracking-tight text-slate-900 dark:text-white">Recent Bids On You</h2>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Track which teams are bidding on your card</p>
+                    </div>
+                </div>
+                <div class="space-y-2 max-h-64 overflow-y-auto pr-1">
+                    <% myRecentBids.forEach(b => { %>
+                        <div class="flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-950 rounded-xl px-4 py-2.5 border border-slate-100 dark:border-slate-800">
+                            <div class="min-w-0">
+                                <p class="text-xs font-black text-slate-900 dark:text-white truncate"><%= b.teamName || 'Unknown team' %></p>
+                                <p class="text-[9px] text-slate-400 font-bold uppercase truncate">
+                                    <%= b.managerName ? ('mgr ' + b.managerName + ' · ') : '' %><%= b.createdAt ? new Date(b.createdAt).toLocaleString() : '' %>
+                                </p>
+                            </div>
+                            <span class="text-sm font-black text-emerald-600 flex-shrink-0"><%= Number(b.amount || 0).toLocaleString() %></span>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } else if (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.status === 'live') { %>
+            <div class="mb-10 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 p-5 text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">No bids on your card yet — auction is live</p>
             </div>
         <% } %>
 
@@ -365,4 +425,34 @@
         const savedTheme = localStorage.getItem('vim_theme') || "<%= user ? (user.theme || 'system') : 'system' %>";
         setTheme(savedTheme);
     })();
+</script>
+
+<script>
+(function() {
+    function fmt(ms) {
+        if (ms <= 0) return '0m';
+        var h = Math.floor(ms / 3600000);
+        var m = Math.floor((ms % 3600000) / 60000);
+        var s = Math.floor((ms % 60000) / 1000);
+        if (h > 0) return h + 'h ' + m + 'm';
+        if (m > 0) return m + 'm ' + s + 's';
+        return s + 's';
+    }
+    function tick() {
+        document.querySelectorAll('.outbid-countdown').forEach(function(el) {
+            var rem = Number(el.getAttribute('data-remaining')) || 0;
+            rem = Math.max(0, rem - 1000);
+            el.setAttribute('data-remaining', String(rem));
+            var span = el.querySelector('.countdown-text');
+            if (span) span.textContent = fmt(rem);
+            if (rem <= 0) {
+                el.textContent = 'Unlocked — refresh to withdraw';
+                el.classList.remove('text-amber-600');
+                el.classList.add('text-emerald-600');
+            }
+        });
+    }
+    tick();
+    setInterval(tick, 1000);
+})();
 </script>

@@ -1421,11 +1421,8 @@ app.post('/auction/withdraw', async (req, res) => {
         }
 
         const existingBid =
-            team.bids.find(
-                b =>
-                    b.playerId &&
-                    b.playerId.toString() ===
-                    playerId.toString()
+            (team.bids || []).find(
+                b => b.playerId && String(b.playerId) === String(playerId)
             );
 
         if (!existingBid) {
@@ -1471,23 +1468,46 @@ app.post('/auction/withdraw', async (req, res) => {
             }
         }
 
-        team.bids =
-            team.bids.filter(
-                b =>
-                    !b.playerId ||
-                    b.playerId.toString() !==
-                        playerId.toString()
+        // Normalize id compare — ObjectId vs string mismatches were leaving
+        // ghost bids on the team (audit log wrote, money still locked).
+        const pid = String(playerId);
+        const beforeCount = (team.bids || []).length;
+        team.bids = (team.bids || []).filter(
+            b => !(b.playerId && String(b.playerId) === pid)
+        );
+        if (team.bids.length === beforeCount) {
+            // Fallback $pull if in-memory filter missed (stale path)
+            await AuctionTeam.updateOne(
+                { _id: team._id },
+                { $pull: { bids: { playerId: playerId } } }
             );
+        } else {
+            team.markModified('bids');
+            await team.save();
+        }
 
-        await team.save();
+        // Belt-and-suspenders: always $pull so DB is clean even if array ops flaky
+        await AuctionTeam.updateOne(
+            { _id: team._id },
+            { $pull: { bids: { playerId: playerId } } }
+        );
+        // Also pull if playerId stored as string
+        await AuctionTeam.updateOne(
+            { _id: team._id },
+            { $pull: { bids: { playerId: pid } } }
+        );
 
-        const player =
-            await Player.findById(playerId);
+        const player = await Player.findById(playerId);
 
         if (player) {
-            await refreshPlayerHighestBid(
-                player._id
-            );
+            // If this team was showing as highest, clear before recompute
+            if ((player.highestBidder || '').toLowerCase() === (team.name || '').toLowerCase()) {
+                player.highestBid = 0;
+                player.highestBidder = '';
+                await player.save();
+            }
+
+            await refreshPlayerHighestBid(player._id);
 
             await AuctionActivity.create({
                 type: 'withdraw',
@@ -1496,7 +1516,8 @@ app.post('/auction/withdraw', async (req, res) => {
                 teamId: team._id,
                 teamName: team.name,
                 managerName: user.name,
-                amount: existingBid.amount
+                amount: Number(existingBid.amount) || 0,
+                meta: { source: 'manager_withdraw' }
             });
         }
 
@@ -3546,7 +3567,15 @@ app.post('/admin/auction/force-drop-bid', async (req, res) => {
         if (team.bids.length === before) {
             return res.redirect('/admin?error=That team has no bid on this player');
         }
+        team.markModified('bids');
         await team.save();
+        await AuctionTeam.updateOne({ _id: team._id }, { $pull: { bids: { playerId: playerId } } });
+        const playerTmp = await Player.findById(playerId);
+        if (playerTmp && (playerTmp.highestBidder || '').toLowerCase() === (team.name || '').toLowerCase()) {
+            playerTmp.highestBid = 0;
+            playerTmp.highestBidder = '';
+            await playerTmp.save();
+        }
         await refreshPlayerHighestBid(playerId);
 
         const player = await Player.findById(playerId);

@@ -101,7 +101,10 @@ const AuctionTeam = mongoose.model('AuctionTeam', new mongoose.Schema({
         playerId: mongoose.Schema.Types.ObjectId,
         playerName: String,
         amount: Number,
-        updatedAt: { type: Date, default: Date.now }
+        updatedAt: { type: Date, default: Date.now },
+        // Set when another team takes the lead. After OUTBID_LOCK_MS the
+        // manager may withdraw this losing bid and free the locked money.
+        outbidAt: { type: Date, default: null }
     }],
     roster: [{
         name: String,
@@ -608,7 +611,32 @@ app.use(async (req, res, next) => {
             myAuctionState = computeManagerAuctionState(myTeamDoc, playersById, rosterLimits);
 
             myOutbidPlayers = myAuctionState.outbidPlayerIds
-                .map(id => playersById.get(id))
+                .map(id => {
+                    const p = playersById.get(id);
+                    if (!p) return null;
+                    const bid = (myTeamDoc.bids || []).find(b => String(b.playerId) === String(id));
+                    const unlock = getOutbidUnlockInfo(bid || {});
+                    // Legacy outbid without outbidAt — treat as locked from updatedAt
+                    let unlockInfo = unlock;
+                    if (bid && !bid.outbidAt) {
+                        const fake = { outbidAt: bid.updatedAt || new Date() };
+                        unlockInfo = getOutbidUnlockInfo(fake);
+                    }
+                    return {
+                        _id: p._id,
+                        name: p.name,
+                        position: p.position,
+                        rank: p.rank,
+                        highestBid: p.highestBid,
+                        highestBidder: p.highestBidder,
+                        myBidAmount: bid ? Number(bid.amount) || 0 : 0,
+                        outbidAt: bid && bid.outbidAt ? bid.outbidAt : (bid && bid.updatedAt) || null,
+                        unlockAt: unlockInfo.unlockAt,
+                        remainingMs: unlockInfo.remainingMs,
+                        canWithdraw: unlockInfo.canWithdraw,
+                        locked: unlockInfo.locked
+                    };
+                })
                 .filter(Boolean);
 
             myWatchlistPlayers = (user.watchlist || [])
@@ -1346,6 +1374,7 @@ app.post('/auction/bid', async (req, res) => {
         await team.save();
 
         await refreshPlayerHighestBid(player._id);
+        await syncOutbidTimestamps(player._id);
 
         await AuctionActivity.create({
             type: 'bid',
@@ -1371,6 +1400,58 @@ app.post('/auction/bid', async (req, res) => {
         );
     }
 });
+
+
+// Mark losing bids with outbidAt; clear outbidAt on the current leader's bid.
+async function syncOutbidTimestamps(playerId) {
+    const player = await Player.findById(playerId);
+    if (!player) return;
+    const teams = await AuctionTeam.find();
+    const leader = (player.highestBidder || '').toLowerCase();
+    const highAmt = Number(player.highestBid) || 0;
+    const now = new Date();
+
+    for (const team of teams) {
+        let changed = false;
+        for (const bid of (team.bids || [])) {
+            if (!bid.playerId || String(bid.playerId) !== String(playerId)) continue;
+            const isLeader =
+                (team.name || '').toLowerCase() === leader &&
+                Number(bid.amount) === highAmt &&
+                highAmt > 0;
+            if (isLeader) {
+                if (bid.outbidAt) {
+                    bid.outbidAt = null;
+                    changed = true;
+                }
+            } else {
+                // Losing / not the high — start 12h clock once
+                if (!bid.outbidAt) {
+                    bid.outbidAt = now;
+                    changed = true;
+                }
+            }
+        }
+        if (changed) {
+            team.markModified('bids');
+            await team.save();
+        }
+    }
+}
+
+function getOutbidUnlockInfo(bid) {
+    if (!bid || !bid.outbidAt) {
+        return { locked: false, unlockAt: null, remainingMs: 0, canWithdraw: true };
+    }
+    const unlockAt = new Date(new Date(bid.outbidAt).getTime() + OUTBID_LOCK_MS);
+    const remainingMs = Math.max(0, unlockAt.getTime() - Date.now());
+    return {
+        locked: remainingMs > 0,
+        unlockAt,
+        remainingMs,
+        canWithdraw: remainingMs <= 0
+    };
+}
 
 // --- WITHDRAW BID ---
 
@@ -1438,39 +1519,34 @@ app.post('/auction/withdraw', async (req, res) => {
             );
         }
 
-        // THE WITHDRAWAL RULE: locked only while a RIVAL still has an
-        // ACTIVE bid placed after yours. If they withdraw, their activity
-        // log stays, but the lock lifts — you become highest again and
-        // can withdraw (until someone else bids after you).
-        const myLastBid = await AuctionActivity
-            .findOne({ type: 'bid', playerId: playerId, teamId: team._id })
-            .sort({ createdAt: -1 });
+        // WITHDRAW RULES:
+        // • Highest / only bid → withdraw anytime while auction is live.
+        // • Outbid → money stays locked for OUTBID_LOCK_MS (12h) from outbidAt,
+        //   then manager may withdraw to free the cash.
+        const playerForRule = await Player.findById(playerId);
+        const isWinning =
+            playerForRule &&
+            (playerForRule.highestBidder || '').toLowerCase() === (team.name || '').toLowerCase() &&
+            Number(playerForRule.highestBid || 0) === Number(existingBid.amount || 0);
 
-        if (myLastBid) {
-            const laterRivalBids = await AuctionActivity.find({
-                type: 'bid',
-                playerId: playerId,
-                teamId: { $ne: team._id },
-                createdAt: { $gt: myLastBid.createdAt }
-            }).sort({ createdAt: -1 });
-
-            let rivalStillActive = false;
-            for (const rivalAct of laterRivalBids) {
-                if (!rivalAct.teamId) continue;
-                const rivalTeam = await AuctionTeam.findById(rivalAct.teamId);
-                if (!rivalTeam) continue;
-                const stillHasBid = (rivalTeam.bids || []).some(
-                    b => b.playerId && b.playerId.toString() === playerId.toString()
-                );
-                if (stillHasBid) {
-                    rivalStillActive = true;
-                    break;
-                }
+        if (!isWinning) {
+            // Ensure outbidAt exists for legacy rows
+            if (!existingBid.outbidAt) {
+                existingBid.outbidAt = existingBid.updatedAt || new Date();
+                team.markModified('bids');
+                await team.save();
             }
-
-            if (rivalStillActive) {
+            const infoUnlock = getOutbidUnlockInfo(existingBid);
+            if (!infoUnlock.canWithdraw) {
+                const hrs = Math.ceil(infoUnlock.remainingMs / (60 * 60 * 1000));
+                const mins = Math.ceil(infoUnlock.remainingMs / (60 * 1000));
+                const wait =
+                    hrs >= 2 ? (hrs + ' hours') : (mins + ' minutes');
                 return res.redirect(
-                    '/market?error=Another manager has already bid since your last bid — this bid is now locked and cannot be withdrawn'
+                    '/market?error=' + encodeURIComponent(
+                        'You were outbid — this bid unlocks for withdraw in about ' + wait +
+                        '. Highest bids can still be withdrawn anytime.'
+                    )
                 );
             }
         }
@@ -1515,6 +1591,7 @@ app.post('/auction/withdraw', async (req, res) => {
             }
 
             await refreshPlayerHighestBid(player._id);
+            await syncOutbidTimestamps(player._id);
 
             await AuctionActivity.create({
                 type: 'withdraw',
@@ -3777,6 +3854,7 @@ app.post('/admin/auction/force-drop-bid', async (req, res) => {
         }
 
         await refreshPlayerHighestBid(player._id);
+        await syncOutbidTimestamps(player._id);
 
         await AuctionActivity.create({
             type: 'withdraw',

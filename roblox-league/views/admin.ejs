@@ -2910,8 +2910,18 @@
                             <% }) } %>
                         </select>
                         <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-2.5 rounded-xl font-black uppercase text-[10px] transition">
-                            ↩ Force-Drop Bid
+                            ↩ Force-Drop / Clear Ghost
                         </button>
+                    </form>
+                    <form action="/admin/auction/reconcile-highs" method="POST"
+                        onsubmit="return confirm('Recompute ALL player high bids from real team bid rows? Safe — does not invent bids.');"
+                        class="pt-1">
+                        <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-xl font-black uppercase text-[10px] transition">
+                            Reconcile all high bids
+                        </button>
+                        <p class="text-[8px] text-slate-400 font-bold uppercase mt-1.5 text-center">
+                            Fixes players still showing a team after withdraw
+                        </p>
                     </form>
                 </div>
 

@@ -3550,7 +3550,37 @@ app.post('/admin/auction/resume', async (req, res) => {
     }
 });
 
+
+// RECONCILE: recompute every player's highestBid from real team.bids only.
+// Fixes ghost highs after broken withdraws. Does NOT invent bids.
+app.post('/admin/auction/reconcile-highs', async (req, res) => {
+    if (!requireAdmin(req, res)) return;
+    try {
+        const players = await Player.find({ verified: true });
+        let fixed = 0;
+        for (const player of players) {
+            if (player.auctionStatus === 'sold') continue;
+            const beforeBid = Number(player.highestBid) || 0;
+            const beforeName = player.highestBidder || '';
+            await refreshPlayerHighestBid(player._id);
+            const after = await Player.findById(player._id);
+            if (!after) continue;
+            if (Number(after.highestBid) !== beforeBid || (after.highestBidder || '') !== beforeName) {
+                fixed++;
+            }
+        }
+        res.redirect('/admin?error=' + encodeURIComponent(
+            'Reconcile done. Updated ' + fixed + ' player high-bid field(s) from live team bids.'
+        ));
+    } catch (err) {
+        console.error('Reconcile highs error:', err);
+        res.redirect('/admin?error=ReconcileFailed');
+    }
+});
+
 // FORCE-DROP a single bid (admin mercy / correction). Then recompute highest.
+// Also handles GHOST state: bid row already gone but player.highestBidder
+// still shows the team (broken withdraw). Clearing the high is enough then.
 app.post('/admin/auction/force-drop-bid', async (req, res) => {
     if (!requireAdmin(req, res)) return;
     try {
@@ -3561,36 +3591,80 @@ app.post('/admin/auction/force-drop-bid', async (req, res) => {
         const team = await AuctionTeam.findById(teamId);
         if (!team) return res.redirect('/admin?error=Team not found');
 
-        const before = (team.bids || []).length;
-        const dropped = (team.bids || []).find(b => b.playerId && String(b.playerId) === String(playerId));
-        team.bids = (team.bids || []).filter(b => !(b.playerId && String(b.playerId) === String(playerId)));
-        if (team.bids.length === before) {
-            return res.redirect('/admin?error=That team has no bid on this player');
-        }
-        team.markModified('bids');
-        await team.save();
-        await AuctionTeam.updateOne({ _id: team._id }, { $pull: { bids: { playerId: playerId } } });
-        const playerTmp = await Player.findById(playerId);
-        if (playerTmp && (playerTmp.highestBidder || '').toLowerCase() === (team.name || '').toLowerCase()) {
-            playerTmp.highestBid = 0;
-            playerTmp.highestBidder = '';
-            await playerTmp.save();
-        }
-        await refreshPlayerHighestBid(playerId);
-
         const player = await Player.findById(playerId);
+        if (!player) return res.redirect('/admin?error=Player not found');
+
+        const pid = String(playerId);
+        const dropped = (team.bids || []).find(b => b.playerId && String(b.playerId) === pid);
+        const before = (team.bids || []).length;
+        team.bids = (team.bids || []).filter(b => !(b.playerId && String(b.playerId) === pid));
+        const removedFromTeam = team.bids.length !== before;
+
+        if (removedFromTeam) {
+            team.markModified('bids');
+            await team.save();
+        }
+        // Always $pull in case of ObjectId/string mismatch leftovers
+        await AuctionTeam.updateOne({ _id: team._id }, { $pull: { bids: { playerId: player._id } } });
+        try {
+            await AuctionTeam.updateOne({ _id: team._id }, { $pull: { bids: { playerId: pid } } });
+        } catch (e) { /* ignore */ }
+
+        const wasHighest =
+            (player.highestBidder || '').toLowerCase() === (team.name || '').toLowerCase();
+
+        if (!removedFromTeam && !wasHighest && !dropped) {
+            // Last resort: still clear high if this team name is on the player
+            // and no other team holds a bid row for them.
+            const anyBid = await AuctionTeam.findOne({ 'bids.playerId': player._id });
+            if (!anyBid) {
+                player.highestBid = 0;
+                player.highestBidder = '';
+                await player.save();
+                await refreshPlayerHighestBid(player._id);
+                await AuctionActivity.create({
+                    type: 'withdraw',
+                    playerId: player._id,
+                    playerName: player.name || '',
+                    teamId: team._id,
+                    teamName: team.name,
+                    managerName: 'ADMIN',
+                    amount: Number(player.highestBid) || 0,
+                    meta: { forced: true, ghostClear: true, note: 'cleared stale high with no team bid rows' }
+                });
+                return res.redirect('/admin?error=' + encodeURIComponent(
+                    'No bid row on that team — cleared stale high on player if present. Market should update.'
+                ));
+            }
+            return res.redirect('/admin?error=' + encodeURIComponent(
+                'That team has no bid row on this player (and is not the listed highest bidder). Pick the team shown as highestBidder, or run Reconcile highs.'
+            ));
+        }
+
+        if (wasHighest) {
+            player.highestBid = 0;
+            player.highestBidder = '';
+            await player.save();
+        }
+
+        await refreshPlayerHighestBid(player._id);
+
         await AuctionActivity.create({
             type: 'withdraw',
-            playerId,
-            playerName: (player && player.name) || (dropped && dropped.playerName) || '',
+            playerId: player._id,
+            playerName: player.name || '',
             teamId: team._id,
             teamName: team.name,
             managerName: 'ADMIN',
-            amount: dropped ? dropped.amount : 0,
-            meta: { forced: true }
+            amount: dropped ? Number(dropped.amount) || 0 : 0,
+            meta: { forced: true, removedFromTeam: !!removedFromTeam, wasHighest: !!wasHighest }
         });
 
-        res.redirect('/admin');
+        res.redirect('/admin?error=' + encodeURIComponent(
+            removedFromTeam
+                ? 'Bid force-dropped. Money unlocked and high bid recomputed.'
+                : 'Ghost high cleared (bid row was already gone). High bid recomputed.'
+        ));
     } catch (err) {
         console.error('Force Drop Bid Error:', err);
         res.redirect('/admin?error=ForceDropBidFailed');

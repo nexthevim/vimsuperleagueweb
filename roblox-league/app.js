@@ -241,6 +241,9 @@ function isRegistrationClosed(status) {
 
 // Fixed minimum bid increments — no meaningless +1/+2 bidding.
 // Configurable in one place if the league wants different tiers later.
+// After being outbid, money stays locked this long before withdraw is allowed.
+const OUTBID_LOCK_MS = 12 * 60 * 60 * 1000; // 12 hours
+
 const BID_INCREMENT_TIERS = [
     { upTo: 5000, step: 100 },
     { upTo: 20000, step: 250 },
@@ -577,8 +580,8 @@ app.use(async (req, res, next) => {
         let isManager = false;
         let myTeamDoc = null;
 
-        if (user) {
-            const escapedName = user.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        if (user && user.name) {
+            const escapedName = String(user.name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
             const teamDoc = await AuctionTeam.findOne({
                 manager: new RegExp(`^${escapedName}$`, 'i')
@@ -605,12 +608,13 @@ app.use(async (req, res, next) => {
         let myOutbidPlayers = [];
 
         if (isManager && myTeamDoc) {
+          try {
             const playersById = new Map(players.map(p => [String(p._id), p]));
             const rosterLimits = getRosterLimits(info.auction);
 
             myAuctionState = computeManagerAuctionState(myTeamDoc, playersById, rosterLimits);
 
-            myOutbidPlayers = myAuctionState.outbidPlayerIds
+            myOutbidPlayers = (myAuctionState.outbidPlayerIds || [])
                 .map(id => {
                     const p = playersById.get(id);
                     if (!p) return null;
@@ -642,6 +646,12 @@ app.use(async (req, res, next) => {
             myWatchlistPlayers = (user.watchlist || [])
                 .map(id => playersById.get(String(id)))
                 .filter(Boolean);
+          } catch (mgrErr) {
+            console.error('Manager state error:', mgrErr.message);
+            myAuctionState = null;
+            myOutbidPlayers = [];
+            myWatchlistPlayers = [];
+          }
         }
 
         // Most recent auction events, for the audit log under the Auction
@@ -1440,17 +1450,28 @@ async function syncOutbidTimestamps(playerId) {
 }
 
 function getOutbidUnlockInfo(bid) {
-    if (!bid || !bid.outbidAt) {
-        return { locked: false, unlockAt: null, remainingMs: 0, canWithdraw: true };
+    try {
+        if (!bid || !bid.outbidAt) {
+            return { locked: false, unlockAt: null, remainingMs: 0, canWithdraw: true };
+        }
+        const lockMs = (typeof OUTBID_LOCK_MS === 'number' && OUTBID_LOCK_MS > 0)
+            ? OUTBID_LOCK_MS
+            : (12 * 60 * 60 * 1000);
+        const start = new Date(bid.outbidAt).getTime();
+        if (!Number.isFinite(start)) {
+            return { locked: false, unlockAt: null, remainingMs: 0, canWithdraw: true };
+        }
+        const unlockAt = new Date(start + lockMs);
+        const remainingMs = Math.max(0, unlockAt.getTime() - Date.now());
+        return {
+            locked: remainingMs > 0,
+            unlockAt,
+            remainingMs,
+            canWithdraw: remainingMs <= 0
+        };
+    } catch (e) {
+        return { locked: true, unlockAt: null, remainingMs: 12 * 60 * 60 * 1000, canWithdraw: false };
     }
-    const unlockAt = new Date(new Date(bid.outbidAt).getTime() + OUTBID_LOCK_MS);
-    const remainingMs = Math.max(0, unlockAt.getTime() - Date.now());
-    return {
-        locked: remainingMs > 0,
-        unlockAt,
-        remainingMs,
-        canWithdraw: remainingMs <= 0
-    };
 }
 
 // --- WITHDRAW BID ---

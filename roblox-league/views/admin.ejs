@@ -2659,12 +2659,12 @@
     <!-- ========================================================= -->
     <!-- CATEGORY 6: AUCTION CONTROL -->
     <!-- ========================================================= -->
-    <section id="section-auction" class="tab-section hidden space-y-8">
+    <section id="section-auction" class="tab-section hidden space-y-6">
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
 
             <!-- SESSION CONTROL -->
-            <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 lg:col-span-1 shadow-sm">
+            <div class="bg-white border border-slate-200 p-5 md:p-6 rounded-2xl space-y-5 xl:col-span-4 shadow-sm">
 
                 <div>
                     <span class="text-xs font-black uppercase tracking-widest text-purple-600 bg-purple-100 px-3 py-1 rounded-full border border-purple-200">
@@ -2965,7 +2965,7 @@
 
 
             <!-- TEAM SETUP -->
-            <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-3xl space-y-6 lg:col-span-2 shadow-sm">
+            <div class="bg-white border border-slate-200 p-5 md:p-6 rounded-2xl space-y-5 xl:col-span-8 shadow-sm min-w-0">
 
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-200 pb-4">
 
@@ -3140,23 +3140,58 @@
 
                                     <div class="bg-white p-3 rounded-xl border border-slate-200">
                                         <p class="text-[8px] font-black uppercase text-slate-400">
-                                            Budget
+                                            Total budget
                                         </p>
                                         <p class="text-sm font-black text-emerald-600 font-mono mt-1">
-                                            $<%= Number(aTeam.budget || 0).toLocaleString() %>
+                                            <%= Number(aTeam.budget || 0).toLocaleString() %> V
                                         </p>
                                     </div>
 
                                     <div class="bg-white p-3 rounded-xl border border-slate-200">
                                         <p class="text-[8px] font-black uppercase text-slate-400">
-                                            Won
+                                            Locked in bids
                                         </p>
-                                        <p class="text-sm font-black text-purple-600 mt-1">
-                                            <%= Array.isArray(aTeam.wonPlayers) ? aTeam.wonPlayers.length : (Array.isArray(aTeam.roster) ? aTeam.roster.length : 0) %>
+                                        <%
+                                            const lockedBids = Array.isArray(aTeam.bids)
+                                                ? aTeam.bids.reduce((s, b) => s + (Number(b.amount) || 0), 0)
+                                                : 0;
+                                            const availNow = Number(aTeam.budget || 0) - Number(aTeam.spent || 0) - lockedBids;
+                                        %>
+                                        <p class="text-sm font-black text-amber-600 font-mono mt-1">
+                                            <%= lockedBids.toLocaleString() %> V
                                         </p>
+                                        <p class="text-[8px] text-slate-400 font-bold mt-0.5">Free ~<%= availNow.toLocaleString() %> V</p>
                                     </div>
 
                                 </div>
+
+                                <form action="/admin/auction/update-team-budget" method="POST"
+                                    class="bg-white border border-slate-200 rounded-xl p-3 space-y-2"
+                                    onsubmit="return confirm('Update budget for <%= (aTeam.name || '').replace(/'/g, "\\'") %>?');">
+                                    <input type="hidden" name="teamId" value="<%= aTeam._id || aTeam.id %>">
+                                    <p class="text-[9px] font-black uppercase text-slate-500 tracking-wider">Edit money</p>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="text-[8px] font-bold uppercase text-slate-400">Total budget</label>
+                                            <input type="number" name="budget" min="0" step="1"
+                                                value="<%= Number(aTeam.budget || 0) %>"
+                                                class="admin-input text-[11px] py-2">
+                                        </div>
+                                        <div>
+                                            <label class="text-[8px] font-bold uppercase text-slate-400">Spent (end only)</label>
+                                            <input type="number" name="spent" min="0" step="1"
+                                                value="<%= Number(aTeam.spent || 0) %>"
+                                                class="admin-input text-[11px] py-2">
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-[10px] font-black uppercase transition">
+                                        Save budget
+                                    </button>
+                                    <p class="text-[8px] text-slate-400 font-semibold leading-relaxed">
+                                        Free money = total − spent − locked bids. Raise total to give them more to bid with. Does not remove their bids.
+                                    </p>
+                                </form>
 
                                 <!-- CLASS BREAKDOWN (auto caps from SS count) -->
                                 <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
@@ -3331,8 +3366,67 @@
 
                 </div>
 
+
             </div>
 
+        </div>
+
+        <!-- AUCTION AUDIT LOG (full width) -->
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/80">
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-wider text-slate-800">Auction audit log</p>
+                    <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Live trail of bids, withdraws, force-drops, rank changes, start/end</p>
+                </div>
+                <span class="text-[10px] font-bold text-slate-500 bg-white border border-slate-200 px-2.5 py-1 rounded-lg">
+                    <%= typeof auctionActivityFeed !== 'undefined' ? auctionActivityFeed.length : 0 %> recent
+                </span>
+            </div>
+            <div class="max-h-[420px] overflow-y-auto divide-y divide-slate-100">
+                <% if (typeof auctionActivityFeed === 'undefined' || !auctionActivityFeed || !auctionActivityFeed.length) { %>
+                    <p class="text-center text-xs text-slate-400 font-bold uppercase tracking-wider py-12">No auction events yet</p>
+                <% } else { %>
+                    <% auctionActivityFeed.forEach(function(ev) {
+                        const t = String(ev.type || '').toLowerCase();
+                        let badge = 'bg-slate-100 text-slate-600';
+                        let label = t || 'event';
+                        if (t === 'bid') { badge = 'bg-blue-50 text-blue-700'; label = 'BID'; }
+                        else if (t === 'withdraw') { badge = 'bg-amber-50 text-amber-700'; label = (ev.meta && ev.meta.forced) ? 'FORCE DROP' : 'WITHDRAW'; }
+                        else if (t === 'won') { badge = 'bg-emerald-50 text-emerald-700'; label = 'WON'; }
+                        else if (t === 'auction_start') { badge = 'bg-red-50 text-red-700'; label = 'START'; }
+                        else if (t === 'auction_end') { badge = 'bg-slate-800 text-white'; label = 'END'; }
+                        else if (t === 'rank_change') { badge = 'bg-purple-50 text-purple-700'; label = 'RANK'; }
+                    %>
+                        <div class="px-4 py-3 flex items-start gap-3 hover:bg-slate-50/80">
+                            <span class="flex-shrink-0 text-[9px] font-black uppercase tracking-wide px-2 py-1 rounded-md <%= badge %>"><%= label %></span>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-xs font-bold text-slate-900 truncate">
+                                    <% if (ev.playerName) { %><%= ev.playerName %><% } else { %><span class="text-slate-400">—</span><% } %>
+                                    <% if (ev.meta && ev.meta.oldRank && ev.meta.rank) { %>
+                                        <span class="text-slate-400 font-semibold"> · <%= ev.meta.oldRank %> → <%= ev.meta.rank %></span>
+                                    <% } else if (ev.meta && ev.meta.rank) { %>
+                                        <span class="text-slate-400 font-semibold"> · → <%= ev.meta.rank %></span>
+                                    <% } %>
+                                </p>
+                                <p class="text-[10px] text-slate-500 font-semibold truncate mt-0.5">
+                                    <% if (ev.teamName) { %><%= ev.teamName %><% } %>
+                                    <% if (ev.managerName) { %> · <%= ev.managerName %><% } %>
+                                    <% if (ev.meta && ev.meta.ghostClear) { %> · ghost clear<% } %>
+                                    <% if (ev.meta && ev.meta.reason) { %> · <%= ev.meta.reason %><% } %>
+                                </p>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <% if (ev.amount) { %>
+                                    <p class="text-xs font-black text-slate-900"><%= Number(ev.amount).toLocaleString() %> V</p>
+                                <% } %>
+                                <p class="text-[9px] text-slate-400 font-bold">
+                                    <%= ev.createdAt ? new Date(ev.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '' %>
+                                </p>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
         </div>
 
     </section>

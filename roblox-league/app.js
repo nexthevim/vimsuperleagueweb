@@ -553,26 +553,37 @@ function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersByI
 // --- GLOBAL MIDDLEWARE ---
 
 app.use(async (req, res, next) => {
+    // Skip heavy DB work for static / health checks (stops useless load on Render)
+    const p = req.path || '';
+    if (
+        p.startsWith('/css') ||
+        p.startsWith('/js') ||
+        p.startsWith('/images') ||
+        p.startsWith('/favicon') ||
+        p === '/health' ||
+        p === '/healthz'
+    ) {
+        return next();
+    }
+
     try {
         const info = await getInfo();
 
-        const players = await Player.find();
+        const players = await Player.find().lean();
 
         const user = req.session.playerId
-            ? await Player.findById(req.session.playerId)
+            ? await Player.findById(req.session.playerId).lean()
             : null;
 
-        const auctionTeams = (await AuctionTeam.find()).map(team => {
-            const plain = team.toObject();
-
+        const auctionTeams = (await AuctionTeam.find().lean()).map(team => {
+            const plain = { ...team };
             // admin.ejs expects each auction team to expose "wonPlayers" —
             // that's just the team's current bids, renamed/shaped for the view.
-            plain.id = team._id.toString();
+            plain.id = team._id ? team._id.toString() : '';
             plain.wonPlayers = (plain.bids || []).map(bid => ({
-                id: bid.playerId ? bid.playerId.toString() : "",
-                name: bid.playerName || ""
+                id: bid.playerId ? bid.playerId.toString() : '',
+                name: bid.playerName || ''
             }));
-
             return plain;
         });
 
@@ -675,9 +686,9 @@ app.use(async (req, res, next) => {
 
             players: players,
 
-            matches: await Match.find(),
+            matches: await Match.find().lean(),
 
-            groups: await Group.find(),
+            groups: await Group.find().lean(),
 
             auctionTeams: auctionTeams,
 
@@ -719,7 +730,33 @@ app.use(async (req, res, next) => {
         next();
 
     } catch (err) {
-        next(err);
+        // Never take down the whole page for one bad locals build (Render OOM /
+        // bad session / outbid helper). Log and continue with safe empties.
+        console.error('Global middleware error:', err && err.message ? err.message : err);
+        res.locals = {
+            ...(res.locals || {}),
+            players: res.locals.players || [],
+            matches: res.locals.matches || [],
+            groups: res.locals.groups || [],
+            auctionTeams: res.locals.auctionTeams || [],
+            liveLink: (res.locals.liveLink != null ? res.locals.liveLink : ''),
+            leaderboards: res.locals.leaderboards || {},
+            records: res.locals.records || [],
+            stories: res.locals.stories || [],
+            auctionSettings: res.locals.auctionSettings || {},
+            auctionSession: res.locals.auctionSession || {},
+            isAdmin: !!(req.session && req.session.isAdmin),
+            user: res.locals.user || null,
+            isManager: false,
+            currentManagerTeam: null,
+            managerPlayerNames: [],
+            myAuctionState: null,
+            myWatchlistPlayers: [],
+            myOutbidPlayers: [],
+            auctionActivityFeed: [],
+            page: res.locals.page || ''
+        };
+        next();
     }
 });
 
@@ -4553,6 +4590,26 @@ app.post('/admin-login', (req, res) => {
 // ============================================================
 // START SERVER
 // ============================================================
+
+// ---- Crash shields (Render / multi-user) ----
+// Unhandled errors must not kill the process silently without a log.
+process.on('uncaughtException', (err) => {
+    console.error('uncaughtException:', err && err.stack ? err.stack : err);
+});
+process.on('unhandledRejection', (reason) => {
+    console.error('unhandledRejection:', reason);
+});
+
+// Express 4 error middleware — last resort so users see a short message, not a blank 500.
+app.use((err, req, res, next) => {
+    console.error('Express error:', err && err.stack ? err.stack : err);
+    if (res.headersSent) return next(err);
+    res.status(500).send(
+        'Something went wrong loading this page. Refresh in a moment. If it keeps happening, tell an admin.'
+    );
+});
+
+app.get('/health', (req, res) => res.status(200).send('ok'));
 
 app.listen(
     process.env.PORT || 3000,

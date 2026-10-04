@@ -639,15 +639,54 @@ app.use(async (req, res, next) => {
             ? await Player.findById(req.session.playerId).lean()
             : null;
 
-        const auctionTeams = (await AuctionTeam.find().lean()).map(team => {
+        const auctionTeamDocs = await AuctionTeam.find().lean();
+        // playerId -> { highestBidder, highestBid } for win checks
+        const bidLeadByPlayer = new Map();
+        for (const pl of players) {
+            bidLeadByPlayer.set(String(pl._id), {
+                highestBidder: (pl.highestBidder || '').toLowerCase(),
+                highestBid: Number(pl.highestBid) || 0
+            });
+        }
+
+        const auctionTeams = auctionTeamDocs.map(team => {
             const plain = { ...team };
-            // admin.ejs expects each auction team to expose "wonPlayers" —
-            // that's just the team's current bids, renamed/shaped for the view.
             plain.id = team._id ? team._id.toString() : '';
-            plain.wonPlayers = (plain.bids || []).map(bid => ({
-                id: bid.playerId ? bid.playerId.toString() : '',
-                name: bid.playerName || ''
-            }));
+            const teamName = (team.name || '').toLowerCase();
+
+            // ONLY bids that are currently winning (match player.highestBidder + amount)
+            plain.wonPlayers = (plain.bids || [])
+                .filter(bid => {
+                    if (!bid.playerId) return false;
+                    const lead = bidLeadByPlayer.get(String(bid.playerId));
+                    if (!lead || !lead.highestBidder) return false;
+                    return lead.highestBidder === teamName
+                        && Number(bid.amount) === lead.highestBid
+                        && lead.highestBid > 0;
+                })
+                .map(bid => ({
+                    id: bid.playerId ? bid.playerId.toString() : '',
+                    name: bid.playerName || '',
+                    amount: Number(bid.amount) || 0
+                }));
+
+            // Outbid / locked bids still on the team (not winning)
+            plain.outbidPlayers = (plain.bids || [])
+                .filter(bid => {
+                    if (!bid.playerId) return false;
+                    const lead = bidLeadByPlayer.get(String(bid.playerId));
+                    if (!lead || !lead.highestBidder) return true; // no leader = odd state, treat as not win
+                    return !(lead.highestBidder === teamName
+                        && Number(bid.amount) === lead.highestBid
+                        && lead.highestBid > 0);
+                })
+                .map(bid => ({
+                    id: bid.playerId ? bid.playerId.toString() : '',
+                    name: bid.playerName || '',
+                    amount: Number(bid.amount) || 0
+                }));
+
+            plain.activeBidCount = (plain.bids || []).length;
             return plain;
         });
 

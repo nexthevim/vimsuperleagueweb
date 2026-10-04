@@ -192,10 +192,11 @@
     #spotlightRisingFull .text-slate-400 { color: #94a3b8 !important; }
     #spotlightTopFull:hover .hover\:bg-slate-50:hover,
     #spotlightTopFull .hover\:bg-slate-50:hover { background: rgba(255,255,255,0.05) !important; }
+}
 </style>
 
 <% if (typeof error !== 'undefined' && error) { %>
-    <div class="fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-red-600 text-white px-8 py-4 rounded-full font-black uppercase italic shadow-[0_15px_30px_rgba(220,38,38,0.3)] border border-white/20 animate-bounce text-xs tracking-wider">
+    <div class="fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-red-600 text-white px-8 py-4 rounded-full font-black uppercase italic shadow-[0_15px_30px_rgba(220,38,38,0.3)] border border-white/20 text-xs tracking-wider">
         ⚠️ <%= error %>
     </div>
 <% } %>
@@ -342,9 +343,9 @@
                                 <div class="relative flex flex-col items-center">
                                     <span class="absolute -top-3 z-30 text-2xl drop-shadow-lg"><%= medals[i] %></span>
                                     <div class="player-card w-[220px] h-[300px] glass-light rounded-[28px] border border-slate-200 shadow-lg relative group"
-                                         onmousemove="tiltCard(event, this)"
+                                         
                                          onmouseleave="resetTilt(this)"
-                                         onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
+                                         onmousemove="tiltCard(event, this)" onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
                                         <div class="card-sheen"></div>
                                         <% if (p.cardImage && String(p.cardImage).trim()) { %>
                                             <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover rounded-[28px]">
@@ -412,9 +413,9 @@
                             <div class="relative flex flex-col items-center">
                                 <span class="<%= spotPosClass(posKey) %> text-white text-[9px] font-black px-2.5 py-1 rounded-lg uppercase absolute -top-2 z-30 shadow"><%= posKey %></span>
                                 <div class="player-card w-[200px] h-[280px] glass-light rounded-[28px] border border-slate-200 shadow-lg relative group"
-                                     onmousemove="tiltCard(event, this)"
+                                     
                                      onmouseleave="resetTilt(this)"
-                                     onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
+                                     onmousemove="tiltCard(event, this)" onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
                                     <div class="card-sheen"></div>
                                     <% if (p.cardImage && String(p.cardImage).trim()) { %>
                                         <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover rounded-[28px]">
@@ -469,9 +470,9 @@
                                 <div class="relative flex flex-col items-center">
                                     <span class="absolute -top-3 z-30 bg-rose-600 text-white text-[9px] font-black px-2.5 py-1 rounded-full shadow uppercase"><%= r.bidCount %>× bids</span>
                                     <div class="player-card w-[220px] h-[300px] glass-light rounded-[28px] border border-rose-200 shadow-lg relative group"
-                                         onmousemove="tiltCard(event, this)"
+                                         
                                          onmouseleave="resetTilt(this)"
-                                         onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
+                                         onmousemove="tiltCard(event, this)" onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
                                         <div class="card-sheen"></div>
                                         <% if (p.cardImage && String(p.cardImage).trim()) { %>
                                             <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover rounded-[28px]">
@@ -574,9 +575,9 @@
                                      data-pos="<%= pos %>"
                                      data-class="<%= rank %>"
                                      data-eligible="<%= eligibleAttr %>"
-                                     onmousemove="tiltCard(event, this)" 
+                                      
                                      onmouseleave="resetTilt(this)"
-                                     onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= p.experience || p.bio %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- isMgrAccount %>, <%- isWatched %>)">
+                                     onmousemove="tiltCard(event, this)" onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '').replace(/\\/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- isMgrAccount %>, <%- isWatched %>)">
                                     
                                     <!-- Shiny Dynamic Sweeping Glare -->
                                     <div class="card-sheen"></div>
@@ -886,7 +887,7 @@
                                     %>
                                         <div class="flex items-center justify-between gap-3 bg-slate-50 hover:bg-slate-100 border border-slate-100 rounded-2xl px-4 py-3 transition cursor-pointer"
                                              <% if (full) { %>
-                                             onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= (full.experience || full.bio || '').toString().replace(/`/g,'') %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>', <%- (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((full.name||'').toLowerCase())) %>, <%- !!(typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(full._id||full.id))) %>)"
+                                             onmousemove="tiltCard(event, this)" onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= (full.experience || full.bio || '').toString().replace(/`/g,'') %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>', <%- (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((full.name||'').toLowerCase())) %>, <%- !!(typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(full._id||full.id))) %>)"
                                              <% } %>>
                                             <div class="flex items-center gap-3 min-w-0">
                                                 <% if (full && full.cardImage) { %>
@@ -925,7 +926,7 @@
                                     %>
                                         <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3"
                                              <% if (full) { %>
-                                             onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= (full.experience || full.bio || '').toString().replace(/`/g,'') %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>', false, false)"
+                                             onmousemove="tiltCard(event, this)" onclick="openBio(this, '<%= full.name %>', '<%= full.cardImage %>', `<%= (full.experience || full.bio || '').toString().replace(/`/g,'') %>`, '<%= full.discord %>', '<%= full.goals || 0 %>', '<%= full.assists || 0 %>', '<%= full.saves || 0 %>', '<%= full.mvps || 0 %>', '<%= full.views ? full.views.length : 0 %>', '<%= full.position %>', '<%= full.country %>', '<%= full.timezone %>', '<%= full.highestBid || 0 %>', '<%= full.highestBidder || "None" %>', '<%= full._id || full.id %>', '<%= full.reservePrice || 0 %>', false, false)"
                                              class="cursor-pointer hover:bg-slate-100"
                                              <% } %>>
                                             <div class="min-w-0">
@@ -1092,8 +1093,8 @@
                 <div id="modalBiddingBox" class="relative z-10 bg-white text-slate-900 p-4 rounded-2xl border border-slate-200 mb-4 shadow-sm">
                     <div class="grid grid-cols-2 gap-3 mb-4">
                         <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3">
-                            <span class="text-[8px] font-black text-emerald-600/70 uppercase tracking-widest block">Highest Bid</span>
-                            <span id="modalHighestBid" class="text-lg font-black italic text-emerald-600 leading-tight">0 Vollars</span>
+                            <span id="modalHighestBidLabel" class="text-[8px] font-black text-emerald-600/70 uppercase tracking-widest block">Highest Bid</span>
+                            <span id="modalHighestBid" class="text-lg font-black italic text-emerald-600 leading-tight">No bids yet</span>
                         </div>
                         <div class="bg-slate-50 border border-slate-100 rounded-xl p-3">
                             <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Reserve</span>
@@ -1674,11 +1675,15 @@
         const rect = el.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        const xc = rect.width / 2;
-        const yc = rect.height / 2;
-        const dx = (x - xc) / xc;
-        const dy = (y - yc) / yc;
-        el.style.transform = `rotateY(${dx * 14}deg) rotateX(${-dy * 14}deg) translateY(-6px)`;
+        const midX = rect.width / 2;
+        const midY = rect.height / 2;
+        const rotateY = ((x - midX) / midX) * 8;
+        const rotateX = ((midY - y) / midY) * 8;
+        el.style.transform = 'perspective(1000px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale3d(1.03,1.03,1.03)';
+        el.onmouseleave = function() {
+            el.style.transform = '';
+            el.onmouseleave = null;
+        };
     }
 
     function resetTilt(el) {
@@ -1761,26 +1766,39 @@
         const hBidder = (bidder && bidder !== 'undefined' && bidder !== 'null' && bidder !== 'None') ? bidder : null;
         const rPrice = (reservePrice && reservePrice !== 'undefined' && reservePrice !== 'null') ? reservePrice : '0';
 
-        if(document.getElementById('modalHighestBid')) {
-    document.getElementById('modalHighestBid').innerText = hBid + " Vollars" + (hBidder ? " (" + hBidder + ")" : "");
-}
-if(document.getElementById('modalReservePrice')) {
-    document.getElementById('modalReservePrice').innerText = rPrice + " Vollars";
-}
-if(document.getElementById('modalPlayerId')) {
-    document.getElementById('modalPlayerId').value = (playerId && playerId !== 'undefined' && playerId !== 'null') ? playerId : '';
-}
-if(document.getElementById('modalWithdrawPlayerId')) {
-    document.getElementById('modalWithdrawPlayerId').value =
-        (playerId && playerId !== 'undefined' && playerId !== 'null') ? playerId : '';
-}
-if(document.getElementById('modalBidInput')) {
-    const minNextBid = computeMinNextBid(parseInt(hBid) || 0, parseInt(rPrice) || 0);
-    document.getElementById('modalBidInput').min = minNextBid;
-    document.getElementById('modalBidInput').placeholder = `Min bid: ${minNextBid.toLocaleString()} Vollars`;
-    document.getElementById('modalBidInput').value = '';
-    renderQuickBidButtons(minNextBid, parseInt(hBid) || 0);
-}
+        const hasRealBid = !!(hBidder && (parseInt(hBid, 10) || 0) > 0);
+        const bidLabel = document.getElementById('modalHighestBidLabel');
+        const bidEl = document.getElementById('modalHighestBid');
+        if (bidEl) {
+            if (hasRealBid) {
+                if (bidLabel) bidLabel.innerText = 'Highest Bid';
+                bidEl.innerText = Number(hBid).toLocaleString() + ' Vollars (' + hBidder + ')';
+                bidEl.classList.remove('text-slate-400');
+                bidEl.classList.add('text-emerald-600');
+            } else {
+                if (bidLabel) bidLabel.innerText = 'Current Bid';
+                bidEl.innerText = 'No bids yet';
+                bidEl.classList.add('text-slate-400');
+                bidEl.classList.remove('text-emerald-600');
+            }
+        }
+        if (document.getElementById('modalReservePrice')) {
+            document.getElementById('modalReservePrice').innerText = Number(rPrice).toLocaleString() + ' Vollars';
+        }
+        if (document.getElementById('modalPlayerId')) {
+            document.getElementById('modalPlayerId').value = (playerId && playerId !== 'undefined' && playerId !== 'null') ? playerId : '';
+        }
+        if (document.getElementById('modalWithdrawPlayerId')) {
+            document.getElementById('modalWithdrawPlayerId').value =
+                (playerId && playerId !== 'undefined' && playerId !== 'null') ? playerId : '';
+        }
+        if (document.getElementById('modalBidInput')) {
+            const minNextBid = computeMinNextBid(hasRealBid ? (parseInt(hBid, 10) || 0) : 0, parseInt(rPrice, 10) || 0);
+            document.getElementById('modalBidInput').min = minNextBid;
+            document.getElementById('modalBidInput').placeholder = 'Min bid: ' + minNextBid.toLocaleString() + ' Vollars';
+            document.getElementById('modalBidInput').value = '';
+            renderQuickBidButtons(minNextBid, hasRealBid ? (parseInt(hBid, 10) || 0) : 0);
+        }
 // Reset the bid button back to its default "Place Bid" state every time
 // the modal is opened, so a previous "Update Bid" edit-mode doesn't stick.
 const resetBidBtn = document.getElementById('modalBidButton');

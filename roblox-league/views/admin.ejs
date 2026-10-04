@@ -3166,6 +3166,8 @@
                                                 ? aTeam.bids.reduce((s, b) => s + (Number(b.amount) || 0), 0)
                                                 : 0;
                                             const availNow = Number(aTeam.budget || 0) - Number(aTeam.spent || 0) - lockedBids;
+                                            const winningN = Array.isArray(aTeam.wonPlayers) ? aTeam.wonPlayers.length : 0;
+                                            const outbidN = Array.isArray(aTeam.outbidPlayers) ? aTeam.outbidPlayers.length : 0;
                                         %>
                                         <p class="text-sm font-black text-amber-600 font-mono mt-1">
                                             <%= lockedBids.toLocaleString() %> V
@@ -3173,6 +3175,27 @@
                                         <p class="text-[8px] text-slate-400 font-bold mt-0.5">Free ~<%= availNow.toLocaleString() %> V</p>
                                     </div>
 
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3">
+                                        <p class="text-[8px] font-black uppercase text-emerald-600">Currently winning</p>
+                                        <p class="text-sm font-black text-emerald-700 mt-1"><%= winningN %></p>
+                                        <% if (winningN > 0) { %>
+                                            <p class="text-[8px] text-emerald-700/80 font-semibold mt-1 leading-snug truncate">
+                                                <%= aTeam.wonPlayers.map(x => x.name).join(', ') %>
+                                            </p>
+                                        <% } %>
+                                    </div>
+                                    <div class="bg-rose-50 border border-rose-100 rounded-xl p-3">
+                                        <p class="text-[8px] font-black uppercase text-rose-600">Outbid (locked)</p>
+                                        <p class="text-sm font-black text-rose-700 mt-1"><%= outbidN %></p>
+                                        <% if (outbidN > 0) { %>
+                                            <p class="text-[8px] text-rose-700/80 font-semibold mt-1 leading-snug truncate">
+                                                <%= aTeam.outbidPlayers.map(x => x.name).join(', ') %>
+                                            </p>
+                                        <% } %>
+                                    </div>
                                 </div>
 
                                 <form action="/admin/auction/update-team-budget" method="POST"

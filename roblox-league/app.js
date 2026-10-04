@@ -17,10 +17,71 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Persistent sessions in MongoDB so logins survive Render restarts.
+// Cookie lasts 60 days; store is the `sessions` collection.
+const SessionRecord = mongoose.model('Session', new mongoose.Schema({
+    _id: String,
+    expires: Date,
+    session: mongoose.Schema.Types.Mixed
+}));
+
+class MongoSessionStore extends session.Store {
+    get(sid, cb) {
+        SessionRecord.findById(sid).lean()
+            .then(doc => {
+                if (!doc) return cb(null, null);
+                if (doc.expires && doc.expires.getTime() < Date.now()) {
+                    SessionRecord.deleteOne({ _id: sid }).catch(() => {});
+                    return cb(null, null);
+                }
+                return cb(null, doc.session);
+            })
+            .catch(err => cb(err));
+    }
+    set(sid, sess, cb) {
+        let maxAge = 60 * 24 * 60 * 60 * 1000; // 60 days default
+        try {
+            if (sess && sess.cookie && sess.cookie.maxAge) {
+                maxAge = Number(sess.cookie.maxAge) || maxAge;
+            }
+        } catch (e) { /* ignore */ }
+        SessionRecord.findByIdAndUpdate(
+            sid,
+            {
+                _id: sid,
+                session: sess,
+                expires: new Date(Date.now() + maxAge)
+            },
+            { upsert: true, new: true }
+        )
+            .then(() => cb(null))
+            .catch(err => cb(err));
+    }
+    destroy(sid, cb) {
+        SessionRecord.deleteOne({ _id: sid })
+            .then(() => cb(null))
+            .catch(err => cb(err));
+    }
+    touch(sid, sess, cb) {
+        this.set(sid, sess, cb);
+    }
+}
+
+// Behind Render's proxy so secure cookies / IPs work correctly when enabled
+app.set('trust proxy', 1);
+
 app.use(session({
-    secret: 'vim-super-league-2025-stable',
+    secret: process.env.SESSION_SECRET || 'vim-super-league-2025-stable',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: false,
+    store: new MongoSessionStore(),
+    name: 'vim.sid',
+    cookie: {
+        maxAge: 60 * 24 * 60 * 60 * 1000, // 60 days
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: false // set true only if you force HTTPS-only and trust proxy is on
+    }
 }));
 
 const ADMIN_KEY = "yakuza26";

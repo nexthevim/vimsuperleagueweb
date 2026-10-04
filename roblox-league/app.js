@@ -27,40 +27,47 @@ const SessionRecord = mongoose.model('Session', new mongoose.Schema({
 
 class MongoSessionStore extends session.Store {
     get(sid, cb) {
-        SessionRecord.findById(sid).lean()
+        SessionRecord.collection.findOne({ _id: String(sid) })
             .then(doc => {
                 if (!doc) return cb(null, null);
-                if (doc.expires && doc.expires.getTime() < Date.now()) {
-                    SessionRecord.deleteOne({ _id: sid }).catch(() => {});
+                if (doc.expires && new Date(doc.expires).getTime() < Date.now()) {
+                    SessionRecord.collection.deleteOne({ _id: String(sid) }).catch(() => {});
                     return cb(null, null);
                 }
-                return cb(null, doc.session);
+                return cb(null, doc.session || null);
             })
-            .catch(err => cb(err));
+            .catch(err => {
+                console.error('Session get error:', err.message);
+                cb(null, null); // fail soft — never block the site
+            });
     }
     set(sid, sess, cb) {
-        let maxAge = 60 * 24 * 60 * 60 * 1000; // 60 days default
+        let maxAge = 60 * 24 * 60 * 60 * 1000;
         try {
             if (sess && sess.cookie && sess.cookie.maxAge) {
                 maxAge = Number(sess.cookie.maxAge) || maxAge;
             }
         } catch (e) { /* ignore */ }
-        SessionRecord.findByIdAndUpdate(
-            sid,
-            {
-                _id: sid,
-                session: sess,
-                expires: new Date(Date.now() + maxAge)
-            },
-            { upsert: true, new: true }
+        const payload = {
+            _id: String(sid),
+            session: sess,
+            expires: new Date(Date.now() + maxAge)
+        };
+        SessionRecord.collection.updateOne(
+            { _id: String(sid) },
+            { $set: payload },
+            { upsert: true }
         )
             .then(() => cb(null))
-            .catch(err => cb(err));
+            .catch(err => {
+                console.error('Session set error:', err.message);
+                cb(err);
+            });
     }
     destroy(sid, cb) {
-        SessionRecord.deleteOne({ _id: sid })
+        SessionRecord.collection.deleteOne({ _id: String(sid) })
             .then(() => cb(null))
-            .catch(err => cb(err));
+            .catch(err => cb(null)); // soft
     }
     touch(sid, sess, cb) {
         this.set(sid, sess, cb);
@@ -1259,21 +1266,73 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    const {
-        username,
-        password
-    } = req.body;
+    try {
+        const username = String(
+            (req.body.username != null ? req.body.username : req.body.name) || ''
+        ).trim();
+        const password = String(req.body.password != null ? req.body.password : '');
 
-    const player = await Player.findOne({
-        name: new RegExp(`^${username}$`, 'i'),
-        password
-    });
+        if (!username || password === '') {
+            return res.redirect('/market?error=Invalid username or password');
+        }
 
-    if (player) {
-        req.session.playerId = player._id;
-        res.redirect('/profile');
-    } else {
-        res.redirect('/market?error=Invalid username or password');
+        // Load candidates by name (case-insensitive, trimmed) without fragile regex
+        const allPlayers = await Player.find({}).select('name password').lean();
+        const lower = username.toLowerCase();
+        const matches = allPlayers.filter(p =>
+            String(p.name || '').trim().toLowerCase() === lower
+        );
+
+        if (!matches.length) {
+            console.log('Login fail: no user named', JSON.stringify(username));
+            return res.redirect('/market?error=Invalid username or password');
+        }
+
+        // Prefer exact password match; allow trim on either side
+        let matched = matches.find(p => {
+            const stored = p.password != null ? String(p.password) : '';
+            return (
+                stored === password ||
+                stored === password.trim() ||
+                stored.trim() === password ||
+                stored.trim() === password.trim()
+            );
+        });
+
+        if (!matched) {
+            console.log('Login fail: password mismatch for', JSON.stringify(username));
+            return res.redirect('/market?error=Invalid username or password');
+        }
+
+        const playerId = String(matched._id);
+
+        const finish = () => {
+            req.session.playerId = playerId;
+            req.session.save(err => {
+                if (err) {
+                    console.error('Login session save failed:', err);
+                    // Still try redirect — cookie may work in-memory for this request
+                    return res.redirect('/profile');
+                }
+                return res.redirect('/profile');
+            });
+        };
+
+        // Rotate session id after login (safer + avoids stale empty sessions)
+        if (typeof req.session.regenerate === 'function') {
+            req.session.regenerate(err => {
+                if (err) {
+                    console.error('Session regenerate failed:', err);
+                    return finish();
+                }
+                finish();
+            });
+        } else {
+            finish();
+        }
+    } catch (err) {
+        console.error('Login error:', err);
+        return res.redirect('/market?error=Invalid username or password');
     }
 });
 

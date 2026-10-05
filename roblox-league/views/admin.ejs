@@ -3145,6 +3145,42 @@
 
                                 </div>
 
+                                <!-- CHANGE MANAGER — bids/budget stay on the team -->
+                                <form action="/admin/auction/change-manager" method="POST"
+                                    class="bg-white border border-slate-200 rounded-xl p-3 space-y-2"
+                                    onsubmit="return confirm('Change manager for this team? Bids and budget stay on the team.');">
+                                    <input type="hidden" name="teamId" value="<%= aTeam._id || aTeam.id %>">
+                                    <p class="text-[9px] font-black uppercase text-slate-500 tracking-wider">Change manager</p>
+                                    <input type="search"
+                                        class="admin-input text-[11px] py-2 mb-1 change-mgr-search"
+                                        placeholder="Search Roblox / Discord…"
+                                        autocomplete="off"
+                                        oninput="filterChangeMgrSelect(this)">
+                                    <select name="managerName" required
+                                        class="admin-input text-[11px] change-mgr-select"
+                                        size="4"
+                                        style="height: auto; min-height: 6rem;">
+                                        <option value="" disabled selected>New manager…</option>
+                                        <% if (typeof players !== 'undefined') { %>
+                                            <% players.filter(p => p.verified).forEach(p => { %>
+                                                <option
+                                                    value="<%= p.name %>"
+                                                    data-search="<%= ((p.name || '') + ' ' + (p.discord || '')).toLowerCase() %>"
+                                                    <%= (aTeam.manager || '').toLowerCase() === (p.name || '').toLowerCase() ? 'selected' : '' %>>
+                                                    <%= p.name %><% if (p.discord) { %> · @<%= p.discord %><% } %>
+                                                </option>
+                                            <% }) %>
+                                        <% } %>
+                                    </select>
+                                    <button type="submit"
+                                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg text-[10px] font-black uppercase transition">
+                                        Assign new manager
+                                    </button>
+                                    <p class="text-[8px] text-slate-400 font-semibold leading-relaxed">
+                                        Old manager loses bid rights. Team bids, budget, and locks stay the same.
+                                    </p>
+                                </form>
+
 
                                 <div class="grid grid-cols-2 gap-2">
 
@@ -3972,6 +4008,22 @@
     }
 
     
+    function filterChangeMgrSelect(inputEl) {
+        const q = (inputEl.value || '').toLowerCase().trim();
+        const form = inputEl.closest('form');
+        if (!form) return;
+        const select = form.querySelector('.change-mgr-select');
+        if (!select) return;
+        Array.from(select.options).forEach((opt, i) => {
+            if (i === 0 && (!opt.value || opt.disabled)) {
+                opt.hidden = false;
+                return;
+            }
+            const hay = (opt.getAttribute('data-search') || opt.textContent || '').toLowerCase();
+            opt.hidden = !(!q || hay.includes(q));
+        });
+    }
+
     function filterManagerSelect(query) {
         const q = (query || '').toLowerCase().trim();
         const select = document.getElementById('managerSelect');

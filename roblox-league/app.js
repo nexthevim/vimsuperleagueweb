@@ -3089,6 +3089,75 @@ app.post('/admin/add-auction-team', async (req, res) => {
 // Edit total budget (and optional spent) for an enrolled auction team.
 // Available money = budget - spent - sum(active bids). Raising budget
 // increases what they can still bid with; does not wipe bids.
+
+// Change only the manager on an enrolled team. Bids / budget / roster stay.
+// Old manager becomes a normal player again; new account can bid for this team.
+app.post('/admin/auction/change-manager', async (req, res) => {
+    if (!requireAdmin(req, res)) return;
+    try {
+        const { teamId, managerName } = req.body;
+        if (!teamId) {
+            return res.redirect('/admin?error=Team required');
+        }
+        const newManager = String(managerName || '').trim();
+        if (!newManager) {
+            return res.redirect('/admin?error=Pick a new manager');
+        }
+
+        const team = await AuctionTeam.findById(teamId);
+        if (!team) {
+            return res.redirect('/admin?error=Team not found');
+        }
+
+        // Must be a real registered player (prefer verified)
+        const player = await Player.findOne({
+            name: { $regex: new RegExp('^' + newManager.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i') }
+        });
+        if (!player) {
+            return res.redirect('/admin?error=' + encodeURIComponent('No player account named \"' + newManager + '\"'));
+        }
+
+        const canonicalName = player.name;
+        const oldManager = team.manager || '';
+
+        // One manager → one team: clear this person off any other enrolled team
+        const others = await AuctionTeam.find({
+            _id: { $ne: team._id },
+            manager: { $regex: new RegExp('^' + canonicalName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i') }
+        });
+        for (const other of others) {
+            other.manager = '';
+            await other.save();
+        }
+
+        team.manager = canonicalName;
+        await team.save();
+
+        try {
+            await AuctionActivity.create({
+                type: 'rank_change',
+                playerName: canonicalName,
+                teamId: team._id,
+                teamName: team.name,
+                managerName: 'ADMIN',
+                meta: {
+                    reason: 'manager_change',
+                    oldManager: oldManager,
+                    newManager: canonicalName,
+                    team: team.name
+                }
+            });
+        } catch (e) { /* non-fatal */ }
+
+        res.redirect('/admin?error=' + encodeURIComponent(
+            team.name + ': manager ' + (oldManager || '—') + ' → ' + canonicalName + '. Bids unchanged.'
+        ));
+    } catch (err) {
+        console.error('Change manager error:', err);
+        res.redirect('/admin?error=ChangeManagerFailed');
+    }
+});
+
 app.post('/admin/auction/update-team-budget', async (req, res) => {
     if (!requireAdmin(req, res)) return;
     try {

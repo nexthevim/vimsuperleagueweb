@@ -3161,7 +3161,7 @@ app.post('/admin/auction/change-manager', async (req, res) => {
 app.post('/admin/auction/update-team-budget', async (req, res) => {
     if (!requireAdmin(req, res)) return;
     try {
-        const { teamId, budget, spent } = req.body;
+        const { teamId, budget, spent, available } = req.body;
         if (!teamId) {
             return res.redirect('/admin?error=Team required');
         }
@@ -3170,13 +3170,6 @@ app.post('/admin/auction/update-team-budget', async (req, res) => {
             return res.redirect('/admin?error=Team not found');
         }
 
-        if (budget !== undefined && budget !== '') {
-            const b = Number(budget);
-            if (!Number.isFinite(b) || b < 0) {
-                return res.redirect('/admin?error=Invalid budget amount');
-            }
-            team.budget = b;
-        }
         if (spent !== undefined && spent !== '') {
             const s = Number(spent);
             if (!Number.isFinite(s) || s < 0) {
@@ -3185,15 +3178,33 @@ app.post('/admin/auction/update-team-budget', async (req, res) => {
             team.spent = s;
         }
 
+        const locked = (team.bids || []).reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
+
+        // Prefer "available" when set: total budget = available + spent + locked bids
+        // This is the fair way to refund / fix without leaving permanent extra pool.
+        if (available !== undefined && available !== '') {
+            const a = Number(available);
+            if (!Number.isFinite(a) || a < 0) {
+                return res.redirect('/admin?error=Invalid available amount');
+            }
+            team.budget = a + Number(team.spent || 0) + locked;
+        } else if (budget !== undefined && budget !== '') {
+            const b = Number(budget);
+            if (!Number.isFinite(b) || b < 0) {
+                return res.redirect('/admin?error=Invalid budget amount');
+            }
+            team.budget = b;
+        }
+
         await team.save();
 
-        const locked = (team.bids || []).reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
-        const available = Number(team.budget || 0) - Number(team.spent || 0) - locked;
+        const locked2 = (team.bids || []).reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
+        const availOut = Number(team.budget || 0) - Number(team.spent || 0) - locked2;
 
         res.redirect('/admin?error=' + encodeURIComponent(
-            team.name + ': budget ' + Number(team.budget).toLocaleString() +
-            ' · locked ' + locked.toLocaleString() +
-            ' · available ~' + available.toLocaleString() + ' V'
+            team.name + ': total ' + Number(team.budget).toLocaleString() +
+            ' · locked ' + locked2.toLocaleString() +
+            ' · available ' + availOut.toLocaleString() + ' V'
         ));
     } catch (err) {
         console.error('Update team budget error:', err);

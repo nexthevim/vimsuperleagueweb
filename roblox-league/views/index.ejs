@@ -4,305 +4,844 @@
 
 <style>
     :root {
-        --brand-blue: #0088ff;
-        --brand-cyan: #00c6ff;
-        --text-dark: #0f172a;
-        --text-muted: #64748b;
+        --ink: #111315;
+        --ink-2: #25292d;
+        --paper: #f3f0e8;
+        --paper-2: #e8e3d8;
+        --line: rgba(17, 19, 21, .16);
+        --muted: #6f726f;
+        --blue: #1677ff;
+        --green: #6f8f63;
+        --orange: #e36b32;
+        --red: #d94b45;
     }
 
-    /* Multi-layered Soft Greyish-White Gradient Background */
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
     body {
-        background-color: #f4f6f9;
-        background-image: 
-            radial-gradient(at 0% 20%, rgba(226, 232, 240, 0.8) 0px, transparent 50%),
-            radial-gradient(at 100% 50%, rgba(203, 213, 225, 0.6) 0px, transparent 50%),
-            radial-gradient(at 0% 80%, rgba(226, 232, 240, 0.8) 0px, transparent 50%),
-            linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
-        background-attachment: fixed;
-        color: var(--text-dark);
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
         font-family: 'Plus Jakarta Sans', sans-serif;
         overflow-x: hidden;
-        min-height: 100vh;
     }
 
-    /* Fullscreen Hero Background Image with Overlay */
-    .hero-container {
+    ::selection {
+        background: var(--ink);
+        color: var(--paper);
+    }
+
+    .vim-page {
         position: relative;
-        background: url('/images/vimgfx.png') center/cover no-repeat;
-        min-height: 85vh;
+        isolation: isolate;
+        overflow: hidden;
+        background:
+            linear-gradient(rgba(17,19,21,.045) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(17,19,21,.045) 1px, transparent 1px),
+            var(--paper);
+        background-size: 48px 48px;
     }
 
-    /* Fog / Cloud Transition into Grey Tone at Hero Bottom */
-    .fog-bottom {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 220px;
-        background: linear-gradient(to bottom, transparent 0%, rgba(244, 246, 249, 0.7) 40%, #f4f6f9 100%);
-        pointer-events: none;
-    }
-
-    /* Glassmorphism Elevated Cards with Gradient Fill */
-    .clean-card {
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(203, 213, 225, 0.6);
-        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08);
-        border-radius: 1.5rem;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .clean-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 40px -10px rgba(0, 136, 255, 0.15);
-        border-color: rgba(0, 136, 255, 0.4);
-    }
-
-    /* Custom Search & Action Bar */
-    .search-pill {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    .gradient-text {
-        background: linear-gradient(135deg, #0088ff 0%, #00c6ff 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .btn-gradient {
-        background: linear-gradient(135deg, #0088ff 0%, #00c6ff 100%);
-        box-shadow: 0 8px 20px rgba(0, 136, 255, 0.3);
-    }
-
-    .btn-gradient:hover {
-        opacity: 0.95;
-        box-shadow: 0 12px 25px rgba(0, 136, 255, 0.45);
-    }
-
-    /* Standout Grey-Gradient Container Cards */
-    .section-grey-gradient {
-        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-        border-radius: 2rem;
-        border: 1px solid #cbd5e1;
-        box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
-    }
-
-    /* =========================================================
-       HOMEPAGE TOUR
-       ========================================================= */
-
-    #vim-tour-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 50000;
-        pointer-events: none;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.25s ease, visibility 0.25s ease;
-    }
-
-    #vim-tour-overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    #vim-tour-backdrop {
-        position: absolute;
-        inset: 0;
-        background: rgba(2, 6, 23, 0.76);
-        pointer-events: auto;
-    }
-
-    #vim-tour-spotlight {
-        position: absolute;
-        width: 100px;
-        height: 100px;
-        border-radius: 9999px;
-        border: 2px solid rgba(0, 198, 255, 0.95);
-        box-shadow:
-            0 0 0 4px rgba(0, 136, 255, 0.10),
-            0 0 30px rgba(0, 136, 255, 0.45),
-            0 0 70px rgba(0, 198, 255, 0.25);
-        pointer-events: none;
-        transform: translate(-50%, -50%);
-        transition:
-            left 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-            top 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-            width 0.35s ease,
-            height 0.35s ease;
-    }
-
-    #vim-tour-card {
-        position: fixed;
-        width: min(360px, calc(100vw - 32px));
-        background: rgba(255, 255, 255, 0.97);
-        color: #0f172a;
-        border: 1px solid rgba(226, 232, 240, 0.9);
-        border-radius: 20px;
-        padding: 22px;
-        box-shadow:
-            0 30px 80px rgba(0, 0, 0, 0.35),
-            0 10px 30px rgba(0, 136, 255, 0.15);
-        z-index: 50002;
-        pointer-events: auto;
-        transition:
-            left 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-            top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    #vim-tour-card::before {
+    .vim-page::before {
         content: "";
-        position: absolute;
-        width: 12px;
-        height: 12px;
-        background: white;
-        border-left: 1px solid rgba(226, 232, 240, 0.9);
-        border-top: 1px solid rgba(226, 232, 240, 0.9);
-        transform: rotate(45deg);
-        top: -7px;
-        left: 34px;
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: -1;
+        background: radial-gradient(circle at 72% 8%, rgba(111,143,99,.16), transparent 24rem);
     }
 
-    #vim-tour-card.centered::before {
-        display: none;
-    }
-
-    .vim-tour-eyebrow {
-        font-size: 9px;
-        font-weight: 900;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: #0088ff;
-        margin-bottom: 6px;
-    }
-
-    .vim-tour-title {
+    .display {
         font-family: 'Syne', sans-serif;
-        font-size: 20px;
-        font-weight: 900;
-        line-height: 1.15;
-        margin-bottom: 8px;
+        letter-spacing: -.055em;
     }
 
-    .vim-tour-description {
-        color: #64748b;
-        font-size: 12px;
-        line-height: 1.65;
-        margin-bottom: 18px;
-    }
-
-    .vim-tour-progress {
+    .eyebrow {
         display: flex;
         align-items: center;
-        gap: 5px;
-        margin-bottom: 16px;
+        gap: 9px;
+        font-size: 10px;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: .18em;
+        text-transform: uppercase;
     }
 
-    .vim-tour-progress span {
-        height: 4px;
-        width: 20px;
-        border-radius: 999px;
-        background: #e2e8f0;
-        transition: all 0.25s ease;
+    .eyebrow::before {
+        content: "";
+        width: 24px;
+        height: 2px;
+        background: currentColor;
     }
 
-    .vim-tour-progress span.active {
-        width: 32px;
-        background: linear-gradient(90deg, #0088ff, #00c6ff);
+    /* HERO — deliberately editorial rather than card-based */
+    .vim-hero {
+        position: relative;
+        min-height: min(820px, calc(100vh - 64px));
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+        background: #1a1d1f;
+        color: white;
     }
 
-    .vim-tour-actions {
+    .vim-hero-art {
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(90deg, rgba(10,12,13,.92) 0%, rgba(10,12,13,.62) 43%, rgba(10,12,13,.2) 100%),
+            linear-gradient(0deg, rgba(10,12,13,.85) 0%, transparent 50%),
+            url('/images/vimgfx.png') center/cover no-repeat;
+        transform: scale(1.035);
+        transition: transform 1.2s cubic-bezier(.16,1,.3,1);
+    }
+
+    .vim-hero:hover .vim-hero-art { transform: scale(1.055); }
+
+    .vim-hero-grid {
+        position: absolute;
+        inset: 0;
+        opacity: .18;
+        background:
+            linear-gradient(90deg, transparent 49.8%, white 50%, transparent 50.2%),
+            linear-gradient(transparent 49.8%, white 50%, transparent 50.2%);
+        background-size: 180px 180px;
+        mask-image: linear-gradient(to bottom, transparent, black 30%, black 75%, transparent);
+        transform: perspective(600px) rotateX(58deg) scale(1.7) translateY(18%);
+        transform-origin: center bottom;
+        pointer-events: none;
+    }
+
+    .vim-hero-copy {
+        position: relative;
+        z-index: 2;
+        width: min(1400px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 110px 0 74px;
+    }
+
+    .hero-kicker {
+        color: #b8c8b1;
+        margin-bottom: 22px;
+    }
+
+    .hero-title {
+        max-width: 920px;
+        margin: 0;
+        font-size: clamp(4rem, 10vw, 9.4rem);
+        line-height: .78;
+        text-transform: uppercase;
+    }
+
+    .hero-title .outline {
+        color: transparent;
+        -webkit-text-stroke: 1.5px rgba(255,255,255,.82);
+    }
+
+    .hero-subrow {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 310px;
+        gap: 50px;
+        align-items: end;
+        margin-top: 52px;
+    }
+
+    .hero-copy {
+        max-width: 590px;
+        color: rgba(255,255,255,.72);
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .hero-meta {
+        border-top: 1px solid rgba(255,255,255,.35);
+        padding-top: 13px;
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .vim-tour-skip {
-        border: none;
-        background: transparent;
-        color: #94a3b8;
-        font-size: 10px;
-        font-weight: 800;
+        gap: 16px;
+        font-size: 9px;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        padding: 8px 4px;
+        letter-spacing: .16em;
+        font-weight: 900;
+        color: rgba(255,255,255,.62);
     }
 
-    .vim-tour-next {
-        border: none;
-        background: linear-gradient(135deg, #0088ff, #00c6ff);
+    .hero-scroll {
+        position: absolute;
+        right: 26px;
+        bottom: 34px;
+        writing-mode: vertical-rl;
+        font-size: 9px;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,.55);
+    }
+
+    /* Search becomes a command strip */
+    .arena-search {
+        position: relative;
+        z-index: 10;
+        width: min(1400px, calc(100% - 48px));
+        margin: -1px auto 0;
+        background: var(--ink);
+        color: white;
+        border-top: 4px solid var(--green);
+        display: grid;
+        grid-template-columns: 150px 1fr auto;
+        align-items: center;
+    }
+
+    .arena-label {
+        height: 76px;
+        display: flex;
+        align-items: center;
+        padding: 0 22px;
+        border-right: 1px solid rgba(255,255,255,.14);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+    }
+
+    .arena-form {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 24px;
+    }
+
+    .arena-form svg { color: #8d948f; }
+
+    .arena-input {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: white;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .arena-input::placeholder { color: #777c7a; }
+
+    .arena-submit {
+        height: 76px;
+        padding: 0 28px;
+        border: 0;
+        border-left: 1px solid rgba(255,255,255,.14);
+        background: var(--green);
         color: white;
         font-size: 10px;
         font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        padding: 11px 17px;
-        border-radius: 11px;
-        box-shadow: 0 7px 18px rgba(0, 136, 255, 0.25);
+        letter-spacing: .16em;
+        cursor: pointer;
+        transition: background .2s ease, padding .2s ease;
     }
 
-    #vim-tour-launcher {
-        position: fixed;
-        right: 20px;
-        bottom: 20px;
-        width: 42px;
-        height: 42px;
-        border-radius: 9999px;
-        background: rgba(15, 23, 42, 0.92);
+    .arena-submit:hover { background: #829f75; padding-inline: 34px; }
+
+    #search-results-dropdown {
+        background: #191c1e !important;
         color: white;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25);
-        z-index: 40000;
+        border: 1px solid rgba(255,255,255,.12) !important;
+        border-radius: 0 !important;
+        box-shadow: 0 30px 80px rgba(0,0,0,.3) !important;
+    }
+
+    /* Main editorial canvas */
+    .vim-main {
+        width: min(1400px, calc(100% - 48px));
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }
+
+    .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 24px;
+        padding-bottom: 17px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 26px;
+    }
+
+    .section-head h2 {
+        margin: 7px 0 0;
+        font-size: clamp(2rem, 4vw, 4rem);
+        line-height: .92;
+    }
+
+    .section-link {
+        color: var(--ink);
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .13em;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .section-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+
+    /* Matchday */
+    .matchday {
+        padding: 110px 0 90px;
+    }
+
+    .match-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(290px, .75fr);
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+    }
+
+    .fixture {
+        position: relative;
+        min-height: 390px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 28px;
+        border-right: 1px solid var(--line);
+        overflow: hidden;
+        background: rgba(255,255,255,.24);
+    }
+
+    .fixture::after {
+        content: "VIMSL";
+        position: absolute;
+        right: -10px;
+        bottom: -42px;
+        font-family: 'Syne', sans-serif;
+        font-size: 150px;
+        font-weight: 900;
+        letter-spacing: -.08em;
+        color: rgba(17,19,21,.045);
+        pointer-events: none;
+    }
+
+    .fixture-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 20px;
+    }
+
+    .match-number {
+        font-family: 'Syne', sans-serif;
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .live-dot {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: var(--red);
+        font-size: 9px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .14em;
+    }
+
+    .live-dot::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 0 5px rgba(217,75,69,.1);
+    }
+
+    .fixture-teams {
+        display: grid;
+        grid-template-columns: 1fr 110px 1fr;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .fixture-team {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    .fixture-team.right {
+        flex-direction: row-reverse;
+        text-align: right;
+    }
+
+    .fixture-team img {
+        width: 74px;
+        height: 74px;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 12px rgba(0,0,0,.12));
+        transition: transform .35s cubic-bezier(.16,1,.3,1);
+    }
+
+    .fixture:hover .fixture-team:first-child img { transform: translateX(-5px) rotate(-3deg); }
+    .fixture:hover .fixture-team.right img { transform: translateX(5px) rotate(3deg); }
+
+    .team-name {
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(1.1rem, 2vw, 1.75rem);
+        font-weight: 900;
+        line-height: .95;
+        text-transform: uppercase;
+    }
+
+    .vs-mark {
+        text-align: center;
+        font-family: 'Syne', sans-serif;
+        font-size: 25px;
+        font-weight: 900;
+        color: var(--green);
+    }
+
+    .fixture-time {
+        display: block;
+        margin-top: 7px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 9px;
+        font-weight: 900;
+        color: var(--muted);
+        letter-spacing: .12em;
+    }
+
+    .fixture-foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        position: relative;
+        z-index: 1;
+        padding-top: 18px;
+        border-top: 1px dashed var(--line);
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        color: var(--muted);
+    }
+
+    .broadcast {
+        min-height: 390px;
+        background: #16191b;
+        color: white;
+        padding: 28px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .broadcast::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: .14;
+        background:
+            linear-gradient(90deg, transparent 49%, #fff 49.4%, #fff 50.6%, transparent 51%),
+            linear-gradient(transparent 49%, #fff 49.4%, #fff 50.6%, transparent 51%);
+        background-size: 130px 130px;
+        transform: perspective(500px) rotateX(58deg) scale(1.8);
+        transform-origin: center bottom;
+    }
+
+    .broadcast-inner { position: relative; z-index: 1; height: 100%; min-height: 330px; display: flex; flex-direction: column; }
+
+    .broadcast-head {
+        display: flex;
+        justify-content: space-between;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,.58);
+    }
+
+    .broadcast-screen {
+        flex: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
+        text-align: center;
+    }
+
+    .broadcast-screen .offline {
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(1.7rem, 3vw, 2.6rem);
+        line-height: .9;
+        letter-spacing: -.05em;
+        text-transform: uppercase;
+    }
+
+    .broadcast-screen .small {
+        display: block;
+        margin-top: 12px;
+        font: 800 9px 'Plus Jakarta Sans', sans-serif;
+        letter-spacing: .16em;
+        color: #777e7c;
+    }
+
+    /* Guide — giant numbered rail */
+    .guide {
+        padding: 15px 0 105px;
+    }
+
+    .guide-rail {
+        border-top: 1px solid var(--line);
+    }
+
+    .guide-step {
+        display: grid;
+        grid-template-columns: 120px minmax(190px, .8fr) 1.4fr;
+        gap: 30px;
+        align-items: center;
+        padding: 28px 0;
+        border-bottom: 1px solid var(--line);
+        transition: padding .35s ease, background .35s ease;
+    }
+
+    .guide-step:hover {
+        padding-left: 18px;
+        padding-right: 18px;
+        background: rgba(111,143,99,.07);
+    }
+
+    .guide-number {
+        font-family: 'Syne', sans-serif;
+        font-size: 4rem;
+        line-height: .8;
+        color: rgba(17,19,21,.15);
+    }
+
+    .guide-title {
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(1.5rem, 3vw, 2.8rem);
         font-weight: 900;
-        transition: all 0.2s ease;
+        line-height: .9;
+        text-transform: uppercase;
     }
 
-    #vim-tour-launcher:hover {
-        transform: translateY(-2px) scale(1.05);
-        box-shadow: 0 16px 35px rgba(0, 136, 255, 0.25);
+    .guide-copy {
+        max-width: 520px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.7;
     }
 
-    html.dark #vim-tour-launcher {
-        background: rgba(255, 255, 255, 0.94);
-        color: #0f172a;
+    /* Results become a scoreboard */
+    .results { padding: 20px 0 105px; }
+
+    .scoreboard {
+        border-top: 3px solid var(--ink);
+    }
+
+    .score-row {
+        display: grid;
+        grid-template-columns: 95px minmax(0, 1fr) 80px minmax(0, 1fr) 110px;
+        align-items: center;
+        min-height: 78px;
+        border-bottom: 1px solid var(--line);
+        text-decoration: none;
+        color: var(--ink);
+        transition: background .25s ease, padding .25s ease;
+    }
+
+    .score-row:hover {
+        background: rgba(17,19,21,.045);
+        padding-inline: 12px;
+    }
+
+    .score-time {
+        color: var(--muted);
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+    }
+
+    .score-team {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .score-team.right { justify-content: flex-end; }
+
+    .score-team img { width: 28px; height: 28px; object-fit: contain; }
+
+    .score {
+        text-align: center;
+        font-family: 'Syne', sans-serif;
+        font-size: 21px;
+        font-weight: 900;
+    }
+
+    .final-tag {
+        justify-self: end;
+        font-size: 8px;
+        font-weight: 900;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--green);
+    }
+
+    /* Journal / editorial */
+    .journal { padding: 15px 0 105px; }
+
+    .story-grid {
+        display: grid;
+        grid-template-columns: 1.6fr .7fr .7fr;
+        gap: 1px;
+        background: var(--ink);
+        border: 1px solid var(--ink);
+    }
+
+    .story {
+        position: relative;
+        min-height: 350px;
+        overflow: hidden;
+        background: var(--ink);
+        color: white;
+        text-decoration: none;
+    }
+
+    .story:first-child { min-height: 520px; }
+
+    .story img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: .72;
+        transition: transform .7s cubic-bezier(.16,1,.3,1), opacity .5s ease;
+    }
+
+    .story::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(0deg, rgba(10,11,12,.92), rgba(10,11,12,.05) 75%);
+    }
+
+    .story:hover img {
+        transform: scale(1.055);
+        opacity: .86;
+    }
+
+    .story-content {
+        position: absolute;
+        z-index: 2;
+        inset: auto 22px 22px;
+    }
+
+    .story-date {
+        font-size: 8px;
+        font-weight: 900;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,.62);
+    }
+
+    .story h3 {
+        margin: 8px 0 7px;
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(1.25rem, 2.6vw, 2.8rem);
+        line-height: .9;
+        letter-spacing: -.04em;
+        text-transform: uppercase;
+    }
+
+    .story:not(:first-child) h3 { font-size: 1.35rem; }
+
+    .story p {
+        margin: 0;
+        color: rgba(255,255,255,.68);
+        font-size: 10px;
+        line-height: 1.55;
+    }
+
+    /* Closing frame */
+    .closing {
+        position: relative;
+        overflow: hidden;
+        min-height: 330px;
+        background: var(--green);
+        color: white;
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .closing::before {
+        content: "90+";
+        position: absolute;
+        right: -15px;
+        bottom: -80px;
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(12rem, 27vw, 28rem);
+        font-weight: 900;
+        letter-spacing: -.12em;
+        color: rgba(255,255,255,.1);
+        line-height: .8;
+    }
+
+    .closing h2 {
+        position: relative;
+        z-index: 1;
+        max-width: 800px;
+        margin: 0;
+        font-size: clamp(3rem, 7vw, 7rem);
+        line-height: .78;
+        text-transform: uppercase;
+    }
+
+    .closing-foot {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 25px;
+    }
+
+    .closing-copy {
+        max-width: 390px;
+        color: rgba(255,255,255,.72);
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .closing-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 18px;
+        background: white;
+        color: var(--ink);
+        padding: 17px 21px;
+        text-decoration: none;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        transition: transform .25s ease;
+    }
+
+    .closing-button:hover { transform: translateX(5px); }
+
+    /* Existing tour: adapt its colors to the new language */
+    #vim-tour-card {
+        border-radius: 0 !important;
+        background: #f3f0e8 !important;
+        color: #111315 !important;
+        border: 1px solid rgba(17,19,21,.25) !important;
+        box-shadow: 18px 18px 0 rgba(17,19,21,.28) !important;
+    }
+
+    #vim-tour-card::before {
+        background: #f3f0e8 !important;
+        border-left-color: rgba(17,19,21,.25) !important;
+        border-top-color: rgba(17,19,21,.25) !important;
+    }
+
+    .vim-tour-eyebrow { color: #6f8f63 !important; }
+    .vim-tour-description { color: #6f726f !important; }
+
+    .vim-tour-next {
+        border-radius: 0 !important;
+        background: #111315 !important;
+        box-shadow: none !important;
+    }
+
+    .vim-tour-progress span.active { background: #6f8f63 !important; }
+
+    #vim-tour-spotlight {
+        border-color: #91b184 !important;
+        box-shadow: 0 0 0 4px rgba(111,143,99,.12), 0 0 35px rgba(111,143,99,.35) !important;
+    }
+
+    #vim-tour-launcher {
+        border-radius: 0 !important;
+        background: #111315 !important;
+    }
+
+    @media (max-width: 900px) {
+        .hero-subrow,
+        .match-grid { grid-template-columns: 1fr; }
+
+        .fixture { border-right: 0; border-bottom: 1px solid var(--line); }
+
+        .story-grid { grid-template-columns: 1fr 1fr; }
+        .story:first-child { grid-column: 1 / -1; }
+
+        .guide-step { grid-template-columns: 75px 1fr; }
+        .guide-copy { grid-column: 2; }
     }
 
     @media (max-width: 640px) {
-        #vim-tour-card {
-            bottom: 20px !important;
-            top: auto !important;
-            left: 16px !important;
-            width: calc(100vw - 32px);
-        }
+        .vim-hero { min-height: 690px; }
+        .vim-hero-copy,
+        .vim-main,
+        .arena-search { width: min(100% - 28px, 1400px); }
 
-        #vim-tour-card::before {
-            display: none;
-        }
+        .hero-title { font-size: clamp(3.4rem, 18vw, 6rem); }
+        .hero-subrow { margin-top: 34px; gap: 25px; }
+        .hero-scroll { display: none; }
 
-        #vim-tour-spotlight {
-            width: 75px;
-            height: 75px;
-        }
+        .arena-search { display: block; }
+        .arena-label { height: 44px; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.14); }
+        .arena-form { height: 62px; padding: 0 15px; }
+        .arena-submit { width: 100%; height: 54px; border-left: 0; border-top: 1px solid rgba(255,255,255,.14); }
 
-        #vim-tour-launcher {
-            right: 14px;
-            bottom: 14px;
-        }
+        .matchday,
+        .guide,
+        .results,
+        .journal { padding-bottom: 72px; }
+
+        .fixture { min-height: 330px; padding: 20px; }
+        .fixture-teams { grid-template-columns: 1fr 50px 1fr; gap: 5px; }
+        .fixture-team { flex-direction: column; text-align: center; gap: 8px; }
+        .fixture-team.right { flex-direction: column; text-align: center; }
+        .fixture-team img { width: 58px; height: 58px; }
+        .team-name { font-size: 14px; }
+
+        .broadcast { min-height: 290px; }
+        .broadcast-inner { min-height: 230px; }
+
+        .guide-step { grid-template-columns: 55px 1fr; gap: 15px; }
+        .guide-number { font-size: 2.8rem; }
+        .guide-copy { grid-column: 2; }
+
+        .score-row { grid-template-columns: 48px 1fr 58px 1fr; gap: 5px; }
+        .final-tag { display: none; }
+        .score-team { font-size: 9px; gap: 6px; }
+        .score-team img { width: 22px; height: 22px; }
+
+        .story-grid { grid-template-columns: 1fr; }
+        .story:first-child { grid-column: auto; min-height: 400px; }
+        .story:not(:first-child) { min-height: 280px; }
+
+        .closing { padding: 32px 24px; min-height: 380px; }
+        .closing-foot { flex-direction: column; align-items: start; }
+
+        .section-head { align-items: start; flex-direction: column; gap: 12px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-        #vim-tour-spotlight,
-        #vim-tour-card {
+        *, *::before, *::after {
+            scroll-behavior: auto !important;
             transition: none !important;
+            animation: none !important;
         }
     }
 </style>
@@ -351,384 +890,292 @@
     ?
 </button>
 
-<!-- HERO SECTION -->
-<header class="hero-container relative flex items-center justify-center pt-24 pb-48 px-6 text-center">
-    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent"></div>
 
-    <div class="relative z-10 max-w-4xl mx-auto mt-8">
-        <span class="inline-block bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full mb-6">
-            VIM SUPER LEAGUE
-        </span>
 
-        <h1 class="font-['Syne'] text-4xl sm:text-6xl md:text-7xl font-black text-white uppercase tracking-tight leading-tight mb-4">
-            FIND THE PERFECT <span class="gradient-text">LEAGUE</span> TO COMPETE
-        </h1>
-        
-        <p class="text-white/80 text-sm sm:text-base font-medium max-w-2xl mx-auto mb-10 tracking-wide">
-            Track official fixtures, inspect player markets, and jump straight into high-stakes league competitions.
-        </p>
+<div class="vim-page">
 
-        <!-- Centered Floating Quick Bar -->
-        <div class="relative max-w-2xl mx-auto z-50">
-            <form id="search-form" action="/matches" method="GET" class="search-pill rounded-2xl p-3 flex flex-col sm:flex-row items-center gap-3">
-                <div class="flex-1 w-full flex items-center gap-3 px-4 py-2">
-                    <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0a7 7 0 0114 0z"></path>
-                    </svg>
+    <!-- HERO / MATCHDAY OPENING -->
+    <header class="vim-hero">
+        <div class="vim-hero-art"></div>
+        <div class="vim-hero-grid"></div>
 
-                    <input 
-                        id="live-search-input" 
-                        name="q"
-                        type="text" 
-                        placeholder="Search teams, players, or matches..." 
-                        autocomplete="off"
-                        class="w-full bg-transparent text-gray-800 placeholder-gray-400 text-sm font-medium focus:outline-none"
-                    >
+        <div class="vim-hero-copy">
+            <div class="eyebrow hero-kicker">VIM SUPER LEAGUE · OFFICIAL</div>
+
+            <h1 class="display hero-title">
+                THIS IS<br>
+                <span class="outline">YOUR</span><br>
+                LEAGUE.
+            </h1>
+
+            <div class="hero-subrow">
+                <p class="hero-copy">
+                    Fixtures. Players. Markets. Stories. Everything happening inside VIM Super League,
+                    brought together as one living matchday experience.
+                </p>
+
+                <div class="hero-meta">
+                    <span>Season // Live</span>
+                    <span>Est. VIMSL</span>
                 </div>
-
-                <button 
-                    type="submit" 
-                    id="search-btn" 
-                    class="btn-gradient text-white text-xs font-bold uppercase tracking-wider px-8 py-4 rounded-xl w-full sm:w-auto shrink-0 transition text-center cursor-pointer"
-                >
-                    SEARCH ARENA
-                </button>
-            </form>
-
-            <!-- Live Suggestions Dropdown -->
-            <div 
-                id="search-results-dropdown" 
-                class="hidden absolute left-0 right-0 mt-2 bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-2xl p-4 space-y-4 max-h-96 overflow-y-auto text-left z-50"
-            >
             </div>
         </div>
+
+        <div class="hero-scroll">Scroll to enter the league ↓</div>
+    </header>
+
+    <!-- SEARCH / COMMAND STRIP -->
+    <div class="arena-search">
+        <div class="arena-label">Search Arena</div>
+
+        <form id="search-form" action="/matches" method="GET" class="arena-form">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0a7 7 0 0114 0z"></path>
+            </svg>
+
+            <input
+                id="live-search-input"
+                name="q"
+                type="text"
+                placeholder="Search teams, players, or matches..."
+                autocomplete="off"
+                class="arena-input"
+            >
+        </form>
+
+        <button type="submit" form="search-form" id="search-btn" class="arena-submit">
+            ENTER
+        </button>
+
+        <div
+            id="search-results-dropdown"
+            class="hidden absolute left-0 right-0 mt-2 p-4 space-y-4 max-h-96 overflow-y-auto text-left z-50"
+        ></div>
     </div>
 
-    <div class="fog-bottom"></div>
-</header>
+    <main class="vim-main">
 
-<main class="relative z-20 max-w-7xl mx-auto px-6 -mt-16 pb-32">
-
-    <!-- FLOATING FEATURE CARDS -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24">
-        
-        <!-- Next Match Card -->
-        <div id="tour-featured-match" class="lg:col-span-7 clean-card p-8 flex flex-col justify-between">
-            <div class="flex justify-between items-center mb-6">
+        <!-- MATCHDAY -->
+        <section class="matchday" id="tour-featured-match">
+            <div class="section-head">
                 <div>
-                    <span class="text-[11px] font-bold text-sky-500 uppercase tracking-widest block">
-                        Featured Fixture
-                    </span>
-
-                    <h3 class="font-['Syne'] text-2xl font-bold text-gray-900">
-                        Upcoming Match
-                    </h3>
+                    <div class="eyebrow">Matchday</div>
+                    <h2 class="display">Next on the pitch.</h2>
                 </div>
-
-                <span class="bg-sky-50 text-sky-600 border border-sky-100 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                    LIVE SCHEDULE
-                </span>
+                <a href="/matches" class="section-link">Full fixtures →</a>
             </div>
 
-            <% let nextMatch = matches.find(m => m.status === 'upcoming'); %>
-
-            <% if(nextMatch) { %>
-                <div class="flex items-center justify-between bg-gradient-to-r from-slate-50 via-white to-slate-50 rounded-2xl p-6 border border-slate-200/60 my-4 shadow-sm">
-                    <div class="flex flex-col items-center gap-2 flex-1">
-                        <img src="<%= nextMatch.logoA %>" class="w-14 h-14 object-contain drop-shadow-sm">
-                        <span class="font-bold text-sm text-gray-800 uppercase">
-                            <%= nextMatch.teamA %>
-                        </span>
-                    </div>
-                    
-                    <div class="text-center px-4">
-                        <span class="font-['Syne'] font-black text-2xl text-sky-500">
-                            VS
-                        </span>
-
-                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-                            <%= nextMatch.time %>
-                        </span>
+            <div class="match-grid">
+                <div class="fixture">
+                    <div class="fixture-top">
+                        <span class="match-number">01 // UPCOMING</span>
+                        <span class="live-dot">Schedule</span>
                     </div>
 
-                    <div class="flex flex-col items-center gap-2 flex-1">
-                        <img src="<%= nextMatch.logoB %>" class="w-14 h-14 object-contain drop-shadow-sm">
-                        <span class="font-bold text-sm text-gray-800 uppercase">
-                            <%= nextMatch.teamB %>
-                        </span>
+                    <% let nextMatch = matches.find(m => m.status === 'upcoming'); %>
+
+                    <% if(nextMatch) { %>
+                        <div class="fixture-teams">
+                            <div class="fixture-team">
+                                <img src="<%= nextMatch.logoA %>" alt="">
+                                <div class="team-name"><%= nextMatch.teamA %></div>
+                            </div>
+
+                            <div class="vs-mark">
+                                VS
+                                <span class="fixture-time"><%= nextMatch.time %></span>
+                            </div>
+
+                            <div class="fixture-team right">
+                                <img src="<%= nextMatch.logoB %>" alt="">
+                                <div class="team-name"><%= nextMatch.teamB %></div>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="fixture-teams" style="grid-template-columns:1fr;">
+                            <div style="text-align:center;">
+                                <div class="display" style="font-size:clamp(2rem,5vw,4rem);">NO FIXTURE.</div>
+                                <div class="fixture-time">The next match has not been scheduled yet.</div>
+                            </div>
+                        </div>
+                    <% } %>
+
+                    <div class="fixture-foot">
+                        <span>VIM Super League</span>
+                        <span>Matchday // Upcoming</span>
                     </div>
                 </div>
-            <% } else { %>
-                <div class="py-12 text-center bg-slate-50/80 rounded-2xl border border-dashed border-slate-200">
-                    <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-                        No upcoming matches scheduled
-                    </p>
+
+                <div class="broadcast">
+                    <div class="broadcast-inner">
+                        <div class="broadcast-head">
+                            <span>Broadcast Feed</span>
+                            <span><%= liveLink && liveLink.trim() !== "" ? '● Live' : 'Offline' %></span>
+                        </div>
+
+                        <% if(liveLink && liveLink.trim() !== "") { %>
+                            <%
+                                let embedLink = liveLink;
+                                if (liveLink.includes('watch?v=')) {
+                                    embedLink = liveLink.replace('watch?v=', 'embed/').split('&')[0];
+                                } else if (liveLink.includes('youtu.be/')) {
+                                    embedLink = liveLink.replace('youtu.be/', 'youtube.com/embed/').split('?')[0];
+                                }
+                            %>
+
+                            <div class="broadcast-screen">
+                                <iframe
+                                    class="w-full h-full min-h-[260px]"
+                                    style="border:0;"
+                                    src="<%= embedLink %>"
+                                    frameborder="0"
+                                    allowfullscreen
+                                ></iframe>
+                            </div>
+                        <% } else { %>
+                            <div class="broadcast-screen">
+                                <div>
+                                    <div class="offline">Broadcast<br>Offline.</div>
+                                    <span class="small">No live transmission active</span>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
                 </div>
-            <% } %>
+            </div>
+        </section>
 
-            <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-200/60 text-xs font-semibold text-gray-500">
-                <span>Laague Matches</span>
+        <!-- HOW IT WORKS -->
+        <section class="guide">
+            <div class="section-head">
+                <div>
+                    <div class="eyebrow">The route in</div>
+                    <h2 class="display">Three moves.<br>One league.</h2>
+                </div>
+            </div>
 
-                <a href="/matches" class="text-sky-500 hover:text-sky-600 flex items-center gap-1 font-bold">
-                    View Full Fixtures →
+            <div class="guide-rail">
+                <div class="guide-step">
+                    <div class="guide-number">01</div>
+                    <div class="guide-title">Join<br>Community</div>
+                    <div class="guide-copy">
+                        Connect your Discord account and introduce yourself to active scouts and team leaders.
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-number">02</div>
+                    <div class="guide-title">Build<br>Identity</div>
+                    <div class="guide-copy">
+                        Register your player profile, stats, position and role preferences through the live Market Hub.
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-number">03</div>
+                    <div class="guide-title">Enter<br>Matchday</div>
+                    <div class="guide-copy">
+                        Get recruited to an official roster and compete for championship titles.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESULTS -->
+        <section class="results" id="tour-results">
+            <div class="section-head">
+                <div>
+                    <div class="eyebrow">Scoreboard</div>
+                    <h2 class="display">The final whistle.</h2>
+                </div>
+                <a href="/matches" class="section-link">All results →</a>
+            </div>
+
+            <div class="scoreboard">
+                <% let recentResults = matches.filter(m => m.status === 'completed').reverse().slice(0, 6); %>
+
+                <% if(recentResults.length > 0) { %>
+                    <% recentResults.forEach(r => { %>
+                        <a href="/match/<%= r.id %>" class="score-row">
+                            <span class="score-time"><%= r.time %></span>
+
+                            <span class="score-team">
+                                <img src="<%= r.logoA %>" alt="">
+                                <span><%= r.teamA %></span>
+                            </span>
+
+                            <span class="score">
+                                <%= (r.details && r.details.goalsA) ? r.details.goalsA : 0 %>
+                                —
+                                <%= (r.details && r.details.goalsB) ? r.details.goalsB : 0 %>
+                            </span>
+
+                            <span class="score-team right">
+                                <span><%= r.teamB %></span>
+                                <img src="<%= r.logoB %>" alt="">
+                            </span>
+
+                            <span class="final-tag">Final · View match →</span>
+                        </a>
+                    <% }) %>
+                <% } else { %>
+                    <div style="padding:55px 0; color:var(--muted); font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.15em;">
+                        No recent match results available.
+                    </div>
+                <% } %>
+            </div>
+        </section>
+
+        <!-- JOURNAL -->
+        <section class="journal">
+            <div class="section-head">
+                <div>
+                    <div class="eyebrow">The Journal</div>
+                    <h2 class="display">League stories.</h2>
+                </div>
+            </div>
+
+            <div class="story-grid">
+                <% if (typeof stories !== 'undefined' && stories.length > 0) { %>
+                    <% stories.slice().reverse().slice(0, 3).forEach(story => { %>
+                        <a href="#" class="story">
+                            <img src="<%= story.image %>" alt="">
+                            <div class="story-content">
+                                <div class="story-date"><%= story.date || 'League story' %></div>
+                                <h3><%= story.title %></h3>
+                                <p><%= story.description %></p>
+                            </div>
+                        </a>
+                    <% }) %>
+                <% } else { %>
+                    <div style="grid-column:1/-1; padding:70px; background:#111315; color:#777; text-align:center; font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.15em;">
+                        No league stories published yet.
+                    </div>
+                <% } %>
+            </div>
+        </section>
+
+        <!-- CLOSING FRAME -->
+        <section class="closing">
+            <div class="eyebrow" style="color:rgba(255,255,255,.7);">Your next move</div>
+
+            <h2 class="display">Ready for<br>matchday?</h2>
+
+            <div class="closing-foot">
+                <p class="closing-copy">
+                    Set up your player identity, enter the market and start connecting with teams inside VIM Super League.
+                </p>
+
+                <a href="/market" class="closing-button">
+                    Enter the Market
+                    <span>↗</span>
                 </a>
             </div>
-        </div>
+        </section>
 
-        <!-- Live Broadcast Preview Card -->
-        <div class="lg:col-span-5 clean-card p-3 flex flex-col overflow-hidden bg-black text-white relative group">
-            <% if(liveLink && liveLink.trim() !== "") { %>
-                <% 
-                    let embedLink = liveLink;
-
-                    if (liveLink.includes('watch?v=')) {
-                        embedLink = liveLink.replace('watch?v=', 'embed/').split('&')[0];
-                    }
-                    else if (liveLink.includes('youtu.be/')) {
-                        embedLink = liveLink.replace('youtu.be/', 'youtube.com/embed/').split('?')[0];
-                    }
-                %>
-
-                <iframe 
-                    class="w-full h-full min-h-[260px] rounded-xl" 
-                    src="<%= embedLink %>" 
-                    frameborder="0" 
-                    allowfullscreen
-                ></iframe>
-            <% } else { %>
-                <div class="flex-1 min-h-[260px] rounded-xl bg-slate-900 flex flex-col items-center justify-center p-6 text-center">
-                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
-                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                    </div>
-
-                    <span class="font-['Syne'] text-lg font-bold uppercase text-white/70">
-                        Stream is currently Offline
-                    </span>
-
-                    <span class="text-xs text-gray-500 uppercase tracking-wider mt-1">
-                        No live stream active
-                    </span>
-                </div>
-            <% } %>
-        </div>
-    </div>
-
-    <!-- 3-STEP GUIDE SECTION -->
-    <div class="section-grey-gradient p-10 sm:p-14 mb-28">
-        <div class="text-center max-w-3xl mx-auto mb-14">
-            <span class="text-xs font-bold text-sky-500 uppercase tracking-[0.25em] block mb-2">
-                A GUIDE TO THE LEAGUE
-            </span>
-
-            <h2 class="font-['Syne'] text-3xl sm:text-4xl font-black text-gray-900">
-                ENTER THE LEAGUE WITH EASE
-            </h2>
-
-            <p class="text-gray-600 text-sm mt-3">
-                Follow these three straightforward steps to go from free agent to competing on the main stage.
-            </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
-
-            <!-- Step 1 -->
-            <div class="flex flex-col items-center group">
-                <div class="w-20 h-20 rounded-2xl bg-white text-sky-500 border border-slate-200/80 flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300 shadow-md">
-                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0a3 3 0 016 0zm6 3a2 2 0 11-4 0a2 2 0 014 0zM7 10a2 2 0 11-4 0a2 2 0 014 0z"></path>
-                    </svg>
-                </div>
-
-                <h3 class="font-['Syne'] font-bold text-xl text-gray-900 mb-2">
-                    1. Join Community
-                </h3>
-
-                <p class="text-xs text-gray-600 leading-relaxed max-w-xs">
-                    Connect your Discord account and introduce yourself to active scouts and team leaders.
-                </p>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="flex flex-col items-center group">
-                <div class="w-20 h-20 rounded-2xl bg-white text-sky-500 border border-slate-200/80 flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300 shadow-md">
-                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                </div>
-
-                <h3 class="font-['Syne'] font-bold text-xl text-gray-900 mb-2">
-                    2. Register Card
-                </h3>
-
-                <p class="text-xs text-gray-600 leading-relaxed max-w-xs">
-                    Fill out your player profile, stats, and role preferences in our live Market Hub.
-                </p>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="flex flex-col items-center group">
-                <div class="w-20 h-20 rounded-2xl bg-white text-sky-500 border border-slate-200/80 flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300 shadow-md">
-                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                    </svg>
-                </div>
-
-                <h3 class="font-['Syne'] font-bold text-xl text-gray-900 mb-2">
-                    3. Start Competing
-                </h3>
-
-                <p class="text-xs text-gray-600 leading-relaxed max-w-xs">
-                    Get recruited to an official roster and compete for championship titles.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- RECENT RESULTS SECTION -->
-    <div class="mb-24" id="tour-results">
-        <div class="flex justify-between items-end mb-8 border-b border-slate-300/60 pb-4">
-            <div>
-                <span class="text-xs font-bold text-sky-500 uppercase tracking-widest block mb-1">
-                    SCOREBOARD
-                </span>
-
-                <h2 class="font-['Syne'] text-3xl font-bold text-gray-900">
-                    Recent Match Results
-                </h2>
-            </div>
-
-            <a href="/matches" class="text-xs font-bold text-sky-500 hover:text-sky-600 uppercase tracking-wider">
-                All Results →
-            </a>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            <% let recentResults = matches.filter(m => m.status === 'completed').reverse().slice(0, 4); %>
-
-            <% if(recentResults.length > 0) { %>
-                <% recentResults.forEach(r => { %>
-                    <a href="/match/<%= r.id %>" class="clean-card p-6 block group">
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full uppercase">
-                                Final Score
-                            </span>
-
-                            <span class="text-[10px] text-gray-400 font-semibold">
-                                <%= r.time %>
-                            </span>
-                        </div>
-
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <img src="<%= r.logoA %>" class="w-6 h-6 object-contain">
-
-                                    <span class="font-bold text-xs text-gray-800 uppercase group-hover:text-sky-500 transition">
-                                        <%= r.teamA %>
-                                    </span>
-                                </div>
-
-                                <span class="font-['Syne'] font-black text-base text-gray-900">
-                                    <%= (r.details && r.details.goalsA) ? r.details.goalsA : 0 %>
-                                </span>
-                            </div>
-
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <img src="<%= r.logoB %>" class="w-6 h-6 object-contain">
-
-                                    <span class="font-bold text-xs text-gray-500 uppercase">
-                                        <%= r.teamB %>
-                                    </span>
-                                </div>
-
-                                <span class="font-['Syne'] font-black text-base text-gray-400">
-                                    <%= (r.details && r.details.goalsB) ? r.details.goalsB : 0 %>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                <% }) %>
-            <% } else { %>
-                <div class="col-span-full py-12 clean-card text-center text-gray-400 text-xs font-bold uppercase tracking-widest">
-                    No recent match results available
-                </div>
-            <% } %>
-        </div>
-    </div>
-
-    <!-- NEWS AND STORIES SECTION -->
-    <div class="mb-24">
-        <div class="flex justify-between items-end mb-8 border-b border-slate-300/60 pb-4">
-            <div>
-                <span class="text-xs font-bold text-sky-500 uppercase tracking-widest block mb-1">
-                    JOURNAL
-                </span>
-
-                <h2 class="font-['Syne'] text-3xl font-bold text-gray-900">
-                    Latest League Stories
-                </h2>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <% if (typeof stories !== 'undefined' && stories.length > 0) { %>
-                <% stories.slice().reverse().forEach(story => { %>
-                    <div class="clean-card overflow-hidden group flex flex-col">
-                        <div class="aspect-video w-full overflow-hidden relative">
-                            <img 
-                                src="<%= story.image %>" 
-                                class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                            >
-                        </div>
-
-                        <div class="p-6 flex-1 flex flex-col justify-between">
-                            <div>
-                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
-                                    <%= story.date || 'Article' %>
-                                </span>
-
-                                <h4 class="font-['Syne'] font-bold text-lg text-gray-900 group-hover:text-sky-500 transition leading-snug mb-2">
-                                    <%= story.title %>
-                                </h4>
-
-                                <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">
-                                    <%= story.description %>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                <% }) %>
-            <% } else { %>
-                <div class="col-span-full py-12 clean-card text-center text-gray-400 text-xs font-bold uppercase tracking-widest">
-                    No news articles published yet
-                </div>
-            <% } %>
-        </div>
-    </div>
-
-    <!-- BOTTOM ACTION CTA -->
-    <div class="section-grey-gradient p-12 text-center">
-        <h3 class="font-['Syne'] text-3xl font-bold text-gray-900 mb-3">
-            READY TO JOIN THE COMPETITION?
-        </h3>
-
-        <p class="text-xs text-gray-600 uppercase tracking-widest max-w-md mx-auto mb-8">
-            Set up your player card and start connecting with teams right away.
-        </p>
-
-        <a href="/market" class="btn-gradient inline-flex items-center gap-3 text-white px-10 py-5 rounded-2xl font-bold text-xs uppercase tracking-widest transition">
-            LET'S PLAN YOUR CAREER
-
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-            </svg>
-        </a>
-    </div>
-
-</main>
+    </main>
+</div>
 
 <!-- =========================================================
      HOMEPAGE TOUR SCRIPT
@@ -1045,7 +1492,6 @@
     }
 })();
 </script>
-
 <!-- =========================================================
      EXISTING HOMEPAGE SEARCH
      ========================================================= -->

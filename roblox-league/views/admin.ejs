@@ -2713,7 +2713,7 @@
                             </span>
                         <% } else if (auctionStatus === 'paused') { %>
                             <span class="text-[9px] font-black uppercase text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg">
-                                ⏸ PAUSED
+                                🔒 SOFT LOCK
                             </span>
                         <% } else if (auctionStatus === 'processing') { %>
                             <span class="text-[9px] font-black uppercase text-blue-600 bg-blue-50 border border-blue-100 px-2 py-1 rounded-lg animate-pulse">
@@ -2849,6 +2849,54 @@
                     </div>
                 <% } %>
 
+                <!-- CLASS CAP CHECKER — winning bids + manager only -->
+                <% if (typeof rosterReadiness !== 'undefined' && rosterReadiness && rosterReadiness.length > 0) { %>
+                    <%
+                        const capBad = rosterReadiness.filter(t => t.classOk === false);
+                        const capOkN = rosterReadiness.filter(t => t.classOk !== false).length;
+                    %>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <p class="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                Class cap check <span class="text-slate-300">(winning + manager only · outbid ignored)</span>
+                            </p>
+                            <% if (capBad.length === 0) { %>
+                                <span class="text-[9px] font-black uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-lg">
+                                    All <%= rosterReadiness.length %> teams OK
+                                </span>
+                            <% } else { %>
+                                <span class="text-[9px] font-black uppercase tracking-wider text-rose-600 bg-rose-50 border border-rose-100 px-2 py-1 rounded-lg">
+                                    <%= capBad.length %> over cap
+                                </span>
+                            <% } %>
+                        </div>
+                        <p class="text-[9px] text-slate-400 font-semibold leading-relaxed">
+                            Rules: 0 SS → 4S / 6A · 1 SS → 3S / 5A · 2 SS → 2S / 3A · SS max 2
+                        </p>
+                        <% if (capBad.length > 0) { %>
+                            <div class="space-y-2 max-h-64 overflow-y-auto">
+                                <% capBad.forEach(t => { %>
+                                    <div class="bg-rose-50 border border-rose-100 rounded-xl px-3 py-2.5">
+                                        <div class="flex flex-wrap items-center justify-between gap-2">
+                                            <p class="text-xs font-black text-slate-900"><%= t.teamName %></p>
+                                            <p class="text-[9px] font-black uppercase text-rose-600"><%= (t.classViolations || []).join(' · ') %></p>
+                                        </div>
+                                        <p class="text-[9px] text-slate-500 font-bold mt-1">
+                                            Counts SS <%= (t.counts && t.counts.SS) || 0 %>/<%= (t.caps && t.caps.SS) || 2 %>
+                                            · S <%= (t.counts && t.counts.S) || 0 %>/<%= (t.caps && t.caps.S) || '—' %>
+                                            · A <%= (t.counts && t.counts.A) || 0 %>/<%= (t.caps && t.caps.A) || '—' %>
+                                            · roster <%= t.provisionalCount || 0 %>
+                                            <% if (t.manager) { %> · mgr <%= t.manager %><% } %>
+                                        </p>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } else { %>
+                            <p class="text-[9px] text-emerald-700 font-bold">No class-cap violations on current winning lineups.</p>
+                        <% } %>
+                    </div>
+                <% } %>
+
                 <!-- START / PAUSE / RESUME / END -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
 
@@ -2863,9 +2911,9 @@
 
                     <% if (auctionStatus === 'live' || auctionStatus === 'active') { %>
                         <form action="/admin/auction/pause" method="POST"
-                            onsubmit="return confirm('Pause the auction? Bidding, registration, and rank edits freeze until you resume.');">
+                            onsubmit="return confirm('Enable SOFT LOCK? Each team gets 5 total bid/raise attempts. Unlocked withdraws still work. Counters reset to 0.');">
                             <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
-                                ⏸ Pause Auction
+                                🔒 Soft Lock (5 bids/team)
                             </button>
                         </form>
                     <% } else if (auctionStatus === 'paused') { %>

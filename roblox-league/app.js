@@ -4548,24 +4548,8 @@ app.post('/admin/auction/end', async (req, res) => {
             return res.redirect('/admin?error=Auction must be live (or paused) to end');
         }
 
-        // Hard gate: every enrolled team must hold at least minRosterSize
-        // provisional players (manager + current winning bids) before End.
-        const rosterLimits = getRosterLimits(info.auction);
-        const allTeamsCheck = await AuctionTeam.find();
-        const allPlayersCheck = await Player.find();
-        const playersByIdCheck = new Map(allPlayersCheck.map(p => [String(p._id), p]));
-        const shortTeams = [];
-        for (const team of allTeamsCheck) {
-            const state = computeManagerAuctionState(team, playersByIdCheck, rosterLimits);
-            if (state.totalPlayers < rosterLimits.rosterMin) {
-                shortTeams.push(`${team.name} (${state.totalPlayers}/${rosterLimits.rosterMin})`);
-            }
-        }
-        if (shortTeams.length > 0) {
-            return res.redirect('/admin?error=' + encodeURIComponent(
-                `Cannot end yet — ${shortTeams.length} team(s) below the ${rosterLimits.rosterMin}-player minimum: ${shortTeams.join(', ')}`
-            ));
-        }
+        // No min-roster gate — admin ends after soft lock / pause review.
+        // Teams keep whatever winning bids they hold (even under 12).
 
         // Flip immediately so a repeat request (double click, retry) is a
         // no-op instead of re-processing every player a second time.

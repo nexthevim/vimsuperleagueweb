@@ -668,11 +668,17 @@
 
     <% if (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.status === 'paused') { %>
         <div class="max-w-7xl mx-auto px-6 mb-4">
-            <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-sm">
-                <span class="text-xl">⏸</span>
+            <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-sm">
+                <span class="text-xl">🔒</span>
                 <div>
-                    <p class="text-xs font-black uppercase tracking-wider">Auction Paused</p>
-                    <p class="text-[10px] font-bold">Bidding, registration, and rank changes are frozen until an admin resumes.</p>
+                    <p class="text-xs font-black uppercase tracking-wider">Soft lock active</p>
+                    <p class="text-[10px] font-bold leading-relaxed">
+                        Each team has <strong>5 total</strong> bid/raise attempts (not per player).
+                        Unlocked outbid withdraws still allowed — no extra budget.
+                        <% if (typeof softLockInfo !== 'undefined' && softLockInfo && softLockInfo.active && !softLockInfo.spectator) { %>
+                            <span class="text-amber-700">Your team: <%= softLockInfo.remaining %> / <%= softLockInfo.max %> attempts left (used <%= softLockInfo.used %>).</span>
+                        <% } %>
+                    </p>
                 </div>
             </div>
         </div>

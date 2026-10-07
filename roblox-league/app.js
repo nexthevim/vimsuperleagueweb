@@ -179,7 +179,10 @@ const AuctionTeam = mongoose.model('AuctionTeam', new mongoose.Schema({
         position: String,
         rank: String,
         boughtFor: Number
-    }]
+    }],
+
+    // Soft-lock (paused) phase: total bid/raise actions used (max 5)
+    softLockBidsUsed: { type: Number, default: 0 }
 }));
 
 // Immutable auction event log — every bid, withdrawal, win, and admin
@@ -290,19 +293,26 @@ function getAuctionStatus(info) {
     return (info && info.auction && info.auction.status) || 'ready';
 }
 
-// Bidding only while LIVE. PAUSED freezes bids + registration.
+// Soft-lock (admin Pause): each team may place/raise at most SOFT_LOCK_MAX bids total.
+const SOFT_LOCK_MAX_BIDS = 5;
+
+// Bidding open while LIVE or PAUSED (soft-lock with limited attempts).
 function isBiddingOpen(status) {
-    return status === 'live';
+    return status === 'live' || status === 'paused';
 }
 
-// Rank edits blocked only while LIVE.
-// While PAUSED, admin may re-rank players; active bids on that player are wiped.
+// Rank edits blocked while LIVE or soft-lock PAUSED.
 function isRankFrozen(status) {
-    return status === 'live';
+    return status === 'live' || status === 'paused';
 }
 
 // Registration blocked while LIVE or PAUSED.
 function isRegistrationClosed(status) {
+    return status === 'live' || status === 'paused';
+}
+
+// Withdrawals allowed while LIVE or soft-lock PAUSED (same outbid cooldown rules).
+function isWithdrawOpen(status) {
     return status === 'live' || status === 'paused';
 }
 
@@ -511,11 +521,20 @@ function canStillLegallyCompleteRoster(stateAfterBid) {
 // biddable in the UI when the server would actually reject the bid.
 function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersById, rosterLimits }) {
 
-    if (auctionStatus === 'paused') {
-        return { ok: false, reason: 'The auction is paused — bidding is temporarily frozen.' };
+    if (!isBiddingOpen(auctionStatus)) {
+        return { ok: false, reason: 'The auction is not currently open for bidding.' };
     }
-    if (auctionStatus !== 'live') {
-        return { ok: false, reason: 'The auction is not currently live.' };
+
+    // Soft-lock (paused): max SOFT_LOCK_MAX_BIDS total bid/raise actions per team
+    if (auctionStatus === 'paused') {
+        const used = Number(team.softLockBidsUsed) || 0;
+        if (used >= SOFT_LOCK_MAX_BIDS) {
+            return {
+                ok: false,
+                reason: 'Soft lock: your team has used all ' + SOFT_LOCK_MAX_BIDS +
+                    ' bid attempts. No more bids until the admin ends the auction or resumes.'
+            };
+        }
     }
 
     if (isManagerAccount(player, allTeams)) {
@@ -1015,7 +1034,7 @@ async function buildMarketSpotlight(players, allTeams) {
 
 app.get('/market', async (req, res) => {
     try {
-        const players = await Player.find({
+        let players = await Player.find({
             verified: true
         });
 
@@ -1025,19 +1044,64 @@ app.get('/market', async (req, res) => {
 
         const allTeams = await AuctionTeam.find();
 
+        // Sync display highs from live team.bids so conveyor/modal never
+        // show "No bids yet" while leaderboards already show a real bid.
+        const liveHigh = new Map(); // playerId -> { amount, teamName }
+        for (const t of allTeams) {
+            for (const b of (t.bids || [])) {
+                if (!b || !b.playerId) continue;
+                const id = String(b.playerId);
+                const amt = Number(b.amount) || 0;
+                if (amt <= 0) continue;
+                const prev = liveHigh.get(id);
+                if (!prev || amt > prev.amount) {
+                    liveHigh.set(id, { amount: amt, teamName: t.name || '' });
+                }
+            }
+        }
+        players = players.map(p => {
+            const plain = typeof p.toObject === 'function' ? p.toObject() : { ...p };
+            const id = String(plain._id);
+            const live = liveHigh.get(id);
+            if (live && live.amount > 0) {
+                // Prefer live team data when it is higher or when bidder name missing
+                if (live.amount >= (Number(plain.highestBid) || 0) || !(plain.highestBidder || '').trim()) {
+                    plain.highestBid = live.amount;
+                    plain.highestBidder = live.teamName;
+                }
+            } else if (!(plain.highestBidder || '').trim()) {
+                // No real team bid — don't show a phantom high
+                plain.highestBid = 0;
+                plain.highestBidder = '';
+            }
+            return plain;
+        });
+
         const marketSpotlight = await buildMarketSpotlight(players, allTeams);
 
         // Per-manager eligibility, precomputed server-side so the market
         // badges/filter and the actual /auction/bid route can never
         // disagree with each other.
         let myEligibility = null;
+        let softLockInfo = null;
+
+        const info = await getInfo();
+        const auctionStatus = (info.auction && info.auction.status) || 'ready';
 
         if (res.locals.isManager && res.locals.myAuctionState) {
-            const info = await getInfo();
-            const auctionStatus = (info.auction && info.auction.status) || 'ready';
             const playersById = new Map(players.map(p => [String(p._id), p]));
             const myTeam = res.locals.myAuctionState.team;
             const rosterLimits = getRosterLimits(info.auction);
+
+            if (auctionStatus === 'paused') {
+                const used = Number(myTeam.softLockBidsUsed) || 0;
+                softLockInfo = {
+                    active: true,
+                    used,
+                    max: SOFT_LOCK_MAX_BIDS,
+                    remaining: Math.max(0, SOFT_LOCK_MAX_BIDS - used)
+                };
+            }
 
             myEligibility = {};
             for (const p of players) {
@@ -1055,6 +1119,8 @@ app.get('/market', async (req, res) => {
                 });
                 myEligibility[String(p._id)] = verdict.ok;
             }
+        } else if (auctionStatus === 'paused') {
+            softLockInfo = { active: true, used: 0, max: SOFT_LOCK_MAX_BIDS, remaining: SOFT_LOCK_MAX_BIDS, spectator: true };
         }
 
         res.render('market', {
@@ -1063,6 +1129,7 @@ app.get('/market', async (req, res) => {
             teams,
             marketSpotlight,
             myEligibility,
+            softLockInfo,
             error: req.query.error || null,
             ...defaultOg(
                 req,
@@ -1213,6 +1280,23 @@ app.get('/admin', async (req, res) => {
 
         rosterReadiness = allTeams.map(team => {
             const state = computeManagerAuctionState(team, playersById, rosterLimits);
+            // Class-cap check: WINNING bids + manager only (outbid ignored)
+            const counts = state.counts || {};
+            const caps = state.caps || {};
+            const violations = [];
+            if ((counts.SS || 0) > (caps.SS || 2)) {
+                violations.push('SS ' + counts.SS + '/' + caps.SS);
+            }
+            if ((counts.S || 0) > (caps.S || 0)) {
+                violations.push('S ' + counts.S + '/' + caps.S);
+            }
+            if ((counts.A || 0) > (caps.A || 0)) {
+                violations.push('A ' + counts.A + '/' + caps.A);
+            }
+            // Over max roster size
+            if (state.totalPlayers > rosterLimits.rosterMax) {
+                violations.push('roster ' + state.totalPlayers + '/' + rosterLimits.rosterMax);
+            }
             return {
                 teamId: String(team._id),
                 teamName: team.name,
@@ -1220,7 +1304,11 @@ app.get('/admin', async (req, res) => {
                 provisionalCount: state.totalPlayers,
                 availableBudget: state.availableBudget,
                 belowMinimum: state.totalPlayers < rosterLimits.rosterMin,
-                shortfall: Math.max(0, rosterLimits.rosterMin - state.totalPlayers)
+                shortfall: Math.max(0, rosterLimits.rosterMin - state.totalPlayers),
+                counts: { SS: counts.SS || 0, S: counts.S || 0, A: counts.A || 0, B: counts.B || 0, C: counts.C || 0 },
+                caps: { SS: caps.SS, S: caps.S, A: caps.A },
+                classOk: violations.length === 0,
+                classViolations: violations
             };
         });
     } catch (err) {
@@ -1577,10 +1665,21 @@ app.post('/auction/bid', async (req, res) => {
             });
         }
 
+        // Soft-lock: count this successful bid/raise toward the team's 5 attempts
+        if (auctionStatus === 'paused') {
+            team.softLockBidsUsed = (Number(team.softLockBidsUsed) || 0) + 1;
+        }
+
         await team.save();
 
         await refreshPlayerHighestBid(player._id);
         await syncOutbidTimestamps(player._id);
+
+        // Ensure player high is never left without a bidder name if teams hold bids
+        const refreshed = await Player.findById(player._id);
+        if (refreshed && Number(refreshed.highestBid) > 0 && !(refreshed.highestBidder || '').trim()) {
+            await refreshPlayerHighestBid(player._id);
+        }
 
         await AuctionActivity.create({
             type: 'bid',
@@ -1589,7 +1688,10 @@ app.post('/auction/bid', async (req, res) => {
             teamId: team._id,
             teamName: team.name,
             managerName: user.name,
-            amount: amount
+            amount: amount,
+            meta: auctionStatus === 'paused'
+                ? { softLock: true, softLockBidsUsed: team.softLockBidsUsed }
+                : undefined
         });
 
         res.redirect('/market');
@@ -1719,9 +1821,9 @@ app.post('/auction/withdraw', async (req, res) => {
         const info = await getInfo();
         const auctionStatus = (info.auction && info.auction.status) || 'ready';
 
-        if (auctionStatus !== 'live') {
+        if (!isWithdrawOpen(auctionStatus)) {
             return res.redirect(
-                '/market?error=The auction is not currently live'
+                '/market?error=Withdrawals are only allowed while the auction is live or in soft lock'
             );
         }
 
@@ -3949,10 +4051,29 @@ app.post('/admin/auction/pause', async (req, res) => {
         if (info.auction.status !== 'live') {
             return res.redirect('/admin?error=Can only pause a live auction');
         }
+        // Soft lock: each team gets a fresh pool of SOFT_LOCK_MAX_BIDS attempts
         info.auction.status = 'paused';
         info.markModified('auction');
         await info.save();
-        res.redirect('/admin');
+
+        await AuctionTeam.updateMany({}, { $set: { softLockBidsUsed: 0 } });
+
+        await AuctionActivity.create({
+            type: 'rank_change',
+            playerName: '',
+            managerName: 'ADMIN',
+            meta: {
+                reason: 'soft_lock_start',
+                softLockMaxBids: SOFT_LOCK_MAX_BIDS,
+                note: 'Pause = soft lock. Each team may bid/raise up to ' + SOFT_LOCK_MAX_BIDS +
+                    ' times total. Unlocked outbid withdraws still allowed.'
+            }
+        });
+
+        res.redirect('/admin?error=' + encodeURIComponent(
+            'Soft lock ON. Each team has ' + SOFT_LOCK_MAX_BIDS +
+            ' bid attempts total. Unlocked withdraws OK. Resume or End when ready.'
+        ));
     } catch (err) {
         console.error('Pause Auction Error:', err);
         res.redirect('/admin?error=PauseAuctionFailed');
@@ -3993,12 +4114,23 @@ app.post('/admin/auction/fix-all', async (req, res) => {
         const teams = await AuctionTeam.find();
         let bidsCleaned = 0;
 
+        // Valid player ids — bids pointing at deleted alts/accounts are orphaned
+        const allPlayerIds = new Set(
+            (await Player.find({}).select('_id').lean()).map(pl => String(pl._id))
+        );
+        let orphansCleared = 0;
+
         for (const team of teams) {
             const before = (team.bids || []).length;
             team.bids = (team.bids || []).filter(b => {
                 if (!b || !b.playerId) return false;
                 const amt = Number(b.amount);
                 if (!Number.isFinite(amt) || amt <= 0) return false;
+                // Drop bids on deleted players (alt accounts etc.) — unlocks money
+                if (!allPlayerIds.has(String(b.playerId))) {
+                    orphansCleared++;
+                    return false;
+                }
                 return true;
             });
             // de-dupe by playerId keep highest amount
@@ -4048,7 +4180,7 @@ app.post('/admin/auction/fix-all', async (req, res) => {
         });
 
         res.redirect('/admin?error=' + encodeURIComponent(
-            'Fix All done: cleaned ' + bidsCleaned + ' bad/duplicate bid row(s), updated ' + highsFixed + ' player high(s). Real bids kept. Auction still live.'
+            'Fix All done: cleaned ' + bidsCleaned + ' row(s) (incl. deleted-player orphans), updated ' + highsFixed + ' high(s). Money on removed bids is unlocked. Auction still live.'
         ));
     } catch (err) {
         console.error('Fix All error:', err);
@@ -4089,85 +4221,81 @@ app.post('/admin/auction/force-drop-bid', async (req, res) => {
     try {
         const { teamId, playerId } = req.body;
         if (!teamId || !playerId) {
-            return res.redirect('/admin?error=Team and player are required to drop a bid');
+            return res.redirect('/admin?error=Team and player required');
         }
-        const team = await AuctionTeam.findById(teamId);
-        if (!team) return res.redirect('/admin?error=Team not found');
 
-        const player = await Player.findById(playerId);
-        if (!player) return res.redirect('/admin?error=Player not found');
+        const team = await AuctionTeam.findById(teamId);
+        if (!team) {
+            return res.redirect('/admin?error=Team not found');
+        }
 
         const pid = String(playerId);
-        const dropped = (team.bids || []).find(b => b.playerId && String(b.playerId) === pid);
-        const before = (team.bids || []).length;
-        team.bids = (team.bids || []).filter(b => !(b.playerId && String(b.playerId) === pid));
-        const removedFromTeam = team.bids.length !== before;
+        const player = await Player.findById(playerId);
 
-        if (removedFromTeam) {
+        // Always try to pull the bid row from the team first (works even if player was deleted)
+        let dropped = null;
+        const beforeBids = Array.isArray(team.bids) ? team.bids.slice() : [];
+        const idx = beforeBids.findIndex(b => String(b.playerId) === pid);
+        if (idx >= 0) {
+            dropped = beforeBids[idx];
+            team.bids = beforeBids.filter((_, i) => i !== idx);
             team.markModified('bids');
             await team.save();
         }
-        // Always $pull in case of ObjectId/string mismatch leftovers
-        await AuctionTeam.updateOne({ _id: team._id }, { $pull: { bids: { playerId: player._id } } });
-        try {
-            await AuctionTeam.updateOne({ _id: team._id }, { $pull: { bids: { playerId: pid } } });
-        } catch (e) { /* ignore */ }
 
-        const wasHighest =
-            (player.highestBidder || '').toLowerCase() === (team.name || '').toLowerCase();
+        // Player still exists — recompute high / clear ghost name
+        if (player) {
+            const wasHighest =
+                (player.highestBidder || '').toLowerCase() === (team.name || '').toLowerCase();
 
-        if (!removedFromTeam && !wasHighest && !dropped) {
-            // Last resort: still clear high if this team name is on the player
-            // and no other team holds a bid row for them.
-            const anyBid = await AuctionTeam.findOne({ 'bids.playerId': player._id });
-            if (!anyBid) {
+            if (wasHighest) {
                 player.highestBid = 0;
                 player.highestBidder = '';
                 await player.save();
-                await refreshPlayerHighestBid(player._id);
-                await AuctionActivity.create({
-                    type: 'withdraw',
-                    playerId: player._id,
-                    playerName: player.name || '',
-                    teamId: team._id,
-                    teamName: team.name,
-                    managerName: 'ADMIN',
-                    amount: Number(player.highestBid) || 0,
-                    meta: { forced: true, ghostClear: true, note: 'cleared stale high with no team bid rows' }
-                });
-                return res.redirect('/admin?error=' + encodeURIComponent(
-                    'No bid row on that team — cleared stale high on player if present. Market should update.'
-                ));
             }
+            await refreshPlayerHighestBid(player._id);
+            try { await syncOutbidTimestamps(player._id); } catch (e) { /* ignore */ }
+
+            await AuctionActivity.create({
+                type: 'withdraw',
+                playerId: player._id,
+                playerName: player.name || '',
+                teamId: team._id,
+                teamName: team.name,
+                managerName: 'ADMIN',
+                amount: dropped ? Number(dropped.amount) || 0 : 0,
+                meta: { forced: true, removedFromTeam: !!dropped, wasHighest: !!wasHighest }
+            });
+
             return res.redirect('/admin?error=' + encodeURIComponent(
-                'That team has no bid row on this player (and is not the listed highest bidder). Pick the team shown as highestBidder, or run Reconcile highs.'
+                dropped
+                    ? 'Bid force-dropped. Money unlocked and high bid recomputed.'
+                    : (wasHighest
+                        ? 'Ghost high cleared (no bid row). High recomputed.'
+                        : 'No bid row on that team for this player.')
             ));
         }
 
-        if (wasHighest) {
-            player.highestBid = 0;
-            player.highestBidder = '';
-            await player.save();
+        // Player DELETED (alt account etc.) — bid row removal is enough to unlock money
+        if (dropped) {
+            await AuctionActivity.create({
+                type: 'withdraw',
+                playerId: null,
+                playerName: (dropped.playerName || 'Deleted player'),
+                teamId: team._id,
+                teamName: team.name,
+                managerName: 'ADMIN',
+                amount: Number(dropped.amount) || 0,
+                meta: { forced: true, orphanDeletedPlayer: true, playerIdWas: pid }
+            });
+            return res.redirect('/admin?error=' + encodeURIComponent(
+                'Orphan bid on deleted player removed (' + (dropped.playerName || pid) + ', ' +
+                Number(dropped.amount || 0).toLocaleString() + ' V unlocked).'
+            ));
         }
 
-        await refreshPlayerHighestBid(player._id);
-        await syncOutbidTimestamps(player._id);
-
-        await AuctionActivity.create({
-            type: 'withdraw',
-            playerId: player._id,
-            playerName: player.name || '',
-            teamId: team._id,
-            teamName: team.name,
-            managerName: 'ADMIN',
-            amount: dropped ? Number(dropped.amount) || 0 : 0,
-            meta: { forced: true, removedFromTeam: !!removedFromTeam, wasHighest: !!wasHighest }
-        });
-
-        res.redirect('/admin?error=' + encodeURIComponent(
-            removedFromTeam
-                ? 'Bid force-dropped. Money unlocked and high bid recomputed.'
-                : 'Ghost high cleared (bid row was already gone). High bid recomputed.'
+        return res.redirect('/admin?error=' + encodeURIComponent(
+            'Player not found and team has no bid row for that id. Run Fix All to strip deleted-player orphans.'
         ));
     } catch (err) {
         console.error('Force Drop Bid Error:', err);

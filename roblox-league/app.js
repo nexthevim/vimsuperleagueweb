@@ -321,7 +321,7 @@ function isWithdrawOpen(status) {
 // Fixed minimum bid increments — no meaningless +1/+2 bidding.
 // Configurable in one place if the league wants different tiers later.
 // After being outbid, money stays locked this long before withdraw is allowed.
-const OUTBID_LOCK_MS = 12 * 60 * 60 * 1000; // 12 hours
+const OUTBID_LOCK_MS = 15 * 60 * 1000; // 15 minutes outbid withdraw cooldown
 
 const BID_INCREMENT_TIERS = [
     { upTo: 5000, step: 100 },
@@ -1815,13 +1815,15 @@ async function syncOutbidTimestamps(playerId) {
 }
 
 function getOutbidUnlockInfo(bid) {
+    // Cooldown disabled (OUTBID_LOCK_MS = 0): outbid bids can be withdrawn anytime.
     try {
+        if (typeof OUTBID_LOCK_MS === 'number' && OUTBID_LOCK_MS <= 0) {
+            return { locked: false, unlockAt: null, remainingMs: 0, canWithdraw: true };
+        }
         if (!bid || !bid.outbidAt) {
             return { locked: false, unlockAt: null, remainingMs: 0, canWithdraw: true };
         }
-        const lockMs = (typeof OUTBID_LOCK_MS === 'number' && OUTBID_LOCK_MS > 0)
-            ? OUTBID_LOCK_MS
-            : (12 * 60 * 60 * 1000);
+        const lockMs = OUTBID_LOCK_MS;
         const start = new Date(bid.outbidAt).getTime();
         if (!Number.isFinite(start)) {
             return { locked: false, unlockAt: null, remainingMs: 0, canWithdraw: true };
@@ -1835,7 +1837,7 @@ function getOutbidUnlockInfo(bid) {
             canWithdraw: remainingMs <= 0
         };
     } catch (e) {
-        return { locked: true, unlockAt: null, remainingMs: 12 * 60 * 60 * 1000, canWithdraw: false };
+        return { locked: false, unlockAt: null, remainingMs: 0, canWithdraw: true };
     }
 }
 

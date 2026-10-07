@@ -4302,10 +4302,52 @@ app.post('/admin/auction/reconcile-highs', async (req, res) => {
 // FORCE-DROP a single bid (admin mercy / correction). Then recompute highest.
 // Also handles GHOST state: bid row already gone but player.highestBidder
 // still shows the team (broken withdraw). Clearing the high is enough then.
+
+// Set soft-lock attempts used for a team (0–SOFT_LOCK_MAX_BIDS). Does not touch bids.
+app.post('/admin/auction/set-soft-lock-attempts', async (req, res) => {
+    if (!requireAdmin(req, res)) return;
+    try {
+        const { teamId, softLockBidsUsed, softLockRemaining } = req.body;
+        if (!teamId) {
+            return res.redirect('/admin?error=Team required');
+        }
+        const team = await AuctionTeam.findById(teamId);
+        if (!team) {
+            return res.redirect('/admin?error=Team not found');
+        }
+
+        let used;
+        if (softLockRemaining !== undefined && softLockRemaining !== '') {
+            const left = Number(softLockRemaining);
+            if (!Number.isFinite(left) || left < 0) {
+                return res.redirect('/admin?error=Invalid remaining attempts');
+            }
+            used = Math.max(0, SOFT_LOCK_MAX_BIDS - Math.min(SOFT_LOCK_MAX_BIDS, Math.floor(left)));
+        } else {
+            used = Number(softLockBidsUsed);
+            if (!Number.isFinite(used) || used < 0) {
+                return res.redirect('/admin?error=Invalid attempts used');
+            }
+            used = Math.min(SOFT_LOCK_MAX_BIDS, Math.floor(used));
+        }
+
+        team.softLockBidsUsed = used;
+        await team.save();
+
+        const left = Math.max(0, SOFT_LOCK_MAX_BIDS - used);
+        res.redirect('/admin?error=' + encodeURIComponent(
+            team.name + ': soft-lock attempts set to ' + left + '/' + SOFT_LOCK_MAX_BIDS + ' left (used ' + used + '). Bids unchanged.'
+        ));
+    } catch (err) {
+        console.error('Set soft-lock attempts error:', err);
+        res.redirect('/admin?error=SetSoftLockAttemptsFailed');
+    }
+});
+
 app.post('/admin/auction/force-drop-bid', async (req, res) => {
     if (!requireAdmin(req, res)) return;
     try {
-        const { teamId, playerId } = req.body;
+        const { teamId, playerId, refundSoftLock } = req.body;
         if (!teamId || !playerId) {
             return res.redirect('/admin?error=Team and player required');
         }
@@ -4318,7 +4360,6 @@ app.post('/admin/auction/force-drop-bid', async (req, res) => {
         const pid = String(playerId);
         const player = await Player.findById(playerId);
 
-        // Always try to pull the bid row from the team first (works even if player was deleted)
         let dropped = null;
         const beforeBids = Array.isArray(team.bids) ? team.bids.slice() : [];
         const idx = beforeBids.findIndex(b => String(b.playerId) === pid);
@@ -4326,10 +4367,23 @@ app.post('/admin/auction/force-drop-bid', async (req, res) => {
             dropped = beforeBids[idx];
             team.bids = beforeBids.filter((_, i) => i !== idx);
             team.markModified('bids');
+        }
+
+        // Refund one soft-lock attempt when undoing an accidental bid
+        let attemptRefunded = false;
+        const doRefund = refundSoftLock === undefined || refundSoftLock === 'on' || refundSoftLock === 'true' || refundSoftLock === '1';
+        if (dropped && doRefund) {
+            const used = Number(team.softLockBidsUsed) || 0;
+            if (used > 0) {
+                team.softLockBidsUsed = used - 1;
+                attemptRefunded = true;
+            }
+        }
+
+        if (dropped || attemptRefunded) {
             await team.save();
         }
 
-        // Player still exists — recompute high / clear ghost name
         if (player) {
             const wasHighest =
                 (player.highestBidder || '').toLowerCase() === (team.name || '').toLowerCase();
@@ -4350,19 +4404,26 @@ app.post('/admin/auction/force-drop-bid', async (req, res) => {
                 teamName: team.name,
                 managerName: 'ADMIN',
                 amount: dropped ? Number(dropped.amount) || 0 : 0,
-                meta: { forced: true, removedFromTeam: !!dropped, wasHighest: !!wasHighest }
+                meta: {
+                    forced: true,
+                    removedFromTeam: !!dropped,
+                    wasHighest: !!wasHighest,
+                    softLockAttemptRefunded: attemptRefunded,
+                    softLockBidsUsed: Number(team.softLockBidsUsed) || 0
+                }
             });
 
-            return res.redirect('/admin?error=' + encodeURIComponent(
-                dropped
-                    ? 'Bid force-dropped. Money unlocked and high bid recomputed.'
-                    : (wasHighest
-                        ? 'Ghost high cleared (no bid row). High recomputed.'
-                        : 'No bid row on that team for this player.')
-            ));
+            let msg = dropped
+                ? 'Bid force-dropped. Money unlocked and high bid recomputed.'
+                : (wasHighest
+                    ? 'Ghost high cleared (no bid row). High recomputed.'
+                    : 'No bid row on that team for this player.');
+            if (attemptRefunded) {
+                msg += ' Soft-lock attempt restored (' + (Number(team.softLockBidsUsed) || 0) + '/5 used).';
+            }
+            return res.redirect('/admin?error=' + encodeURIComponent(msg));
         }
 
-        // Player DELETED (alt account etc.) — bid row removal is enough to unlock money
         if (dropped) {
             await AuctionActivity.create({
                 type: 'withdraw',
@@ -4372,12 +4433,17 @@ app.post('/admin/auction/force-drop-bid', async (req, res) => {
                 teamName: team.name,
                 managerName: 'ADMIN',
                 amount: Number(dropped.amount) || 0,
-                meta: { forced: true, orphanDeletedPlayer: true, playerIdWas: pid }
+                meta: {
+                    forced: true,
+                    orphanDeletedPlayer: true,
+                    playerIdWas: pid,
+                    softLockAttemptRefunded: attemptRefunded
+                }
             });
-            return res.redirect('/admin?error=' + encodeURIComponent(
-                'Orphan bid on deleted player removed (' + (dropped.playerName || pid) + ', ' +
-                Number(dropped.amount || 0).toLocaleString() + ' V unlocked).'
-            ));
+            let msg = 'Orphan bid on deleted player removed (' + (dropped.playerName || pid) + ', ' +
+                Number(dropped.amount || 0).toLocaleString() + ' V unlocked).';
+            if (attemptRefunded) msg += ' Soft-lock attempt restored.';
+            return res.redirect('/admin?error=' + encodeURIComponent(msg));
         }
 
         return res.redirect('/admin?error=' + encodeURIComponent(
@@ -4388,6 +4454,7 @@ app.post('/admin/auction/force-drop-bid', async (req, res) => {
         res.redirect('/admin?error=ForceDropBidFailed');
     }
 });
+
 
 app.post('/admin/auction/start', async (req, res) => {
 

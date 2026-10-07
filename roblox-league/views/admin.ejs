@@ -2906,11 +2906,11 @@
                             </p>
                             <% if (shortTeams.length > 0) { %>
                             <p class="text-[9px] text-rose-500 font-bold uppercase tracking-wider leading-relaxed">
-                                End is blocked until every team has at least the minimum roster (manager + winning bids).
+                                Some teams are under the usual minimum — you can still End after soft lock / pause if you choose.
                             </p>
                         <% } else { %>
                             <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider leading-relaxed">
-                                All teams meet the minimum — End Auction is available.
+                                All teams meet the usual minimum roster size.
                             </p>
                         <% } %>
                     </div>
@@ -3014,8 +3014,7 @@
                     <% } %>
 
                     <%
-                        const canEndAuction = (auctionStatus === 'live' || auctionStatus === 'active' || auctionStatus === 'paused' || auctionStatus === 'soft_lock')
-                            && !(typeof rosterReadiness !== 'undefined' && rosterReadiness.some(t => t.belowMinimum));
+                        const canEndAuction = (auctionStatus === 'live' || auctionStatus === 'active' || auctionStatus === 'paused' || auctionStatus === 'soft_lock');
                     %>
                     <form action="/admin/auction/end" method="POST" class="sm:col-span-2"
                         onsubmit="return confirm('End the auction now? Finalizes winners, deducts budgets, assigns rosters. Cannot be undone.');">

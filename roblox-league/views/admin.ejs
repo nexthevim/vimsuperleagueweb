@@ -2711,9 +2711,13 @@
                             <span class="text-[9px] font-black uppercase text-red-600 bg-red-50 border border-red-100 px-2 py-1 rounded-lg animate-pulse">
                                 LIVE
                             </span>
+                        <% } else if (auctionStatus === 'soft_lock') { %>
+                            <span class="text-[9px] font-black uppercase text-violet-700 bg-violet-50 border border-violet-200 px-2 py-1 rounded-lg">
+                                🔒 SOFT LOCK
+                            </span>
                         <% } else if (auctionStatus === 'paused') { %>
                             <span class="text-[9px] font-black uppercase text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg">
-                                🔒 SOFT LOCK
+                                ⏸ PAUSED
                             </span>
                         <% } else if (auctionStatus === 'processing') { %>
                             <span class="text-[9px] font-black uppercase text-blue-600 bg-blue-50 border border-blue-100 px-2 py-1 rounded-lg animate-pulse">
@@ -2910,10 +2914,28 @@
                     </form>
 
                     <% if (auctionStatus === 'live' || auctionStatus === 'active') { %>
-                        <form action="/admin/auction/pause" method="POST"
-                            onsubmit="return confirm('Enable SOFT LOCK? Each team gets 5 total bid/raise attempts. Unlocked withdraws still work. Counters reset to 0.');">
-                            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
+                        <form action="/admin/auction/soft-lock" method="POST"
+                            onsubmit="return confirm('SOFT LOCK: each team gets 5 total bid/raise attempts. Unlocked withdraws OK. Counters reset to 0.');">
+                            <button type="submit" class="w-full bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
                                 🔒 Soft Lock (5 bids/team)
+                            </button>
+                        </form>
+                        <form action="/admin/auction/pause" method="POST"
+                            onsubmit="return confirm('FULL PAUSE? All bidding freezes until you resume or end.');">
+                            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
+                                ⏸ Pause (full freeze)
+                            </button>
+                        </form>
+                    <% } else if (auctionStatus === 'soft_lock') { %>
+                        <form action="/admin/auction/pause" method="POST"
+                            onsubmit="return confirm('Pause now? Bidding freezes so you can review winners before End.');">
+                            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
+                                ⏸ Pause (review winners)
+                            </button>
+                        </form>
+                        <form action="/admin/auction/resume" method="POST">
+                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 py-3 rounded-xl font-black uppercase text-[10px] text-white transition shadow-sm">
+                                ▶ Resume to live
                             </button>
                         </form>
                     <% } else if (auctionStatus === 'paused') { %>
@@ -2929,7 +2951,7 @@
                     <% } %>
 
                     <%
-                        const canEndAuction = (auctionStatus === 'live' || auctionStatus === 'active' || auctionStatus === 'paused')
+                        const canEndAuction = (auctionStatus === 'live' || auctionStatus === 'active' || auctionStatus === 'paused' || auctionStatus === 'soft_lock')
                             && !(typeof rosterReadiness !== 'undefined' && rosterReadiness.some(t => t.belowMinimum));
                     %>
                     <form action="/admin/auction/end" method="POST" class="sm:col-span-2"

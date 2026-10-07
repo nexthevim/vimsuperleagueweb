@@ -3034,22 +3034,27 @@
                         <p class="text-[9px] text-slate-400 font-bold mt-0.5">Remove one team's bid on a player (e.g. accidental lock). Highest bid recalculates.</p>
                     </div>
                     <form action="/admin/auction/force-drop-bid" method="POST" class="space-y-2"
-                        onsubmit="return confirm('Force-drop this bid? The player\'s highest bidder will be recalculated.');">
+                        onsubmit="return confirm('Revert this bid? Money unlocks, high bid recalculates, and one soft-lock attempt is restored if checked.');">
                         <select name="teamId" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800">
                             <option value="">Select team…</option>
                             <% if (typeof auctionTeams !== 'undefined') { auctionTeams.forEach(t => { %>
-                                <option value="<%= t._id || t.id %>"><%= t.name %></option>
+                                <option value="<%= t._id || t.id %>"><%= t.name %> (<%= Math.max(0, 5 - (Number(t.softLockBidsUsed)||0)) %>/5 left)</option>
                             <% }) } %>
                         </select>
                         <select name="playerId" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800">
                             <option value="">Select player…</option>
-                            <% if (typeof players !== 'undefined') { players.filter(p => p.verified && Number(p.highestBid||0) > 0).forEach(p => { %>
-                                <option value="<%= p._id || p.id %>"><%= p.name %> — <%= Number(p.highestBid||0).toLocaleString() %> V (<%= p.highestBidder || '—' %>)</option>
+                            <% if (typeof players !== 'undefined') { players.filter(p => p.verified).forEach(p => { %>
+                                <option value="<%= p._id || p.id %>"><%= p.name %><% if (Number(p.highestBid||0) > 0) { %> — <%= Number(p.highestBid||0).toLocaleString() %> V (<%= p.highestBidder || '—' %>)<% } %></option>
                             <% }) } %>
                         </select>
+                        <label class="flex items-center gap-2 text-[10px] font-bold text-slate-600 cursor-pointer px-1">
+                            <input type="checkbox" name="refundSoftLock" value="true" checked class="rounded border-slate-300">
+                            Refund 1 soft-lock attempt (for accidental bids)
+                        </label>
                         <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-2.5 rounded-xl font-black uppercase text-[10px] transition">
-                            ↩ Force-Drop / Clear Ghost
+                            ↩ Revert bid / Force-drop
                         </button>
+                        <p class="text-[8px] text-slate-400 font-bold uppercase text-center">Removes that team's bid, unlocks money, restores attempt if checked</p>
                     </form>
                     <form action="/admin/auction/reconcile-highs" method="POST"
                         onsubmit="return confirm('Recompute ALL player high bids from real team bid rows? Safe — does not invent bids.');"
@@ -3243,6 +3248,23 @@
 
                     <% if (typeof auctionTeams !== 'undefined' && auctionTeams.length > 0) { %>
 
+                        <% if (typeof auctionStatus !== 'undefined' && auctionStatus === 'soft_lock' && typeof auctionTeams !== 'undefined' && auctionTeams.length) { %>
+                            <div class="bg-violet-50 border border-violet-200 rounded-2xl p-4 mb-4 space-y-2">
+                                <p class="text-[10px] font-black uppercase tracking-wider text-violet-700">Soft lock — attempts per team</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                    <% auctionTeams.forEach(t => {
+                                        const u = Number(t.softLockBidsUsed) || 0;
+                                        const left = Math.max(0, 5 - u);
+                                    %>
+                                        <div class="bg-white border border-violet-100 rounded-xl px-3 py-2 flex items-center justify-between gap-2">
+                                            <span class="text-[11px] font-black text-slate-800 truncate"><%= t.name %></span>
+                                            <span class="text-[10px] font-black tabular-nums <%= left === 0 ? 'text-rose-600' : 'text-violet-700' %>"><%= left %>/5 left</span>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            </div>
+                        <% } %>
+
                         <% auctionTeams.forEach(aTeam => { %>
 
                             <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-4 relative">
@@ -3261,6 +3283,35 @@
                                         <p class="text-[11px] font-bold text-purple-600 uppercase mt-1">
                                             Manager: <%= aTeam.manager || 'Unassigned' %>
                                         </p>
+                                        <%
+                                            const _slUsed = Number(aTeam.softLockBidsUsed) || 0;
+                                            const _slMax = 5;
+                                            const _slLeft = Math.max(0, _slMax - _slUsed);
+                                            const _slActive = (typeof auctionStatus !== 'undefined' && auctionStatus === 'soft_lock');
+                                        %>
+                                        <% if (_slActive) { %>
+                                            <p class="mt-2 inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-lg border
+                                                <%= _slLeft === 0 ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-violet-50 text-violet-700 border-violet-200' %>">
+                                                Soft lock: <%= _slLeft %>/<%= _slMax %> left
+                                                <span class="font-bold opacity-70">(used <%= _slUsed %>)</span>
+                                            </p>
+                                            <form action="/admin/auction/set-soft-lock-attempts" method="POST"
+                                                class="mt-2 flex flex-wrap items-center gap-1.5"
+                                                onsubmit="return confirm('Set soft-lock remaining attempts for this team? Bids stay the same.');">
+                                                <input type="hidden" name="teamId" value="<%= aTeam._id || aTeam.id %>">
+                                                <label class="text-[8px] font-bold uppercase text-violet-600">Attempts left</label>
+                                                <input type="number" name="softLockRemaining" min="0" max="5" step="1"
+                                                    value="<%= _slLeft %>"
+                                                    class="w-14 admin-input text-[11px] py-1 px-2">
+                                                <button type="submit" class="text-[9px] font-black uppercase px-2 py-1 rounded-lg bg-violet-600 text-white hover:bg-violet-700">
+                                                    Set
+                                                </button>
+                                            </form>
+                                        <% } else if (_slUsed > 0) { %>
+                                            <p class="mt-2 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                                                Last soft lock used <%= _slUsed %>/<%= _slMax %>
+                                            </p>
+                                        <% } %>
                                     </div>
 
 

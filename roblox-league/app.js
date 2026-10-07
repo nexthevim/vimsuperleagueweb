@@ -1357,6 +1357,69 @@ app.post('/register', async (req, res) => {
     res.redirect('/profile');
 });
 
+
+// ADMIN EXCEPTION REGISTER — works anytime (even during live/soft_lock/paused).
+// Does NOT open public market registration.
+app.post('/admin/exception-register', async (req, res) => {
+    if (!requireAdmin(req, res)) return;
+    try {
+        const name = String(req.body.name || '').trim();
+        const password = String(req.body.password || '').trim();
+        const discord = String(req.body.discord || '').trim();
+        const position = String(req.body.position || 'FWD').trim().toUpperCase() || 'FWD';
+        const rank = String(req.body.rank || 'C').trim().toUpperCase();
+        const country = String(req.body.country || '').trim();
+        const bio = String(req.body.bio || req.body.experience || '').trim();
+        const verified = req.body.verified === 'on' || req.body.verified === 'true' || req.body.verified === '1';
+
+        if (!name || !password) {
+            return res.redirect('/admin?error=' + encodeURIComponent('Exception register needs name + password'));
+        }
+
+        const exists = await Player.findOne({
+            name: new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i')
+        });
+        if (exists) {
+            return res.redirect('/admin?error=' + encodeURIComponent('Username already taken: ' + name));
+        }
+
+        const validRank = ['C', 'B', 'A', 'S', 'SS'].includes(rank) ? rank : 'C';
+        const validPos = ['FWD', 'MID', 'DEF', 'GK'].includes(position) ? position : 'FWD';
+
+        const player = await Player.create({
+            name,
+            password,
+            discord: discord || name,
+            position: validPos,
+            rank: validRank,
+            country,
+            experience: bio,
+            bio,
+            verified: !!verified,
+            auctionStatus: 'available',
+            highestBid: 0,
+            highestBidder: ''
+        });
+
+        // Apply reserve from rank if helper exists
+        try {
+            if (typeof getReservePriceForClass === 'function') {
+                player.reservePrice = getReservePriceForClass(validRank);
+                await player.save();
+            }
+        } catch (e) { /* ignore */ }
+
+        res.redirect('/admin?error=' + encodeURIComponent(
+            'Exception player created: ' + player.name +
+            (verified ? ' (verified)' : ' (pending verify)') +
+            ' — market public register still closed if auction is active.'
+        ));
+    } catch (err) {
+        console.error('Exception register error:', err);
+        res.redirect('/admin?error=ExceptionRegisterFailed');
+    }
+});
+
 app.post('/login', async (req, res) => {
     try {
         const username = String(

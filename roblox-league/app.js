@@ -293,27 +293,28 @@ function getAuctionStatus(info) {
     return (info && info.auction && info.auction.status) || 'ready';
 }
 
-// Soft-lock (admin Pause): each team may place/raise at most SOFT_LOCK_MAX bids total.
+// Soft-lock phase: each team may place/raise at most SOFT_LOCK_MAX_BIDS times total.
+// PAUSED is a full freeze (no bids). SOFT_LOCK is limited bidding before final pause/end.
 const SOFT_LOCK_MAX_BIDS = 5;
 
-// Bidding open while LIVE or PAUSED (soft-lock with limited attempts).
+// Bidding: live = unlimited, soft_lock = max 5/team, paused = none
 function isBiddingOpen(status) {
-    return status === 'live' || status === 'paused';
+    return status === 'live' || status === 'soft_lock';
 }
 
-// Rank edits blocked while LIVE or soft-lock PAUSED.
+// Rank edits blocked while live or soft_lock (paused = admin may edit ranks)
 function isRankFrozen(status) {
-    return status === 'live' || status === 'paused';
+    return status === 'live' || status === 'soft_lock';
 }
 
-// Registration blocked while LIVE or PAUSED.
+// Registration closed for any active auction phase
 function isRegistrationClosed(status) {
-    return status === 'live' || status === 'paused';
+    return status === 'live' || status === 'paused' || status === 'soft_lock';
 }
 
-// Withdrawals allowed while LIVE or soft-lock PAUSED (same outbid cooldown rules).
+// Withdraw while live or soft_lock (same outbid cooldown rules). Not while fully paused.
 function isWithdrawOpen(status) {
-    return status === 'live' || status === 'paused';
+    return status === 'live' || status === 'soft_lock';
 }
 
 
@@ -525,16 +526,19 @@ function evaluateBid({ auctionStatus, team, player, amount, allTeams, playersByI
         return { ok: false, reason: 'The auction is not currently open for bidding.' };
     }
 
-    // Soft-lock (paused): max SOFT_LOCK_MAX_BIDS total bid/raise actions per team
-    if (auctionStatus === 'paused') {
+    // Soft-lock: max SOFT_LOCK_MAX_BIDS total bid/raise actions per team
+    if (auctionStatus === 'soft_lock') {
         const used = Number(team.softLockBidsUsed) || 0;
         if (used >= SOFT_LOCK_MAX_BIDS) {
             return {
                 ok: false,
                 reason: 'Soft lock: your team has used all ' + SOFT_LOCK_MAX_BIDS +
-                    ' bid attempts. No more bids until the admin ends the auction or resumes.'
+                    ' bid attempts. Wait for admin to pause/end the auction.'
             };
         }
+    }
+    if (auctionStatus === 'paused') {
+        return { ok: false, reason: 'The auction is paused — bidding is frozen.' };
     }
 
     if (isManagerAccount(player, allTeams)) {
@@ -1093,7 +1097,7 @@ app.get('/market', async (req, res) => {
             const myTeam = res.locals.myAuctionState.team;
             const rosterLimits = getRosterLimits(info.auction);
 
-            if (auctionStatus === 'paused') {
+            if (auctionStatus === 'soft_lock') {
                 const used = Number(myTeam.softLockBidsUsed) || 0;
                 softLockInfo = {
                     active: true,
@@ -1119,7 +1123,7 @@ app.get('/market', async (req, res) => {
                 });
                 myEligibility[String(p._id)] = verdict.ok;
             }
-        } else if (auctionStatus === 'paused') {
+        } else if (auctionStatus === 'soft_lock') {
             softLockInfo = { active: true, used: 0, max: SOFT_LOCK_MAX_BIDS, remaining: SOFT_LOCK_MAX_BIDS, spectator: true };
         }
 
@@ -1666,7 +1670,7 @@ app.post('/auction/bid', async (req, res) => {
         }
 
         // Soft-lock: count this successful bid/raise toward the team's 5 attempts
-        if (auctionStatus === 'paused') {
+        if (auctionStatus === 'soft_lock') {
             team.softLockBidsUsed = (Number(team.softLockBidsUsed) || 0) + 1;
         }
 
@@ -1689,7 +1693,7 @@ app.post('/auction/bid', async (req, res) => {
             teamName: team.name,
             managerName: user.name,
             amount: amount,
-            meta: auctionStatus === 'paused'
+            meta: auctionStatus === 'soft_lock'
                 ? { softLock: true, softLockBidsUsed: team.softLockBidsUsed }
                 : undefined
         });
@@ -4048,11 +4052,32 @@ app.post('/admin/auction/pause', async (req, res) => {
     try {
         const info = await getInfo();
         info.auction = info.auction || {};
-        if (info.auction.status !== 'live') {
-            return res.redirect('/admin?error=Can only pause a live auction');
+        // Can pause from live OR soft_lock (full freeze to review winners before end)
+        if (info.auction.status !== 'live' && info.auction.status !== 'soft_lock') {
+            return res.redirect('/admin?error=Can only pause while live or soft lock');
         }
-        // Soft lock: each team gets a fresh pool of SOFT_LOCK_MAX_BIDS attempts
         info.auction.status = 'paused';
+        info.markModified('auction');
+        await info.save();
+        res.redirect('/admin?error=' + encodeURIComponent(
+            'Auction PAUSED — all bidding frozen. Review winning lineups, then End or Resume.'
+        ));
+    } catch (err) {
+        console.error('Pause Auction Error:', err);
+        res.redirect('/admin?error=PauseAuctionFailed');
+    }
+});
+
+// SOFT LOCK — limited final bidding (5 attempts per team), then admin can Pause → End
+app.post('/admin/auction/soft-lock', async (req, res) => {
+    if (!requireAdmin(req, res)) return;
+    try {
+        const info = await getInfo();
+        info.auction = info.auction || {};
+        if (info.auction.status !== 'live') {
+            return res.redirect('/admin?error=Soft lock only from a live auction');
+        }
+        info.auction.status = 'soft_lock';
         info.markModified('auction');
         await info.save();
 
@@ -4064,19 +4089,17 @@ app.post('/admin/auction/pause', async (req, res) => {
             managerName: 'ADMIN',
             meta: {
                 reason: 'soft_lock_start',
-                softLockMaxBids: SOFT_LOCK_MAX_BIDS,
-                note: 'Pause = soft lock. Each team may bid/raise up to ' + SOFT_LOCK_MAX_BIDS +
-                    ' times total. Unlocked outbid withdraws still allowed.'
+                softLockMaxBids: SOFT_LOCK_MAX_BIDS
             }
         });
 
         res.redirect('/admin?error=' + encodeURIComponent(
-            'Soft lock ON. Each team has ' + SOFT_LOCK_MAX_BIDS +
-            ' bid attempts total. Unlocked withdraws OK. Resume or End when ready.'
+            'SOFT LOCK ON. Each team has ' + SOFT_LOCK_MAX_BIDS +
+            ' total bid/raise attempts. Unlocked withdraws OK. Pause when ready to freeze, then End.'
         ));
     } catch (err) {
-        console.error('Pause Auction Error:', err);
-        res.redirect('/admin?error=PauseAuctionFailed');
+        console.error('Soft lock error:', err);
+        res.redirect('/admin?error=SoftLockFailed');
     }
 });
 
@@ -4086,13 +4109,13 @@ app.post('/admin/auction/resume', async (req, res) => {
     try {
         const info = await getInfo();
         info.auction = info.auction || {};
-        if (info.auction.status !== 'paused') {
-            return res.redirect('/admin?error=Can only resume a paused auction');
+        if (info.auction.status !== 'paused' && info.auction.status !== 'soft_lock') {
+            return res.redirect('/admin?error=Can only resume from paused or soft lock');
         }
         info.auction.status = 'live';
         info.markModified('auction');
         await info.save();
-        res.redirect('/admin');
+        res.redirect('/admin?error=' + encodeURIComponent('Auction LIVE again — unlimited bidding.'));
     } catch (err) {
         console.error('Resume Auction Error:', err);
         res.redirect('/admin?error=ResumeAuctionFailed');
@@ -4389,7 +4412,7 @@ app.post('/admin/auction/end', async (req, res) => {
         const info = await getInfo();
         info.auction = info.auction || {};
 
-        if (info.auction.status !== 'live' && info.auction.status !== 'paused') {
+        if (info.auction.status !== 'live' && info.auction.status !== 'paused' && info.auction.status !== 'soft_lock') {
             return res.redirect('/admin?error=Auction must be live (or paused) to end');
         }
 

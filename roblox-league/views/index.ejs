@@ -1,871 +1,807 @@
 <%- include('partials/navbar') %>
 
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
     :root {
-        --ink: #0b1220;
-        --muted: #64748b;
-        --line: rgba(15, 23, 42, 0.08);
-        --surface: #ffffff;
-        --canvas: #f6f7f9;
-        --accent: #0088ff;
-        --accent-2: #00b4ff;
+        --bg: #f3f1ec;
+        --paper: #fffcf7;
+        --ink: #1a1a1a;
+        --soft: #6b6560;
+        --line: rgba(26, 26, 26, 0.08);
+        --accent: #1d4ed8;
+        --accent-soft: #dbeafe;
     }
 
     body {
         margin: 0;
-        background: var(--canvas);
+        background: var(--bg);
         color: var(--ink);
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-family: 'Outfit', system-ui, sans-serif;
         overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
     }
 
-    .vim-home {
-        --radius: 1.25rem;
+    .ed {
+        padding-top: 5.5rem;
     }
 
-    .vim-home h1, .vim-home h2, .vim-home h3 {
-        font-family: 'Syne', sans-serif;
-        letter-spacing: -0.03em;
-    }
-
-    /* ---------- HERO ---------- */
-    .home-hero {
-        position: relative;
-        min-height: min(92vh, 920px);
-        display: flex;
-        align-items: flex-end;
-        padding: 7.5rem 1.5rem 5rem;
-        background:
-            linear-gradient(180deg, rgba(8,12,20,0.35) 0%, rgba(8,12,20,0.55) 45%, rgba(8,12,20,0.82) 100%),
-            url('/images/vimgfx.png') center center / cover no-repeat;
-        color: #fff;
-        overflow: hidden;
-    }
-
-    .home-hero::after {
-        content: "";
-        position: absolute;
-        inset: auto 0 0 0;
-        height: 120px;
-        background: linear-gradient(to bottom, transparent, var(--canvas));
-        pointer-events: none;
-    }
-
-    .home-hero-inner {
-        position: relative;
-        z-index: 2;
-        width: 100%;
-        max-width: 1120px;
+    .ed-wrap {
+        width: min(1120px, calc(100% - 2.5rem));
         margin: 0 auto;
     }
 
-    .home-kicker {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.7rem;
-        font-weight: 800;
-        letter-spacing: 0.18em;
+    .ed-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.22em;
         text-transform: uppercase;
-        color: rgba(255,255,255,0.78);
-        margin-bottom: 1.25rem;
+        color: var(--soft);
     }
 
-    .home-kicker span {
-        width: 6px;
-        height: 6px;
-        border-radius: 999px;
-        background: var(--accent-2);
-        box-shadow: 0 0 12px rgba(0,180,255,0.8);
-    }
-
-    .home-hero h1 {
-        font-size: clamp(2.6rem, 7vw, 4.75rem);
+    .ed-serif {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        letter-spacing: -0.02em;
         line-height: 0.95;
-        font-weight: 800;
-        max-width: 14ch;
+    }
+
+    /* ===== HERO SHELL ===== */
+    .ed-hero {
+        padding: 1.25rem 0 0;
+    }
+
+    .ed-hero-frame {
+        position: relative;
+        border-radius: 1.75rem;
+        overflow: hidden;
+        min-height: min(78vh, 760px);
+        background:
+            linear-gradient(180deg, rgba(20,18,16,0.15) 0%, rgba(20,18,16,0.25) 40%, rgba(20,18,16,0.72) 100%),
+            url('/images/vimgfx.png') center center / cover no-repeat;
+        color: #fff;
+        display: flex;
+        align-items: flex-end;
+        box-shadow: 0 30px 80px rgba(26, 26, 26, 0.12);
+    }
+
+    .ed-hero-content {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        padding: 2.5rem 2.25rem 3rem;
+        max-width: 820px;
+    }
+
+    .ed-hero-content .ed-label {
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 1rem;
+    }
+
+    .ed-hero h1 {
         margin: 0 0 1.25rem;
-        text-transform: uppercase;
+        font-size: clamp(3.2rem, 9vw, 6.2rem);
+        color: #fff;
     }
 
-    .home-hero h1 em {
-        font-style: normal;
-        background: linear-gradient(135deg, #5ec8ff, #0088ff);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-    }
-
-    .home-hero-lead {
-        max-width: 36rem;
-        font-size: 1rem;
-        line-height: 1.6;
-        color: rgba(255,255,255,0.78);
+    .ed-hero h1 span {
+        display: block;
+        font-style: italic;
         font-weight: 500;
-        margin: 0 0 2rem;
+        opacity: 0.92;
     }
 
-    .home-hero-actions {
+    .ed-hero-lead {
+        max-width: 28rem;
+        margin: 0 0 1.75rem;
+        font-size: 1.02rem;
+        font-weight: 400;
+        line-height: 1.65;
+        color: rgba(255,255,255,0.78);
+    }
+
+    .ed-actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-bottom: 2.5rem;
+        gap: 0.7rem;
+        margin-bottom: 1.75rem;
     }
 
-    .btn-primary {
+    .ed-btn {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0.95rem 1.4rem;
+        gap: 0.45rem;
+        padding: 0.9rem 1.35rem;
         border-radius: 999px;
-        background: linear-gradient(135deg, #0088ff, #00b4ff);
-        color: #fff;
         font-size: 0.72rem;
-        font-weight: 800;
+        font-weight: 600;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         text-decoration: none;
-        box-shadow: 0 12px 28px rgba(0,136,255,0.28);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
     }
 
-    .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 16px 32px rgba(0,136,255,0.38);
+    .ed-btn:hover { transform: translateY(-1px); }
+
+    .ed-btn-solid {
+        background: #fff;
+        color: var(--ink);
+    }
+
+    .ed-btn-solid:hover { background: #f5f5f5; color: var(--ink); }
+
+    .ed-btn-line {
+        border: 1px solid rgba(255,255,255,0.35);
         color: #fff;
+        background: rgba(255,255,255,0.06);
+        backdrop-filter: blur(6px);
     }
 
-    .btn-ghost {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.95rem 1.35rem;
-        border-radius: 999px;
-        border: 1px solid rgba(255,255,255,0.28);
-        background: rgba(255,255,255,0.08);
-        backdrop-filter: blur(8px);
-        color: #fff;
-        font-size: 0.72rem;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        text-decoration: none;
-        transition: background 0.2s ease, border-color 0.2s ease;
-    }
+    .ed-btn-line:hover { background: rgba(255,255,255,0.14); color: #fff; }
 
-    .btn-ghost:hover {
-        background: rgba(255,255,255,0.14);
-        border-color: rgba(255,255,255,0.45);
-        color: #fff;
-    }
-
-    .home-search {
-        max-width: 520px;
-        background: rgba(255,255,255,0.96);
-        border-radius: 1rem;
-        padding: 0.45rem;
+    /* Search floating under hero text */
+    .ed-search {
         display: flex;
-        gap: 0.35rem;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+        align-items: center;
+        gap: 0.4rem;
+        max-width: 420px;
+        padding: 0.4rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.95);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.18);
         position: relative;
     }
 
-    .home-search input {
+    .ed-search input {
         flex: 1;
         min-width: 0;
         border: 0;
         outline: none;
         background: transparent;
-        padding: 0.85rem 1rem;
+        padding: 0.75rem 1rem;
+        font-family: inherit;
         font-size: 0.9rem;
-        font-weight: 600;
+        font-weight: 500;
         color: var(--ink);
     }
 
-    .home-search button {
+    .ed-search button {
         border: 0;
-        border-radius: 0.75rem;
-        padding: 0.85rem 1.15rem;
+        border-radius: 999px;
+        padding: 0.75rem 1.1rem;
         background: var(--ink);
         color: #fff;
+        font-family: inherit;
         font-size: 0.68rem;
-        font-weight: 800;
-        letter-spacing: 0.08em;
+        font-weight: 600;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
         cursor: pointer;
-        white-space: nowrap;
     }
 
     #search-results-dropdown {
         position: absolute;
-        left: 0;
-        right: 0;
-        top: calc(100% + 0.5rem);
-        background: #fff;
+        left: 0; right: 0;
+        top: calc(100% + 0.55rem);
+        background: var(--paper);
         border: 1px solid var(--line);
-        border-radius: 1rem;
-        box-shadow: 0 24px 60px rgba(15,23,42,0.18);
+        border-radius: 1.1rem;
+        box-shadow: 0 20px 50px rgba(26,26,26,0.14);
         padding: 0.85rem;
         max-height: 22rem;
         overflow-y: auto;
-        z-index: 40;
+        z-index: 30;
         text-align: left;
         color: var(--ink);
     }
 
-    /* ---------- LAYOUT ---------- */
-    .home-wrap {
-        max-width: 1120px;
-        margin: 0 auto;
-        padding: 0 1.5rem;
+    /* ===== INTRO BAND ===== */
+    .ed-intro {
+        padding: 4.5rem 0 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1.15fr;
+        gap: 3rem;
+        align-items: end;
     }
 
-    .home-section {
-        padding: 4.5rem 0;
+    .ed-intro h2 {
+        margin: 0.6rem 0 0;
+        font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+        max-width: 12ch;
     }
 
-    .section-label {
-        font-size: 0.68rem;
-        font-weight: 800;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--accent);
-        margin-bottom: 0.6rem;
-    }
-
-    .section-title {
-        font-size: clamp(1.75rem, 3.5vw, 2.4rem);
-        font-weight: 800;
-        line-height: 1.1;
-        margin: 0 0 0.75rem;
-        color: var(--ink);
-    }
-
-    .section-copy {
-        max-width: 36rem;
-        color: var(--muted);
-        font-size: 0.95rem;
-        line-height: 1.65;
+    .ed-intro p {
         margin: 0;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: var(--soft);
+        font-weight: 400;
+        max-width: 34rem;
     }
 
-    .section-head {
+    @media (max-width: 800px) {
+        .ed-intro { grid-template-columns: 1fr; gap: 1.25rem; }
+    }
+
+    /* ===== MATCH FEATURE ===== */
+    .ed-block {
+        padding: 2.5rem 0;
+    }
+
+    .ed-block-head {
         display: flex;
-        flex-wrap: wrap;
-        align-items: flex-end;
+        align-items: baseline;
         justify-content: space-between;
         gap: 1rem;
-        margin-bottom: 2rem;
-        padding-bottom: 1.25rem;
-        border-bottom: 1px solid var(--line);
+        margin-bottom: 1.5rem;
     }
 
-    .text-link {
-        font-size: 0.75rem;
-        font-weight: 800;
-        letter-spacing: 0.06em;
+    .ed-block-head h3 {
+        margin: 0.35rem 0 0;
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+    }
+
+    .ed-link {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
-        color: var(--accent);
+        color: var(--ink);
         text-decoration: none;
+        border-bottom: 1px solid rgba(26,26,26,0.25);
+        padding-bottom: 0.15rem;
     }
 
-    .text-link:hover { color: #0066cc; }
+    .ed-link:hover { border-color: var(--ink); color: var(--ink); }
 
-    /* ---------- FEATURE GRID ---------- */
-    .feature-grid {
-        display: grid;
-        grid-template-columns: 1.4fr 1fr;
-        gap: 1.25rem;
-        margin-top: -3.5rem;
-        position: relative;
-        z-index: 5;
-    }
-
-    @media (max-width: 900px) {
-        .feature-grid { grid-template-columns: 1fr; margin-top: -2rem; }
-    }
-
-    .panel {
-        background: var(--surface);
+    .ed-match-card {
+        background: var(--paper);
         border: 1px solid var(--line);
-        border-radius: var(--radius);
-        box-shadow: 0 18px 40px rgba(15,23,42,0.06);
-        overflow: hidden;
-    }
-
-    .panel-pad { padding: 1.5rem 1.6rem; }
-
-    .match-strip {
+        border-radius: 1.5rem;
+        padding: 1.75rem 1.5rem;
         display: grid;
         grid-template-columns: 1fr auto 1fr;
-        gap: 1rem;
+        gap: 1.25rem;
         align-items: center;
-        padding: 1.35rem;
-        background: #f8fafc;
-        border-radius: 1rem;
-        border: 1px solid var(--line);
+        box-shadow: 0 12px 40px rgba(26,26,26,0.04);
     }
 
-    .match-side {
+    .ed-team {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.55rem;
+        gap: 0.7rem;
         text-align: center;
     }
 
-    .match-side img {
-        width: 3.25rem;
-        height: 3.25rem;
+    .ed-team img {
+        width: 4rem;
+        height: 4rem;
         object-fit: contain;
     }
 
-    .match-side span {
-        font-size: 0.78rem;
-        font-weight: 800;
+    .ed-team span {
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
-        letter-spacing: 0.02em;
     }
 
-    .match-vs {
+    .ed-vs {
         text-align: center;
+        padding: 0 0.5rem;
     }
 
-    .match-vs strong {
+    .ed-vs strong {
         display: block;
-        font-family: 'Syne', sans-serif;
-        font-size: 1.35rem;
-        font-weight: 800;
-        color: var(--accent);
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.75rem;
+        font-weight: 600;
+        font-style: italic;
     }
 
-    .match-vs small {
-        font-size: 0.65rem;
-        font-weight: 800;
-        letter-spacing: 0.12em;
+    .ed-vs small {
+        display: block;
+        margin-top: 0.35rem;
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: var(--muted);
+        color: var(--soft);
     }
 
-    .stream-frame {
-        min-height: 280px;
-        background: #0b1220;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* Stream */
+    .ed-stream {
+        margin-top: 1.25rem;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        background: #141210;
+        min-height: 300px;
+        border: 1px solid var(--line);
     }
 
-    .stream-frame iframe {
+    .ed-stream iframe {
         width: 100%;
-        min-height: 280px;
+        min-height: 320px;
         border: 0;
         display: block;
     }
 
-    .stream-offline {
+    .ed-stream-empty {
+        min-height: 280px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.45);
+        gap: 0.4rem;
         text-align: center;
-        color: rgba(255,255,255,0.55);
         padding: 2rem;
     }
 
-    .stream-offline strong {
-        display: block;
+    .ed-stream-empty strong {
         color: rgba(255,255,255,0.85);
-        font-family: 'Syne', sans-serif;
-        font-size: 1.05rem;
-        margin-bottom: 0.35rem;
-        text-transform: uppercase;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.5rem;
+        font-weight: 600;
     }
 
-    /* ---------- STEPS ---------- */
-    .steps {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.25rem;
-    }
-
-    @media (max-width: 800px) {
-        .steps { grid-template-columns: 1fr; }
-    }
-
-    .step {
-        padding: 1.5rem;
-        border-radius: var(--radius);
-        background: #fff;
-        border: 1px solid var(--line);
-    }
-
-    .step-num {
-        font-family: 'Syne', sans-serif;
-        font-size: 0.75rem;
-        font-weight: 800;
-        letter-spacing: 0.12em;
-        color: var(--accent);
-        margin-bottom: 0.85rem;
-    }
-
-    .step h3 {
-        font-size: 1.15rem;
-        margin: 0 0 0.5rem;
-        font-weight: 800;
-    }
-
-    .step p {
-        margin: 0;
-        font-size: 0.88rem;
-        line-height: 1.6;
-        color: var(--muted);
-    }
-
-    /* ---------- RESULTS ---------- */
-    .results-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-    }
-
-    @media (max-width: 900px) {
-        .results-grid { grid-template-columns: 1fr; }
-    }
-
-    .result-card {
-        display: block;
-        text-decoration: none;
-        color: inherit;
-        background: #fff;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        padding: 1.15rem 1.25rem;
-        transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .result-card:hover {
-        border-color: rgba(0,136,255,0.35);
-        transform: translateY(-2px);
-        box-shadow: 0 14px 30px rgba(15,23,42,0.08);
-        color: inherit;
-    }
-
-    .result-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-        margin-bottom: 0.55rem;
-    }
-
-    .result-row:last-child { margin-bottom: 0; }
-
-    .result-team {
-        display: flex;
-        align-items: center;
-        gap: 0.55rem;
-        min-width: 0;
-    }
-
-    .result-team img {
-        width: 1.5rem;
-        height: 1.5rem;
-        object-fit: contain;
-    }
-
-    .result-team span {
-        font-size: 0.78rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .result-score {
-        font-family: 'Syne', sans-serif;
-        font-weight: 800;
-        font-size: 1.05rem;
-    }
-
-    .result-score.muted { color: var(--muted); }
-
-    /* ---------- STORIES ---------- */
-    .stories-grid {
+    /* ===== STEPS ===== */
+    .ed-steps {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 1.15rem;
     }
 
-    @media (max-width: 900px) {
-        .stories-grid { grid-template-columns: 1fr; }
-    }
-
-    .story-card {
-        background: #fff;
+    .ed-step {
+        background: var(--paper);
         border: 1px solid var(--line);
-        border-radius: var(--radius);
-        overflow: hidden;
+        border-radius: 1.35rem;
+        padding: 1.75rem 1.5rem;
+        min-height: 180px;
+    }
+
+    .ed-step-num {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2rem;
+        font-weight: 600;
+        font-style: italic;
+        color: rgba(26,26,26,0.28);
+        margin-bottom: 1rem;
+    }
+
+    .ed-step h4 {
+        margin: 0 0 0.55rem;
+        font-size: 1.15rem;
+        font-weight: 600;
+    }
+
+    .ed-step p {
+        margin: 0;
+        font-size: 0.92rem;
+        line-height: 1.65;
+        color: var(--soft);
+        font-weight: 400;
+    }
+
+    @media (max-width: 800px) {
+        .ed-steps { grid-template-columns: 1fr; }
+        .ed-match-card { grid-template-columns: 1fr; gap: 1rem; }
+    }
+
+    /* ===== RESULTS ===== */
+    .ed-results {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.9rem;
+    }
+
+    @media (max-width: 700px) {
+        .ed-results { grid-template-columns: 1fr; }
+    }
+
+    .ed-result {
         display: flex;
         flex-direction: column;
+        gap: 0.65rem;
+        padding: 1.15rem 1.25rem;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 1.15rem;
+        text-decoration: none;
+        color: inherit;
+        transition: border-color 0.2s ease, transform 0.2s ease;
     }
 
-    .story-card img {
-        width: 100%;
-        aspect-ratio: 16 / 10;
-        object-fit: cover;
-        display: block;
+    .ed-result:hover {
+        border-color: rgba(26,26,26,0.2);
+        transform: translateY(-2px);
+        color: inherit;
     }
 
-    .story-body {
-        padding: 1.15rem 1.25rem 1.35rem;
+    .ed-result-row {
         display: flex;
-        flex-direction: column;
-        gap: 0.45rem;
-        flex: 1;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
     }
 
-    .story-date {
-        font-size: 0.65rem;
-        font-weight: 800;
-        letter-spacing: 0.1em;
+    .ed-result-team {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        min-width: 0;
+    }
+
+    .ed-result-team img {
+        width: 1.55rem;
+        height: 1.55rem;
+        object-fit: contain;
+    }
+
+    .ed-result-team span {
+        font-size: 0.82rem;
+        font-weight: 600;
         text-transform: uppercase;
-        color: var(--muted);
-    }
-
-    .story-body h4 {
-        margin: 0;
-        font-size: 1.05rem;
-        font-weight: 800;
-        line-height: 1.25;
-        font-family: 'Syne', sans-serif;
-    }
-
-    .story-body p {
-        margin: 0;
-        font-size: 0.85rem;
-        line-height: 1.55;
-        color: var(--muted);
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+        letter-spacing: 0.03em;
+        white-space: nowrap;
         overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    /* ---------- CTA ---------- */
-    .home-cta {
-        margin: 1rem 0 5rem;
-        border-radius: 1.75rem;
-        padding: 3.25rem 2rem;
-        text-align: center;
-        background:
-            radial-gradient(circle at 20% 20%, rgba(0,136,255,0.12), transparent 45%),
-            radial-gradient(circle at 80% 80%, rgba(0,180,255,0.1), transparent 40%),
-            #0b1220;
+    .ed-result-score {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.35rem;
+        font-weight: 600;
+    }
+
+    .ed-result-score.dim { color: var(--soft); }
+
+    /* ===== STORIES GALLERY ===== */
+    .ed-stories {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr 1fr;
+        gap: 0.9rem;
+    }
+
+    .ed-story {
+        position: relative;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        min-height: 260px;
+        background: #ddd;
+        display: block;
+        text-decoration: none;
         color: #fff;
     }
 
-    .home-cta h3 {
-        margin: 0 0 0.75rem;
-        font-size: clamp(1.6rem, 3vw, 2.2rem);
-        font-weight: 800;
+    .ed-story:first-child { min-height: 420px; grid-row: span 2; }
+
+    .ed-story img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        position: absolute;
+        inset: 0;
+        transition: transform 0.5s ease;
     }
 
-    .home-cta p {
-        margin: 0 auto 1.75rem;
-        max-width: 28rem;
-        color: rgba(255,255,255,0.65);
-        font-size: 0.95rem;
-        line-height: 1.6;
+    .ed-story:hover img { transform: scale(1.04); }
+
+    .ed-story-shade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.72) 100%);
     }
 
-    .empty-state {
-        grid-column: 1 / -1;
-        padding: 3rem 1.5rem;
-        text-align: center;
-        border: 1px dashed rgba(15,23,42,0.15);
-        border-radius: var(--radius);
-        color: var(--muted);
-        font-size: 0.75rem;
-        font-weight: 800;
-        letter-spacing: 0.1em;
+    .ed-story-text {
+        position: absolute;
+        left: 0; right: 0; bottom: 0;
+        padding: 1.25rem 1.3rem;
+        z-index: 2;
+    }
+
+    .ed-story-text small {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
-        background: rgba(255,255,255,0.6);
+        opacity: 0.75;
+        margin-bottom: 0.35rem;
     }
 
-    /* ---------- TOUR (kept functional) ---------- */
-    #vim-tour-overlay {
-        position: fixed; inset: 0; z-index: 50000;
-        pointer-events: none; opacity: 0; visibility: hidden;
-        transition: opacity 0.25s ease, visibility 0.25s ease;
+    .ed-story-text strong {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.45rem;
+        font-weight: 600;
+        line-height: 1.15;
+        display: block;
     }
+
+    @media (max-width: 900px) {
+        .ed-stories { grid-template-columns: 1fr; }
+        .ed-story:first-child { min-height: 300px; grid-row: auto; }
+        .ed-story { min-height: 220px; }
+    }
+
+    /* ===== CTA ===== */
+    .ed-cta {
+        margin: 3rem 0 5rem;
+        border-radius: 1.75rem;
+        padding: 3.5rem 2rem;
+        text-align: center;
+        background: var(--paper);
+        border: 1px solid var(--line);
+    }
+
+    .ed-cta h3 {
+        margin: 0 0 0.85rem;
+        font-size: clamp(2rem, 4vw, 3rem);
+    }
+
+    .ed-cta p {
+        margin: 0 auto 1.75rem;
+        max-width: 26rem;
+        color: var(--soft);
+        font-size: 1rem;
+        line-height: 1.65;
+    }
+
+    .ed-cta .ed-btn-solid {
+        background: var(--ink);
+        color: #fff;
+    }
+
+    .ed-cta .ed-btn-solid:hover {
+        background: #333;
+        color: #fff;
+    }
+
+    .ed-empty {
+        padding: 2.5rem;
+        text-align: center;
+        border: 1px dashed rgba(26,26,26,0.15);
+        border-radius: 1.25rem;
+        color: var(--soft);
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: rgba(255,255,255,0.4);
+    }
+
+    /* Tour — keep working */
+    #vim-tour-overlay { position: fixed; inset: 0; z-index: 50000; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease; }
     #vim-tour-overlay.active { opacity: 1; visibility: visible; }
-    #vim-tour-backdrop {
-        position: absolute; inset: 0;
-        background: rgba(2, 6, 23, 0.76); pointer-events: auto;
-    }
-    #vim-tour-spotlight {
-        position: absolute; width: 100px; height: 100px; border-radius: 9999px;
-        border: 2px solid rgba(0, 198, 255, 0.95);
-        box-shadow: 0 0 0 4px rgba(0,136,255,0.1), 0 0 30px rgba(0,136,255,0.45);
-        pointer-events: none; transform: translate(-50%, -50%);
-        transition: left 0.45s cubic-bezier(0.16,1,0.3,1), top 0.45s cubic-bezier(0.16,1,0.3,1), width 0.35s ease, height 0.35s ease;
-    }
-    #vim-tour-card {
-        position: fixed; width: min(360px, calc(100vw - 32px));
-        background: rgba(255,255,255,0.97); color: #0f172a;
-        border: 1px solid rgba(226,232,240,0.9); border-radius: 20px; padding: 22px;
-        box-shadow: 0 30px 80px rgba(0,0,0,0.35); z-index: 50002; pointer-events: auto;
-        transition: left 0.4s cubic-bezier(0.16,1,0.3,1), top 0.4s cubic-bezier(0.16,1,0.3,1);
-    }
-    #vim-tour-card::before {
-        content: ""; position: absolute; width: 12px; height: 12px; background: white;
-        border-left: 1px solid rgba(226,232,240,0.9); border-top: 1px solid rgba(226,232,240,0.9);
-        transform: rotate(45deg); top: -7px; left: 34px;
-    }
+    #vim-tour-backdrop { position: absolute; inset: 0; background: rgba(20,18,16,0.72); pointer-events: auto; }
+    #vim-tour-spotlight { position: absolute; width: 100px; height: 100px; border-radius: 9999px; border: 2px solid rgba(255,255,255,0.85); box-shadow: 0 0 0 4px rgba(255,255,255,0.12), 0 0 40px rgba(0,0,0,0.25); pointer-events: none; transform: translate(-50%, -50%); transition: left 0.45s cubic-bezier(0.16,1,0.3,1), top 0.45s cubic-bezier(0.16,1,0.3,1), width 0.35s ease, height 0.35s ease; }
+    #vim-tour-card { position: fixed; width: min(360px, calc(100vw - 32px)); background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 1.25rem; padding: 1.35rem; box-shadow: 0 24px 60px rgba(0,0,0,0.2); z-index: 50002; pointer-events: auto; }
     #vim-tour-card.centered::before { display: none; }
-    .vim-tour-eyebrow { font-size: 9px; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; color: #0088ff; margin-bottom: 6px; }
-    .vim-tour-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 900; line-height: 1.15; margin-bottom: 8px; }
-    .vim-tour-description { color: #64748b; font-size: 12px; line-height: 1.65; margin-bottom: 18px; }
-    .vim-tour-progress { display: flex; align-items: center; gap: 5px; margin-bottom: 16px; }
-    .vim-tour-progress span { height: 4px; width: 20px; border-radius: 999px; background: #e2e8f0; transition: all 0.25s ease; }
-    .vim-tour-progress span.active { width: 32px; background: linear-gradient(90deg, #0088ff, #00c6ff); }
-    .vim-tour-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .vim-tour-skip { border: none; background: transparent; color: #94a3b8; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; padding: 8px 4px; }
-    .vim-tour-next { border: none; background: linear-gradient(135deg, #0088ff, #00c6ff); color: white; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; padding: 11px 17px; border-radius: 11px; }
-    #vim-tour-launcher {
-        position: fixed; right: 20px; bottom: 20px; width: 42px; height: 42px; border-radius: 9999px;
-        background: rgba(15,23,42,0.92); color: white; border: 1px solid rgba(255,255,255,0.12);
-        box-shadow: 0 12px 30px rgba(15,23,42,0.25); z-index: 40000;
-        display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900;
-    }
+    .vim-tour-eyebrow { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--soft); margin-bottom: 0.4rem; }
+    .vim-tour-title { font-family: 'Cormorant Garamond', serif; font-size: 1.55rem; font-weight: 600; line-height: 1.15; margin-bottom: 0.45rem; }
+    .vim-tour-description { color: var(--soft); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem; }
+    .vim-tour-progress { display: flex; gap: 5px; margin-bottom: 1rem; }
+    .vim-tour-progress span { height: 3px; width: 18px; border-radius: 999px; background: #e5e2dc; }
+    .vim-tour-progress span.active { width: 28px; background: var(--ink); }
+    .vim-tour-actions { display: flex; justify-content: space-between; align-items: center; }
+    .vim-tour-skip { border: none; background: transparent; color: var(--soft); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem; cursor: pointer; }
+    .vim-tour-next { border: none; background: var(--ink); color: #fff; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.7rem 1rem; border-radius: 999px; cursor: pointer; }
+    #vim-tour-launcher { position: fixed; right: 1.15rem; bottom: 1.15rem; width: 2.5rem; height: 2.5rem; border-radius: 999px; background: var(--ink); color: #fff; border: 0; z-index: 40000; font-weight: 600; cursor: pointer; box-shadow: 0 10px 24px rgba(0,0,0,0.18); }
+
     @media (max-width: 640px) {
-        #vim-tour-card { bottom: 20px !important; top: auto !important; left: 16px !important; width: calc(100vw - 32px); }
-        #vim-tour-card::before { display: none; }
-        .home-hero { min-height: 78vh; padding-bottom: 4rem; }
-        .home-search { flex-direction: column; }
-        .home-search button { width: 100%; }
+        .ed-hero-content { padding: 1.75rem 1.35rem 2.25rem; }
+        .ed-search { max-width: none; flex-direction: column; border-radius: 1.1rem; }
+        .ed-search button { width: 100%; }
+        #vim-tour-card { bottom: 1.15rem !important; top: auto !important; left: 1rem !important; width: calc(100vw - 2rem); }
     }
 </style>
 
-<div class="vim-home">
+<div class="ed">
 
-<!-- TOUR -->
 <div id="vim-tour-overlay" aria-hidden="true">
     <div id="vim-tour-backdrop"></div>
     <div id="vim-tour-spotlight"></div>
     <div id="vim-tour-card">
         <div class="vim-tour-eyebrow" id="vim-tour-eyebrow">VIM SUPER LEAGUE</div>
-        <div class="vim-tour-title" id="vim-tour-title">Welcome to VIMSL</div>
-        <div class="vim-tour-description" id="vim-tour-description">Let's take a quick look around the league.</div>
+        <div class="vim-tour-title" id="vim-tour-title">Welcome</div>
+        <div class="vim-tour-description" id="vim-tour-description">A quick look around the league.</div>
         <div class="vim-tour-progress" id="vim-tour-progress"></div>
         <div class="vim-tour-actions">
-            <button type="button" id="vim-tour-skip" class="vim-tour-skip">Skip Tour</button>
-            <button type="button" id="vim-tour-next" class="vim-tour-next">Next →</button>
+            <button type="button" id="vim-tour-skip" class="vim-tour-skip">Skip</button>
+            <button type="button" id="vim-tour-next" class="vim-tour-next">Next</button>
         </div>
     </div>
 </div>
-<button id="vim-tour-launcher" type="button" aria-label="Replay VIMSL tutorial" title="Replay VIMSL tutorial">?</button>
+<button id="vim-tour-launcher" type="button" aria-label="Replay tutorial" title="Replay tutorial">?</button>
 
-<!-- HERO -->
-<header class="home-hero">
-    <div class="home-hero-inner">
-        <div class="home-kicker"><span></span> VIM Super League</div>
-        <h1>Find the perfect <em>league</em> to compete</h1>
-        <p class="home-hero-lead">
-            Official fixtures, live player market, and high-stakes Roblox football — built for managers and players who take the competition seriously.
-        </p>
-        <div class="home-hero-actions">
-            <a href="/market" class="btn-primary">Enter player market</a>
-            <a href="/matches" class="btn-ghost">View fixtures</a>
+<section class="ed-hero">
+    <div class="ed-wrap">
+        <div class="ed-hero-frame">
+            <div class="ed-hero-content">
+                <div class="ed-label">VIM Super League</div>
+                <h1 class="ed-serif">
+                    Above
+                    <span>the rest</span>
+                </h1>
+                <p class="ed-hero-lead">
+                    Competitive Roblox football — fixtures, market, and matchday energy in one calm place.
+                </p>
+                <div class="ed-actions">
+                    <a href="/market" class="ed-btn ed-btn-solid">Enter market</a>
+                    <a href="/matches" class="ed-btn ed-btn-line">Fixtures</a>
+                </div>
+                <form id="search-form" action="/matches" method="GET" class="ed-search">
+                    <input id="live-search-input" name="q" type="text" placeholder="Search teams, players, matches…" autocomplete="off">
+                    <button type="submit" id="search-btn">Search</button>
+                    <div id="search-results-dropdown" class="hidden"></div>
+                </form>
+            </div>
         </div>
-
-        <form id="search-form" action="/matches" method="GET" class="home-search">
-            <input
-                id="live-search-input"
-                name="q"
-                type="text"
-                placeholder="Search teams, players, or matches…"
-                autocomplete="off"
-            >
-            <button type="submit" id="search-btn">Search</button>
-            <div id="search-results-dropdown" class="hidden"></div>
-        </form>
     </div>
-</header>
+</section>
 
-<main class="home-wrap">
+<section class="ed-wrap ed-intro">
+    <div>
+        <div class="ed-label">The league</div>
+        <h2 class="ed-serif">Built for managers who care about the details</h2>
+    </div>
+    <p>
+        Track upcoming fixtures, browse the player market, and stay close to results — without the noise. Everything on this page is live from the league system.
+    </p>
+</section>
 
-    <!-- FEATURED + STREAM -->
-    <section class="feature-grid" style="margin-bottom: 1rem;">
-        <div id="tour-featured-match" class="panel">
-            <div class="panel-pad">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:1.25rem;">
-                    <div>
-                        <div class="section-label" style="margin-bottom:0.35rem;">Featured fixture</div>
-                        <h2 class="section-title" style="font-size:1.45rem;margin:0;">Upcoming match</h2>
-                    </div>
-                    <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:#eff6ff;border:1px solid #dbeafe;padding:0.35rem 0.65rem;border-radius:999px;">Live schedule</span>
-                </div>
+<section class="ed-wrap ed-block">
+    <div class="ed-block-head">
+        <div>
+            <div class="ed-label">Schedule</div>
+            <h3 class="ed-serif" id="tour-featured-match">Upcoming match</h3>
+        </div>
+        <a href="/matches" class="ed-link">All fixtures</a>
+    </div>
 
-                <% const matchList = (typeof matches !== 'undefined' && matches) ? matches : []; %>
-                <% let nextMatch = matchList.find(m => m.status === 'upcoming'); %>
+    <% const matchList = (typeof matches !== 'undefined' && matches) ? matches : []; %>
+    <% let nextMatch = matchList.find(m => m.status === 'upcoming'); %>
 
-                <% if (nextMatch) { %>
-                    <div class="match-strip">
-                        <div class="match-side">
-                            <img src="<%= nextMatch.logoA %>" alt="">
-                            <span><%= nextMatch.teamA %></span>
-                        </div>
-                        <div class="match-vs">
-                            <strong>VS</strong>
-                            <small><%= nextMatch.time || 'TBC' %></small>
-                        </div>
-                        <div class="match-side">
-                            <img src="<%= nextMatch.logoB %>" alt="">
-                            <span><%= nextMatch.teamB %></span>
-                        </div>
-                    </div>
-                <% } else { %>
-                    <div class="empty-state" style="border-style:dashed;">No upcoming matches scheduled</div>
-                <% } %>
-
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.15rem;padding-top:1rem;border-top:1px solid var(--line);">
-                    <span style="font-size:0.75rem;font-weight:700;color:var(--muted);">League matches</span>
-                    <a href="/matches" class="text-link">Full fixtures →</a>
-                </div>
+    <% if (nextMatch) { %>
+        <div class="ed-match-card">
+            <div class="ed-team">
+                <img src="<%= nextMatch.logoA %>" alt="">
+                <span><%= nextMatch.teamA %></span>
+            </div>
+            <div class="ed-vs">
+                <strong>vs</strong>
+                <small><%= nextMatch.time || 'Time TBC' %></small>
+            </div>
+            <div class="ed-team">
+                <img src="<%= nextMatch.logoB %>" alt="">
+                <span><%= nextMatch.teamB %></span>
             </div>
         </div>
+    <% } else { %>
+        <div class="ed-empty">No upcoming match scheduled</div>
+    <% } %>
 
-        <div class="panel">
-            <div class="stream-frame">
-                <% if (typeof liveLink !== 'undefined' && liveLink && liveLink.trim() !== "") { %>
-                    <%
-                        let embedLink = liveLink;
-                        if (liveLink.includes('watch?v=')) {
-                            embedLink = liveLink.replace('watch?v=', 'embed/').split('&')[0];
-                        } else if (liveLink.includes('youtu.be/')) {
-                            embedLink = liveLink.replace('youtu.be/', 'youtube.com/embed/').split('?')[0];
-                        }
-                    %>
-                    <iframe src="<%= embedLink %>" allowfullscreen title="Live broadcast"></iframe>
-                <% } else { %>
-                    <div class="stream-offline">
-                        <strong>Stream offline</strong>
-                        <span style="font-size:0.8rem;">No live broadcast is active right now</span>
-                    </div>
-                <% } %>
-            </div>
-        </div>
-    </section>
-
-    <!-- HOW IT WORKS -->
-    <section class="home-section">
-        <div class="section-head">
-            <div>
-                <div class="section-label">How it works</div>
-                <h2 class="section-title">From free agent to matchday</h2>
-                <p class="section-copy">Three clear steps. No clutter — just the path into the league.</p>
-            </div>
-        </div>
-        <div class="steps">
-            <div class="step">
-                <div class="step-num">01</div>
-                <h3>Join the community</h3>
-                <p>Connect on Discord, meet managers and scouts, and get oriented before you register.</p>
-            </div>
-            <div class="step">
-                <div class="step-num">02</div>
-                <h3>Build your card</h3>
-                <p>Register in the Market Hub with your role, profile, and the details teams actually look for.</p>
-            </div>
-            <div class="step">
-                <div class="step-num">03</div>
-                <h3>Compete</h3>
-                <p>Get signed, track fixtures, and play for results that show up on the league tables.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- RESULTS -->
-    <section class="home-section" id="tour-results" style="padding-top:0;">
-        <div class="section-head">
-            <div>
-                <div class="section-label">Scoreboard</div>
-                <h2 class="section-title">Recent results</h2>
-            </div>
-            <a href="/matches" class="text-link">All matches →</a>
-        </div>
-
-        <div class="results-grid">
+    <div class="ed-stream">
+        <% if (typeof liveLink !== 'undefined' && liveLink && String(liveLink).trim() !== '') { %>
             <%
-                const recent = matchList
-                    .filter(m => m.status === 'completed' || m.status === 'complete' || (m.details && (m.details.goalsA != null || m.details.goalsB != null)))
-                    .slice(-6)
-                    .reverse();
+                let embedLink = liveLink;
+                if (liveLink.includes('watch?v=')) embedLink = liveLink.replace('watch?v=', 'embed/').split('&')[0];
+                else if (liveLink.includes('youtu.be/')) embedLink = liveLink.replace('youtu.be/', 'youtube.com/embed/').split('?')[0];
             %>
-            <% if (recent.length) { %>
-                <% recent.forEach(r => { %>
-                    <a class="result-card" href="/match/<%= r._id || r.id || '' %>">
-                        <div class="result-row">
-                            <div class="result-team">
-                                <img src="<%= r.logoA %>" alt="">
-                                <span><%= r.teamA %></span>
-                            </div>
-                            <span class="result-score"><%= (r.details && r.details.goalsA != null) ? r.details.goalsA : 0 %></span>
-                        </div>
-                        <div class="result-row">
-                            <div class="result-team">
-                                <img src="<%= r.logoB %>" alt="">
-                                <span style="color:var(--muted);"><%= r.teamB %></span>
-                            </div>
-                            <span class="result-score muted"><%= (r.details && r.details.goalsB != null) ? r.details.goalsB : 0 %></span>
-                        </div>
-                    </a>
-                <% }) %>
-            <% } else { %>
-                <div class="empty-state">No recent results yet</div>
-            <% } %>
-        </div>
-    </section>
-
-    <!-- STORIES -->
-    <section class="home-section" style="padding-top:0;">
-        <div class="section-head">
-            <div>
-                <div class="section-label">Journal</div>
-                <h2 class="section-title">League stories</h2>
+            <iframe src="<%= embedLink %>" allowfullscreen title="Live stream"></iframe>
+        <% } else { %>
+            <div class="ed-stream-empty">
+                <strong>Stream offline</strong>
+                <span>Broadcast appears here when a match is live</span>
             </div>
+        <% } %>
+    </div>
+</section>
+
+<section class="ed-wrap ed-block">
+    <div class="ed-block-head">
+        <div>
+            <div class="ed-label">Path in</div>
+            <h3 class="ed-serif">How players join</h3>
         </div>
-        <div class="stories-grid">
-            <% if (typeof stories !== 'undefined' && stories && stories.length > 0) { %>
-                <% stories.slice().reverse().slice(0, 6).forEach(story => { %>
-                    <article class="story-card">
-                        <% if (story.image) { %>
-                            <img src="<%= story.image %>" alt="">
-                        <% } else { %>
-                            <div style="aspect-ratio:16/10;background:#e2e8f0;"></div>
-                        <% } %>
-                        <div class="story-body">
-                            <div class="story-date"><%= story.date || 'Article' %></div>
-                            <h4><%= story.title %></h4>
-                            <p><%= story.description %></p>
+    </div>
+    <div class="ed-steps">
+        <div class="ed-step">
+            <div class="ed-step-num">01</div>
+            <h4>Join the room</h4>
+            <p>Start in Discord. Meet managers, learn the tone of the league, and get oriented.</p>
+        </div>
+        <div class="ed-step">
+            <div class="ed-step-num">02</div>
+            <h4>Register your card</h4>
+            <p>Build a clean profile in the market — position, identity, the basics teams actually read.</p>
+        </div>
+        <div class="ed-step">
+            <div class="ed-step-num">03</div>
+            <h4>Get signed & play</h4>
+            <p>Auction or signings put you on a roster. Fixtures and results follow from there.</p>
+        </div>
+    </div>
+</section>
+
+<section class="ed-wrap ed-block" id="tour-results">
+    <div class="ed-block-head">
+        <div>
+            <div class="ed-label">Scoreboard</div>
+            <h3 class="ed-serif">Recent results</h3>
+        </div>
+        <a href="/matches" class="ed-link">Full list</a>
+    </div>
+    <div class="ed-results">
+        <%
+            const recent = matchList
+                .filter(m => m.status === 'completed' || m.status === 'complete' || (m.details && (m.details.goalsA != null || m.details.goalsB != null)))
+                .slice(-8)
+                .reverse();
+        %>
+        <% if (recent.length) { %>
+            <% recent.forEach(r => { %>
+                <a class="ed-result" href="/match/<%= r._id || r.id || '' %>">
+                    <div class="ed-result-row">
+                        <div class="ed-result-team">
+                            <img src="<%= r.logoA %>" alt="">
+                            <span><%= r.teamA %></span>
                         </div>
-                    </article>
-                <% }) %>
-            <% } else { %>
-                <div class="empty-state">No stories published yet</div>
-            <% } %>
+                        <span class="ed-result-score"><%= (r.details && r.details.goalsA != null) ? r.details.goalsA : 0 %></span>
+                    </div>
+                    <div class="ed-result-row">
+                        <div class="ed-result-team">
+                            <img src="<%= r.logoB %>" alt="">
+                            <span style="color:var(--soft)"><%= r.teamB %></span>
+                        </div>
+                        <span class="ed-result-score dim"><%= (r.details && r.details.goalsB != null) ? r.details.goalsB : 0 %></span>
+                    </div>
+                </a>
+            <% }) %>
+        <% } else { %>
+            <div class="ed-empty" style="grid-column:1/-1">No results posted yet</div>
+        <% } %>
+    </div>
+</section>
+
+<section class="ed-wrap ed-block">
+    <div class="ed-block-head">
+        <div>
+            <div class="ed-label">Journal</div>
+            <h3 class="ed-serif">Stories from the league</h3>
         </div>
-    </section>
+    </div>
+    <div class="ed-stories">
+        <% if (typeof stories !== 'undefined' && stories && stories.length) { %>
+            <% stories.slice().reverse().slice(0, 5).forEach((story, i) => { %>
+                <div class="ed-story">
+                    <% if (story.image) { %>
+                        <img src="<%= story.image %>" alt="">
+                    <% } %>
+                    <div class="ed-story-shade"></div>
+                    <div class="ed-story-text">
+                        <small><%= story.date || 'Article' %></small>
+                        <strong><%= story.title %></strong>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="ed-empty" style="grid-column:1/-1">Stories will appear here</div>
+        <% } %>
+    </div>
+</section>
 
-    <!-- CTA -->
-    <section class="home-cta">
-        <h3>Ready for the next matchday?</h3>
-        <p>Set up your player card, browse the market, and get in front of managers building their squads.</p>
-        <a href="/market" class="btn-primary">Open the market</a>
-    </section>
+<section class="ed-wrap">
+    <div class="ed-cta">
+        <div class="ed-label" style="margin-bottom:0.75rem">Market</div>
+        <h3 class="ed-serif">Ready when you are</h3>
+        <p>Open the player market, set up your card, or browse who’s available for the next window.</p>
+        <a href="/market" class="ed-btn ed-btn-solid">Go to market</a>
+    </div>
+</section>
 
-</main>
 </div>
 
 <script>
@@ -884,34 +820,30 @@
     if (!overlay || !spotlight || !card) return;
 
     const tourSteps = [
-        { selector: '[data-tour="market"]', mobileSelector: '[data-tour="market-mobile"]', eyebrow: 'PLAYER MARKET', title: 'Build your player profile', description: 'Browse registered players, inspect cards, stats, positions and information.' },
-        { selector: '[data-tour="matches"]', mobileSelector: '[data-tour="matches-mobile"]', eyebrow: 'MATCH CENTER', title: 'Follow the fixtures', description: 'Upcoming fixtures, completed games and individual match details.' },
-        { selector: '[data-tour="metrics"]', mobileSelector: '[data-tour="metrics-mobile"]', eyebrow: 'LEAGUE METRICS', title: 'Track the numbers', description: 'Goals, assists, saves, MVPs and other league records.' },
-        { selector: '[data-tour="records"]', mobileSelector: '[data-tour="records-mobile"]', eyebrow: 'LEAGUE RECORDS', title: 'Explore the history', description: 'Notable achievements, historical records and milestones.' },
-        { selector: '#live-search-input', eyebrow: 'SEARCH', title: 'Find anything quickly', description: 'Search teams, players or matches from the homepage.' },
-        { selector: '#tour-featured-match', eyebrow: 'FEATURED FIXTURE', title: 'See what is coming up', description: 'The next scheduled match is highlighted here.' },
-        { selector: '#tour-results', eyebrow: 'SCOREBOARD', title: 'Keep up with results', description: 'Recent completed matches with final scores.' }
+        { selector: '[data-tour="market"]', mobileSelector: '[data-tour="market-mobile"]', eyebrow: 'MARKET', title: 'Player market', description: 'Browse cards, stats and registration.' },
+        { selector: '[data-tour="matches"]', mobileSelector: '[data-tour="matches-mobile"]', eyebrow: 'MATCHES', title: 'Fixtures', description: 'Upcoming and completed games.' },
+        { selector: '#live-search-input', eyebrow: 'SEARCH', title: 'Find anything', description: 'Teams, players or matches from here.' },
+        { selector: '#tour-featured-match', eyebrow: 'SCHEDULE', title: 'Next match', description: 'The featured upcoming fixture.' },
+        { selector: '#tour-results', eyebrow: 'RESULTS', title: 'Recent scores', description: 'Latest completed matches.' }
     ];
-
     let currentStep = 0;
     function isMobileLayout() { return window.innerWidth < 1280; }
     function getTarget(step) {
-        let target = null;
-        if (isMobileLayout() && step.mobileSelector) target = document.querySelector(step.mobileSelector);
-        if (!target && step.selector) target = document.querySelector(step.selector);
-        return target;
+        let t = null;
+        if (isMobileLayout() && step.mobileSelector) t = document.querySelector(step.mobileSelector);
+        if (!t && step.selector) t = document.querySelector(step.selector);
+        return t;
     }
     function createProgress() {
         progress.innerHTML = '';
-        tourSteps.forEach(function (_, index) {
-            const dot = document.createElement('span');
-            if (index === currentStep) dot.classList.add('active');
-            progress.appendChild(dot);
+        tourSteps.forEach((_, i) => {
+            const d = document.createElement('span');
+            if (i === currentStep) d.classList.add('active');
+            progress.appendChild(d);
         });
     }
     function positionTourCard(target) {
-        const margin = 16;
-        const cardWidth = Math.min(360, window.innerWidth - 32);
+        const margin = 16, cardWidth = Math.min(360, window.innerWidth - 32);
         card.style.width = cardWidth + 'px';
         if (window.innerWidth <= 640) {
             card.classList.add('centered');
@@ -920,27 +852,22 @@
         }
         card.classList.remove('centered');
         const rect = target.getBoundingClientRect();
-        let left = rect.left;
-        let top = rect.bottom + 22;
+        let left = rect.left, top = rect.bottom + 22;
         if (left + cardWidth > window.innerWidth - margin) left = window.innerWidth - cardWidth - margin;
         if (left < margin) left = margin;
-        if (top + 220 > window.innerHeight - margin) {
-            top = rect.top - 220 - 22;
-            if (top < margin) { top = margin; card.classList.add('centered'); }
+        if (top + 200 > window.innerHeight - margin) {
+            top = Math.max(margin, rect.top - 200 - 22);
+            card.classList.add('centered');
         }
-        card.style.left = left + 'px';
-        card.style.top = top + 'px';
-        card.style.bottom = 'auto';
+        card.style.left = left + 'px'; card.style.top = top + 'px'; card.style.bottom = 'auto';
     }
     function moveSpotlight(target) {
         const rect = target.getBoundingClientRect();
-        let width = Math.max(rect.width, 55);
-        let height = Math.max(rect.height, 45);
-        const padding = window.innerWidth <= 640 ? 10 : 9;
+        const pad = window.innerWidth <= 640 ? 10 : 9;
         spotlight.style.left = (rect.left + rect.width / 2) + 'px';
         spotlight.style.top = (rect.top + rect.height / 2) + 'px';
-        spotlight.style.width = (width + padding * 2) + 'px';
-        spotlight.style.height = (height + padding * 2) + 'px';
+        spotlight.style.width = (Math.max(rect.width, 55) + pad * 2) + 'px';
+        spotlight.style.height = (Math.max(rect.height, 45) + pad * 2) + 'px';
     }
     function showStep(index) {
         currentStep = index;
@@ -952,19 +879,18 @@
             return;
         }
         if (isMobileLayout() && step.mobileSelector) {
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (mobileMenu && !mobileMenu.classList.contains('active')) mobileMenu.classList.add('active');
+            const m = document.getElementById('mobile-menu');
+            if (m && !m.classList.contains('active')) m.classList.add('active');
         }
-        target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-        setTimeout(function () { moveSpotlight(target); positionTourCard(target); }, 120);
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => { moveSpotlight(target); positionTourCard(target); }, 120);
         eyebrow.textContent = step.eyebrow;
         title.textContent = step.title;
         description.textContent = step.description;
         createProgress();
-        nextButton.textContent = currentStep === tourSteps.length - 1 ? 'Finish ✓' : 'Next →';
+        nextButton.textContent = currentStep === tourSteps.length - 1 ? 'Done' : 'Next';
     }
     function startTour() {
-        currentStep = 0;
         overlay.classList.add('active');
         overlay.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
@@ -975,30 +901,23 @@
         overlay.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
         localStorage.setItem('vim_home_tour_seen', 'true');
-        const mobileMenu = document.getElementById('mobile-menu');
-        if (mobileMenu) mobileMenu.classList.remove('active');
+        const m = document.getElementById('mobile-menu');
+        if (m) m.classList.remove('active');
     }
-    nextButton.addEventListener('click', function () {
-        if (currentStep >= tourSteps.length - 1) { finishTour(); return; }
-        showStep(currentStep + 1);
+    nextButton.addEventListener('click', () => {
+        if (currentStep >= tourSteps.length - 1) finishTour();
+        else showStep(currentStep + 1);
     });
     skipButton.addEventListener('click', finishTour);
     backdrop.addEventListener('click', finishTour);
     launcher.addEventListener('click', startTour);
-    document.addEventListener('keydown', function (event) {
+    document.addEventListener('keydown', (e) => {
         if (!overlay.classList.contains('active')) return;
-        if (event.key === 'Escape') finishTour();
-        if (event.key === 'ArrowRight' && currentStep < tourSteps.length - 1) showStep(currentStep + 1);
-        if (event.key === 'ArrowLeft' && currentStep > 0) showStep(currentStep - 1);
+        if (e.key === 'Escape') finishTour();
+        if (e.key === 'ArrowRight' && currentStep < tourSteps.length - 1) showStep(currentStep + 1);
+        if (e.key === 'ArrowLeft' && currentStep > 0) showStep(currentStep - 1);
     });
-    window.addEventListener('resize', function () {
-        if (!overlay.classList.contains('active')) return;
-        const target = getTarget(tourSteps[currentStep]);
-        if (target) { moveSpotlight(target); positionTourCard(target); }
-    });
-    if (!localStorage.getItem('vim_home_tour_seen')) {
-        setTimeout(startTour, 900);
-    }
+    if (!localStorage.getItem('vim_home_tour_seen')) setTimeout(startTour, 900);
 })();
 </script>
 
@@ -1008,32 +927,21 @@
     const searchInput = document.getElementById('live-search-input');
     const dropdown = document.getElementById('search-results-dropdown');
     const searchForm = document.getElementById('search-form');
-    let debounceTimer;
-    let topTargetUrl = '';
+    let debounceTimer, topTargetUrl = '';
 
     searchInput.addEventListener('input', (e) => {
         clearTimeout(debounceTimer);
         const query = e.target.value.trim().toLowerCase();
-        if (query.length < 1) {
-            dropdown.classList.add('hidden');
-            dropdown.innerHTML = '';
-            topTargetUrl = '';
-            return;
-        }
+        if (query.length < 1) { dropdown.classList.add('hidden'); dropdown.innerHTML = ''; topTargetUrl = ''; return; }
         debounceTimer = setTimeout(() => {
             fetch(`/api/search?q=${encodeURIComponent(query)}`)
-                .then(res => res.ok ? res.json() : Promise.reject('No server API'))
+                .then(res => res.ok ? res.json() : Promise.reject())
                 .then(data => renderSearchResults(data, query))
                 .catch(() => {
-                    const matchedMatches = localMatches.filter(m =>
-                        (m.teamA && m.teamA.toLowerCase().includes(query)) ||
-                        (m.teamB && m.teamB.toLowerCase().includes(query))
-                    );
-                    const matchedPlayers = localPlayers.filter(p =>
-                        (p.name && p.name.toLowerCase().includes(query)) ||
-                        (p.role && p.role.toLowerCase().includes(query))
-                    );
-                    renderSearchResults({ matches: matchedMatches, players: matchedPlayers }, query);
+                    renderSearchResults({
+                        matches: localMatches.filter(m => (m.teamA && m.teamA.toLowerCase().includes(query)) || (m.teamB && m.teamB.toLowerCase().includes(query))),
+                        players: localPlayers.filter(p => (p.name && p.name.toLowerCase().includes(query)) || (p.role && p.role.toLowerCase().includes(query)))
+                    }, query);
                 });
         }, 150);
     });
@@ -1042,36 +950,26 @@
         const { players, matches } = data;
         let html = '';
         topTargetUrl = '';
-        const hasMatches = matches && matches.length > 0;
-        const hasPlayers = players && players.length > 0;
-        if (!hasMatches && !hasPlayers) {
-            dropdown.innerHTML = `<div style="text-align:center;padding:1rem;font-size:0.75rem;font-weight:700;color:#94a3b8;text-transform:uppercase;">No results for "${query}"</div>`;
+        if ((!matches || !matches.length) && (!players || !players.length)) {
+            dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:#6b6560;font-size:0.8rem;">No results</div>';
             dropdown.classList.remove('hidden');
             return;
         }
-        if (hasMatches) {
-            if (!topTargetUrl) topTargetUrl = `/match/${matches[0].id || matches[0]._id || ''}`;
-            html += `<div style="margin-bottom:0.75rem;"><div style="font-size:0.65rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0088ff;margin-bottom:0.4rem;padding:0 0.35rem;">Matches</div>`;
+        if (matches && matches.length) {
+            if (!topTargetUrl) topTargetUrl = `/match/${matches[0]._id || matches[0].id || ''}`;
+            html += '<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b6560;margin-bottom:0.4rem;">Matches</div>';
             matches.forEach(m => {
-                const matchUrl = (m.id || m._id) ? `/match/${m.id || m._id}` : `/matches?q=${encodeURIComponent(query)}`;
-                html += `<a href="${matchUrl}" style="display:flex;justify-content:space-between;align-items:center;padding:0.55rem 0.45rem;border-radius:0.65rem;text-decoration:none;color:#0f172a;font-size:0.8rem;font-weight:700;">
-                    <span>${m.teamA} <span style="color:#0088ff;">vs</span> ${m.teamB}</span>
-                    <span style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;">${m.status || m.time || 'Fixture'}</span>
-                </a>`;
+                const url = (m._id || m.id) ? `/match/${m._id || m.id}` : `/matches?q=${encodeURIComponent(query)}`;
+                html += `<a href="${url}" style="display:block;padding:0.5rem 0.25rem;text-decoration:none;color:#1a1a1a;font-size:0.85rem;font-weight:500;">${m.teamA} vs ${m.teamB}</a>`;
             });
-            html += `</div>`;
         }
-        if (hasPlayers) {
-            if (!topTargetUrl) topTargetUrl = players[0].id || players[0]._id ? `/player/${players[0].id || players[0]._id}` : `/market`;
-            html += `<div><div style="font-size:0.65rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#0088ff;margin-bottom:0.4rem;padding:0 0.35rem;">Players</div>`;
+        if (players && players.length) {
+            if (!topTargetUrl) topTargetUrl = (players[0]._id || players[0].id) ? `/player/${players[0]._id || players[0].id}` : '/market';
+            html += '<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b6560;margin:0.6rem 0 0.4rem;">Players</div>';
             players.forEach(p => {
-                const playerUrl = (p.id || p._id) ? `/player/${p.id || p._id}` : `/market?search=${encodeURIComponent(p.name)}`;
-                html += `<a href="${playerUrl}" style="display:flex;justify-content:space-between;align-items:center;padding:0.55rem 0.45rem;border-radius:0.65rem;text-decoration:none;color:#0f172a;font-size:0.8rem;font-weight:700;">
-                    <span>${p.name}</span>
-                    <span style="font-size:0.65rem;color:#0284c7;text-transform:uppercase;">${p.role || p.position || 'Player'}</span>
-                </a>`;
+                const url = (p._id || p.id) ? `/player/${p._id || p.id}` : `/market?search=${encodeURIComponent(p.name)}`;
+                html += `<a href="${url}" style="display:block;padding:0.5rem 0.25rem;text-decoration:none;color:#1a1a1a;font-size:0.85rem;font-weight:500;">${p.name}</a>`;
             });
-            html += `</div>`;
         }
         dropdown.innerHTML = html;
         dropdown.classList.remove('hidden');

@@ -977,8 +977,10 @@ app.get('/', async (req, res) => {
         ...defaultOg(
             req,
             'VIM Super League',
-            'Competitive Roblox football league — player market, live matches, stats and records.'
-        )
+            'Find the perfect league to compete — track fixtures, inspect the player market, and jump into high-stakes VSL competitions.'
+        ),
+        // Override embed image with the official VIMSL art (public/images/vimsl-og.png)
+        ogImage: absoluteUrl(req, '/images/vimsl-og.png')
     });
 });
 

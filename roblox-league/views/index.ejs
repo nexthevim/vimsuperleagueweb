@@ -1209,6 +1209,89 @@ body {
         transition-duration: .01ms !important;
     }
 }
+
+.vsl-hero-rotator {
+    position:absolute;
+    inset:0;
+    z-index:1;
+    overflow:hidden;
+}
+.vsl-hero-slide {
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:opacity 1s ease;
+    background-position:center center;
+    background-size:cover;
+    background-repeat:no-repeat;
+}
+.vsl-hero-slide.active { opacity:1; }
+.vsl-hero-rotator::after {
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      linear-gradient(90deg, rgba(8,31,36,.82) 0%, rgba(8,31,36,.58) 34%, rgba(8,31,36,.17) 70%, rgba(8,31,36,.08) 100%),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.06));
+    pointer-events:none;
+}
+.vsl-hero-dots {
+    position:absolute;
+    z-index:6;
+    right:34px;
+    bottom:34px;
+    display:flex;
+    gap:7px;
+}
+.vsl-hero-dot {
+    width:7px;
+    height:7px;
+    border:0;
+    border-radius:50%;
+    background:rgba(255,255,255,.42);
+    padding:0;
+    cursor:pointer;
+    transition:width .2s ease, background .2s ease;
+}
+.vsl-hero-dot.active {
+    width:25px;
+    border-radius:99px;
+    background:#dceca0;
+}
+.vsl-hero h1 {
+    max-width: 760px;
+}
+.vsl-hero-football {
+    position:absolute;
+    z-index:5;
+    right:6%;
+    bottom:5%;
+    width:clamp(130px, 17vw, 235px);
+    aspect-ratio:1;
+    border-radius:50%;
+    object-fit:cover;
+    filter:drop-shadow(0 22px 30px rgba(0,0,0,.3));
+    transform:rotate(-7deg);
+    animation:vslBallFloat 5.5s ease-in-out infinite;
+}
+@keyframes vslBallFloat {
+    0%,100% { transform:translateY(0) rotate(-7deg); }
+    50% { transform:translateY(-12px) rotate(3deg); }
+}
+@media (max-width:820px) {
+    .vsl-hero-football { right:4%; bottom:12%; width:120px; }
+    .vsl-hero-dots { right:20px; bottom:20px; }
+}
+
+
+/* Navbar visibility fix: keep the existing partial, but ensure it sits above the hero. */
+#jlzilc {
+    position:relative;
+    z-index:100;
+}
+.vsl-page { position:relative; z-index:1; }
+.vsl-hero { z-index:2; }
+
 </style>
 
 <%
@@ -1469,7 +1552,7 @@ body {
     <section class="vsl-cta">
         <div>
             <div class="vsl-eyebrow" style="color:#fff;">Player market</div>
-            <h2 class="vsl-display">Ready for your next move?</h2>
+            <h2 class="vsl-display">Make the next move count.</h2>
             <p>Scout the market, follow the action and find where you fit.</p>
         </div>
         <a href="/market" class="vsl-btn">Open the market</a>
@@ -1516,6 +1599,38 @@ body {
         </div>
     </footer>
 </div>
+
+
+<script>
+(() => {
+    const slides = [...document.querySelectorAll('.vsl-hero-slide')];
+    const dots = [...document.querySelectorAll('.vsl-hero-dot')];
+    if (!slides.length) return;
+
+    let index = 0;
+    let timer;
+
+    function showSlide(next) {
+        index = (next + slides.length) % slides.length;
+        slides.forEach((s, i) => s.classList.toggle('active', i === index));
+        dots.forEach((d, i) => d.classList.toggle('active', i === index));
+    }
+
+    function restart() {
+        clearInterval(timer);
+        timer = setInterval(() => showSlide(index + 1), 5500);
+    }
+
+    dots.forEach(dot => {
+        dot.addEventListener('click', () => {
+            showSlide(Number(dot.dataset.slide || 0));
+            restart();
+        });
+    });
+
+    restart();
+})();
+</script>
 
 <script>
 (function () {

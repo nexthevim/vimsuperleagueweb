@@ -1,180 +1,217 @@
 <%- include('partials/navbar') %>
 
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
 
 <style>
     :root {
-        --bg: #f3f1ec;
-        --paper: #fffcf7;
-        --ink: #1a1a1a;
-        --soft: #6b6560;
-        --line: rgba(26, 26, 26, 0.08);
-        --accent: #1d4ed8;
-        --accent-soft: #dbeafe;
+        --void: #07090f;
+        --ink: #e8eaef;
+        --muted: rgba(232, 234, 239, 0.55);
+        --line: rgba(255, 255, 255, 0.08);
+        --glass: rgba(12, 16, 28, 0.55);
+        --accent: #6eb6ff;
     }
 
     body {
         margin: 0;
-        background: var(--bg);
+        background: var(--void);
         color: var(--ink);
-        font-family: 'Outfit', system-ui, sans-serif;
+        font-family: 'DM Sans', system-ui, sans-serif;
         overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
     }
 
-    .ed {
-        padding-top: 5.5rem;
+    /* Keep page dark even if global styles try light */
+    .cx {
+        background: var(--void);
+        min-height: 100vh;
+        padding-top: 5rem;
     }
 
-    .ed-wrap {
-        width: min(1120px, calc(100% - 2.5rem));
+    .cx-wrap {
+        width: min(1180px, calc(100% - 2.5rem));
         margin: 0 auto;
     }
 
-    .ed-label {
-        font-size: 0.68rem;
-        font-weight: 600;
-        letter-spacing: 0.22em;
-        text-transform: uppercase;
-        color: var(--soft);
-    }
-
-    .ed-serif {
+    .cx-serif {
         font-family: 'Cormorant Garamond', Georgia, serif;
         font-weight: 600;
-        letter-spacing: -0.02em;
-        line-height: 0.95;
+        letter-spacing: -0.03em;
+        line-height: 0.88;
     }
 
-    /* ===== HERO SHELL ===== */
-    .ed-hero {
-        padding: 1.25rem 0 0;
+    .cx-label {
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--muted);
     }
 
-    .ed-hero-frame {
+    /* ========== HERO — full cinematic ========== */
+    .cx-hero {
         position: relative;
-        border-radius: 1.75rem;
-        overflow: hidden;
-        min-height: min(78vh, 760px);
-        background:
-            linear-gradient(180deg, rgba(20,18,16,0.15) 0%, rgba(20,18,16,0.25) 40%, rgba(20,18,16,0.72) 100%),
-            url('/images/vimgfx.png') center center / cover no-repeat;
-        color: #fff;
+        min-height: 100vh;
         display: flex;
-        align-items: flex-end;
-        box-shadow: 0 30px 80px rgba(26, 26, 26, 0.12);
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        overflow: hidden;
+        isolation: isolate;
     }
 
-    .ed-hero-content {
+    .cx-hero-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background:
+            radial-gradient(ellipse 80% 60% at 50% 20%, rgba(40, 70, 140, 0.35), transparent 55%),
+            radial-gradient(ellipse 100% 80% at 50% 100%, rgba(0, 0, 0, 0.85), transparent 50%),
+            linear-gradient(180deg, rgba(7, 9, 15, 0.25) 0%, rgba(7, 9, 15, 0.45) 50%, rgba(7, 9, 15, 0.92) 100%),
+            url('/images/vimgfx.png') center center / cover no-repeat;
+        transform: scale(1.02);
+    }
+
+    /* soft stars / grain feel */
+    .cx-hero-bg::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+            radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.35), transparent),
+            radial-gradient(1px 1px at 70% 15%, rgba(255,255,255,0.25), transparent),
+            radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.2), transparent),
+            radial-gradient(1.5px 1.5px at 85% 55%, rgba(255,255,255,0.3), transparent),
+            radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.2), transparent);
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .cx-hero-inner {
         position: relative;
         z-index: 2;
-        width: 100%;
-        padding: 2.5rem 2.25rem 3rem;
-        max-width: 820px;
+        width: min(960px, calc(100% - 2rem));
+        padding: 2rem 0 4rem;
     }
 
-    .ed-hero-content .ed-label {
-        color: rgba(255,255,255,0.7);
-        margin-bottom: 1rem;
+    .cx-hero .cx-label {
+        margin-bottom: 1.5rem;
+        color: rgba(255,255,255,0.55);
     }
 
-    .ed-hero h1 {
-        margin: 0 0 1.25rem;
-        font-size: clamp(3.2rem, 9vw, 6.2rem);
+    .cx-hero h1 {
+        margin: 0 0 1.5rem;
+        font-size: clamp(4.2rem, 14vw, 9.5rem);
         color: #fff;
+        text-transform: uppercase;
+        text-shadow: 0 20px 60px rgba(0,0,0,0.45);
     }
 
-    .ed-hero h1 span {
+    .cx-hero h1 .line {
+        display: block;
+    }
+
+    .cx-hero h1 .line-em {
         display: block;
         font-style: italic;
         font-weight: 500;
-        opacity: 0.92;
+        color: rgba(255,255,255,0.88);
     }
 
-    .ed-hero-lead {
+    .cx-hero-lead {
         max-width: 28rem;
-        margin: 0 0 1.75rem;
+        margin: 0 auto 2rem;
         font-size: 1.02rem;
         font-weight: 400;
-        line-height: 1.65;
-        color: rgba(255,255,255,0.78);
+        line-height: 1.7;
+        color: var(--muted);
     }
 
-    .ed-actions {
+    .cx-actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.7rem;
-        margin-bottom: 1.75rem;
+        gap: 0.75rem;
+        justify-content: center;
+        margin-bottom: 2.25rem;
     }
 
-    .ed-btn {
+    .cx-btn {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 0.45rem;
-        padding: 0.9rem 1.35rem;
+        padding: 0.95rem 1.5rem;
         border-radius: 999px;
-        font-size: 0.72rem;
+        font-size: 0.7rem;
         font-weight: 600;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
         text-decoration: none;
-        transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+        transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
     }
 
-    .ed-btn:hover { transform: translateY(-1px); }
+    .cx-btn:hover { transform: translateY(-1px); }
 
-    .ed-btn-solid {
+    .cx-btn-fill {
         background: #fff;
-        color: var(--ink);
+        color: #07090f;
     }
 
-    .ed-btn-solid:hover { background: #f5f5f5; color: var(--ink); }
+    .cx-btn-fill:hover { background: #e8eaef; color: #07090f; }
 
-    .ed-btn-line {
-        border: 1px solid rgba(255,255,255,0.35);
+    .cx-btn-ghost {
+        border: 1px solid rgba(255,255,255,0.28);
         color: #fff;
-        background: rgba(255,255,255,0.06);
-        backdrop-filter: blur(6px);
+        background: rgba(255,255,255,0.04);
+        backdrop-filter: blur(8px);
     }
 
-    .ed-btn-line:hover { background: rgba(255,255,255,0.14); color: #fff; }
+    .cx-btn-ghost:hover {
+        border-color: rgba(255,255,255,0.5);
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+    }
 
-    /* Search floating under hero text */
-    .ed-search {
+    .cx-search {
+        position: relative;
+        max-width: 440px;
+        margin: 0 auto;
         display: flex;
         align-items: center;
-        gap: 0.4rem;
-        max-width: 420px;
+        gap: 0.35rem;
         padding: 0.4rem;
         border-radius: 999px;
-        background: rgba(255,255,255,0.95);
-        box-shadow: 0 16px 40px rgba(0,0,0,0.18);
-        position: relative;
+        background: rgba(8, 12, 22, 0.65);
+        border: 1px solid rgba(255,255,255,0.12);
+        backdrop-filter: blur(16px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.35);
     }
 
-    .ed-search input {
+    .cx-search input {
         flex: 1;
         min-width: 0;
         border: 0;
         outline: none;
         background: transparent;
-        padding: 0.75rem 1rem;
+        padding: 0.8rem 1.05rem;
         font-family: inherit;
         font-size: 0.9rem;
         font-weight: 500;
-        color: var(--ink);
+        color: #fff;
     }
 
-    .ed-search button {
+    .cx-search input::placeholder { color: rgba(255,255,255,0.35); }
+
+    .cx-search button {
         border: 0;
         border-radius: 999px;
-        padding: 0.75rem 1.1rem;
-        background: var(--ink);
-        color: #fff;
+        padding: 0.8rem 1.15rem;
+        background: #fff;
+        color: #07090f;
         font-family: inherit;
         font-size: 0.68rem;
-        font-weight: 600;
-        letter-spacing: 0.06em;
+        font-weight: 700;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
         cursor: pointer;
     }
@@ -183,422 +220,434 @@
         position: absolute;
         left: 0; right: 0;
         top: calc(100% + 0.55rem);
-        background: var(--paper);
+        background: #0e1422;
         border: 1px solid var(--line);
         border-radius: 1.1rem;
-        box-shadow: 0 20px 50px rgba(26,26,26,0.14);
-        padding: 0.85rem;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+        padding: 0.9rem;
         max-height: 22rem;
         overflow-y: auto;
-        z-index: 30;
+        z-index: 40;
         text-align: left;
         color: var(--ink);
     }
 
-    /* ===== INTRO BAND ===== */
-    .ed-intro {
-        padding: 4.5rem 0 2rem;
-        display: grid;
-        grid-template-columns: 1fr 1.15fr;
-        gap: 3rem;
-        align-items: end;
+    /* scroll cue */
+    .cx-scroll {
+        position: absolute;
+        bottom: 1.75rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.35);
     }
 
-    .ed-intro h2 {
-        margin: 0.6rem 0 0;
-        font-size: clamp(2.2rem, 4.5vw, 3.4rem);
-        max-width: 12ch;
+    /* ========== SECTIONS on dark ========== */
+    .cx-section {
+        position: relative;
+        padding: 5rem 0;
+        background:
+            radial-gradient(ellipse 70% 50% at 50% 0%, rgba(30, 50, 100, 0.18), transparent 60%),
+            var(--void);
     }
 
-    .ed-intro p {
-        margin: 0;
-        font-size: 1.05rem;
-        line-height: 1.7;
-        color: var(--soft);
-        font-weight: 400;
-        max-width: 34rem;
+    .cx-section + .cx-section {
+        border-top: 1px solid var(--line);
     }
 
-    @media (max-width: 800px) {
-        .ed-intro { grid-template-columns: 1fr; gap: 1.25rem; }
-    }
-
-    /* ===== MATCH FEATURE ===== */
-    .ed-block {
-        padding: 2.5rem 0;
-    }
-
-    .ed-block-head {
+    .cx-head {
         display: flex;
-        align-items: baseline;
+        flex-wrap: wrap;
+        align-items: flex-end;
         justify-content: space-between;
         gap: 1rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 2.25rem;
     }
 
-    .ed-block-head h3 {
-        margin: 0.35rem 0 0;
-        font-size: clamp(1.8rem, 3vw, 2.4rem);
-    }
-
-    .ed-link {
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: var(--ink);
-        text-decoration: none;
-        border-bottom: 1px solid rgba(26,26,26,0.25);
-        padding-bottom: 0.15rem;
-    }
-
-    .ed-link:hover { border-color: var(--ink); color: var(--ink); }
-
-    .ed-match-card {
-        background: var(--paper);
-        border: 1px solid var(--line);
-        border-radius: 1.5rem;
-        padding: 1.75rem 1.5rem;
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        gap: 1.25rem;
-        align-items: center;
-        box-shadow: 0 12px 40px rgba(26,26,26,0.04);
-    }
-
-    .ed-team {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.7rem;
-        text-align: center;
-    }
-
-    .ed-team img {
-        width: 4rem;
-        height: 4rem;
-        object-fit: contain;
-    }
-
-    .ed-team span {
-        font-size: 0.85rem;
-        font-weight: 600;
-        letter-spacing: 0.04em;
+    .cx-head h2 {
+        margin: 0.45rem 0 0;
+        font-size: clamp(2.4rem, 5vw, 3.6rem);
+        color: #fff;
         text-transform: uppercase;
     }
 
-    .ed-vs {
-        text-align: center;
-        padding: 0 0.5rem;
+    .cx-head p {
+        margin: 0.65rem 0 0;
+        max-width: 28rem;
+        font-size: 0.95rem;
+        line-height: 1.65;
+        color: var(--muted);
     }
 
-    .ed-vs strong {
-        display: block;
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 1.75rem;
-        font-weight: 600;
-        font-style: italic;
-    }
-
-    .ed-vs small {
-        display: block;
-        margin-top: 0.35rem;
+    .cx-link {
         font-size: 0.68rem;
         font-weight: 600;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: var(--soft);
+        color: rgba(255,255,255,0.7);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255,255,255,0.25);
+        padding-bottom: 0.2rem;
     }
 
-    /* Stream */
-    .ed-stream {
-        margin-top: 1.25rem;
+    .cx-link:hover { color: #fff; border-color: #fff; }
+
+    /* Match feature */
+    .cx-match {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 1.5rem;
+        align-items: center;
+        padding: 2.25rem 1.5rem;
         border-radius: 1.5rem;
-        overflow: hidden;
-        background: #141210;
-        min-height: 300px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
         border: 1px solid var(--line);
+        backdrop-filter: blur(12px);
     }
 
-    .ed-stream iframe {
+    .cx-team {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.85rem;
+        text-align: center;
+    }
+
+    .cx-team img {
+        width: 4.5rem;
+        height: 4.5rem;
+        object-fit: contain;
+        filter: drop-shadow(0 12px 24px rgba(0,0,0,0.35));
+    }
+
+    .cx-team span {
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .cx-vs {
+        text-align: center;
+        padding: 0 0.5rem;
+    }
+
+    .cx-vs strong {
+        display: block;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2rem;
+        font-weight: 500;
+        font-style: italic;
+        color: rgba(255,255,255,0.9);
+    }
+
+    .cx-vs small {
+        display: block;
+        margin-top: 0.4rem;
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    .cx-stream {
+        margin-top: 1.25rem;
+        border-radius: 1.35rem;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        background: #05070c;
+        min-height: 300px;
+    }
+
+    .cx-stream iframe {
         width: 100%;
-        min-height: 320px;
+        min-height: 340px;
         border: 0;
         display: block;
     }
 
-    .ed-stream-empty {
+    .cx-stream-empty {
         min-height: 280px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: rgba(255,255,255,0.45);
         gap: 0.4rem;
+        color: var(--muted);
         text-align: center;
         padding: 2rem;
     }
 
-    .ed-stream-empty strong {
-        color: rgba(255,255,255,0.85);
+    .cx-stream-empty strong {
         font-family: 'Cormorant Garamond', serif;
-        font-size: 1.5rem;
-        font-weight: 600;
+        font-size: 1.75rem;
+        font-weight: 500;
+        font-style: italic;
+        color: rgba(255,255,255,0.75);
     }
 
-    /* ===== STEPS ===== */
-    .ed-steps {
+    /* Steps */
+    .cx-steps {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 1.15rem;
+        gap: 1rem;
     }
 
-    .ed-step {
-        background: var(--paper);
+    .cx-step {
+        padding: 1.85rem 1.5rem;
+        border-radius: 1.25rem;
         border: 1px solid var(--line);
-        border-radius: 1.35rem;
-        padding: 1.75rem 1.5rem;
-        min-height: 180px;
+        background: rgba(255,255,255,0.02);
+        min-height: 190px;
     }
 
-    .ed-step-num {
+    .cx-step-num {
         font-family: 'Cormorant Garamond', serif;
-        font-size: 2rem;
-        font-weight: 600;
+        font-size: 2.4rem;
+        font-weight: 500;
         font-style: italic;
-        color: rgba(26,26,26,0.28);
+        color: rgba(255,255,255,0.22);
         margin-bottom: 1rem;
     }
 
-    .ed-step h4 {
+    .cx-step h3 {
         margin: 0 0 0.55rem;
-        font-size: 1.15rem;
+        font-size: 1.05rem;
         font-weight: 600;
+        letter-spacing: 0.02em;
     }
 
-    .ed-step p {
+    .cx-step p {
         margin: 0;
-        font-size: 0.92rem;
+        font-size: 0.9rem;
         line-height: 1.65;
-        color: var(--soft);
-        font-weight: 400;
+        color: var(--muted);
     }
 
-    @media (max-width: 800px) {
-        .ed-steps { grid-template-columns: 1fr; }
-        .ed-match-card { grid-template-columns: 1fr; gap: 1rem; }
-    }
-
-    /* ===== RESULTS ===== */
-    .ed-results {
+    /* Results */
+    .cx-results {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 0.9rem;
+        gap: 0.85rem;
     }
 
-    @media (max-width: 700px) {
-        .ed-results { grid-template-columns: 1fr; }
-    }
-
-    .ed-result {
+    .cx-result {
         display: flex;
         flex-direction: column;
-        gap: 0.65rem;
-        padding: 1.15rem 1.25rem;
-        background: var(--paper);
+        gap: 0.7rem;
+        padding: 1.2rem 1.3rem;
+        border-radius: 1.1rem;
         border: 1px solid var(--line);
-        border-radius: 1.15rem;
+        background: rgba(255,255,255,0.025);
         text-decoration: none;
         color: inherit;
-        transition: border-color 0.2s ease, transform 0.2s ease;
+        transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
     }
 
-    .ed-result:hover {
-        border-color: rgba(26,26,26,0.2);
+    .cx-result:hover {
+        border-color: rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.05);
         transform: translateY(-2px);
         color: inherit;
     }
 
-    .ed-result-row {
+    .cx-result-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 0.75rem;
     }
 
-    .ed-result-team {
+    .cx-result-team {
         display: flex;
         align-items: center;
-        gap: 0.6rem;
+        gap: 0.65rem;
         min-width: 0;
     }
 
-    .ed-result-team img {
-        width: 1.55rem;
-        height: 1.55rem;
+    .cx-result-team img {
+        width: 1.6rem;
+        height: 1.6rem;
         object-fit: contain;
     }
 
-    .ed-result-team span {
-        font-size: 0.82rem;
+    .cx-result-team span {
+        font-size: 0.8rem;
         font-weight: 600;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
-        letter-spacing: 0.03em;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-    .ed-result-score {
+    .cx-result-score {
         font-family: 'Cormorant Garamond', serif;
-        font-size: 1.35rem;
+        font-size: 1.45rem;
         font-weight: 600;
     }
 
-    .ed-result-score.dim { color: var(--soft); }
+    .cx-result-score.dim { color: var(--muted); }
 
-    /* ===== STORIES GALLERY ===== */
-    .ed-stories {
+    /* Stories — dark gallery */
+    .cx-stories {
         display: grid;
-        grid-template-columns: 1.4fr 1fr 1fr;
-        gap: 0.9rem;
+        grid-template-columns: 1.45fr 1fr 1fr;
+        gap: 0.85rem;
     }
 
-    .ed-story {
+    .cx-story {
         position: relative;
-        border-radius: 1.25rem;
+        border-radius: 1.15rem;
         overflow: hidden;
-        min-height: 260px;
-        background: #ddd;
-        display: block;
-        text-decoration: none;
-        color: #fff;
+        min-height: 240px;
+        border: 1px solid var(--line);
+        background: #101522;
     }
 
-    .ed-story:first-child { min-height: 420px; grid-row: span 2; }
+    .cx-story:first-child {
+        min-height: 420px;
+        grid-row: span 2;
+    }
 
-    .ed-story img {
+    .cx-story img {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
-        position: absolute;
-        inset: 0;
-        transition: transform 0.5s ease;
+        transition: transform 0.55s ease;
+        opacity: 0.9;
     }
 
-    .ed-story:hover img { transform: scale(1.04); }
+    .cx-story:hover img { transform: scale(1.05); }
 
-    .ed-story-shade {
+    .cx-story-shade {
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.72) 100%);
+        background: linear-gradient(180deg, transparent 35%, rgba(7,9,15,0.88) 100%);
+        z-index: 1;
     }
 
-    .ed-story-text {
+    .cx-story-text {
         position: absolute;
         left: 0; right: 0; bottom: 0;
         padding: 1.25rem 1.3rem;
         z-index: 2;
     }
 
-    .ed-story-text small {
+    .cx-story-text small {
         display: block;
-        font-size: 0.65rem;
+        font-size: 0.62rem;
         font-weight: 600;
-        letter-spacing: 0.14em;
+        letter-spacing: 0.16em;
         text-transform: uppercase;
-        opacity: 0.75;
+        color: var(--muted);
         margin-bottom: 0.35rem;
     }
 
-    .ed-story-text strong {
+    .cx-story-text strong {
         font-family: 'Cormorant Garamond', serif;
-        font-size: 1.45rem;
+        font-size: 1.5rem;
         font-weight: 600;
-        line-height: 1.15;
-        display: block;
+        line-height: 1.12;
+        color: #fff;
+    }
+
+    /* Closing banner */
+    .cx-close {
+        position: relative;
+        min-height: 52vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        overflow: hidden;
+        border-top: 1px solid var(--line);
+    }
+
+    .cx-close-bg {
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(ellipse at 50% 30%, rgba(50, 90, 160, 0.25), transparent 55%),
+            linear-gradient(180deg, rgba(7,9,15,0.4), rgba(7,9,15,0.85)),
+            url('/images/vimgfx.png') center 30% / cover no-repeat;
+        filter: saturate(0.85);
+    }
+
+    .cx-close-inner {
+        position: relative;
+        z-index: 2;
+        padding: 3rem 1.5rem;
+        max-width: 40rem;
+    }
+
+    .cx-close h2 {
+        margin: 0.5rem 0 1rem;
+        font-size: clamp(2.8rem, 7vw, 4.5rem);
+        text-transform: uppercase;
+        color: #fff;
+    }
+
+    .cx-close p {
+        margin: 0 auto 1.75rem;
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.65;
+        max-width: 26rem;
+    }
+
+    .cx-empty {
+        padding: 2.75rem 1.5rem;
+        text-align: center;
+        border: 1px dashed rgba(255,255,255,0.12);
+        border-radius: 1.15rem;
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
     }
 
     @media (max-width: 900px) {
-        .ed-stories { grid-template-columns: 1fr; }
-        .ed-story:first-child { min-height: 300px; grid-row: auto; }
-        .ed-story { min-height: 220px; }
+        .cx-steps, .cx-results { grid-template-columns: 1fr; }
+        .cx-stories { grid-template-columns: 1fr; }
+        .cx-story:first-child { min-height: 280px; grid-row: auto; }
+        .cx-match { grid-template-columns: 1fr; gap: 1.1rem; }
     }
-
-    /* ===== CTA ===== */
-    .ed-cta {
-        margin: 3rem 0 5rem;
-        border-radius: 1.75rem;
-        padding: 3.5rem 2rem;
-        text-align: center;
-        background: var(--paper);
-        border: 1px solid var(--line);
-    }
-
-    .ed-cta h3 {
-        margin: 0 0 0.85rem;
-        font-size: clamp(2rem, 4vw, 3rem);
-    }
-
-    .ed-cta p {
-        margin: 0 auto 1.75rem;
-        max-width: 26rem;
-        color: var(--soft);
-        font-size: 1rem;
-        line-height: 1.65;
-    }
-
-    .ed-cta .ed-btn-solid {
-        background: var(--ink);
-        color: #fff;
-    }
-
-    .ed-cta .ed-btn-solid:hover {
-        background: #333;
-        color: #fff;
-    }
-
-    .ed-empty {
-        padding: 2.5rem;
-        text-align: center;
-        border: 1px dashed rgba(26,26,26,0.15);
-        border-radius: 1.25rem;
-        color: var(--soft);
-        font-size: 0.8rem;
-        font-weight: 500;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        background: rgba(255,255,255,0.4);
-    }
-
-    /* Tour — keep working */
-    #vim-tour-overlay { position: fixed; inset: 0; z-index: 50000; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease; }
-    #vim-tour-overlay.active { opacity: 1; visibility: visible; }
-    #vim-tour-backdrop { position: absolute; inset: 0; background: rgba(20,18,16,0.72); pointer-events: auto; }
-    #vim-tour-spotlight { position: absolute; width: 100px; height: 100px; border-radius: 9999px; border: 2px solid rgba(255,255,255,0.85); box-shadow: 0 0 0 4px rgba(255,255,255,0.12), 0 0 40px rgba(0,0,0,0.25); pointer-events: none; transform: translate(-50%, -50%); transition: left 0.45s cubic-bezier(0.16,1,0.3,1), top 0.45s cubic-bezier(0.16,1,0.3,1), width 0.35s ease, height 0.35s ease; }
-    #vim-tour-card { position: fixed; width: min(360px, calc(100vw - 32px)); background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 1.25rem; padding: 1.35rem; box-shadow: 0 24px 60px rgba(0,0,0,0.2); z-index: 50002; pointer-events: auto; }
-    #vim-tour-card.centered::before { display: none; }
-    .vim-tour-eyebrow { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--soft); margin-bottom: 0.4rem; }
-    .vim-tour-title { font-family: 'Cormorant Garamond', serif; font-size: 1.55rem; font-weight: 600; line-height: 1.15; margin-bottom: 0.45rem; }
-    .vim-tour-description { color: var(--soft); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem; }
-    .vim-tour-progress { display: flex; gap: 5px; margin-bottom: 1rem; }
-    .vim-tour-progress span { height: 3px; width: 18px; border-radius: 999px; background: #e5e2dc; }
-    .vim-tour-progress span.active { width: 28px; background: var(--ink); }
-    .vim-tour-actions { display: flex; justify-content: space-between; align-items: center; }
-    .vim-tour-skip { border: none; background: transparent; color: var(--soft); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem; cursor: pointer; }
-    .vim-tour-next { border: none; background: var(--ink); color: #fff; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.7rem 1rem; border-radius: 999px; cursor: pointer; }
-    #vim-tour-launcher { position: fixed; right: 1.15rem; bottom: 1.15rem; width: 2.5rem; height: 2.5rem; border-radius: 999px; background: var(--ink); color: #fff; border: 0; z-index: 40000; font-weight: 600; cursor: pointer; box-shadow: 0 10px 24px rgba(0,0,0,0.18); }
 
     @media (max-width: 640px) {
-        .ed-hero-content { padding: 1.75rem 1.35rem 2.25rem; }
-        .ed-search { max-width: none; flex-direction: column; border-radius: 1.1rem; }
-        .ed-search button { width: 100%; }
-        #vim-tour-card { bottom: 1.15rem !important; top: auto !important; left: 1rem !important; width: calc(100vw - 2rem); }
+        .cx-hero h1 { font-size: clamp(3.4rem, 18vw, 5rem); }
+        .cx-search { flex-direction: column; border-radius: 1.15rem; max-width: none; }
+        .cx-search button { width: 100%; }
+        .cx-scroll { display: none; }
     }
+
+    /* Tour */
+    #vim-tour-overlay { position: fixed; inset: 0; z-index: 50000; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease; }
+    #vim-tour-overlay.active { opacity: 1; visibility: visible; }
+    #vim-tour-backdrop { position: absolute; inset: 0; background: rgba(5,7,12,0.8); pointer-events: auto; }
+    #vim-tour-spotlight { position: absolute; width: 100px; height: 100px; border-radius: 9999px; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 0 40px rgba(110,182,255,0.25); pointer-events: none; transform: translate(-50%, -50%); transition: left 0.45s ease, top 0.45s ease, width 0.35s ease, height 0.35s ease; }
+    #vim-tour-card { position: fixed; width: min(360px, calc(100vw - 32px)); background: #0e1422; color: #e8eaef; border: 1px solid rgba(255,255,255,0.1); border-radius: 1.15rem; padding: 1.3rem; box-shadow: 0 30px 70px rgba(0,0,0,0.5); z-index: 50002; pointer-events: auto; }
+    .vim-tour-eyebrow { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+    .vim-tour-title { font-family: 'Cormorant Garamond', serif; font-size: 1.55rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .vim-tour-description { color: var(--muted); font-size: 0.88rem; line-height: 1.55; margin-bottom: 1rem; }
+    .vim-tour-progress { display: flex; gap: 5px; margin-bottom: 1rem; }
+    .vim-tour-progress span { height: 3px; width: 18px; border-radius: 999px; background: rgba(255,255,255,0.15); }
+    .vim-tour-progress span.active { width: 28px; background: #fff; }
+    .vim-tour-actions { display: flex; justify-content: space-between; align-items: center; }
+    .vim-tour-skip { border: 0; background: transparent; color: var(--muted); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+    .vim-tour-next { border: 0; background: #fff; color: #07090f; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.7rem 1rem; border-radius: 999px; cursor: pointer; }
+    #vim-tour-launcher { position: fixed; right: 1.1rem; bottom: 1.1rem; width: 2.5rem; height: 2.5rem; border-radius: 999px; background: rgba(255,255,255,0.92); color: #07090f; border: 0; z-index: 40000; font-weight: 700; cursor: pointer; box-shadow: 0 12px 28px rgba(0,0,0,0.35); }
 </style>
 
-<div class="ed">
+<div class="cx">
 
 <div id="vim-tour-overlay" aria-hidden="true">
     <div id="vim-tour-backdrop"></div>
@@ -606,7 +655,7 @@
     <div id="vim-tour-card">
         <div class="vim-tour-eyebrow" id="vim-tour-eyebrow">VIM SUPER LEAGUE</div>
         <div class="vim-tour-title" id="vim-tour-title">Welcome</div>
-        <div class="vim-tour-description" id="vim-tour-description">A quick look around the league.</div>
+        <div class="vim-tour-description" id="vim-tour-description">A quick look around.</div>
         <div class="vim-tour-progress" id="vim-tour-progress"></div>
         <div class="vim-tour-actions">
             <button type="button" id="vim-tour-skip" class="vim-tour-skip">Skip</button>
@@ -614,191 +663,193 @@
         </div>
     </div>
 </div>
-<button id="vim-tour-launcher" type="button" aria-label="Replay tutorial" title="Replay tutorial">?</button>
+<button id="vim-tour-launcher" type="button" aria-label="Tutorial" title="Tutorial">?</button>
 
-<section class="ed-hero">
-    <div class="ed-wrap">
-        <div class="ed-hero-frame">
-            <div class="ed-hero-content">
-                <div class="ed-label">VIM Super League</div>
-                <h1 class="ed-serif">
-                    Above
-                    <span>the rest</span>
-                </h1>
-                <p class="ed-hero-lead">
-                    Competitive Roblox football — fixtures, market, and matchday energy in one calm place.
-                </p>
-                <div class="ed-actions">
-                    <a href="/market" class="ed-btn ed-btn-solid">Enter market</a>
-                    <a href="/matches" class="ed-btn ed-btn-line">Fixtures</a>
+<!-- HERO -->
+<header class="cx-hero">
+    <div class="cx-hero-bg" aria-hidden="true"></div>
+    <div class="cx-hero-inner">
+        <div class="cx-label">VIM Super League</div>
+        <h1 class="cx-serif">
+            <span class="line">Above</span>
+            <span class="line line-em">the rest</span>
+        </h1>
+        <p class="cx-hero-lead">
+            Competitive Roblox football — fixtures, market, and matchday, in one place.
+        </p>
+        <div class="cx-actions">
+            <a href="/market" class="cx-btn cx-btn-fill">Enter market</a>
+            <a href="/matches" class="cx-btn cx-btn-ghost">View fixtures</a>
+        </div>
+        <form id="search-form" action="/matches" method="GET" class="cx-search">
+            <input id="live-search-input" name="q" type="text" placeholder="Search teams, players, matches…" autocomplete="off">
+            <button type="submit" id="search-btn">Search</button>
+            <div id="search-results-dropdown" class="hidden"></div>
+        </form>
+    </div>
+    <div class="cx-scroll">Scroll</div>
+</header>
+
+<!-- UPCOMING -->
+<section class="cx-section">
+    <div class="cx-wrap">
+        <div class="cx-head">
+            <div>
+                <div class="cx-label">Schedule</div>
+                <h2 class="cx-serif" id="tour-featured-match">Next match</h2>
+            </div>
+            <a href="/matches" class="cx-link">All fixtures</a>
+        </div>
+
+        <% const matchList = (typeof matches !== 'undefined' && matches) ? matches : []; %>
+        <% let nextMatch = matchList.find(m => m.status === 'upcoming'); %>
+
+        <% if (nextMatch) { %>
+            <div class="cx-match">
+                <div class="cx-team">
+                    <img src="<%= nextMatch.logoA %>" alt="">
+                    <span><%= nextMatch.teamA %></span>
                 </div>
-                <form id="search-form" action="/matches" method="GET" class="ed-search">
-                    <input id="live-search-input" name="q" type="text" placeholder="Search teams, players, matches…" autocomplete="off">
-                    <button type="submit" id="search-btn">Search</button>
-                    <div id="search-results-dropdown" class="hidden"></div>
-                </form>
+                <div class="cx-vs">
+                    <strong>vs</strong>
+                    <small><%= nextMatch.time || 'Time TBC' %></small>
+                </div>
+                <div class="cx-team">
+                    <img src="<%= nextMatch.logoB %>" alt="">
+                    <span><%= nextMatch.teamB %></span>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="cx-empty">No upcoming match scheduled</div>
+        <% } %>
+
+        <div class="cx-stream">
+            <% if (typeof liveLink !== 'undefined' && liveLink && String(liveLink).trim() !== '') { %>
+                <%
+                    let embedLink = liveLink;
+                    if (liveLink.includes('watch?v=')) embedLink = liveLink.replace('watch?v=', 'embed/').split('&')[0];
+                    else if (liveLink.includes('youtu.be/')) embedLink = liveLink.replace('youtu.be/', 'youtube.com/embed/').split('?')[0];
+                %>
+                <iframe src="<%= embedLink %>" allowfullscreen title="Live stream"></iframe>
+            <% } else { %>
+                <div class="cx-stream-empty">
+                    <strong>Stream offline</strong>
+                    <span>Live broadcast will appear here</span>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</section>
+
+<!-- PATH -->
+<section class="cx-section">
+    <div class="cx-wrap">
+        <div class="cx-head">
+            <div>
+                <div class="cx-label">Path in</div>
+                <h2 class="cx-serif">How you join</h2>
+                <p>Simple steps from free agent to matchday — no noise.</p>
+            </div>
+        </div>
+        <div class="cx-steps">
+            <div class="cx-step">
+                <div class="cx-step-num">01</div>
+                <h3>Join the community</h3>
+                <p>Open Discord, meet managers and scouts, learn how the league moves.</p>
+            </div>
+            <div class="cx-step">
+                <div class="cx-step-num">02</div>
+                <h3>Register your card</h3>
+                <p>Build a clean profile in the market — role, name, the details teams read first.</p>
+            </div>
+            <div class="cx-step">
+                <div class="cx-step-num">03</div>
+                <h3>Get signed & play</h3>
+                <p>Auction or signings put you on a roster. Fixtures and results follow.</p>
             </div>
         </div>
     </div>
 </section>
 
-<section class="ed-wrap ed-intro">
-    <div>
-        <div class="ed-label">The league</div>
-        <h2 class="ed-serif">Built for managers who care about the details</h2>
-    </div>
-    <p>
-        Track upcoming fixtures, browse the player market, and stay close to results — without the noise. Everything on this page is live from the league system.
-    </p>
-</section>
-
-<section class="ed-wrap ed-block">
-    <div class="ed-block-head">
-        <div>
-            <div class="ed-label">Schedule</div>
-            <h3 class="ed-serif" id="tour-featured-match">Upcoming match</h3>
+<!-- RESULTS -->
+<section class="cx-section" id="tour-results">
+    <div class="cx-wrap">
+        <div class="cx-head">
+            <div>
+                <div class="cx-label">Scoreboard</div>
+                <h2 class="cx-serif">Recent results</h2>
+            </div>
+            <a href="/matches" class="cx-link">Full list</a>
         </div>
-        <a href="/matches" class="ed-link">All fixtures</a>
-    </div>
-
-    <% const matchList = (typeof matches !== 'undefined' && matches) ? matches : []; %>
-    <% let nextMatch = matchList.find(m => m.status === 'upcoming'); %>
-
-    <% if (nextMatch) { %>
-        <div class="ed-match-card">
-            <div class="ed-team">
-                <img src="<%= nextMatch.logoA %>" alt="">
-                <span><%= nextMatch.teamA %></span>
-            </div>
-            <div class="ed-vs">
-                <strong>vs</strong>
-                <small><%= nextMatch.time || 'Time TBC' %></small>
-            </div>
-            <div class="ed-team">
-                <img src="<%= nextMatch.logoB %>" alt="">
-                <span><%= nextMatch.teamB %></span>
-            </div>
-        </div>
-    <% } else { %>
-        <div class="ed-empty">No upcoming match scheduled</div>
-    <% } %>
-
-    <div class="ed-stream">
-        <% if (typeof liveLink !== 'undefined' && liveLink && String(liveLink).trim() !== '') { %>
+        <div class="cx-results">
             <%
-                let embedLink = liveLink;
-                if (liveLink.includes('watch?v=')) embedLink = liveLink.replace('watch?v=', 'embed/').split('&')[0];
-                else if (liveLink.includes('youtu.be/')) embedLink = liveLink.replace('youtu.be/', 'youtube.com/embed/').split('?')[0];
+                const recent = matchList
+                    .filter(m => m.status === 'completed' || m.status === 'complete' || (m.details && (m.details.goalsA != null || m.details.goalsB != null)))
+                    .slice(-8)
+                    .reverse();
             %>
-            <iframe src="<%= embedLink %>" allowfullscreen title="Live stream"></iframe>
-        <% } else { %>
-            <div class="ed-stream-empty">
-                <strong>Stream offline</strong>
-                <span>Broadcast appears here when a match is live</span>
+            <% if (recent.length) { %>
+                <% recent.forEach(r => { %>
+                    <a class="cx-result" href="/match/<%= r._id || r.id || '' %>">
+                        <div class="cx-result-row">
+                            <div class="cx-result-team">
+                                <img src="<%= r.logoA %>" alt="">
+                                <span><%= r.teamA %></span>
+                            </div>
+                            <span class="cx-result-score"><%= (r.details && r.details.goalsA != null) ? r.details.goalsA : 0 %></span>
+                        </div>
+                        <div class="cx-result-row">
+                            <div class="cx-result-team">
+                                <img src="<%= r.logoB %>" alt="">
+                                <span style="color:var(--muted)"><%= r.teamB %></span>
+                            </div>
+                            <span class="cx-result-score dim"><%= (r.details && r.details.goalsB != null) ? r.details.goalsB : 0 %></span>
+                        </div>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <div class="cx-empty" style="grid-column:1/-1">No results yet</div>
+            <% } %>
+        </div>
+    </div>
+</section>
+
+<!-- STORIES -->
+<section class="cx-section">
+    <div class="cx-wrap">
+        <div class="cx-head">
+            <div>
+                <div class="cx-label">Journal</div>
+                <h2 class="cx-serif">League stories</h2>
             </div>
-        <% } %>
-    </div>
-</section>
-
-<section class="ed-wrap ed-block">
-    <div class="ed-block-head">
-        <div>
-            <div class="ed-label">Path in</div>
-            <h3 class="ed-serif">How players join</h3>
         </div>
-    </div>
-    <div class="ed-steps">
-        <div class="ed-step">
-            <div class="ed-step-num">01</div>
-            <h4>Join the room</h4>
-            <p>Start in Discord. Meet managers, learn the tone of the league, and get oriented.</p>
-        </div>
-        <div class="ed-step">
-            <div class="ed-step-num">02</div>
-            <h4>Register your card</h4>
-            <p>Build a clean profile in the market — position, identity, the basics teams actually read.</p>
-        </div>
-        <div class="ed-step">
-            <div class="ed-step-num">03</div>
-            <h4>Get signed & play</h4>
-            <p>Auction or signings put you on a roster. Fixtures and results follow from there.</p>
-        </div>
-    </div>
-</section>
-
-<section class="ed-wrap ed-block" id="tour-results">
-    <div class="ed-block-head">
-        <div>
-            <div class="ed-label">Scoreboard</div>
-            <h3 class="ed-serif">Recent results</h3>
-        </div>
-        <a href="/matches" class="ed-link">Full list</a>
-    </div>
-    <div class="ed-results">
-        <%
-            const recent = matchList
-                .filter(m => m.status === 'completed' || m.status === 'complete' || (m.details && (m.details.goalsA != null || m.details.goalsB != null)))
-                .slice(-8)
-                .reverse();
-        %>
-        <% if (recent.length) { %>
-            <% recent.forEach(r => { %>
-                <a class="ed-result" href="/match/<%= r._id || r.id || '' %>">
-                    <div class="ed-result-row">
-                        <div class="ed-result-team">
-                            <img src="<%= r.logoA %>" alt="">
-                            <span><%= r.teamA %></span>
+        <div class="cx-stories">
+            <% if (typeof stories !== 'undefined' && stories && stories.length) { %>
+                <% stories.slice().reverse().slice(0, 5).forEach(story => { %>
+                    <article class="cx-story">
+                        <% if (story.image) { %><img src="<%= story.image %>" alt=""><% } %>
+                        <div class="cx-story-shade"></div>
+                        <div class="cx-story-text">
+                            <small><%= story.date || 'Article' %></small>
+                            <strong><%= story.title %></strong>
                         </div>
-                        <span class="ed-result-score"><%= (r.details && r.details.goalsA != null) ? r.details.goalsA : 0 %></span>
-                    </div>
-                    <div class="ed-result-row">
-                        <div class="ed-result-team">
-                            <img src="<%= r.logoB %>" alt="">
-                            <span style="color:var(--soft)"><%= r.teamB %></span>
-                        </div>
-                        <span class="ed-result-score dim"><%= (r.details && r.details.goalsB != null) ? r.details.goalsB : 0 %></span>
-                    </div>
-                </a>
-            <% }) %>
-        <% } else { %>
-            <div class="ed-empty" style="grid-column:1/-1">No results posted yet</div>
-        <% } %>
-    </div>
-</section>
-
-<section class="ed-wrap ed-block">
-    <div class="ed-block-head">
-        <div>
-            <div class="ed-label">Journal</div>
-            <h3 class="ed-serif">Stories from the league</h3>
+                    </article>
+                <% }) %>
+            <% } else { %>
+                <div class="cx-empty" style="grid-column:1/-1">Stories will appear here</div>
+            <% } %>
         </div>
     </div>
-    <div class="ed-stories">
-        <% if (typeof stories !== 'undefined' && stories && stories.length) { %>
-            <% stories.slice().reverse().slice(0, 5).forEach((story, i) => { %>
-                <div class="ed-story">
-                    <% if (story.image) { %>
-                        <img src="<%= story.image %>" alt="">
-                    <% } %>
-                    <div class="ed-story-shade"></div>
-                    <div class="ed-story-text">
-                        <small><%= story.date || 'Article' %></small>
-                        <strong><%= story.title %></strong>
-                    </div>
-                </div>
-            <% }) %>
-        <% } else { %>
-            <div class="ed-empty" style="grid-column:1/-1">Stories will appear here</div>
-        <% } %>
-    </div>
 </section>
 
-<section class="ed-wrap">
-    <div class="ed-cta">
-        <div class="ed-label" style="margin-bottom:0.75rem">Market</div>
-        <h3 class="ed-serif">Ready when you are</h3>
-        <p>Open the player market, set up your card, or browse who’s available for the next window.</p>
-        <a href="/market" class="ed-btn ed-btn-solid">Go to market</a>
+<!-- CLOSE -->
+<section class="cx-close">
+    <div class="cx-close-bg" aria-hidden="true"></div>
+    <div class="cx-close-inner">
+        <div class="cx-label">Market</div>
+        <h2 class="cx-serif">Compete<br>above the rest</h2>
+        <p>Open the player market, build your card, and step into the next window.</p>
+        <a href="/market" class="cx-btn cx-btn-fill">Enter market</a>
     </div>
 </section>
 
@@ -820,11 +871,11 @@
     if (!overlay || !spotlight || !card) return;
 
     const tourSteps = [
-        { selector: '[data-tour="market"]', mobileSelector: '[data-tour="market-mobile"]', eyebrow: 'MARKET', title: 'Player market', description: 'Browse cards, stats and registration.' },
+        { selector: '[data-tour="market"]', mobileSelector: '[data-tour="market-mobile"]', eyebrow: 'MARKET', title: 'Player market', description: 'Browse cards and register.' },
         { selector: '[data-tour="matches"]', mobileSelector: '[data-tour="matches-mobile"]', eyebrow: 'MATCHES', title: 'Fixtures', description: 'Upcoming and completed games.' },
-        { selector: '#live-search-input', eyebrow: 'SEARCH', title: 'Find anything', description: 'Teams, players or matches from here.' },
-        { selector: '#tour-featured-match', eyebrow: 'SCHEDULE', title: 'Next match', description: 'The featured upcoming fixture.' },
-        { selector: '#tour-results', eyebrow: 'RESULTS', title: 'Recent scores', description: 'Latest completed matches.' }
+        { selector: '#live-search-input', eyebrow: 'SEARCH', title: 'Find anything', description: 'Teams, players or matches.' },
+        { selector: '#tour-featured-match', eyebrow: 'SCHEDULE', title: 'Next match', description: 'Featured upcoming fixture.' },
+        { selector: '#tour-results', eyebrow: 'RESULTS', title: 'Scores', description: 'Recent completed matches.' }
     ];
     let currentStep = 0;
     function isMobileLayout() { return window.innerWidth < 1280; }
@@ -846,24 +897,18 @@
         const margin = 16, cardWidth = Math.min(360, window.innerWidth - 32);
         card.style.width = cardWidth + 'px';
         if (window.innerWidth <= 640) {
-            card.classList.add('centered');
             card.style.left = '16px'; card.style.top = 'auto'; card.style.bottom = '20px';
             return;
         }
-        card.classList.remove('centered');
         const rect = target.getBoundingClientRect();
-        let left = rect.left, top = rect.bottom + 22;
-        if (left + cardWidth > window.innerWidth - margin) left = window.innerWidth - cardWidth - margin;
-        if (left < margin) left = margin;
-        if (top + 200 > window.innerHeight - margin) {
-            top = Math.max(margin, rect.top - 200 - 22);
-            card.classList.add('centered');
-        }
+        let left = Math.min(Math.max(margin, rect.left), window.innerWidth - cardWidth - margin);
+        let top = rect.bottom + 22;
+        if (top + 200 > window.innerHeight - margin) top = Math.max(margin, rect.top - 200);
         card.style.left = left + 'px'; card.style.top = top + 'px'; card.style.bottom = 'auto';
     }
     function moveSpotlight(target) {
         const rect = target.getBoundingClientRect();
-        const pad = window.innerWidth <= 640 ? 10 : 9;
+        const pad = 9;
         spotlight.style.left = (rect.left + rect.width / 2) + 'px';
         spotlight.style.top = (rect.top + rect.height / 2) + 'px';
         spotlight.style.width = (Math.max(rect.width, 55) + pad * 2) + 'px';
@@ -892,31 +937,20 @@
     }
     function startTour() {
         overlay.classList.add('active');
-        overlay.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
         showStep(0);
     }
     function finishTour() {
         overlay.classList.remove('active');
-        overlay.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
         localStorage.setItem('vim_home_tour_seen', 'true');
         const m = document.getElementById('mobile-menu');
         if (m) m.classList.remove('active');
     }
-    nextButton.addEventListener('click', () => {
-        if (currentStep >= tourSteps.length - 1) finishTour();
-        else showStep(currentStep + 1);
-    });
+    nextButton.addEventListener('click', () => currentStep >= tourSteps.length - 1 ? finishTour() : showStep(currentStep + 1));
     skipButton.addEventListener('click', finishTour);
     backdrop.addEventListener('click', finishTour);
     launcher.addEventListener('click', startTour);
-    document.addEventListener('keydown', (e) => {
-        if (!overlay.classList.contains('active')) return;
-        if (e.key === 'Escape') finishTour();
-        if (e.key === 'ArrowRight' && currentStep < tourSteps.length - 1) showStep(currentStep + 1);
-        if (e.key === 'ArrowLeft' && currentStep > 0) showStep(currentStep - 1);
-    });
     if (!localStorage.getItem('vim_home_tour_seen')) setTimeout(startTour, 900);
 })();
 </script>
@@ -937,12 +971,10 @@
             fetch(`/api/search?q=${encodeURIComponent(query)}`)
                 .then(res => res.ok ? res.json() : Promise.reject())
                 .then(data => renderSearchResults(data, query))
-                .catch(() => {
-                    renderSearchResults({
-                        matches: localMatches.filter(m => (m.teamA && m.teamA.toLowerCase().includes(query)) || (m.teamB && m.teamB.toLowerCase().includes(query))),
-                        players: localPlayers.filter(p => (p.name && p.name.toLowerCase().includes(query)) || (p.role && p.role.toLowerCase().includes(query)))
-                    }, query);
-                });
+                .catch(() => renderSearchResults({
+                    matches: localMatches.filter(m => (m.teamA && m.teamA.toLowerCase().includes(query)) || (m.teamB && m.teamB.toLowerCase().includes(query))),
+                    players: localPlayers.filter(p => (p.name && p.name.toLowerCase().includes(query)) || (p.role && p.role.toLowerCase().includes(query)))
+                }, query));
         }, 150);
     });
 
@@ -951,24 +983,24 @@
         let html = '';
         topTargetUrl = '';
         if ((!matches || !matches.length) && (!players || !players.length)) {
-            dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:#6b6560;font-size:0.8rem;">No results</div>';
+            dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:rgba(232,234,239,0.5);font-size:0.8rem;">No results</div>';
             dropdown.classList.remove('hidden');
             return;
         }
         if (matches && matches.length) {
             if (!topTargetUrl) topTargetUrl = `/match/${matches[0]._id || matches[0].id || ''}`;
-            html += '<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b6560;margin-bottom:0.4rem;">Matches</div>';
+            html += '<div style="font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(232,234,239,0.45);margin-bottom:0.4rem;">Matches</div>';
             matches.forEach(m => {
                 const url = (m._id || m.id) ? `/match/${m._id || m.id}` : `/matches?q=${encodeURIComponent(query)}`;
-                html += `<a href="${url}" style="display:block;padding:0.5rem 0.25rem;text-decoration:none;color:#1a1a1a;font-size:0.85rem;font-weight:500;">${m.teamA} vs ${m.teamB}</a>`;
+                html += `<a href="${url}" style="display:block;padding:0.5rem 0.25rem;text-decoration:none;color:#e8eaef;font-size:0.85rem;font-weight:500;">${m.teamA} vs ${m.teamB}</a>`;
             });
         }
         if (players && players.length) {
             if (!topTargetUrl) topTargetUrl = (players[0]._id || players[0].id) ? `/player/${players[0]._id || players[0].id}` : '/market';
-            html += '<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#6b6560;margin:0.6rem 0 0.4rem;">Players</div>';
+            html += '<div style="font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(232,234,239,0.45);margin:0.65rem 0 0.4rem;">Players</div>';
             players.forEach(p => {
                 const url = (p._id || p.id) ? `/player/${p._id || p.id}` : `/market?search=${encodeURIComponent(p.name)}`;
-                html += `<a href="${url}" style="display:block;padding:0.5rem 0.25rem;text-decoration:none;color:#1a1a1a;font-size:0.85rem;font-weight:500;">${p.name}</a>`;
+                html += `<a href="${url}" style="display:block;padding:0.5rem 0.25rem;text-decoration:none;color:#e8eaef;font-size:0.85rem;font-weight:500;">${p.name}</a>`;
             });
         }
         dropdown.innerHTML = html;

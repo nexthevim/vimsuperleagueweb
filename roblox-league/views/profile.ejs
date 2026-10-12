@@ -4,827 +4,846 @@
 
 <style>
 :root {
-    --pf-paper: #f7f4ed;
-    --pf-paper-2: #fffdf8;
-    --pf-ink: #123b3c;
-    --pf-ink-deep: #083536;
-    --pf-teal: #07595a;
-    --pf-coral: #f18470;
-    --pf-coral-dark: #dc6957;
-    --pf-mint: #d9ece6;
-    --pf-muted: #728081;
-    --pf-line: rgba(18,59,60,.12);
-    --pf-display: "DM Serif Display", Georgia, serif;
-    --pf-body: "Manrope", system-ui, sans-serif;
+    --p-bg: #eef3ef;
+    --p-surface: #ffffff;
+    --p-ink: #1a2e28;
+    --p-muted: #6b7c74;
+    --p-teal: #0d5c56;
+    --p-teal-soft: #d8ebe6;
+    --p-coral: #e8896e;
+    --p-line: rgba(26,46,40,.08);
+    --p-serif: "DM Serif Display", Georgia, serif;
+    --p-sans: "Manrope", system-ui, sans-serif;
 }
 
 #profile-page {
-    font-family: var(--pf-body);
-    background: var(--pf-paper);
-    color: var(--pf-ink);
+    font-family: var(--p-sans);
+    background:
+        radial-gradient(ellipse 80% 50% at 10% 0%, rgba(216,235,230,.7), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 90% 20%, rgba(232,137,110,.12), transparent 45%),
+        var(--p-bg);
+    color: var(--p-ink);
     min-height: 100vh;
-    padding: 5.5rem 1.1rem 3.5rem;
+    padding: 5.75rem 1rem 4rem;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
 }
-
 html.dark #profile-page {
-    background: #0e1210;
-    color: #e8ece9;
+    background: #0c1110;
+    color: #e6ebe8;
 }
 
-.pf-shell {
-    width: min(1180px, 100%);
-    margin: 0 auto;
-}
+.p-wrap { width: min(1140px, 100%); margin: 0 auto; }
+.p-serif { font-family: var(--p-serif); font-weight: 400; letter-spacing: -.02em; }
 
-.pf-display {
-    font-family: var(--pf-display);
-    font-weight: 400;
-    letter-spacing: -.02em;
+/* reveal */
+.p-reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1);
 }
+.p-reveal.on { opacity: 1; transform: none; }
+.p-d1 { transition-delay: .06s; }
+.p-d2 { transition-delay: .12s; }
+.p-d3 { transition-delay: .18s; }
+.p-d4 { transition-delay: .24s; }
 
-.pf-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--pf-coral-dark);
-    font-size: .62rem;
-    font-weight: 800;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-}
-.pf-eyebrow::before {
-    content: "";
-    width: 16px;
-    height: 1px;
-    background: currentColor;
-}
-
-/* 3D buttons */
-.pf-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 0 18px;
-    border: 0;
-    border-radius: 999px;
-    font-family: inherit;
-    font-size: .62rem;
-    font-weight: 800;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    text-decoration: none;
-    cursor: pointer;
-    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
-}
-.pf-btn:hover { transform: translateY(-3px); }
-.pf-btn:active { transform: translateY(2px); }
-
-.pf-btn-coral {
-    background: var(--pf-coral);
-    color: #fff;
-    box-shadow: 0 5px 0 #c95e4e, 0 12px 24px rgba(241,132,112,.25);
-}
-.pf-btn-coral:hover {
-    background: #f48d7a;
-    color: #fff;
-    box-shadow: 0 3px 0 #c95e4e, 0 14px 28px rgba(241,132,112,.3);
-}
-.pf-btn-coral:active { box-shadow: 0 2px 0 #c95e4e, 0 6px 12px rgba(241,132,112,.2); }
-
-.pf-btn-teal {
-    background: var(--pf-teal);
-    color: #fff;
-    box-shadow: 0 5px 0 #043d3e, 0 12px 24px rgba(7,89,90,.2);
-}
-.pf-btn-teal:hover {
-    background: #096565;
-    color: #fff;
-    box-shadow: 0 3px 0 #043d3e, 0 14px 28px rgba(7,89,90,.28);
-}
-.pf-btn-teal:active { box-shadow: 0 2px 0 #043d3e, 0 6px 12px rgba(7,89,90,.18); }
-
-.pf-btn-ghost {
-    background: transparent;
-    color: var(--pf-ink);
-    border: 1.5px solid var(--pf-line);
-    box-shadow: 0 4px 0 rgba(18,59,60,.06);
-}
-.pf-btn-ghost:hover {
-    background: rgba(18,59,60,.04);
-    color: var(--pf-ink);
-}
-html.dark .pf-btn-ghost {
-    color: #e8ece9;
-    border-color: rgba(255,255,255,.14);
-    box-shadow: 0 4px 0 rgba(0,0,0,.25);
-}
-
-.pf-btn-danger {
-    background: #fff;
-    color: #b91c1c;
-    border: 1.5px solid rgba(185,28,28,.25);
-    box-shadow: 0 4px 0 rgba(185,28,28,.12);
-}
-.pf-btn-danger:hover {
-    background: #fef2f2;
-    color: #991b1b;
-}
-
-/* Cards with soft curve */
-.pf-card {
-    background: var(--pf-paper-2);
-    border: 1px solid var(--pf-line);
-    border-radius: 1.35rem;
-    padding: 1.35rem 1.4rem;
-    box-shadow: 0 10px 28px rgba(18,59,60,.05);
-}
-html.dark .pf-card {
-    background: #151a18;
-    border-color: rgba(255,255,255,.08);
-    box-shadow: 0 10px 28px rgba(0,0,0,.25);
-}
-
-.pf-card-h {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-.pf-card-h h2, .pf-card-h h3 {
-    margin: 0;
-    font-size: 0.95rem;
-    color: var(--pf-ink-deep);
-}
-html.dark .pf-card-h h2, html.dark .pf-card-h h3 { color: #f0f4f1; }
-
-/* Header */
-.pf-hero {
+/* header band */
+.p-top {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
     justify-content: space-between;
     gap: 1.25rem;
     margin-bottom: 1.75rem;
-    padding-bottom: 1.35rem;
-    border-bottom: 1px solid var(--pf-line);
 }
-html.dark .pf-hero { border-bottom-color: rgba(255,255,255,.08); }
-
-.pf-hero h1 {
-    margin: 0.35rem 0 0.25rem;
-    font-size: clamp(2.4rem, 5vw, 3.4rem);
-    line-height: 0.95;
-    color: var(--pf-ink-deep);
+.p-top .tag {
+    display: inline-block;
+    font-size: .62rem;
+    font-weight: 800;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--p-coral);
+    margin-bottom: .4rem;
 }
-html.dark .pf-hero h1 { color: #f2f6f3; }
-.pf-hero h1 em {
-    font-style: italic;
-    color: var(--pf-teal);
-}
-.pf-hero p {
+.p-top h1 {
     margin: 0;
-    color: var(--pf-muted);
-    font-size: 0.85rem;
+    font-size: clamp(2.6rem, 6vw, 3.8rem);
+    line-height: .92;
+    color: var(--p-ink);
+}
+html.dark .p-top h1 { color: #f0f5f2; }
+.p-top h1 i { font-style: italic; color: var(--p-teal); }
+.p-top .sub {
+    margin: .45rem 0 0;
+    color: var(--p-muted);
+    font-size: .9rem;
+    max-width: 28rem;
 }
 
-/* Stat tiles */
-.pf-stat-grid {
+/* plant-style 3D pop tiles */
+.p-pops {
     display: grid;
-    grid-cols: 2;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.65rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: .85rem;
+    margin-bottom: 2rem;
 }
-@media (min-width: 640px) {
-    .pf-stat-grid.four { grid-template-columns: repeat(4, 1fr); }
-}
-.pf-stat {
-    text-align: center;
-    padding: 1rem 0.75rem;
-    border-radius: 1.1rem;
-    background: var(--pf-paper);
-    border: 1px solid var(--pf-line);
-}
-html.dark .pf-stat {
-    background: #101412;
-    border-color: rgba(255,255,255,.07);
-}
-.pf-stat span {
-    display: block;
-    font-size: 0.58rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--pf-muted);
-}
-.pf-stat strong {
-    display: block;
-    margin-top: 0.25rem;
-    font-family: var(--pf-display);
-    font-size: 1.65rem;
-    font-style: italic;
-    color: var(--pf-ink-deep);
-}
-html.dark .pf-stat strong { color: #f0f4f1; }
-.pf-stat strong.em { color: #059669; }
+@media (max-width: 900px) { .p-pops { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .p-pops { grid-template-columns: 1fr; } }
 
-/* Player card frame */
-.pf-card-frame {
+.p-pop {
     position: relative;
-    aspect-ratio: 3/4;
-    border-radius: 1.25rem;
-    overflow: hidden;
-    background: #0a0f0e;
-    border: 1px solid rgba(18,59,60,.2);
-    box-shadow: 0 18px 40px rgba(18,59,60,.15);
-}
-.pf-card-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-}
-.pf-card-frame:hover img { transform: scale(1.04); }
-.pf-card-overlay {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    padding: 1.25rem 1rem 1rem;
-    background: linear-gradient(to top, rgba(0,0,0,.9), transparent);
-}
-.pf-card-overlay b {
-    display: block;
-    color: #fff;
-    font-size: 1.15rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    font-style: italic;
-    line-height: 1.1;
-}
-.pf-card-overlay span {
-    color: #7dd3fc;
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-/* Form */
-.pf-label {
-    display: block;
-    margin-bottom: 0.4rem;
-    font-size: 0.58rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--pf-muted);
-}
-.pf-input, .pf-select, .pf-area {
-    width: 100%;
-    padding: 0.85rem 1rem;
-    border-radius: 0.9rem;
-    border: 1.5px solid var(--pf-line);
-    background: var(--pf-paper);
-    color: var(--pf-ink);
-    font-family: inherit;
-    font-size: 0.85rem;
-    font-weight: 600;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-.pf-input:focus, .pf-select:focus, .pf-area:focus {
-    border-color: var(--pf-teal);
-    box-shadow: 0 0 0 3px rgba(7,89,90,.12);
-}
-html.dark .pf-input, html.dark .pf-select, html.dark .pf-area {
-    background: #101412;
-    border-color: rgba(255,255,255,.1);
-    color: #e8ece9;
-}
-.pf-area { resize: vertical; min-height: 110px; line-height: 1.55; }
-
-.pf-grid-2 {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-}
-@media (min-width: 720px) {
-    .pf-grid-2 { grid-template-columns: 1fr 1fr; }
-}
-.pf-grid-3 {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-}
-@media (min-width: 720px) {
-    .pf-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-}
-
-/* Theme pills */
-.pf-theme-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.55rem;
-}
-.theme-btn {
-    min-height: 48px;
-    border-radius: 999px;
-    border: 1.5px solid var(--pf-line);
-    background: var(--pf-paper);
-    color: var(--pf-ink);
-    font-family: inherit;
-    font-size: 0.62rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-    box-shadow: 0 4px 0 rgba(18,59,60,.06);
-}
-.theme-btn:hover { transform: translateY(-2px); }
-.theme-btn.is-active {
-    background: var(--pf-teal);
-    color: #fff;
-    border-color: transparent;
-    box-shadow: 0 5px 0 #043d3e, 0 10px 20px rgba(7,89,90,.2);
-}
-html.dark .theme-btn {
-    background: #101412;
-    border-color: rgba(255,255,255,.1);
-    color: #e8ece9;
-    box-shadow: 0 4px 0 rgba(0,0,0,.3);
-}
-html.dark .theme-btn.is-active {
-    background: #fff;
-    color: #0e1210;
-    box-shadow: 0 5px 0 #c5c5c5;
-}
-
-/* Manager lists */
-.pf-list {
     display: flex;
     flex-direction: column;
-    gap: 0.45rem;
-    max-height: 16rem;
-    overflow-y: auto;
-}
-.pf-row {
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
-    padding: 0.65rem 0.8rem;
-    border-radius: 0.9rem;
-    background: var(--pf-paper);
-    border: 1px solid var(--pf-line);
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 2.4rem 1rem 1.25rem;
+    border-radius: 1.35rem;
+    background: var(--p-surface);
+    border: 1px solid var(--p-line);
+    box-shadow:
+        0 1px 0 rgba(255,255,255,.9) inset,
+        0 14px 0 #d5ddd7,
+        0 18px 32px rgba(26,46,40,.08);
+    transform: translateY(0);
+    transition: transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s ease;
+    overflow: visible;
 }
-html.dark .pf-row {
-    background: #101412;
-    border-color: rgba(255,255,255,.07);
+html.dark .p-pop {
+    background: #151c19;
+    border-color: rgba(255,255,255,.08);
+    box-shadow: 0 14px 0 #0a0e0c, 0 18px 32px rgba(0,0,0,.35);
 }
-.pf-row.win { border-color: rgba(5,150,105,.25); background: rgba(5,150,105,.06); }
-.pf-row.out { border-color: rgba(225,29,72,.2); background: rgba(225,29,72,.05); }
-.pf-row.ready { border-color: rgba(5,150,105,.35); background: rgba(5,150,105,.1); }
-.pf-row.watch { border-color: rgba(217,119,6,.2); background: rgba(217,119,6,.06); }
+.p-pop:hover {
+    transform: translateY(-10px);
+    box-shadow:
+        0 1px 0 rgba(255,255,255,.95) inset,
+        0 22px 0 #d5ddd7,
+        0 30px 44px rgba(26,46,40,.12);
+    color: inherit;
+}
+.p-pop:active {
+    transform: translateY(4px);
+    box-shadow: 0 4px 0 #d5ddd7, 0 8px 16px rgba(26,46,40,.1);
+}
 
-.pf-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.2rem 0.55rem;
-    border-radius: 999px;
-    font-size: 0.55rem;
+.p-pop-ico {
+    position: absolute;
+    top: -1.35rem;
+    width: 4.25rem;
+    height: 4.25rem;
+    border-radius: 1.15rem;
+    display: grid;
+    place-items: center;
+    transition: transform .35s cubic-bezier(.22,1,.36,1);
+    box-shadow: 0 12px 24px rgba(26,46,40,.16);
+}
+.p-pop:hover .p-pop-ico {
+    transform: translateY(-16px) scale(1.1);
+}
+.p-pop:nth-child(1) .p-pop-ico { background: linear-gradient(145deg,#7dd3fc,#2563eb); }
+.p-pop:nth-child(2) .p-pop-ico { background: linear-gradient(145deg,#86efac,#15803d); }
+.p-pop:nth-child(3) .p-pop-ico { background: linear-gradient(145deg,#fcd34d,#c2410c); }
+.p-pop:nth-child(4) .p-pop-ico { background: linear-gradient(145deg,#c4b5fd,#6d28d9); }
+.p-pop-ico svg { width: 1.7rem; height: 1.7rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,.2)); }
+
+.p-pop strong {
+    display: block;
+    margin-top: .35rem;
+    font-size: .78rem;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: .04em;
     text-transform: uppercase;
 }
-.pf-badge-ok { background: rgba(5,150,105,.12); color: #059669; }
-.pf-badge-warn { background: rgba(217,119,6,.12); color: #d97706; }
-.pf-badge-bad { background: rgba(225,29,72,.12); color: #e11d48; }
+.p-pop span {
+    margin-top: .2rem;
+    font-size: .72rem;
+    color: var(--p-muted);
+    line-height: 1.35;
+}
 
-.pf-alert {
+/* curved panel */
+.p-panel {
+    background: var(--p-surface);
+    border-radius: 2rem 2rem 1.25rem 1.25rem;
+    border: 1px solid var(--p-line);
+    padding: 1.5rem 1.4rem 1.6rem;
+    margin-bottom: 1.35rem;
+    box-shadow: 0 16px 40px rgba(26,46,40,.06);
+}
+html.dark .p-panel {
+    background: #141a17;
+    border-color: rgba(255,255,255,.07);
+    box-shadow: 0 16px 40px rgba(0,0,0,.3);
+}
+
+.p-panel-head {
     display: flex;
-    gap: 0.75rem;
-    align-items: flex-start;
-    padding: 0.95rem 1.05rem;
-    border-radius: 1.1rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    line-height: 1.45;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: 1.15rem;
 }
-.pf-alert-warn {
-    background: rgba(245,158,11,.1);
-    border: 1px solid rgba(245,158,11,.25);
-    color: #b45309;
+.p-panel-head h2 {
+    margin: .2rem 0 0;
+    font-size: clamp(1.4rem, 3vw, 1.85rem);
+    line-height: 1;
+    color: var(--p-ink);
 }
-.pf-alert-bad {
-    background: rgba(225,29,72,.08);
-    border: 1px solid rgba(225,29,72,.2);
-    color: #be123c;
+html.dark .p-panel-head h2 { color: #f0f5f2; }
+.p-kicker {
+    font-size: .6rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--p-coral);
 }
 
-.pf-layout {
+/* underline anim links */
+.p-uline {
+    position: relative;
+    display: inline-block;
+    color: var(--p-teal);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+.p-uline::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -3px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--p-teal);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform .28s cubic-bezier(.22,1,.36,1);
+}
+.p-uline:hover::after { transform: scaleX(1); }
+
+/* layout */
+.p-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.25rem;
 }
 @media (min-width: 960px) {
-    .pf-layout { grid-template-columns: 340px 1fr; gap: 1.5rem; }
+    .p-grid { grid-template-columns: 320px 1fr; align-items: start; }
 }
 
-.pf-section-title {
-    margin: 0 0 0.85rem;
-    font-size: 1.05rem;
-    color: var(--pf-ink-deep);
+/* card */
+.p-player-card {
+    position: relative;
+    aspect-ratio: 3/4;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    background: #0d1412;
+    box-shadow: 0 20px 48px rgba(26,46,40,.18);
 }
-html.dark .pf-section-title { color: #f0f4f1; }
+.p-player-card img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .6s cubic-bezier(.22,1,.36,1);
+}
+.p-player-card:hover img { transform: scale(1.05); }
+.p-player-meta {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 1.35rem 1.1rem 1.1rem;
+    background: linear-gradient(to top, rgba(0,0,0,.92) 10%, transparent);
+}
+.p-player-meta b {
+    display: block;
+    color: #fff;
+    font-size: 1.2rem;
+    font-style: italic;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1.05;
+}
+.p-player-meta em {
+    color: #7dd3fc;
+    font-style: normal;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+.p-pos {
+    display: inline-block;
+    margin-top: .45rem;
+    padding: .28rem .55rem;
+    border-radius: 999px;
+    background: var(--p-teal);
+    color: #fff;
+    font-size: .58rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
 
-.pf-discord-box {
+/* stats */
+.p-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .55rem;
+    margin-top: .85rem;
+}
+.p-stat {
+    text-align: center;
+    padding: .9rem .5rem;
+    border-radius: 1.1rem;
+    background: #f4f8f5;
+    border: 1px solid var(--p-line);
+    transition: transform .2s ease;
+}
+.p-stat:hover { transform: translateY(-3px); }
+html.dark .p-stat { background: #101612; border-color: rgba(255,255,255,.07); }
+.p-stat span {
+    display: block;
+    font-size: .55rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--p-muted);
+}
+.p-stat strong {
+    font-family: var(--p-serif);
+    font-size: 1.55rem;
+    font-style: italic;
+    color: var(--p-ink);
+}
+html.dark .p-stat strong { color: #eef3ef; }
+
+/* form */
+.p-label {
+    display: block;
+    margin-bottom: .35rem;
+    font-size: .58rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--p-muted);
+}
+.p-field, .p-select, .p-area {
+    width: 100%;
+    padding: .85rem 1rem;
+    border-radius: 1rem;
+    border: 1.5px solid var(--p-line);
+    background: #f7faf8;
+    color: var(--p-ink);
+    font-family: inherit;
+    font-size: .85rem;
+    font-weight: 600;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.p-field:focus, .p-select:focus, .p-area:focus {
+    border-color: var(--p-teal);
+    box-shadow: 0 0 0 4px rgba(13,92,86,.1);
+}
+html.dark .p-field, html.dark .p-select, html.dark .p-area {
+    background: #0f1412;
+    border-color: rgba(255,255,255,.1);
+    color: #e6ebe8;
+}
+.p-area { min-height: 120px; resize: vertical; line-height: 1.55; }
+
+.p-row2 { display: grid; grid-template-columns: 1fr; gap: .9rem; }
+.p-row3 { display: grid; grid-template-columns: 1fr; gap: .9rem; }
+@media (min-width: 700px) {
+    .p-row2 { grid-template-columns: 1fr 1fr; }
+    .p-row3 { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* 3D primary btn */
+.p-btn3d {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    min-height: 48px;
+    padding: 0 1.35rem;
+    border: 0;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    background: var(--p-coral);
+    color: #fff;
+    box-shadow: 0 6px 0 #c45f48, 0 14px 28px rgba(232,137,110,.28);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.p-btn3d:hover { transform: translateY(-3px); box-shadow: 0 4px 0 #c45f48, 0 18px 32px rgba(232,137,110,.32); color: #fff; }
+.p-btn3d:active { transform: translateY(3px); box-shadow: 0 2px 0 #c45f48; }
+.p-btn3d.teal {
+    background: var(--p-teal);
+    box-shadow: 0 6px 0 #063a37, 0 14px 28px rgba(13,92,86,.22);
+}
+.p-btn3d.teal:hover { box-shadow: 0 4px 0 #063a37, 0 18px 32px rgba(13,92,86,.28); color: #fff; }
+.p-btn3d.ghost {
+    background: #fff;
+    color: var(--p-ink);
+    box-shadow: 0 6px 0 #d5ddd7, 0 12px 24px rgba(26,46,40,.08);
+}
+.p-btn3d.ghost:hover { color: var(--p-ink); }
+.p-btn3d.danger {
+    background: #fff;
+    color: #b91c1c;
+    box-shadow: 0 5px 0 #f0c4c4, 0 10px 20px rgba(185,28,28,.1);
+}
+
+/* theme */
+.p-themes { display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem; }
+.theme-btn {
+    min-height: 52px;
+    border-radius: 1rem;
+    border: 1.5px solid var(--p-line);
+    background: #f7faf8;
+    color: var(--p-ink);
+    font-family: inherit;
+    font-size: .62rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #dce4df;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.theme-btn:hover { transform: translateY(-3px); }
+.theme-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #dce4df; }
+.theme-btn.is-active {
+    background: var(--p-teal);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 6px 0 #063a37, 0 12px 24px rgba(13,92,86,.2);
+}
+html.dark .theme-btn {
+    background: #101612;
+    border-color: rgba(255,255,255,.1);
+    color: #e6ebe8;
+    box-shadow: 0 5px 0 #0a0e0c;
+}
+html.dark .theme-btn.is-active {
+    background: #fff;
+    color: #0c1110;
+    box-shadow: 0 6px 0 #c5c5c5;
+}
+
+/* discord strip */
+.p-discord {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1.15rem 1.25rem;
-    border-radius: 1.25rem;
-    background: linear-gradient(135deg, #5865F2, #7289da);
+    padding: 1.25rem 1.35rem;
+    margin-bottom: 1.35rem;
+    border-radius: 1.75rem;
+    background: linear-gradient(135deg, #5865F2 0%, #7289da 100%);
     color: #fff;
-    box-shadow: 0 12px 28px rgba(88,101,242,.28);
+    box-shadow: 0 16px 36px rgba(88,101,242,.28);
 }
-.pf-discord-box h3 {
-    margin: 0 0 0.2rem;
-    font-size: 1rem;
-    font-family: var(--pf-display);
-}
-.pf-discord-box p {
-    margin: 0;
-    font-size: 0.78rem;
-    opacity: 0.9;
-}
-.pf-btn-discord {
+.p-discord h3 { margin: 0 0 .2rem; font-size: 1.15rem; font-family: var(--p-serif); }
+.p-discord p { margin: 0; font-size: .8rem; opacity: .92; max-width: 26rem; }
+.p-discord .p-btn3d {
     background: #fff;
     color: #5865F2;
-    box-shadow: 0 5px 0 #d1d5f0, 0 10px 20px rgba(0,0,0,.12);
+    box-shadow: 0 6px 0 #c5caf5, 0 12px 24px rgba(0,0,0,.12);
 }
-.pf-btn-discord:hover {
-    background: #f8f9ff;
-    color: #4752c4;
-    box-shadow: 0 3px 0 #d1d5f0, 0 12px 24px rgba(0,0,0,.14);
-}
+.p-discord .p-btn3d:hover { color: #4752c4; }
 
-.pf-class-grid {
+/* manager bits */
+.p-mgr-stats {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0.4rem;
+    grid-template-columns: repeat(2,1fr);
+    gap: .55rem;
+    margin-bottom: 1rem;
 }
-.pf-class {
+@media (min-width: 640px) { .p-mgr-stats { grid-template-columns: repeat(4,1fr); } }
+.p-mgr-stat {
+    padding: 1rem .75rem;
+    border-radius: 1.15rem;
+    background: #f4f8f5;
+    border: 1px solid var(--p-line);
     text-align: center;
-    padding: 0.65rem 0.25rem;
-    border-radius: 0.85rem;
-    background: var(--pf-paper);
-    border: 1px solid var(--pf-line);
 }
-html.dark .pf-class {
-    background: #101412;
-    border-color: rgba(255,255,255,.07);
-}
-.pf-class span {
+html.dark .p-mgr-stat { background: #101612; border-color: rgba(255,255,255,.07); }
+.p-mgr-stat span {
     display: block;
-    font-size: 0.55rem;
+    font-size: .55rem;
     font-weight: 800;
-    letter-spacing: 0.1em;
+    letter-spacing: .1em;
     text-transform: uppercase;
-    color: var(--pf-muted);
+    color: var(--p-muted);
 }
-.pf-class b {
-    font-family: var(--pf-display);
-    font-size: 1.05rem;
+.p-mgr-stat strong {
+    font-family: var(--p-serif);
+    font-size: 1.35rem;
     font-style: italic;
 }
+.p-mgr-stat strong.ok { color: #059669; }
 
-.pf-muted { color: var(--pf-muted); font-size: 0.75rem; }
-.pf-empty {
-    padding: 1rem;
+.p-classes {
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    gap: .4rem;
+    margin-bottom: .75rem;
+}
+.p-class {
     text-align: center;
-    color: var(--pf-muted);
-    font-size: 0.8rem;
-    font-style: italic;
-    font-weight: 600;
+    padding: .65rem .2rem;
+    border-radius: .9rem;
+    background: #f4f8f5;
+    border: 1px solid var(--p-line);
+}
+html.dark .p-class { background: #101612; border-color: rgba(255,255,255,.07); }
+.p-class span { display: block; font-size: .52rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--p-muted); }
+.p-class b { font-family: var(--p-serif); font-style: italic; font-size: 1rem; }
+
+.p-cols3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: .75rem;
+}
+@media (min-width: 900px) { .p-cols3 { grid-template-columns: 1fr 1fr 1fr; } }
+
+.p-list { display: flex; flex-direction: column; gap: .4rem; max-height: 15rem; overflow-y: auto; }
+.p-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: .65rem .75rem;
+    border-radius: .9rem;
+    background: #f4f8f5;
+    border: 1px solid var(--p-line);
+}
+html.dark .p-item { background: #101612; border-color: rgba(255,255,255,.07); }
+.p-item.win { border-color: rgba(5,150,105,.3); background: rgba(5,150,105,.07); }
+.p-item.out { border-color: rgba(225,29,72,.25); background: rgba(225,29,72,.06); }
+.p-item.ready { border-color: rgba(5,150,105,.35); background: rgba(5,150,105,.1); }
+.p-item.watch { border-color: rgba(217,119,6,.25); background: rgba(217,119,6,.07); }
+
+.p-alert {
+    display: flex; gap: .65rem; align-items: flex-start;
+    padding: .85rem 1rem; border-radius: 1rem;
+    font-size: .8rem; font-weight: 600; line-height: 1.45;
+    margin-bottom: .55rem;
+}
+.p-alert.warn { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25); color: #b45309; }
+.p-alert.bad { background: rgba(225,29,72,.08); border: 1px solid rgba(225,29,72,.2); color: #be123c; }
+
+.p-empty { padding: .9rem; text-align: center; color: var(--p-muted); font-size: .78rem; font-style: italic; font-weight: 600; }
+.p-muted { color: var(--p-muted); font-size: .75rem; }
+
+/* extra info chips */
+.p-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-top: .75rem;
+}
+.p-chip {
+    padding: .35rem .7rem;
+    border-radius: 999px;
+    background: var(--p-teal-soft);
+    color: var(--p-teal);
+    font-size: .62rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+}
+html.dark .p-chip {
+    background: rgba(13,92,86,.25);
+    color: #7dd3c8;
 }
 
-/* underline link anim */
-.pf-link {
-    position: relative;
-    color: var(--pf-teal);
-    font-weight: 700;
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    text-decoration: none;
+/* soft wave divider */
+.p-wave {
+    height: 28px;
+    margin: -.4rem 0 1.1rem;
+    border-radius: 50%;
+    background: transparent;
+    border-bottom: 1px solid var(--p-line);
+    opacity: .7;
 }
-.pf-link::after {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; bottom: -2px;
-    height: 1.5px;
-    background: var(--pf-teal);
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
-}
-.pf-link:hover::after { transform: scaleX(1); }
 </style>
 
 <div id="profile-page">
-<div class="pf-shell">
+<div class="p-wrap">
 
-    <!-- HEADER -->
-    <header class="pf-hero">
+    <!-- TOP -->
+    <header class="p-top p-reveal on">
         <div>
-            <div class="pf-eyebrow">Your account</div>
-            <h1 class="pf-display">Player <em>Hub</em></h1>
-            <p>Dashboard, card, and settings — all in one place.</p>
+            <div class="tag">Account · VIM Super League</div>
+            <h1 class="p-serif">Player <i>Hub</i></h1>
+            <p class="sub">Your card, stats, bids, and settings — built the same way as the rest of VIM.</p>
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center">
-            <a href="/market" class="pf-btn pf-btn-teal">Open market</a>
-            <form action="/profile/delete" method="POST" onsubmit="return confirm('Are you sure? This will permanently remove your market card and player stats.')" style="margin:0">
-                <button type="submit" class="pf-btn pf-btn-danger">Delete account</button>
+        <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+            <a href="/market" class="p-btn3d teal">Auction hub</a>
+            <form action="/profile/delete" method="POST" style="margin:0" onsubmit="return confirm('Delete account permanently? This removes your market card and stats.')">
+                <button type="submit" class="p-btn3d danger">Delete</button>
             </form>
         </div>
     </header>
 
-    <!-- MANAGER DASHBOARD -->
+    <!-- 3D POP SHORTCUTS -->
+    <nav class="p-pops p-reveal on p-d1" aria-label="Quick links">
+        <a class="p-pop" href="/market">
+            <div class="p-pop-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M8 4h8l2 3v2H6V7l2-3z" fill="#fff"/><path d="M7 9h10v9a2 2 0 01-2 2H9a2 2 0 01-2-2V9z" fill="#dbeafe"/><circle cx="12" cy="14.5" r="2.2" fill="#1e40af"/></svg>
+            </div>
+            <strong>Market</strong>
+            <span>Browse & bid</span>
+        </a>
+        <a class="p-pop" href="/matches">
+            <div class="p-pop-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#fff"/><path d="M12 5l2.2 1.6-1 3.2H9.8l-1-3.2L12 5z" fill="#14532d"/><path d="M7 10.2l2.8-.6.9 2.9-2.3 1.8-2.2-1.9.2-2.2z" fill="#14532d"/><path d="M17 10.2l-2.8-.6-.9 2.9 2.3 1.8 2.2-1.9-.2-2.2z" fill="#14532d"/></svg>
+            </div>
+            <strong>Matches</strong>
+            <span>Fixtures & scores</span>
+        </a>
+        <a class="p-pop" href="#edit-profile">
+            <div class="p-pop-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="3.5" fill="#fff"/><path d="M6 19c1.2-3.2 3.5-4.8 6-4.8s4.8 1.6 6 4.8" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+            </div>
+            <strong>Edit profile</strong>
+            <span>Name, bio, pos</span>
+        </a>
+        <a class="p-pop" href="#theme">
+            <div class="p-pop-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" fill="#fff"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <strong>Theme</strong>
+            <span>Light / dark</span>
+        </a>
+    </nav>
+
+    <!-- MANAGER -->
     <% if (typeof isManager !== 'undefined' && isManager && typeof myAuctionState !== 'undefined' && myAuctionState) { %>
-    <section class="pf-card" style="margin-bottom:1.5rem">
-        <div class="pf-card-h">
+    <section class="p-panel p-reveal on p-d2">
+        <div class="p-panel-head">
             <div>
-                <div class="pf-eyebrow">Manager only</div>
-                <h2 class="pf-display pf-section-title" style="margin:0.2rem 0 0">Manager Dashboard — <%= myAuctionState.team.name %></h2>
-                <p class="pf-muted" style="margin:0.15rem 0 0">Private to you. No other manager can see this.</p>
+                <div class="p-kicker">Manager only · private</div>
+                <h2 class="p-serif"><%= myAuctionState.team.name %></h2>
             </div>
+            <a class="p-uline" href="/market">Open auction →</a>
         </div>
 
-        <div class="pf-stat-grid four" style="margin-bottom:1rem">
-            <div class="pf-stat">
-                <span>Total budget</span>
-                <strong><%= Number(myAuctionState.budget).toLocaleString() %></strong>
-            </div>
-            <div class="pf-stat">
-                <span>Available</span>
-                <strong class="em"><%= Number(myAuctionState.availableBudget).toLocaleString() %></strong>
-            </div>
-            <div class="pf-stat">
-                <span>Roster</span>
-                <strong><%= myAuctionState.totalPlayers %><span style="font-size:0.7em;opacity:0.5">/<%= myAuctionState.rosterMax %></span></strong>
-            </div>
-            <div class="pf-stat">
-                <span>Slots left</span>
-                <strong><%= myAuctionState.remainingSlots.total %></strong>
-            </div>
+        <div class="p-mgr-stats">
+            <div class="p-mgr-stat"><span>Total budget</span><strong><%= Number(myAuctionState.budget).toLocaleString() %></strong></div>
+            <div class="p-mgr-stat"><span>Available</span><strong class="ok"><%= Number(myAuctionState.availableBudget).toLocaleString() %></strong></div>
+            <div class="p-mgr-stat"><span>Roster</span><strong><%= myAuctionState.totalPlayers %><span style="font-size:.7em;opacity:.5">/<%= myAuctionState.rosterMax %></span></strong></div>
+            <div class="p-mgr-stat"><span>Slots left</span><strong><%= myAuctionState.remainingSlots.total %></strong></div>
         </div>
 
-        <p class="pf-muted" style="margin:0 0 0.5rem;font-size:0.62rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase">Class slots</p>
-        <div class="pf-class-grid" style="margin-bottom:0.75rem">
+        <p class="p-muted" style="margin:0 0 .4rem;font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase">Class slots</p>
+        <div class="p-classes">
             <% ['SS','S','A','B','C'].forEach(k => {
                 const has = myAuctionState.caps[k] !== undefined;
                 const count = myAuctionState.counts[k] || 0;
                 const cap = has ? myAuctionState.caps[k] : null;
             %>
-                <div class="pf-class">
-                    <span><%= k %></span>
-                    <b><%= count %><% if (has) { %><span style="opacity:0.45;font-size:0.75em">/<%= cap %></span><% } %></b>
-                </div>
+            <div class="p-class"><span><%= k %></span><b><%= count %><% if (has) { %><span style="opacity:.45;font-size:.75em">/<%= cap %></span><% } %></b></div>
             <% }) %>
         </div>
-        <p class="pf-muted" style="margin:0 0 1rem">Caps auto-adjust: 0 SS → 4S/6A · 1 SS → 3S/5A · 2 SS → 2S/3A. Manager = 1 roster slot.</p>
+        <p class="p-muted" style="margin:0 0 1rem">Caps: 0 SS→4S/6A · 1 SS→3S/5A · 2 SS→2S/3A. Manager counts as 1 slot.</p>
 
         <% const needMore = Math.max(0, myAuctionState.rosterMin - myAuctionState.totalPlayers); %>
         <% if (needMore > 0) { %>
-            <div class="pf-alert pf-alert-warn" style="margin-bottom:0.65rem">
-                <span>⚠️</span>
-                <p style="margin:0">Roster warning: you still need at least <strong><%= needMore %></strong> more player(s) to hit the <%= myAuctionState.rosterMin %>-player minimum. Available: <%= Number(myAuctionState.availableBudget).toLocaleString() %> V.</p>
-            </div>
+        <div class="p-alert warn">⚠️ Need at least <strong><%= needMore %></strong> more player(s) for the <%= myAuctionState.rosterMin %>-player minimum. Available <%= Number(myAuctionState.availableBudget).toLocaleString() %> V.</div>
         <% } %>
         <% if (myAuctionState.availableBudget < 2500 && myAuctionState.totalPlayers < myAuctionState.rosterMin) { %>
-            <div class="pf-alert pf-alert-bad" style="margin-bottom:0.65rem">
-                <span>🚨</span>
-                <p style="margin:0">Budget critical: you may not have enough left to reach the <%= myAuctionState.rosterMin %>-player minimum.</p>
-            </div>
+        <div class="p-alert bad">🚨 Budget may be too low to finish the minimum roster.</div>
         <% } %>
 
-        <div style="display:grid;grid-template-columns:1fr;gap:0.85rem;margin-top:1rem">
-            <style>@media(min-width:900px){.pf-mgr-cols{grid-template-columns:1fr 1fr 1fr!important}}</style>
-            <div class="pf-mgr-cols" style="display:grid;grid-template-columns:1fr;gap:0.85rem">
-                <!-- WINNING -->
-                <div class="pf-card" style="padding:1rem;box-shadow:none">
-                    <p style="margin:0 0 0.65rem;font-size:0.62rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#059669">Currently winning (<%= myAuctionState.provisional.length %>)</p>
-                    <% if (myAuctionState.provisional.length > 0) { %>
-                        <div class="pf-list">
-                            <% myAuctionState.provisional.forEach(({player, amount, isManager}) => { %>
-                                <div class="pf-row win">
-                                    <span style="font-size:0.8rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-                                        <%= player.name %><% if (isManager) { %> <span class="pf-badge">mgr</span><% } %>
-                                    </span>
-                                    <strong style="font-size:0.8rem;color:#059669;flex-shrink:0"><%= isManager ? '—' : Number(amount).toLocaleString() %></strong>
-                                </div>
-                            <% }) %>
-                        </div>
-                    <% } else { %>
-                        <div class="pf-empty">No active winning bids yet.</div>
-                    <% } %>
+        <div class="p-cols3" style="margin-top:1rem">
+            <div>
+                <p style="margin:0 0 .55rem;font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#059669">Winning (<%= myAuctionState.provisional.length %>)</p>
+                <% if (myAuctionState.provisional.length > 0) { %>
+                <div class="p-list">
+                    <% myAuctionState.provisional.forEach(({player, amount, isManager}) => { %>
+                    <div class="p-item win">
+                        <span style="font-size:.8rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= player.name %><% if (isManager) { %> · mgr<% } %></span>
+                        <strong style="color:#059669;font-size:.8rem"><%= isManager ? '—' : Number(amount).toLocaleString() %></strong>
+                    </div>
+                    <% }) %>
                 </div>
-
-                <!-- OUTBID -->
-                <div class="pf-card" style="padding:1rem;box-shadow:none">
-                    <p style="margin:0 0 0.65rem;font-size:0.62rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#e11d48">Outbid / locked (<%= typeof myOutbidPlayers !== 'undefined' ? myOutbidPlayers.length : 0 %>)</p>
-                    <% if (typeof myOutbidPlayers !== 'undefined' && myOutbidPlayers.length > 0) { %>
-                        <% const readyWithdraw = myOutbidPlayers.filter(x => x.canWithdraw); %>
-                        <% if (readyWithdraw.length > 0) { %>
-                            <div class="pf-alert pf-alert-warn" style="margin-bottom:0.55rem;background:rgba(5,150,105,.08);border-color:rgba(5,150,105,.25);color:#047857">
-                                <div>
-                                    <strong style="font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase">You can withdraw now</strong>
-                                    <p style="margin:0.25rem 0 0;font-size:0.72rem"><%= readyWithdraw.map(x => x.name).join(', ') %></p>
-                                </div>
-                            </div>
-                        <% } %>
-                        <div class="pf-list">
-                            <% myOutbidPlayers.forEach(p => { %>
-                                <div class="pf-row <%= p.canWithdraw ? 'ready' : 'out' %>">
-                                    <div style="min-width:0">
-                                        <p style="margin:0;font-size:0.8rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= p.name %></p>
-                                        <p class="pf-muted" style="margin:0.15rem 0 0;font-size:0.62rem">
-                                            Your bid <%= Number(p.myBidAmount || 0).toLocaleString() %> · now <%= Number(p.highestBid || 0).toLocaleString() %> by <%= p.highestBidder || '—' %>
-                                        </p>
-                                        <% if (p.canWithdraw) { %>
-                                            <span class="pf-badge pf-badge-ok" style="margin-top:0.25rem">Unlocked</span>
-                                        <% } else { %>
-                                            <p class="pf-muted outbid-countdown" data-remaining="<%= Number(p.remainingMs) || 0 %>" style="margin:0.25rem 0 0;font-size:0.62rem;font-weight:800;color:#d97706">
-                                                Unlock in <span class="countdown-text">…</span>
-                                            </p>
-                                        <% } %>
-                                    </div>
-                                    <strong style="font-size:0.8rem;flex-shrink:0;color:<%= p.canWithdraw ? '#059669' : '#e11d48' %>"><%= Number(p.myBidAmount || p.highestBid || 0).toLocaleString() %></strong>
-                                </div>
-                            <% }) %>
-                        </div>
-                        <p class="pf-muted" style="margin:0.55rem 0 0;font-size:0.68rem;line-height:1.4">Highest bids: withdraw anytime. Outbid: locked 12h, then free.</p>
-                    <% } else { %>
-                        <div class="pf-empty">You haven't been outbid on anything.</div>
-                    <% } %>
-                </div>
-
-                <!-- WATCHLIST -->
-                <div class="pf-card" style="padding:1rem;box-shadow:none">
-                    <p style="margin:0 0 0.65rem;font-size:0.62rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#d97706">Watchlist (<%= typeof myWatchlistPlayers !== 'undefined' ? myWatchlistPlayers.length : 0 %>)</p>
-                    <% if (typeof myWatchlistPlayers !== 'undefined' && myWatchlistPlayers.length > 0) { %>
-                        <div class="pf-list">
-                            <% myWatchlistPlayers.forEach(p => {
-                                const amWinningWatched = (p.highestBidder || '').toLowerCase() === myAuctionState.team.name.toLowerCase() && Number(p.highestBid) > 0;
-                            %>
-                                <div class="pf-row watch">
-                                    <div style="min-width:0">
-                                        <p style="margin:0;font-size:0.8rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= p.name %></p>
-                                        <p class="pf-muted" style="margin:0.15rem 0 0;font-size:0.62rem;color:<%= amWinningWatched ? '#059669' : 'inherit' %>"><%= amWinningWatched ? "You're winning" : (p.highestBidder || 'No bids yet') %></p>
-                                    </div>
-                                    <strong style="font-size:0.8rem;flex-shrink:0"><%= Number(p.highestBid || p.reservePrice || 0).toLocaleString() %></strong>
-                                </div>
-                            <% }) %>
-                        </div>
-                    <% } else { %>
-                        <div class="pf-empty">Star players in the Market to track them here.</div>
-                    <% } %>
-                </div>
+                <% } else { %><div class="p-empty">No winning bids yet</div><% } %>
             </div>
-        </div>
-
-        <div style="text-align:center;margin-top:1.15rem">
-            <a href="/market" class="pf-btn pf-btn-coral">Go to auction hub →</a>
+            <div>
+                <p style="margin:0 0 .55rem;font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#e11d48">Outbid (<%= typeof myOutbidPlayers !== 'undefined' ? myOutbidPlayers.length : 0 %>)</p>
+                <% if (typeof myOutbidPlayers !== 'undefined' && myOutbidPlayers.length > 0) { %>
+                    <% const readyWithdraw = myOutbidPlayers.filter(x => x.canWithdraw); %>
+                    <% if (readyWithdraw.length) { %>
+                    <div class="p-alert warn" style="background:rgba(5,150,105,.08);border-color:rgba(5,150,105,.25);color:#047857">You can withdraw: <%= readyWithdraw.map(x => x.name).join(', ') %></div>
+                    <% } %>
+                <div class="p-list">
+                    <% myOutbidPlayers.forEach(p => { %>
+                    <div class="p-item <%= p.canWithdraw ? 'ready' : 'out' %>">
+                        <div style="min-width:0">
+                            <p style="margin:0;font-size:.8rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= p.name %></p>
+                            <p class="p-muted" style="margin:.15rem 0 0;font-size:.62rem">Yours <%= Number(p.myBidAmount||0).toLocaleString() %> · now <%= Number(p.highestBid||0).toLocaleString() %> (<%= p.highestBidder || '—' %>)</p>
+                            <% if (!p.canWithdraw) { %>
+                            <p class="outbid-countdown p-muted" data-remaining="<%= Number(p.remainingMs)||0 %>" style="margin:.2rem 0 0;font-size:.62rem;font-weight:800;color:#d97706">Unlock in <span class="countdown-text">…</span></p>
+                            <% } else { %>
+                            <p class="p-muted" style="margin:.2rem 0 0;font-size:.62rem;font-weight:800;color:#059669">Unlocked</p>
+                            <% } %>
+                        </div>
+                        <strong style="font-size:.8rem;color:<%= p.canWithdraw ? '#059669' : '#e11d48' %>"><%= Number(p.myBidAmount || p.highestBid || 0).toLocaleString() %></strong>
+                    </div>
+                    <% }) %>
+                </div>
+                <% } else { %><div class="p-empty">Not outbid on anyone</div><% } %>
+            </div>
+            <div>
+                <p style="margin:0 0 .55rem;font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#d97706">Watchlist (<%= typeof myWatchlistPlayers !== 'undefined' ? myWatchlistPlayers.length : 0 %>)</p>
+                <% if (typeof myWatchlistPlayers !== 'undefined' && myWatchlistPlayers.length > 0) { %>
+                <div class="p-list">
+                    <% myWatchlistPlayers.forEach(p => {
+                        const amWinningWatched = (p.highestBidder || '').toLowerCase() === myAuctionState.team.name.toLowerCase() && Number(p.highestBid) > 0;
+                    %>
+                    <div class="p-item watch">
+                        <div style="min-width:0">
+                            <p style="margin:0;font-size:.8rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= p.name %></p>
+                            <p class="p-muted" style="margin:.15rem 0 0;font-size:.62rem;color:<%= amWinningWatched ? '#059669' : 'inherit' %>"><%= amWinningWatched ? "You're winning" : (p.highestBidder || 'No bids') %></p>
+                        </div>
+                        <strong style="font-size:.8rem"><%= Number(p.highestBid || p.reservePrice || 0).toLocaleString() %></strong>
+                    </div>
+                    <% }) %>
+                </div>
+                <% } else { %><div class="p-empty">Star players on Market</div><% } %>
+            </div>
         </div>
     </section>
     <% } %>
 
-    <!-- RECENT BIDS ON YOU -->
+    <!-- BIDS ON YOU -->
     <% if (typeof myRecentBids !== 'undefined' && myRecentBids && myRecentBids.length > 0) { %>
-    <section class="pf-card" style="margin-bottom:1.5rem">
-        <div class="pf-card-h">
+    <section class="p-panel p-reveal on p-d2">
+        <div class="p-panel-head">
             <div>
-                <div class="pf-eyebrow">Auction activity</div>
-                <h2 class="pf-display pf-section-title" style="margin:0.2rem 0 0">Recent bids on you</h2>
-                <p class="pf-muted" style="margin:0.15rem 0 0">Teams bidding on your card</p>
+                <div class="p-kicker">Live interest</div>
+                <h2 class="p-serif">Bids on your card</h2>
             </div>
         </div>
-        <div class="pf-list" style="max-height:18rem">
+        <div class="p-list" style="max-height:18rem">
             <% myRecentBids.forEach(b => { %>
-                <div class="pf-row">
-                    <div style="min-width:0">
-                        <p style="margin:0;font-size:0.85rem;font-weight:800"><%= b.teamName || 'Unknown team' %></p>
-                        <p class="pf-muted" style="margin:0.15rem 0 0;font-size:0.65rem">
-                            <%= b.managerName ? ('mgr ' + b.managerName + ' · ') : '' %><%= b.createdAt ? new Date(b.createdAt).toLocaleString() : '' %>
-                        </p>
-                    </div>
-                    <strong style="color:#059669;font-size:0.95rem"><%= Number(b.amount || 0).toLocaleString() %></strong>
+            <div class="p-item">
+                <div style="min-width:0">
+                    <p style="margin:0;font-size:.85rem;font-weight:800"><%= b.teamName || 'Unknown team' %></p>
+                    <p class="p-muted" style="margin:.15rem 0 0;font-size:.65rem"><%= b.managerName ? ('mgr ' + b.managerName + ' · ') : '' %><%= b.createdAt ? new Date(b.createdAt).toLocaleString() : '' %></p>
                 </div>
+                <strong style="color:#059669;font-size:.95rem"><%= Number(b.amount || 0).toLocaleString() %></strong>
+            </div>
             <% }) %>
         </div>
     </section>
     <% } else if (typeof auctionSettings !== 'undefined' && auctionSettings && auctionSettings.status === 'live') { %>
-    <div class="pf-card" style="margin-bottom:1.5rem;text-align:center;border-style:dashed">
-        <p class="pf-muted" style="margin:0;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;font-size:0.7rem">No bids on your card yet — auction is live</p>
+    <div class="p-panel" style="text-align:center;border-style:dashed">
+        <p class="p-muted" style="margin:0;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.7rem">Auction is live — no bids on your card yet</p>
     </div>
     <% } %>
 
-    <!-- DISCORD CONNECT (placeholder) -->
-    <section class="pf-discord-box" style="margin-bottom:1.5rem">
+    <!-- DISCORD -->
+    <section class="p-discord p-reveal on p-d3">
         <div>
             <h3>Connect Discord</h3>
-            <p>Link your Discord for role sync, pings, and easier verification. (Coming soon)</p>
+            <p>Link your Discord for roles, match pings, and faster verification. Placeholder for now — wiring comes next.</p>
         </div>
-        <button type="button" class="pf-btn pf-btn-discord" onclick="alert('Discord connect is coming soon — placeholder for now.')">
-            Connect Discord
-        </button>
+        <button type="button" class="p-btn3d" onclick="alert('Discord connect coming soon — this is a placeholder.')">Connect Discord</button>
     </section>
 
-    <div class="pf-layout">
-        <!-- LEFT: card + stats -->
-        <div style="display:flex;flex-direction:column;gap:1rem">
-            <div class="pf-card">
-                <div class="pf-card-h" style="margin-bottom:0.75rem">
-                    <p class="pf-muted" style="margin:0;font-size:0.58rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase">Official player card</p>
+    <div class="p-wave"></div>
+
+    <!-- MAIN GRID -->
+    <div class="p-grid">
+        <aside class="p-reveal on p-d2">
+            <div class="p-panel" style="margin-bottom:.85rem">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+                    <span class="p-kicker">Official card</span>
                     <% if (user && user.cardImage) { %>
-                        <span class="pf-badge pf-badge-ok">Verified</span>
+                    <span style="font-size:.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#059669;background:rgba(5,150,105,.1);padding:.25rem .55rem;border-radius:999px">Verified</span>
                     <% } %>
                 </div>
-                <div class="pf-card-frame">
+                <div class="p-player-card">
                     <% if (user && user.cardImage) { %>
-                        <img src="<%= user.cardImage %>" alt="<%= user.name %> Card">
+                    <img src="<%= user.cardImage %>" alt="<%= user.name %>">
                     <% } else { %>
-                        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;text-align:center;gap:0.75rem">
-                            <div style="width:2.5rem;height:2.5rem;border:2px solid rgba(56,189,248,.25);border-top-color:#38bdf8;border-radius:50%;animation:pfspin 0.9s linear infinite"></div>
-                            <style>@keyframes pfspin{to{transform:rotate(360deg)}}</style>
-                            <div>
-                                <p style="margin:0;color:#fff;font-size:0.75rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase">Card pending</p>
-                                <p class="pf-muted" style="margin:0.35rem 0 0;font-size:0.7rem">An admin will generate your market card soon.</p>
-                            </div>
-                        </div>
+                    <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;padding:1.5rem;text-align:center">
+                        <div style="width:2.4rem;height:2.4rem;border:2px solid rgba(125,211,252,.25);border-top-color:#7dd3fc;border-radius:50%;animation:pspin .85s linear infinite"></div>
+                        <style>@keyframes pspin{to{transform:rotate(360deg)}}</style>
+                        <p style="margin:0;color:#fff;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Card pending</p>
+                        <p class="p-muted" style="margin:0;font-size:.7rem">Admin will generate your market card soon.</p>
+                    </div>
                     <% } %>
-                    <div class="pf-card-overlay">
-                        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:0.5rem">
-                            <div>
-                                <b><%= user ? user.name : 'Unknown' %></b>
-                                <span>@<%= user ? user.discord : 'none' %></span>
-                            </div>
-                            <span style="background:var(--pf-teal);color:#fff;font-size:0.55rem;font-weight:800;padding:0.25rem 0.5rem;border-radius:0.35rem;letter-spacing:0.06em;text-transform:uppercase"><%= user ? user.position : '???' %></span>
-                        </div>
+                    <div class="p-player-meta">
+                        <b><%= user ? user.name : 'Unknown' %></b>
+                        <em>@<%= user ? user.discord : 'none' %></em>
+                        <div class="p-pos"><%= user ? user.position : '???' %></div>
                     </div>
                 </div>
-            </div>
-
-            <div class="pf-stat-grid">
-                <div class="pf-stat"><span>Goals</span><strong><%= user ? user.goals : 0 %></strong></div>
-                <div class="pf-stat"><span>Assists</span><strong><%= user ? user.assists : 0 %></strong></div>
-                <div class="pf-stat"><span>Saves</span><strong><%= user ? (user.saves || 0) : 0 %></strong></div>
-                <div class="pf-stat"><span>MVPs</span><strong><%= user ? user.mvps : 0 %></strong></div>
-            </div>
-        </div>
-
-        <!-- RIGHT: theme + form -->
-        <div style="display:flex;flex-direction:column;gap:1rem">
-            <div class="pf-card">
-                <div class="pf-card-h">
-                    <h3 class="pf-display">Website theme</h3>
-                </div>
-                <div class="pf-theme-row">
-                    <button type="button" onclick="setTheme('light')" id="btn-theme-light" class="theme-btn">☀️ Light</button>
-                    <button type="button" onclick="setTheme('dark')" id="btn-theme-dark" class="theme-btn">🌙 Dark</button>
-                    <button type="button" onclick="setTheme('system')" id="btn-theme-system" class="theme-btn">💻 System</button>
+                <div class="p-chips">
+                    <% if (user && user.country) { %><span class="p-chip"><%= user.country %></span><% } %>
+                    <% if (user && user.timezone) { %><span class="p-chip"><%= user.timezone %></span><% } %>
+                    <% if (user && user.position) { %><span class="p-chip"><%= user.position %></span><% } %>
                 </div>
             </div>
+            <div class="p-stats">
+                <div class="p-stat"><span>Goals</span><strong><%= user ? user.goals : 0 %></strong></div>
+                <div class="p-stat"><span>Assists</span><strong><%= user ? user.assists : 0 %></strong></div>
+                <div class="p-stat"><span>Saves</span><strong><%= user ? (user.saves || 0) : 0 %></strong></div>
+                <div class="p-stat"><span>MVPs</span><strong><%= user ? user.mvps : 0 %></strong></div>
+            </div>
+        </aside>
 
-            <div class="pf-card">
-                <div class="pf-card-h" style="border-bottom:1px solid var(--pf-line);padding-bottom:0.85rem;margin-bottom:1.15rem">
+        <div class="p-reveal on p-d3">
+            <div class="p-panel" id="theme" style="margin-bottom:1rem">
+                <div class="p-panel-head">
                     <div>
-                        <h3 class="pf-display" style="margin:0">Edit profile</h3>
-                        <p class="pf-muted" style="margin:0.25rem 0 0">Changes show up on the Market card.</p>
+                        <div class="p-kicker">Appearance</div>
+                        <h2 class="p-serif">Theme</h2>
                     </div>
                 </div>
+                <div class="p-themes">
+                    <button type="button" class="theme-btn" id="btn-theme-light" onclick="setTheme('light')">☀️ Light</button>
+                    <button type="button" class="theme-btn" id="btn-theme-dark" onclick="setTheme('dark')">🌙 Dark</button>
+                    <button type="button" class="theme-btn" id="btn-theme-system" onclick="setTheme('system')">💻 System</button>
+                </div>
+            </div>
 
-                <form action="/profile/update" method="POST" style="display:flex;flex-direction:column;gap:1.05rem">
-                    <div class="pf-grid-2">
+            <div class="p-panel" id="edit-profile">
+                <div class="p-panel-head">
+                    <div>
+                        <div class="p-kicker">Settings</div>
+                        <h2 class="p-serif">Edit profile</h2>
+                    </div>
+                    <a class="p-uline" href="/market">View on market</a>
+                </div>
+                <p class="p-muted" style="margin:-.4rem 0 1.1rem">Updates show on your market card right away.</p>
+
+                <form action="/profile/update" method="POST" style="display:flex;flex-direction:column;gap:1rem">
+                    <div class="p-row2">
                         <div>
-                            <label class="pf-label">Display name</label>
-                            <input class="pf-input" name="name" value="<%= user ? user.name : '' %>" required>
+                            <label class="p-label">Display name</label>
+                            <input class="p-field" name="name" value="<%= user ? user.name : '' %>" required>
                         </div>
                         <div>
-                            <label class="pf-label">Discord handle</label>
-                            <input class="pf-input" name="discord" value="<%= user ? user.discord : '' %>" required placeholder="username">
+                            <label class="p-label">Discord handle</label>
+                            <input class="p-field" name="discord" value="<%= user ? user.discord : '' %>" required placeholder="username">
                         </div>
                     </div>
-
-                    <div class="pf-grid-3">
+                    <div class="p-row3">
                         <div>
-                            <label class="pf-label">Position</label>
-                            <select class="pf-select" name="position">
+                            <label class="p-label">Position</label>
+                            <select class="p-select" name="position">
                                 <option value="FWD" <%= user && user.position === 'FWD' ? 'selected' : '' %>>Forward (FWD)</option>
                                 <option value="MID" <%= user && user.position === 'MID' ? 'selected' : '' %>>Midfield (MID)</option>
                                 <option value="DEF" <%= user && user.position === 'DEF' ? 'selected' : '' %>>Defense (DEF)</option>
@@ -832,23 +851,21 @@ html.dark .pf-class {
                             </select>
                         </div>
                         <div>
-                            <label class="pf-label">Country</label>
-                            <input class="pf-input" name="country" value="<%= user ? user.country : '' %>" required placeholder="e.g. India, USA">
+                            <label class="p-label">Country</label>
+                            <input class="p-field" name="country" value="<%= user ? user.country : '' %>" required placeholder="e.g. India">
                         </div>
                         <div>
-                            <label class="pf-label">Timezone</label>
-                            <input class="pf-input" name="timezone" value="<%= user ? user.timezone : '' %>" placeholder="e.g. GMT+5:30">
+                            <label class="p-label">Timezone</label>
+                            <input class="p-field" name="timezone" value="<%= user ? user.timezone : '' %>" placeholder="e.g. GMT+5:30">
                         </div>
                     </div>
-
                     <div>
-                        <label class="pf-label">Market biography</label>
-                        <textarea class="pf-area" name="bio" rows="4" placeholder="Experience, past teams, playstyle…"><%= user ? (user.bio || user.experience) : '' %></textarea>
+                        <label class="p-label">Market biography</label>
+                        <textarea class="p-area" name="bio" rows="4" placeholder="Past teams, playstyle, what managers should know…"><%= user ? (user.bio || user.experience) : '' %></textarea>
                     </div>
-
-                    <div style="display:flex;flex-wrap:wrap;gap:0.55rem;align-items:center;padding-top:0.25rem">
-                        <button type="submit" class="pf-btn pf-btn-coral">Save profile</button>
-                        <a href="/market" class="pf-link">View on market</a>
+                    <div style="display:flex;flex-wrap:wrap;gap:.55rem;align-items:center;padding-top:.25rem">
+                        <button type="submit" class="p-btn3d">Save changes</button>
+                        <a href="/market" class="p-uline">Preview market card</a>
                     </div>
                 </form>
             </div>
@@ -859,30 +876,44 @@ html.dark .pf-class {
 </div>
 
 <script>
-    if (window.tailwind) {
-        tailwind.config = { darkMode: 'class' };
+if (window.tailwind) tailwind.config = { darkMode: 'class' };
+function setTheme(mode) {
+    localStorage.setItem('vim_theme', mode);
+    const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', isDark);
+    fetch('/profile/update-theme', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theme: mode })
+    }).catch(() => {});
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('is-active'));
+    const el = document.getElementById('btn-theme-' + mode);
+    if (el) el.classList.add('is-active');
+}
+(function () {
+    setTheme(localStorage.getItem('vim_theme') || "<%= user ? (user.theme || 'system') : 'system' %>");
+})();
+
+/* scroll reveals */
+(function () {
+    const els = document.querySelectorAll('.p-reveal');
+    if (!('IntersectionObserver' in window)) {
+        els.forEach(e => e.classList.add('on'));
+        return;
     }
-    function setTheme(mode) {
-        localStorage.setItem('vim_theme', mode);
-        const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        if (isDark) document.documentElement.classList.add('dark');
-        else document.documentElement.classList.remove('dark');
-        fetch('/profile/update-theme', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ theme: mode })
-        }).catch(() => {});
-        document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('is-active'));
-        const activeBtn = document.getElementById('btn-theme-' + mode);
-        if (activeBtn) activeBtn.classList.add('is-active');
-    }
-    (function() {
-        const savedTheme = localStorage.getItem('vim_theme') || "<%= user ? (user.theme || 'system') : 'system' %>";
-        setTheme(savedTheme);
-    })();
-</script>
-<script>
-(function() {
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(en => {
+            if (en.isIntersecting) {
+                en.target.classList.add('on');
+                io.unobserve(en.target);
+            }
+        });
+    }, { threshold: 0.12 });
+    els.forEach(e => io.observe(e));
+})();
+
+/* outbid countdown */
+(function () {
     function fmt(ms) {
         if (ms <= 0) return '0m';
         var h = Math.floor(ms / 3600000);
@@ -893,9 +924,8 @@ html.dark .pf-class {
         return s + 's';
     }
     function tick() {
-        document.querySelectorAll('.outbid-countdown').forEach(function(el) {
-            var rem = Number(el.getAttribute('data-remaining')) || 0;
-            rem = Math.max(0, rem - 1000);
+        document.querySelectorAll('.outbid-countdown').forEach(function (el) {
+            var rem = Math.max(0, (Number(el.getAttribute('data-remaining')) || 0) - 1000);
             el.setAttribute('data-remaining', String(rem));
             var span = el.querySelector('.countdown-text');
             if (span) span.textContent = fmt(rem);

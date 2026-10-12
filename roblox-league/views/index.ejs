@@ -428,37 +428,84 @@ body {
 
 .vsl-service {
     position: relative;
-    min-height: 230px;
-    padding: 25px 21px 20px;
+    min-height: 240px;
+    padding: 28px 22px 22px;
     border: 1px solid rgba(18,59,60,.10);
-    border-radius: 17px;
-    background: rgba(255,253,248,.78);
-    box-shadow: 0 8px 22px rgba(18,59,60,.045);
-    transition: transform .22s ease, box-shadow .22s ease;
+    border-radius: 18px;
+    background: #fffdf8;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    /* 3D block */
+    box-shadow:
+        0 1px 0 rgba(255,255,255,.9) inset,
+        0 0 0 1px rgba(18,59,60,.04),
+        0 10px 0 #d9d2c4,
+        0 16px 28px rgba(18,59,60,.10);
+    transform: translateY(0);
+    transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s ease;
+    overflow: visible;
 }
 
-.vsl-service:nth-child(2) { transform: translateY(13px); }
-.vsl-service:nth-child(4) { transform: translateY(-7px); }
+.vsl-service:nth-child(2) { margin-top: 12px; }
+.vsl-service:nth-child(4) { margin-top: -6px; }
 
 .vsl-service:hover {
-    transform: translateY(-7px) rotate(-.4deg) !important;
-    box-shadow: 0 20px 36px rgba(18,59,60,.12);
+    transform: translateY(-10px);
+    box-shadow:
+        0 1px 0 rgba(255,255,255,.95) inset,
+        0 0 0 1px rgba(18,59,60,.05),
+        0 18px 0 #d9d2c4,
+        0 28px 40px rgba(18,59,60,.16);
+    color: inherit;
+}
+
+.vsl-service:active {
+    transform: translateY(4px);
+    box-shadow:
+        0 1px 0 rgba(255,255,255,.7) inset,
+        0 0 0 1px rgba(18,59,60,.04),
+        0 4px 0 #d9d2c4,
+        0 8px 16px rgba(18,59,60,.12);
 }
 
 .vsl-service-icon {
-    width: 47px;
-    height: 47px;
+    width: 58px;
+    height: 58px;
     display: grid;
     place-items: center;
-    border-radius: 50%;
-    background: var(--vsl-mint);
-    color: var(--vsl-teal);
-    font-family: var(--vsl-display);
-    font-size: 1.35rem;
+    border-radius: 16px;
+    margin-bottom: 4px;
+    transition: transform .28s cubic-bezier(.2,.8,.2,1);
+    box-shadow: 0 8px 16px rgba(18,59,60,.12);
+}
+
+.vsl-service:hover .vsl-service-icon {
+    transform: translateY(-14px) scale(1.12);
+}
+
+.vsl-service:nth-child(1) .vsl-service-icon {
+    background: linear-gradient(145deg, #7dd3fc, #2563eb);
+}
+.vsl-service:nth-child(2) .vsl-service-icon {
+    background: linear-gradient(145deg, #86efac, #15803d);
+}
+.vsl-service:nth-child(3) .vsl-service-icon {
+    background: linear-gradient(145deg, #c4b5fd, #6d28d9);
+}
+.vsl-service:nth-child(4) .vsl-service-icon {
+    background: linear-gradient(145deg, #fcd34d, #c2410c);
+}
+
+.vsl-service-icon svg {
+    width: 30px;
+    height: 30px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.2));
 }
 
 .vsl-service h3 {
-    margin: 22px 0 8px;
+    margin: 18px 0 8px;
     color: var(--vsl-ink);
     font-size: .76rem;
     line-height: 1.35;
@@ -467,10 +514,11 @@ body {
 }
 
 .vsl-service p {
-    margin: 0 0 18px;
+    margin: 0 0 16px;
     color: var(--vsl-muted);
     font-size: .69rem;
     line-height: 1.65;
+    flex: 1;
 }
 
 .vsl-mini-link {
@@ -1416,33 +1464,62 @@ body > header,
         </div>
 
         <div class="vsl-service-grid">
-            <article class="vsl-service" data-tour="market">
-                <div class="vsl-service-icon">M</div>
+            <a href="/market" class="vsl-service" data-tour="market">
+                <div class="vsl-service-icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" fill="none">
+                        <path d="M10 6h12l3 4v3H7V10l3-4z" fill="#fff" opacity=".95"/>
+                        <path d="M8 13h16v11a2 2 0 01-2 2H10a2 2 0 01-2-2V13z" fill="#dbeafe"/>
+                        <circle cx="16" cy="20" r="3.2" fill="#1e40af"/>
+                        <path d="M14.8 20.2l.9.7-.25 1.05.95-.5.95.5-.25-1.05.9-.7-1.1-.1-.5-1-.5 1z" fill="#93c5fd"/>
+                    </svg>
+                </div>
                 <h3>Player market</h3>
                 <p>Scout available players, follow bids and see where the next big move could happen.</p>
-                <a href="/market" class="vsl-mini-link">Open market</a>
-            </article>
+                <span class="vsl-mini-link">Open market</span>
+            </a>
 
-            <article class="vsl-service" data-tour="matches">
-                <div class="vsl-service-icon">F</div>
+            <a href="/matches" class="vsl-service" data-tour="matches">
+                <div class="vsl-service-icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="12" fill="#fff"/>
+                        <path d="M16 6l3.2 2.4-1.2 3.9h-4L12.8 8.4 16 6z" fill="#14532d"/>
+                        <path d="M8.5 12.5l3.9-.9 1.2 3.9-3.2 2.5-3.1-2.7.2-2.8z" fill="#14532d"/>
+                        <path d="M23.5 12.5l-3.9-.9-1.2 3.9 3.2 2.5 3.1-2.7-.2-2.8z" fill="#14532d"/>
+                        <path d="M11 22.5l.9-3.9 3.9 1.2v4l-3.4 1.4-1.4-2.7z" fill="#14532d"/>
+                        <path d="M21 22.5l-.9-3.9-3.9 1.2v4l3.4 1.4 1.4-2.7z" fill="#14532d"/>
+                    </svg>
+                </div>
                 <h3>Fixtures</h3>
                 <p>Upcoming games, completed matches and the schedule your manager needs to know.</p>
-                <a href="/matches" class="vsl-mini-link">View fixtures</a>
-            </article>
+                <span class="vsl-mini-link">View fixtures</span>
+            </a>
 
-            <article class="vsl-service">
-                <div class="vsl-service-icon">P</div>
+            <a href="/market" class="vsl-service">
+                <div class="vsl-service-icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="11" r="5.5" fill="#ede9fe"/>
+                        <path d="M7 26c1.5-5 5-7.5 9-7.5s7.5 2.5 9 7.5" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/>
+                        <path d="M7 26c1.5-5 5-7.5 9-7.5s7.5 2.5 9 7.5" stroke="#5b21b6" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                        <circle cx="16" cy="11" r="5.5" stroke="#5b21b6" stroke-width="1.5" fill="none"/>
+                    </svg>
+                </div>
                 <h3>Player profiles</h3>
                 <p>Find the players behind the lineups and keep an eye on the talent moving through VIM.</p>
-                <a href="/market" class="vsl-mini-link">Browse players</a>
-            </article>
+                <span class="vsl-mini-link">Browse players</span>
+            </a>
 
-            <article class="vsl-service">
-                <div class="vsl-service-icon">N</div>
+            <a href="/matches" class="vsl-service">
+                <div class="vsl-service-icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" fill="none">
+                        <path d="M8 26V14h4v12H8zm6 0V8h4v18h-4zm6 0v-8h4v8h-4z" fill="#fff"/>
+                        <path d="M9 13l6-5 5 3 5-6" stroke="#fef3c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <circle cx="25" cy="5" r="2" fill="#fef3c7"/>
+                    </svg>
+                </div>
                 <h3>League news</h3>
                 <p>Catch the stories, announcements and moments that make each season feel alive.</p>
-                <a href="#tour-results" class="vsl-mini-link">See results</a>
-            </article>
+                <span class="vsl-mini-link">See results</span>
+            </a>
         </div>
     </section>
 

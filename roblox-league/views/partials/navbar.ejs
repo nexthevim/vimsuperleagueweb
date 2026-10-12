@@ -1,3 +1,5 @@
+<%- include('partials/og-meta') %>
+
 <script>
     // Configure Tailwind dark mode dynamically
     if (window.tailwind) {
@@ -194,27 +196,7 @@
         box-shadow: 0 12px 32px rgba(0, 136, 255, 0.3);
     }
 
-    .vim-ai-button::after {
-        content: "";
-        position: absolute;
-        inset: -3px;
-        border-radius: 50%;
-        border: 1px solid rgba(0, 198, 255, 0.2);
-        animation: vimAiPulse 2.4s ease-in-out infinite;
-        pointer-events: none;
-    }
-
-    @keyframes vimAiPulse {
-        0%, 100% {
-            transform: scale(1);
-            opacity: 0.25;
-        }
-
-        50% {
-            transform: scale(1.18);
-            opacity: 0;
-        }
-    }
+    .vim-ai-button::after { display: none; }
 
     .vim-tool-label {
         position: absolute;

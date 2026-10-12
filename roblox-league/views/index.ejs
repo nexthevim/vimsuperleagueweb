@@ -1332,18 +1332,10 @@ body {
 }
 
 
-/* Navbar sits above homepage layers (works with existing partial) */
-nav, header, .navbar, #navbar, [class*="nav"] {
-    /* only raise fixed/sticky bars */
-}
+/* Homepage layers — do NOT override the global navbar position */
 .vsl-home { position: relative; z-index: 1; }
 .vsl-hero { position: relative; z-index: 2; }
-/* Common fixed-nav patterns from the shared navbar partial */
-body > nav,
-body > header,
-.fixed, .sticky {
-    z-index: 200 !important;
-}
+
 
 </style>
 

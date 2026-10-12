@@ -1,0 +1,28 @@
+<%
+  // Open Graph / Discord / Twitter embeds — crawlers read these from raw HTML.
+  // Values come from res.render(...defaultOg / buildMatchOg...).
+  const _ogTitle = (typeof ogTitle !== 'undefined' && ogTitle) ? ogTitle : 'VIM Super League';
+  const _ogDesc = (typeof ogDescription !== 'undefined' && ogDescription)
+    ? ogDescription
+    : 'Competitive Roblox football league — player market, live matches, stats and records.';
+  const _ogImage = (typeof ogImage !== 'undefined' && ogImage) ? ogImage : '/images/vimgfx.png';
+  const _ogUrl = (typeof ogUrl !== 'undefined' && ogUrl) ? ogUrl : '';
+%>
+<!-- Open Graph (Discord, Slack, iMessage, Facebook) -->
+<meta property="og:site_name" content="VIM Super League" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="<%= _ogTitle %>" />
+<meta property="og:description" content="<%= _ogDesc %>" />
+<meta property="og:image" content="<%= _ogImage %>" />
+<% if (_ogUrl) { %><meta property="og:url" content="<%= _ogUrl %>" /><% } %>
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="<%= _ogTitle %>" />
+<meta name="twitter:description" content="<%= _ogDesc %>" />
+<meta name="twitter:image" content="<%= _ogImage %>" />
+
+<title><%= _ogTitle %></title>
+<meta name="description" content="<%= _ogDesc %>" />

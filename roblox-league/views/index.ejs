@@ -4,25 +4,32 @@
 
 <style>
     :root {
-        --sand: #f7f3ec;
-        --paper: #fffcf8;
-        --ink: #1c2b2a;
-        --soft: #5c6b6a;
-        --teal: #0f4c4a;
-        --teal-mid: #1a6b68;
-        --coral: #e8a87c;
-        --coral-deep: #d4896a;
-        --line: rgba(28, 43, 42, 0.08);
-        --radius: 1.5rem;
+        --sand: #121212;
+        --paper: #1a1a1a;
+        --ink: #f0f0f0;
+        --soft: #9a9a9a;
+        --teal: #2a2a2a;
+        --teal-mid: #c8c8c8;
+        --coral: #ffffff;
+        --coral-deep: #e8e8e8;
+        --line: rgba(255, 255, 255, 0.08);
+        --radius: 1.25rem;
+        --surface: #161616;
+        --elevated: #1e1e1e;
+        --muted-line: rgba(255, 255, 255, 0.06);
     }
 
     body {
         margin: 0;
-        background: var(--sand);
+        background: #0e0e0e;
         color: var(--ink);
         font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
         overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
+    }
+
+    .pc {
+        background: #0e0e0e;
     }
 
     .pc { padding-top: 4.75rem; }
@@ -48,7 +55,7 @@
         font-weight: 700;
         letter-spacing: 0.18em;
         text-transform: uppercase;
-        color: var(--teal-mid);
+        color: rgba(255,255,255,0.45);
     }
 
     /* ----- reveal on scroll ----- */
@@ -80,7 +87,7 @@
         min-height: min(88vh, 820px);
         width: 100%;
         background:
-            linear-gradient(105deg, rgba(15, 76, 74, 0.78) 0%, rgba(15, 76, 74, 0.4) 36%, rgba(15, 76, 74, 0.1) 58%, transparent 75%),
+            linear-gradient(105deg, rgba(10, 10, 10, 0.88) 0%, rgba(14, 14, 14, 0.55) 40%, rgba(14, 14, 14, 0.2) 65%, transparent 82%),
             url('/images/vimgfx.png') center center / cover no-repeat;
         color: #fff;
         box-shadow: none;
@@ -155,18 +162,18 @@
     .pc-btn:hover { transform: translateY(-2px); }
 
     .pc-btn-coral {
-        background: var(--coral);
-        color: #1c2b2a;
-        box-shadow: 0 10px 24px rgba(232, 168, 124, 0.35);
+        background: #ffffff;
+        color: #0e0e0e;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
     }
-    .pc-btn-coral:hover { background: var(--coral-deep); color: #1c2b2a; }
+    .pc-btn-coral:hover { background: #eaeaea; color: #0e0e0e; }
 
     .pc-btn-ghost {
-        border: 1.5px solid rgba(255,255,255,0.45);
+        border: 1.5px solid rgba(255,255,255,0.22);
         color: #fff;
-        background: rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.04);
     }
-    .pc-btn-ghost:hover { background: rgba(255,255,255,0.16); color: #fff; }
+    .pc-btn-ghost:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
     .pc-search {
         position: relative;
@@ -175,23 +182,25 @@
         max-width: 400px;
         padding: 0.4rem;
         border-radius: 999px;
-        background: rgba(255,252,248,0.95);
-        box-shadow: 0 14px 36px rgba(0,0,0,0.15);
+        background: rgba(20, 20, 20, 0.92);
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 0 14px 36px rgba(0,0,0,0.4);
     }
     .pc-search input {
         flex: 1; min-width: 0; border: 0; outline: none; background: transparent;
-        padding: 0.75rem 1rem; font-family: inherit; font-size: 0.88rem; font-weight: 600; color: var(--ink);
+        padding: 0.75rem 1rem; font-family: inherit; font-size: 0.88rem; font-weight: 600; color: #f0f0f0;
     }
+    .pc-search input::placeholder { color: rgba(255,255,255,0.35); }
     .pc-search button {
         border: 0; border-radius: 999px; padding: 0.75rem 1.1rem;
-        background: var(--teal); color: #fff; font-family: inherit;
+        background: #fff; color: #0e0e0e; font-family: inherit;
         font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
     }
     #search-results-dropdown {
         position: absolute; left: 0; right: 0; top: calc(100% + 0.5rem);
-        background: var(--paper); border: 1px solid var(--line); border-radius: 1rem;
-        box-shadow: 0 20px 50px rgba(28,43,42,0.14); padding: 0.85rem;
-        max-height: 22rem; overflow-y: auto; z-index: 40; text-align: left; color: var(--ink);
+        background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5); padding: 0.85rem;
+        max-height: 22rem; overflow-y: auto; z-index: 40; text-align: left; color: #f0f0f0;
     }
 
     /* decorative side panel placeholders in hero */
@@ -235,13 +244,13 @@
         height: 48px;
         margin-top: -1px;
     }
-    .pc-wave path { fill: var(--sand); }
+    .pc-wave path { fill: #0e0e0e; }
 
     /* ========== 3D POP BUTTONS ========== */
     .pc-pops {
         padding: 1.25rem 0 1.75rem;
         margin-top: 0;
-        background: var(--sand);
+        background: #0e0e0e;
     }
     .pc-pops-grid {
         display: grid;
@@ -258,39 +267,46 @@
         color: inherit;
         padding: 1.25rem 0.85rem 1.15rem;
         border-radius: 1.25rem;
-        background: var(--paper);
-        border: 1px solid var(--line);
-        box-shadow:
-            0 1px 0 rgba(255,255,255,0.9) inset,
-            0 10px 28px rgba(28, 43, 42, 0.07);
-        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+        background: #161616;
+        border: 1px solid rgba(255,255,255,0.07);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease;
         overflow: visible;
     }
     .pc-pop:hover {
         transform: translateY(-8px);
-        box-shadow: 0 22px 44px rgba(28, 43, 42, 0.14);
+        border-color: rgba(255,255,255,0.14);
+        box-shadow: 0 22px 48px rgba(0, 0, 0, 0.5);
         color: inherit;
     }
     .pc-pop-icon {
-        width: 4.5rem;
-        height: 4.5rem;
+        width: 4.75rem;
+        height: 4.75rem;
         margin-bottom: 1rem;
-        border-radius: 1.15rem;
-        background: linear-gradient(145deg, #e8f5f4, #d4ebe9);
+        border-radius: 1.25rem;
+        background: linear-gradient(160deg, #252525 0%, #141414 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        box-shadow: 0 8px 18px rgba(15, 76, 74, 0.12);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.07);
+        position: relative;
     }
     .pc-pop:hover .pc-pop-icon {
-        transform: translateY(-14px) scale(1.12);
+        transform: translateY(-16px) scale(1.14);
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.08);
     }
     .pc-pop-icon svg {
-        width: 2.35rem;
-        height: 2.35rem;
-        color: var(--teal);
+        width: 2.6rem;
+        height: 2.6rem;
+        overflow: visible;
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));
     }
+    .pc-pop:nth-child(1) .pc-pop-icon { background: linear-gradient(160deg, #1e3a5f 0%, #0f172a 100%); }
+    .pc-pop:nth-child(2) .pc-pop-icon { background: linear-gradient(160deg, #14532d 0%, #052e16 100%); }
+    .pc-pop:nth-child(3) .pc-pop-icon { background: linear-gradient(160deg, #5b21b6 0%, #2e1065 100%); }
+    .pc-pop:nth-child(4) .pc-pop-icon { background: linear-gradient(160deg, #92400e 0%, #451a03 100%); }
     .pc-pop strong {
         display: block;
         font-size: 0.95rem;
@@ -323,11 +339,11 @@
         gap: 1rem;
     }
     .pc-card {
-        background: var(--paper);
-        border: 1px solid var(--line);
+        background: #161616;
+        border: 1px solid rgba(255,255,255,0.07);
         border-radius: var(--radius);
         padding: 1.5rem;
-        box-shadow: 0 12px 32px rgba(28,43,42,0.05);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.3);
     }
     .pc-match {
         display: grid;
@@ -335,9 +351,10 @@
         gap: 1rem;
         align-items: center;
         padding: 1.25rem;
-        background: var(--sand);
+        background: #111;
         border-radius: 1.15rem;
         margin-top: 1rem;
+        border: 1px solid rgba(255,255,255,0.05);
     }
     .pc-team {
         display: flex; flex-direction: column; align-items: center; gap: 0.55rem; text-align: center;
@@ -345,15 +362,15 @@
     .pc-team img { width: 3.5rem; height: 3.5rem; object-fit: contain; }
     .pc-team span { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; }
     .pc-vs { text-align: center; }
-    .pc-vs strong { font-family: 'Fraunces', serif; font-size: 1.4rem; font-style: italic; color: var(--teal); }
+    .pc-vs strong { font-family: 'Fraunces', serif; font-size: 1.4rem; font-style: italic; color: #fff; }
     .pc-vs small { display: block; margin-top: 0.25rem; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); }
 
     .pc-stream {
         border-radius: var(--radius);
         overflow: hidden;
-        background: #0f1a19;
+        background: #0a0a0a;
         min-height: 260px;
-        border: 1px solid var(--line);
+        border: 1px solid rgba(255,255,255,0.07);
     }
     .pc-stream iframe { width: 100%; min-height: 280px; border: 0; display: block; }
     .pc-stream-empty {
@@ -364,16 +381,18 @@
 
     /* ========== IMAGE PLACEHOLDERS GALLERY ========== */
     .pc-gallery-band {
-        background: var(--teal);
+        background: #141414;
         color: #fff;
         padding: 2.75rem 0 3rem;
         border-radius: 0;
         margin-top: 0.5rem;
         width: 100%;
+        border-top: 1px solid rgba(255,255,255,0.06);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-    .pc-gallery-band .pc-label { color: rgba(255,255,255,0.65); }
+    .pc-gallery-band .pc-label { color: rgba(255,255,255,0.4); }
     .pc-gallery-band h2 { color: #fff; margin: 0.45rem 0 0.35rem; font-size: clamp(1.8rem, 3vw, 2.4rem); }
-    .pc-gallery-band .sub { color: rgba(255,255,255,0.65); font-size: 0.95rem; margin: 0 0 1.75rem; }
+    .pc-gallery-band .sub { color: rgba(255,255,255,0.45); font-size: 0.95rem; margin: 0 0 1.75rem; }
 
     .pc-gallery {
         display: grid;
@@ -384,8 +403,8 @@
         aspect-ratio: 4 / 5;
         border-radius: 1.1rem;
         overflow: hidden;
-        background: rgba(255,255,255,0.08);
-        border: 1px dashed rgba(255,255,255,0.25);
+        background: rgba(255,255,255,0.03);
+        border: 1px dashed rgba(255,255,255,0.12);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -416,7 +435,7 @@
 
     /* ========== ABOUT ========== */
     .pc-about {
-        background: var(--paper);
+        background: #121212;
         padding: 2.75rem 0;
         border-radius: 0;
         margin-bottom: 0;
@@ -432,8 +451,8 @@
         border-radius: 1.5rem;
         overflow: hidden;
         min-height: 320px;
-        background: var(--sand);
-        border: 1px dashed rgba(28,43,42,0.15);
+        background: #181818;
+        border: 1px dashed rgba(255,255,255,0.1);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -460,11 +479,11 @@
     .pc-about-quote {
         margin-top: 1.25rem;
         padding-top: 1.15rem;
-        border-top: 1px solid var(--line);
+        border-top: 1px solid rgba(255,255,255,0.08);
         font-family: 'Fraunces', serif;
         font-style: italic;
         font-size: 1.15rem;
-        color: var(--ink);
+        color: #f0f0f0;
         line-height: 1.45;
     }
     .pc-about-quote cite {
@@ -488,13 +507,13 @@
     .pc-result {
         display: flex; flex-direction: column; gap: 0.55rem;
         padding: 1.1rem 1.2rem;
-        background: var(--paper);
-        border: 1px solid var(--line);
+        background: #161616;
+        border: 1px solid rgba(255,255,255,0.07);
         border-radius: 1.15rem;
         text-decoration: none; color: inherit;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
-    .pc-result:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(28,43,42,0.08); color: inherit; }
+    .pc-result:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.12); color: inherit; }
     .pc-result-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
     .pc-result-team { display: flex; align-items: center; gap: 0.55rem; min-width: 0; }
     .pc-result-team img { width: 1.5rem; height: 1.5rem; object-fit: contain; }
@@ -509,8 +528,8 @@
         gap: 1rem;
     }
     .pc-story {
-        background: var(--paper);
-        border: 1px solid var(--line);
+        background: #161616;
+        border: 1px solid rgba(255,255,255,0.07);
         border-radius: 1.25rem;
         overflow: hidden;
         display: flex;
@@ -518,7 +537,7 @@
     }
     .pc-story-img {
         aspect-ratio: 16/10;
-        background: var(--sand);
+        background: #111;
         position: relative;
         overflow: hidden;
     }
@@ -533,35 +552,37 @@
         margin: 1.25rem 0 1.5rem;
         border-radius: 1.5rem;
         padding: 2rem 1.75rem;
-        background: linear-gradient(135deg, var(--coral), #f0b892);
+        background: #1a1a1a;
+        border: 1px solid rgba(255,255,255,0.1);
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
         gap: 1.25rem;
-        box-shadow: 0 18px 40px rgba(232, 168, 124, 0.3);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
     }
     .pc-cta h3 {
         margin: 0 0 0.35rem;
         font-size: clamp(1.5rem, 2.5vw, 1.9rem);
-        color: #1c2b2a;
-    }
-    .pc-cta p { margin: 0; color: rgba(28,43,42,0.75); font-size: 0.95rem; }
-    .pc-cta .pc-btn {
-        background: var(--teal);
         color: #fff;
-        box-shadow: 0 10px 24px rgba(15,76,74,0.25);
     }
-    .pc-cta .pc-btn:hover { background: #0a3836; color: #fff; }
+    .pc-cta p { margin: 0; color: rgba(255,255,255,0.5); font-size: 0.95rem; }
+    .pc-cta .pc-btn {
+        background: #fff;
+        color: #0e0e0e;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.3);
+    }
+    .pc-cta .pc-btn:hover { background: #e8e8e8; color: #0e0e0e; }
 
     /* ========== FOOTER SOCIAL / ABOUT ========== */
     .pc-footer {
-        background: var(--teal);
+        background: #0a0a0a;
         color: #fff;
         padding: 2.75rem 0 1.5rem;
         border-radius: 0;
         margin-top: 0;
         width: 100%;
+        border-top: 1px solid rgba(255,255,255,0.06);
     }
     .pc-footer-grid {
         display: grid;
@@ -628,16 +649,16 @@
     }
 
     .pc-empty {
-        padding: 2.25rem; text-align: center; border: 1px dashed rgba(28,43,42,0.15);
+        padding: 2.25rem; text-align: center; border: 1px dashed rgba(255,255,255,0.12);
         border-radius: 1.15rem; color: var(--soft); font-size: 0.75rem; font-weight: 700;
-        letter-spacing: 0.1em; text-transform: uppercase; background: rgba(255,255,255,0.4);
+        letter-spacing: 0.1em; text-transform: uppercase; background: rgba(255,255,255,0.02);
     }
 
     .pc-link {
         font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-        color: var(--teal); text-decoration: none;
+        color: rgba(255,255,255,0.7); text-decoration: none;
     }
-    .pc-link:hover { color: var(--teal-mid); }
+    .pc-link:hover { color: #fff; }
 
     .pc-section-head {
         display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
@@ -667,19 +688,19 @@
     /* Tour */
     #vim-tour-overlay { position: fixed; inset: 0; z-index: 50000; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease; }
     #vim-tour-overlay.active { opacity: 1; visibility: visible; }
-    #vim-tour-backdrop { position: absolute; inset: 0; background: rgba(15, 40, 38, 0.78); pointer-events: auto; }
-    #vim-tour-spotlight { position: absolute; width: 100px; height: 100px; border-radius: 9999px; border: 2px solid rgba(232,168,124,0.9); box-shadow: 0 0 30px rgba(232,168,124,0.35); pointer-events: none; transform: translate(-50%, -50%); transition: left 0.45s ease, top 0.45s ease, width 0.35s ease, height 0.35s ease; }
-    #vim-tour-card { position: fixed; width: min(360px, calc(100vw - 32px)); background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 1.25rem; padding: 1.3rem; box-shadow: 0 24px 60px rgba(0,0,0,0.25); z-index: 50002; pointer-events: auto; }
-    .vim-tour-eyebrow { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--teal-mid); margin-bottom: 0.35rem; }
+    #vim-tour-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.82); pointer-events: auto; }
+    #vim-tour-spotlight { position: absolute; width: 100px; height: 100px; border-radius: 9999px; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 0 30px rgba(255,255,255,0.15); pointer-events: none; transform: translate(-50%, -50%); transition: left 0.45s ease, top 0.45s ease, width 0.35s ease, height 0.35s ease; }
+    #vim-tour-card { position: fixed; width: min(360px, calc(100vw - 32px)); background: #1a1a1a; color: #f0f0f0; border: 1px solid rgba(255,255,255,0.1); border-radius: 1.25rem; padding: 1.3rem; box-shadow: 0 24px 60px rgba(0,0,0,0.5); z-index: 50002; pointer-events: auto; }
+    .vim-tour-eyebrow { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 0.35rem; }
     .vim-tour-title { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 0.4rem; }
     .vim-tour-description { color: var(--soft); font-size: 0.88rem; line-height: 1.55; margin-bottom: 1rem; }
     .vim-tour-progress { display: flex; gap: 5px; margin-bottom: 1rem; }
-    .vim-tour-progress span { height: 3px; width: 18px; border-radius: 999px; background: #e5e0d8; }
-    .vim-tour-progress span.active { width: 28px; background: var(--coral); }
+    .vim-tour-progress span { height: 3px; width: 18px; border-radius: 999px; background: rgba(255,255,255,0.12); }
+    .vim-tour-progress span.active { width: 28px; background: #fff; }
     .vim-tour-actions { display: flex; justify-content: space-between; align-items: center; }
     .vim-tour-skip { border: 0; background: transparent; color: var(--soft); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
-    .vim-tour-next { border: 0; background: var(--teal); color: #fff; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.7rem 1rem; border-radius: 999px; cursor: pointer; }
-    #vim-tour-launcher { position: fixed; right: 1.1rem; bottom: 1.1rem; width: 2.5rem; height: 2.5rem; border-radius: 999px; background: var(--teal); color: #fff; border: 0; z-index: 40000; font-weight: 800; cursor: pointer; box-shadow: 0 10px 24px rgba(15,76,74,0.3); }
+    .vim-tour-next { border: 0; background: #fff; color: #0e0e0e; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.7rem 1rem; border-radius: 999px; cursor: pointer; }
+    #vim-tour-launcher { position: fixed; right: 1.1rem; bottom: 1.1rem; width: 2.5rem; height: 2.5rem; border-radius: 999px; background: #1a1a1a; color: #fff; border: 1px solid rgba(255,255,255,0.12); z-index: 40000; font-weight: 800; cursor: pointer; box-shadow: 0 10px 24px rgba(0,0,0,0.4); }
 </style>
 
 <div class="pc">
@@ -746,28 +767,96 @@
     <div class="pc-pops-grid">
         <a href="/market" class="pc-pop reveal reveal-d1">
             <div class="pc-pop-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 7h16M4 12h16M4 17h10" stroke-linecap="round"/><circle cx="18" cy="17" r="2.5"/></svg>
+                <!-- Jersey / transfer card -->
+                <svg viewBox="0 0 48 48" fill="none">
+                    <defs>
+                        <linearGradient id="mk1" x1="8" y1="6" x2="40" y2="42" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#60a5fa"/><stop offset="1" stop-color="#2563eb"/>
+                        </linearGradient>
+                        <linearGradient id="mk2" x1="16" y1="14" x2="32" y2="36" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#93c5fd"/><stop offset="1" stop-color="#3b82f6"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M16 10l-6 4v6c0 2 1 3 2.5 3.5L14 40h20l1.5-16.5C37 23 38 22 38 20v-6l-6-4-2 3h-12l-2-3z" fill="url(#mk1)"/>
+                    <path d="M18 14h12v4c0 4-2.5 7-6 7s-6-3-6-7v-4z" fill="url(#mk2)" opacity="0.9"/>
+                    <circle cx="24" cy="28" r="3.2" fill="#fde68a"/>
+                    <path d="M22.5 28.2l.9.7-.3 1.1 1-.5 1 .5-.3-1.1.9-.7-1.1-.1-.5-1-.5 1-1.1.1z" fill="#b45309"/>
+                    <path d="M14 8h4l2 4H16L14 8zm16 0h4l-2 4h-4l2-4z" fill="#38bdf8"/>
+                </svg>
             </div>
             <strong>Market</strong>
             <span>Player cards & registration</span>
         </a>
         <a href="/matches" class="pc-pop reveal reveal-d2">
             <div class="pc-pop-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="9"/><path d="M12 3a12 12 0 010 18M12 3a12 12 0 000 18M3 12h18" stroke-linecap="round"/></svg>
+                <!-- Soccer ball -->
+                <svg viewBox="0 0 48 48" fill="none">
+                    <defs>
+                        <radialGradient id="ball" cx="18" cy="16" r="22" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#ffffff"/><stop offset="1" stop-color="#d1d5db"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="24" cy="24" r="16" fill="url(#ball)"/>
+                    <circle cx="24" cy="24" r="16" fill="none" stroke="#0f172a" stroke-width="1.2" opacity="0.25"/>
+                    <path d="M24 12l4.2 3.1-1.6 5.1H21.4l-1.6-5.1L24 12z" fill="#0f172a"/>
+                    <path d="M13.5 20.5l5.1-1.2 1.6 5.1-4.2 3.2-4.1-3.5.6-3.6z" fill="#0f172a"/>
+                    <path d="M34.5 20.5l-5.1-1.2-1.6 5.1 4.2 3.2 4.1-3.5-.6-3.6z" fill="#0f172a"/>
+                    <path d="M17.2 33.5l1.2-5.1 5.1 1.6v5.2l-4.5 1.8-1.8-3.5z" fill="#0f172a"/>
+                    <path d="M30.8 33.5l-1.2-5.1-5.1 1.6v5.2l4.5 1.8 1.8-3.5z" fill="#0f172a"/>
+                    <path d="M19.8 24.4l4.2-3.2 4.2 3.2-1.6 5.1h-5.2l-1.6-5.1z" fill="#22c55e" opacity="0.35"/>
+                    <circle cx="24" cy="24" r="16" fill="none" stroke="#4ade80" stroke-width="2" opacity="0.35"/>
+                </svg>
             </div>
             <strong>Matches</strong>
             <span>Fixtures & live scores</span>
         </a>
         <a href="/metrics" class="pc-pop reveal reveal-d3">
             <div class="pc-pop-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M5 19V10M12 19V5M19 19v-7" stroke-linecap="round"/><path d="M4 19h16" stroke-linecap="round"/></svg>
+                <!-- Rising bars / stats -->
+                <svg viewBox="0 0 48 48" fill="none">
+                    <defs>
+                        <linearGradient id="b1" x1="10" y1="36" x2="10" y2="22" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#a78bfa"/><stop offset="1" stop-color="#7c3aed"/>
+                        </linearGradient>
+                        <linearGradient id="b2" x1="24" y1="36" x2="24" y2="14" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#c4b5fd"/><stop offset="1" stop-color="#8b5cf6"/>
+                        </linearGradient>
+                        <linearGradient id="b3" x1="38" y1="36" x2="38" y2="10" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#ddd6fe"/><stop offset="1" stop-color="#a78bfa"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="7" y="22" width="7" height="16" rx="2" fill="url(#b1)"/>
+                    <rect x="20.5" y="14" width="7" height="24" rx="2" fill="url(#b2)"/>
+                    <rect x="34" y="10" width="7" height="28" rx="2" fill="url(#b3)"/>
+                    <path d="M9 20l12-8 8 4 10-10" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <circle cx="39" cy="6" r="2.5" fill="#fbbf24"/>
+                    <path d="M6 38h36" stroke="#ffffff" stroke-opacity="0.2" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
             </div>
             <strong>Metrics</strong>
             <span>Goals, assists, MVPs</span>
         </a>
         <a href="/records" class="pc-pop reveal reveal-d4">
             <div class="pc-pop-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M7 6H5a2 2 0 000 4h2M17 6h2a2 2 0 010 4h-2" stroke-linecap="round"/></svg>
+                <!-- Trophy -->
+                <svg viewBox="0 0 48 48" fill="none">
+                    <defs>
+                        <linearGradient id="tr" x1="14" y1="8" x2="34" y2="40" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#fde68a"/><stop offset="0.5" stop-color="#f59e0b"/><stop offset="1" stop-color="#d97706"/>
+                        </linearGradient>
+                        <linearGradient id="tr2" x1="20" y1="28" x2="28" y2="42" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#fbbf24"/><stop offset="1" stop-color="#b45309"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M16 10h16v8c0 5.5-3.5 10-8 10s-8-4.5-8-10V10z" fill="url(#tr)"/>
+                    <path d="M16 10h16v3H16V10z" fill="#fef3c7" opacity="0.7"/>
+                    <path d="M16 12H11c0 5 2.5 8 5 9V12zm16 0h5c0 5-2.5 8-5 9V12z" fill="#f59e0b"/>
+                    <path d="M22 28h4v5h-4v-5z" fill="url(#tr2)"/>
+                    <rect x="17" y="33" width="14" height="4" rx="1.5" fill="#fbbf24"/>
+                    <rect x="15" y="37" width="18" height="4" rx="1.5" fill="#d97706"/>
+                    <circle cx="24" cy="18" r="3" fill="#fef3c7"/>
+                    <path d="M24 15.5l.7 1.5 1.6.2-1.2 1.1.3 1.6L24 19l-1.4.9.3-1.6-1.2-1.1 1.6-.2.7-1.5z" fill="#b45309"/>
+                </svg>
             </div>
             <strong>Records</strong>
             <span>League history & milestones</span>
@@ -1147,24 +1236,24 @@
         let html = '';
         topTargetUrl = '';
         if ((!matches || !matches.length) && (!players || !players.length)) {
-            dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:#5c6b6a;font-size:0.8rem;">No results</div>';
+            dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:#9a9a9a;font-size:0.8rem;">No results</div>';
             dropdown.classList.remove('hidden');
             return;
         }
         if (matches && matches.length) {
             if (!topTargetUrl) topTargetUrl = `/match/${matches[0]._id || matches[0].id || ''}`;
-            html += '<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#5c6b6a;margin-bottom:0.35rem;">Matches</div>';
+            html += '<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#9a9a9a;margin-bottom:0.35rem;">Matches</div>';
             matches.forEach(m => {
                 const url = (m._id || m.id) ? `/match/${m._id || m.id}` : `/matches?q=${encodeURIComponent(query)}`;
-                html += `<a href="${url}" style="display:block;padding:0.45rem 0.2rem;text-decoration:none;color:#1c2b2a;font-size:0.85rem;font-weight:600;">${m.teamA} vs ${m.teamB}</a>`;
+                html += `<a href="${url}" style="display:block;padding:0.45rem 0.2rem;text-decoration:none;color:#f0f0f0;font-size:0.85rem;font-weight:600;">${m.teamA} vs ${m.teamB}</a>`;
             });
         }
         if (players && players.length) {
             if (!topTargetUrl) topTargetUrl = (players[0]._id || players[0].id) ? `/player/${players[0]._id || players[0].id}` : '/market';
-            html += '<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#5c6b6a;margin:0.55rem 0 0.35rem;">Players</div>';
+            html += '<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#9a9a9a;margin:0.55rem 0 0.35rem;">Players</div>';
             players.forEach(p => {
                 const url = (p._id || p.id) ? `/player/${p._id || p.id}` : `/market?search=${encodeURIComponent(p.name)}`;
-                html += `<a href="${url}" style="display:block;padding:0.45rem 0.2rem;text-decoration:none;color:#1c2b2a;font-size:0.85rem;font-weight:600;">${p.name}</a>`;
+                html += `<a href="${url}" style="display:block;padding:0.45rem 0.2rem;text-decoration:none;color:#f0f0f0;font-size:0.85rem;font-weight:600;">${p.name}</a>`;
             });
         }
         dropdown.innerHTML = html;

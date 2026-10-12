@@ -71,18 +71,19 @@
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     html.dark ::-webkit-scrollbar-thumb { background: #334155; }
     
-    nav { z-index: 9999 !important; }
-100% {
-                opacity: 0;
-                width: 58px;
-                height: 58px;
-            }
-        }
+    nav {
+        z-index: 9999 !important;
+        position: relative;
     }
 
     /* Frosted Glass Header */
     .vim-nav-glass {
-        background: rgba(255, 255, 255, 0.85);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        background: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         border-bottom: 1px solid rgba(226, 232, 240, 0.8);

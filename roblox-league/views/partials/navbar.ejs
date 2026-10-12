@@ -1,4 +1,24 @@
-<%- include('partials/og-meta') %>
+<%
+  // Discord / OG embeds — inline so a missing partial never 500s the site
+  const _ogTitle = (typeof ogTitle !== 'undefined' && ogTitle) ? ogTitle : 'VIM Super League';
+  const _ogDesc = (typeof ogDescription !== 'undefined' && ogDescription)
+    ? ogDescription
+    : 'Competitive Roblox football league — player market, live matches, stats and records.';
+  const _ogImage = (typeof ogImage !== 'undefined' && ogImage) ? ogImage : '';
+  const _ogUrl = (typeof ogUrl !== 'undefined' && ogUrl) ? ogUrl : '';
+%>
+<meta property="og:site_name" content="VIM Super League" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="<%= _ogTitle %>" />
+<meta property="og:description" content="<%= _ogDesc %>" />
+<% if (_ogImage) { %><meta property="og:image" content="<%= _ogImage %>" /><% } %>
+<% if (_ogUrl) { %><meta property="og:url" content="<%= _ogUrl %>" /><% } %>
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="<%= _ogTitle %>" />
+<meta name="twitter:description" content="<%= _ogDesc %>" />
+<% if (_ogImage) { %><meta name="twitter:image" content="<%= _ogImage %>" /><% } %>
+<title><%= _ogTitle %></title>
+<meta name="description" content="<%= _ogDesc %>" />
 
 <script>
     // Configure Tailwind dark mode dynamically

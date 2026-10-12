@@ -25,10 +25,10 @@
         -webkit-font-smoothing: antialiased;
     }
 
-    .pc { padding-top: 5rem; }
+    .pc { padding-top: 4.75rem; }
 
     .pc-wrap {
-        width: min(1120px, calc(100% - 2.5rem));
+        width: min(1200px, calc(100% - 1.75rem));
         margin: 0 auto;
     }
 
@@ -65,30 +65,30 @@
     /* ========== HERO ========== */
     .pc-hero {
         position: relative;
-        padding: 1.5rem 0 0;
+        padding: 0.75rem 0 0;
         overflow: hidden;
     }
 
     .pc-hero-shell {
         position: relative;
-        border-radius: 2rem;
+        border-radius: 1.75rem;
         overflow: hidden;
-        min-height: min(72vh, 680px);
+        min-height: min(78vh, 720px);
         background:
-            linear-gradient(115deg, rgba(15, 76, 74, 0.55) 0%, rgba(15, 76, 74, 0.15) 42%, transparent 70%),
+            linear-gradient(105deg, rgba(15, 76, 74, 0.72) 0%, rgba(15, 76, 74, 0.35) 38%, rgba(15, 76, 74, 0.08) 62%, transparent 78%),
             url('/images/vimgfx.png') center center / cover no-repeat;
         color: #fff;
         display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
+        grid-template-columns: 1.15fr 0.85fr;
         align-items: center;
-        box-shadow: 0 28px 60px rgba(28, 43, 42, 0.12);
+        box-shadow: 0 20px 50px rgba(28, 43, 42, 0.1);
     }
 
     .pc-hero-copy {
         position: relative;
         z-index: 2;
-        padding: 3rem 2.5rem 3.5rem;
-        max-width: 34rem;
+        padding: 2.75rem 2.25rem 3rem 2.75rem;
+        max-width: 36rem;
     }
 
     .pc-hero-copy .pc-label {
@@ -184,10 +184,10 @@
     .pc-hero-side {
         position: relative;
         z-index: 2;
-        padding: 2rem;
+        padding: 1.75rem 1.75rem 1.75rem 0.5rem;
         display: flex;
         flex-direction: column;
-        gap: 0.85rem;
+        gap: 0.75rem;
         justify-content: center;
     }
     .pc-float-card {
@@ -216,19 +216,20 @@
     .pc-wave {
         display: block;
         width: 100%;
-        height: 72px;
+        height: 48px;
         margin-top: -1px;
     }
     .pc-wave path { fill: var(--sand); }
 
     /* ========== 3D POP BUTTONS ========== */
     .pc-pops {
-        padding: 1rem 0 3.5rem;
+        padding: 0.25rem 0 2rem;
+        margin-top: -0.5rem;
     }
     .pc-pops-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 1.15rem;
+        gap: 0.9rem;
     }
     .pc-pop {
         position: relative;
@@ -238,8 +239,8 @@
         text-align: center;
         text-decoration: none;
         color: inherit;
-        padding: 1.5rem 1rem 1.35rem;
-        border-radius: 1.35rem;
+        padding: 1.25rem 0.85rem 1.15rem;
+        border-radius: 1.25rem;
         background: var(--paper);
         border: 1px solid var(--line);
         box-shadow:
@@ -287,11 +288,11 @@
 
     /* ========== SERVICES-STYLE STRIP ========== */
     .pc-band {
-        padding: 3.5rem 0;
+        padding: 2.25rem 0;
     }
     .pc-band-head {
         text-align: center;
-        margin-bottom: 2.25rem;
+        margin-bottom: 1.5rem;
     }
     .pc-band-head h2 {
         margin: 0.5rem 0 0;
@@ -348,9 +349,9 @@
     .pc-gallery-band {
         background: var(--teal);
         color: #fff;
-        padding: 3.5rem 0 4rem;
-        border-radius: 2.5rem 2.5rem 0 0;
-        margin-top: 1rem;
+        padding: 2.75rem 0 3rem;
+        border-radius: 2rem 2rem 0 0;
+        margin-top: 0.5rem;
     }
     .pc-gallery-band .pc-label { color: rgba(255,255,255,0.65); }
     .pc-gallery-band h2 { color: #fff; margin: 0.45rem 0 0.35rem; font-size: clamp(1.8rem, 3vw, 2.4rem); }
@@ -398,14 +399,14 @@
     /* ========== ABOUT ========== */
     .pc-about {
         background: var(--paper);
-        padding: 4rem 0;
-        border-radius: 0 0 2.5rem 2.5rem;
-        margin-bottom: 2rem;
+        padding: 2.75rem 0;
+        border-radius: 0 0 2rem 2rem;
+        margin-bottom: 1.25rem;
     }
     .pc-about-grid {
         display: grid;
         grid-template-columns: 0.95fr 1.05fr;
-        gap: 2.5rem;
+        gap: 2rem;
         align-items: center;
     }
     .pc-about-photo {
@@ -510,9 +511,9 @@
 
     /* CTA coral band */
     .pc-cta {
-        margin: 2rem 0;
-        border-radius: 1.75rem;
-        padding: 2.5rem 2rem;
+        margin: 1.25rem 0 1.5rem;
+        border-radius: 1.5rem;
+        padding: 2rem 1.75rem;
         background: linear-gradient(135deg, var(--coral), #f0b892);
         display: flex;
         flex-wrap: wrap;
@@ -538,15 +539,15 @@
     .pc-footer {
         background: var(--teal);
         color: #fff;
-        padding: 3.5rem 0 2rem;
-        border-radius: 2.5rem 2.5rem 0 0;
-        margin-top: 1rem;
+        padding: 2.75rem 0 1.5rem;
+        border-radius: 2rem 2rem 0 0;
+        margin-top: 0.5rem;
     }
     .pc-footer-grid {
         display: grid;
         grid-template-columns: 1.4fr 1fr 1fr;
-        gap: 2rem;
-        margin-bottom: 2.5rem;
+        gap: 1.5rem;
+        margin-bottom: 1.75rem;
     }
     .pc-footer h4 {
         margin: 0 0 0.85rem;
@@ -620,7 +621,7 @@
 
     .pc-section-head {
         display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
-        gap: 1rem; margin-bottom: 1.5rem;
+        gap: 0.75rem; margin-bottom: 1.15rem;
     }
     .pc-section-head h2 {
         margin: 0.35rem 0 0; font-size: clamp(1.7rem, 3vw, 2.2rem);

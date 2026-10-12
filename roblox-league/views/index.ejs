@@ -1,1112 +1,738 @@
 <%- include('partials/navbar') %>
 
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
 
 <style>
     :root {
-        --sand: #121212;
-        --paper: #1a1a1a;
-        --ink: #f0f0f0;
-        --soft: #9a9a9a;
-        --teal: #2a2a2a;
-        --teal-mid: #c8c8c8;
-        --coral: #ffffff;
-        --coral-deep: #e8e8e8;
-        --line: rgba(255, 255, 255, 0.08);
-        --radius: 1.25rem;
-        --surface: #161616;
-        --elevated: #1e1e1e;
-        --muted-line: rgba(255, 255, 255, 0.06);
+        --brand-blue: #0088ff;
+        --brand-cyan: #00c6ff;
+        --text-dark: #0f172a;
+        --text-muted: #64748b;
     }
 
+    /* Multi-layered Soft Greyish-White Gradient Background */
     body {
-        margin: 0;
-        background: #0e0e0e;
-        color: var(--ink);
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-        overflow-x: hidden;
-        -webkit-font-smoothing: antialiased;
-    }
-
-    .pc {
-        background: #0e0e0e;
-    }
-
-    .pc { padding-top: 4.75rem; }
-
-    .pc-wrap {
-        width: min(1440px, calc(100% - 1.25rem));
-        margin: 0 auto;
-    }
-    .pc-wrap-tight {
-        width: min(1440px, calc(100% - 1.25rem));
-        margin: 0 auto;
-    }
-
-    .pc-serif {
-        font-family: 'Fraunces', Georgia, serif;
-        font-weight: 600;
-        letter-spacing: -0.03em;
-        line-height: 1.05;
-    }
-
-    .pc-label {
-        font-size: 0.68rem;
-        font-weight: 700;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.45);
-    }
-
-    /* ----- reveal on scroll ----- */
-    .reveal {
-        opacity: 0;
-        transform: translateY(28px);
-        transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .reveal.in {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    .reveal-d1 { transition-delay: 0.08s; }
-    .reveal-d2 { transition-delay: 0.16s; }
-    .reveal-d3 { transition-delay: 0.24s; }
-    .reveal-d4 { transition-delay: 0.32s; }
-
-    /* ========== HERO ========== */
-    .pc-hero {
-        position: relative;
-        padding: 0;
-        overflow: hidden;
-    }
-
-    .pc-hero-shell {
-        position: relative;
-        border-radius: 0;
-        overflow: hidden;
-        min-height: min(88vh, 820px);
-        width: 100%;
-        background:
-            linear-gradient(105deg, rgba(10, 10, 10, 0.88) 0%, rgba(14, 14, 14, 0.55) 40%, rgba(14, 14, 14, 0.2) 65%, transparent 82%),
-            url('/images/vimgfx.png') center center / cover no-repeat;
-        color: #fff;
-        box-shadow: none;
-    }
-
-    .pc-hero-inner {
-        width: min(1440px, calc(100% - 1.25rem));
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
-        align-items: center;
-        gap: 1.25rem;
-        padding: 0 0.5rem;
-        box-sizing: border-box;
-        min-height: min(88vh, 820px);
-    }
-
-    .pc-hero-copy {
-        position: relative;
-        z-index: 2;
-        padding: 3.25rem 1.5rem 3.5rem 0.5rem;
-        max-width: 40rem;
-    }
-
-    .pc-hero-copy .pc-label {
-        color: rgba(255,255,255,0.75);
-        margin-bottom: 1rem;
-    }
-
-    .pc-hero h1 {
-        margin: 0 0 1.1rem;
-        font-size: clamp(2.6rem, 5.5vw, 4rem);
-        color: #fff;
-    }
-
-    .pc-hero h1 em {
-        font-style: italic;
-        font-weight: 500;
-        display: block;
-        opacity: 0.95;
-    }
-
-    .pc-hero-lead {
-        margin: 0 0 1.75rem;
-        font-size: 1rem;
-        line-height: 1.65;
-        color: rgba(255,255,255,0.82);
-        font-weight: 500;
-        max-width: 28rem;
-    }
-
-    .pc-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.7rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .pc-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        padding: 0.9rem 1.35rem;
-        border-radius: 999px;
-        font-size: 0.72rem;
-        font-weight: 800;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        text-decoration: none;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-    .pc-btn:hover { transform: translateY(-2px); }
-
-    .pc-btn-coral {
-        background: #ffffff;
-        color: #0e0e0e;
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
-    }
-    .pc-btn-coral:hover { background: #eaeaea; color: #0e0e0e; }
-
-    .pc-btn-ghost {
-        border: 1.5px solid rgba(255,255,255,0.22);
-        color: #fff;
-        background: rgba(255,255,255,0.04);
-    }
-    .pc-btn-ghost:hover { background: rgba(255,255,255,0.1); color: #fff; }
-
-    .pc-search {
-        position: relative;
-        display: flex;
-        gap: 0.35rem;
-        max-width: 400px;
-        padding: 0.4rem;
-        border-radius: 999px;
-        background: rgba(20, 20, 20, 0.92);
-        border: 1px solid rgba(255,255,255,0.12);
-        box-shadow: 0 14px 36px rgba(0,0,0,0.4);
-    }
-    .pc-search input {
-        flex: 1; min-width: 0; border: 0; outline: none; background: transparent;
-        padding: 0.75rem 1rem; font-family: inherit; font-size: 0.88rem; font-weight: 600; color: #f0f0f0;
-    }
-    .pc-search input::placeholder { color: rgba(255,255,255,0.35); }
-    .pc-search button {
-        border: 0; border-radius: 999px; padding: 0.75rem 1.1rem;
-        background: #fff; color: #0e0e0e; font-family: inherit;
-        font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
-    }
-    #search-results-dropdown {
-        position: absolute; left: 0; right: 0; top: calc(100% + 0.5rem);
-        background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5); padding: 0.85rem;
-        max-height: 22rem; overflow-y: auto; z-index: 40; text-align: left; color: #f0f0f0;
-    }
-
-    /* decorative side panel placeholders in hero */
-    .pc-hero-side {
-        position: relative;
-        z-index: 2;
-        padding: 2rem 0.5rem 2rem 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        justify-content: center;
-        height: 100%;
-    }
-    .pc-float-card {
-        border-radius: 1.15rem;
-        overflow: hidden;
-        border: 2px solid rgba(255,255,255,0.5);
-        box-shadow: 0 16px 40px rgba(0,0,0,0.18);
-        background: rgba(255,255,255,0.12);
-        backdrop-filter: blur(6px);
-        min-height: 160px;
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: rgba(255,255,255,0.7);
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-    }
-    .pc-float-card img {
-        width: 100%; height: 100%; object-fit: cover; display: block; min-height: 160px;
-    }
-    .pc-float-card.tall { min-height: 220px; flex: 1.35; }
-
-    /* wave divider */
-    .pc-wave {
-        display: block;
-        width: 100%;
-        height: 48px;
-        margin-top: -1px;
-    }
-    .pc-wave path { fill: #0e0e0e; }
-
-    /* ========== 3D POP BUTTONS ========== */
-    .pc-pops {
-        padding: 1.25rem 0 1.75rem;
-        margin-top: 0;
-        background: #0e0e0e;
-    }
-    .pc-pops-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
-    }
-    .pc-pop {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        text-decoration: none;
-        color: inherit;
-        padding: 1.25rem 0.85rem 1.15rem;
-        border-radius: 1.25rem;
-        background: #161616;
-        border: 1px solid rgba(255,255,255,0.07);
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
-        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease;
-        overflow: visible;
-    }
-    .pc-pop:hover {
-        transform: translateY(-8px);
-        border-color: rgba(255,255,255,0.14);
-        box-shadow: 0 22px 48px rgba(0, 0, 0, 0.5);
-        color: inherit;
-    }
-    .pc-pop-icon {
-        width: 4.75rem;
-        height: 4.75rem;
-        margin-bottom: 1rem;
-        border-radius: 1.25rem;
-        background: linear-gradient(160deg, #252525 0%, #141414 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.07);
-        position: relative;
-    }
-    .pc-pop:hover .pc-pop-icon {
-        transform: translateY(-16px) scale(1.14);
-        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.08);
-    }
-    .pc-pop-icon svg {
-        width: 2.6rem;
-        height: 2.6rem;
-        overflow: visible;
-        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));
-    }
-    .pc-pop:nth-child(1) .pc-pop-icon { background: linear-gradient(160deg, #1e3a5f 0%, #0f172a 100%); }
-    .pc-pop:nth-child(2) .pc-pop-icon { background: linear-gradient(160deg, #14532d 0%, #052e16 100%); }
-    .pc-pop:nth-child(3) .pc-pop-icon { background: linear-gradient(160deg, #5b21b6 0%, #2e1065 100%); }
-    .pc-pop:nth-child(4) .pc-pop-icon { background: linear-gradient(160deg, #92400e 0%, #451a03 100%); }
-    .pc-pop strong {
-        display: block;
-        font-size: 0.95rem;
-        font-weight: 800;
-        margin-bottom: 0.25rem;
-    }
-    .pc-pop span {
-        font-size: 0.78rem;
-        color: var(--soft);
-        line-height: 1.4;
-    }
-
-    /* ========== SERVICES-STYLE STRIP ========== */
-    .pc-band {
-        padding: 2rem 0;
-    }
-    .pc-band-head {
-        text-align: center;
-        margin-bottom: 1.5rem;
-    }
-    .pc-band-head h2 {
-        margin: 0.5rem 0 0;
-        font-size: clamp(1.9rem, 3.5vw, 2.6rem);
-    }
-
-    /* Match + stream */
-    .pc-split {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr;
-        gap: 1rem;
-    }
-    .pc-card {
-        background: #161616;
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: var(--radius);
-        padding: 1.5rem;
-        box-shadow: 0 12px 32px rgba(0,0,0,0.3);
-    }
-    .pc-match {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        gap: 1rem;
-        align-items: center;
-        padding: 1.25rem;
-        background: #111;
-        border-radius: 1.15rem;
-        margin-top: 1rem;
-        border: 1px solid rgba(255,255,255,0.05);
-    }
-    .pc-team {
-        display: flex; flex-direction: column; align-items: center; gap: 0.55rem; text-align: center;
-    }
-    .pc-team img { width: 3.5rem; height: 3.5rem; object-fit: contain; }
-    .pc-team span { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; }
-    .pc-vs { text-align: center; }
-    .pc-vs strong { font-family: 'Fraunces', serif; font-size: 1.4rem; font-style: italic; color: #fff; }
-    .pc-vs small { display: block; margin-top: 0.25rem; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); }
-
-    .pc-stream {
-        border-radius: var(--radius);
-        overflow: hidden;
-        background: #0a0a0a;
-        min-height: 260px;
-        border: 1px solid rgba(255,255,255,0.07);
-    }
-    .pc-stream iframe { width: 100%; min-height: 280px; border: 0; display: block; }
-    .pc-stream-empty {
-        min-height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        color: rgba(255,255,255,0.5); text-align: center; padding: 1.5rem; gap: 0.35rem;
-    }
-    .pc-stream-empty strong { color: rgba(255,255,255,0.85); font-family: 'Fraunces', serif; font-size: 1.25rem; }
-
-    /* ========== IMAGE PLACEHOLDERS GALLERY ========== */
-    .pc-gallery-band {
-        background: #141414;
-        color: #fff;
-        padding: 2.75rem 0 3rem;
-        border-radius: 0;
-        margin-top: 0.5rem;
-        width: 100%;
-        border-top: 1px solid rgba(255,255,255,0.06);
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-    .pc-gallery-band .pc-label { color: rgba(255,255,255,0.4); }
-    .pc-gallery-band h2 { color: #fff; margin: 0.45rem 0 0.35rem; font-size: clamp(1.8rem, 3vw, 2.4rem); }
-    .pc-gallery-band .sub { color: rgba(255,255,255,0.45); font-size: 0.95rem; margin: 0 0 1.75rem; }
-
-    .pc-gallery {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 0.75rem;
-    }
-    .pc-ph {
-        aspect-ratio: 4 / 5;
-        border-radius: 1.1rem;
-        overflow: hidden;
-        background: rgba(255,255,255,0.03);
-        border: 1px dashed rgba(255,255,255,0.12);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.4rem;
-        color: rgba(255,255,255,0.55);
-        font-size: 0.68rem;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        text-align: center;
-        padding: 0.75rem;
-        position: relative;
-    }
-    .pc-ph img {
-        position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-    }
-    .pc-ph.has-img { border-style: solid; border-color: transparent; }
-    .pc-ph.has-img span { display: none; }
-    .pc-ph-label {
-        position: absolute; left: 0; right: 0; bottom: 0;
-        padding: 0.65rem 0.7rem;
-        background: linear-gradient(transparent, rgba(0,0,0,0.55));
-        color: #fff; font-size: 0.7rem; font-weight: 700;
-        letter-spacing: 0.04em; text-transform: uppercase;
-        z-index: 2;
-    }
-
-    /* ========== ABOUT ========== */
-    .pc-about {
-        background: #121212;
-        padding: 2.75rem 0;
-        border-radius: 0;
-        margin-bottom: 0;
-        width: 100%;
-    }
-    .pc-about-grid {
-        display: grid;
-        grid-template-columns: 0.95fr 1.05fr;
-        gap: 2rem;
-        align-items: center;
-    }
-    .pc-about-photo {
-        border-radius: 1.5rem;
-        overflow: hidden;
-        min-height: 320px;
-        background: #181818;
-        border: 1px dashed rgba(255,255,255,0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--soft);
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        position: relative;
-    }
-    .pc-about-photo img {
-        position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-    }
-    .pc-about h2 {
-        margin: 0.5rem 0 1rem;
-        font-size: clamp(1.9rem, 3.2vw, 2.6rem);
-    }
-    .pc-about p {
-        margin: 0 0 1rem;
-        font-size: 1rem;
-        line-height: 1.7;
-        color: var(--soft);
-    }
-    .pc-about-quote {
-        margin-top: 1.25rem;
-        padding-top: 1.15rem;
-        border-top: 1px solid rgba(255,255,255,0.08);
-        font-family: 'Fraunces', serif;
-        font-style: italic;
-        font-size: 1.15rem;
-        color: #f0f0f0;
-        line-height: 1.45;
-    }
-    .pc-about-quote cite {
-        display: block;
-        margin-top: 0.5rem;
+        background-color: #f4f6f9;
+        background-image: 
+            radial-gradient(at 0% 20%, rgba(226, 232, 240, 0.8) 0px, transparent 50%),
+            radial-gradient(at 100% 50%, rgba(203, 213, 225, 0.6) 0px, transparent 50%),
+            radial-gradient(at 0% 80%, rgba(226, 232, 240, 0.8) 0px, transparent 50%),
+            linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+        background-attachment: fixed;
+        color: var(--text-dark);
         font-family: 'Plus Jakarta Sans', sans-serif;
-        font-style: normal;
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--soft);
+        overflow-x: hidden;
+        min-height: 100vh;
     }
 
-    /* Results */
-    .pc-results {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.85rem;
-    }
-    .pc-result {
-        display: flex; flex-direction: column; gap: 0.55rem;
-        padding: 1.1rem 1.2rem;
-        background: #161616;
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 1.15rem;
-        text-decoration: none; color: inherit;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    }
-    .pc-result:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.12); color: inherit; }
-    .pc-result-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
-    .pc-result-team { display: flex; align-items: center; gap: 0.55rem; min-width: 0; }
-    .pc-result-team img { width: 1.5rem; height: 1.5rem; object-fit: contain; }
-    .pc-result-team span { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .pc-result-score { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; }
-    .pc-result-score.dim { color: var(--soft); }
-
-    /* Stories */
-    .pc-stories {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-    }
-    .pc-story {
-        background: #161616;
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 1.25rem;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-    .pc-story-img {
-        aspect-ratio: 16/10;
-        background: #111;
+    /* Fullscreen Hero Background Image with Overlay */
+    .hero-container {
         position: relative;
-        overflow: hidden;
+        background: url('/images/vimgfx.png') center/cover no-repeat;
+        min-height: 85vh;
     }
-    .pc-story-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .pc-story-body { padding: 1.15rem 1.2rem 1.35rem; }
-    .pc-story-body small { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft); }
-    .pc-story-body h3 { margin: 0.35rem 0 0.4rem; font-size: 1.1rem; font-family: 'Fraunces', serif; font-weight: 600; line-height: 1.2; }
-    .pc-story-body p { margin: 0; font-size: 0.85rem; line-height: 1.55; color: var(--soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-    /* CTA coral band */
-    .pc-cta {
-        margin: 1.25rem 0 1.5rem;
+    /* Fog / Cloud Transition into Grey Tone at Hero Bottom */
+    .fog-bottom {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 220px;
+        background: linear-gradient(to bottom, transparent 0%, rgba(244, 246, 249, 0.7) 40%, #f4f6f9 100%);
+        pointer-events: none;
+    }
+
+    /* Glassmorphism Elevated Cards with Gradient Fill */
+    .clean-card {
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(203, 213, 225, 0.6);
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08);
         border-radius: 1.5rem;
-        padding: 2rem 1.75rem;
-        background: #1a1a1a;
-        border: 1px solid rgba(255,255,255,0.1);
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1.25rem;
-        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .pc-cta h3 {
-        margin: 0 0 0.35rem;
-        font-size: clamp(1.5rem, 2.5vw, 1.9rem);
-        color: #fff;
-    }
-    .pc-cta p { margin: 0; color: rgba(255,255,255,0.5); font-size: 0.95rem; }
-    .pc-cta .pc-btn {
-        background: #fff;
-        color: #0e0e0e;
-        box-shadow: 0 10px 24px rgba(0,0,0,0.3);
-    }
-    .pc-cta .pc-btn:hover { background: #e8e8e8; color: #0e0e0e; }
 
-    /* ========== FOOTER SOCIAL / ABOUT ========== */
-    .pc-footer {
-        background: #0a0a0a;
-        color: #fff;
-        padding: 2.75rem 0 1.5rem;
-        border-radius: 0;
-        margin-top: 0;
-        width: 100%;
-        border-top: 1px solid rgba(255,255,255,0.06);
+    .clean-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px -10px rgba(0, 136, 255, 0.15);
+        border-color: rgba(0, 136, 255, 0.4);
     }
-    .pc-footer-grid {
-        display: grid;
-        grid-template-columns: 1.4fr 1fr 1fr;
-        gap: 1.5rem;
-        margin-bottom: 1.75rem;
+
+    /* Custom Search & Action Bar */
+    .search-pill {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     }
-    .pc-footer h4 {
-        margin: 0 0 0.85rem;
-        font-size: 0.72rem;
-        font-weight: 800;
-        letter-spacing: 0.16em;
+
+    .gradient-text {
+        background: linear-gradient(135deg, #0088ff 0%, #00c6ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #0088ff 0%, #00c6ff 100%);
+        box-shadow: 0 8px 20px rgba(0, 136, 255, 0.3);
+    }
+
+    .btn-gradient:hover {
+        opacity: 0.95;
+        box-shadow: 0 12px 25px rgba(0, 136, 255, 0.45);
+    }
+
+    /* Standout Grey-Gradient Container Cards */
+    .section-grey-gradient {
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+        border-radius: 2rem;
+        border: 1px solid #cbd5e1;
+        box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    }
+
+    /* =========================================================
+       HOMEPAGE TOUR
+       ========================================================= */
+
+    #vim-tour-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 50000;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    #vim-tour-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #vim-tour-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.76);
+        pointer-events: auto;
+    }
+
+    #vim-tour-spotlight {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border-radius: 9999px;
+        border: 2px solid rgba(0, 198, 255, 0.95);
+        box-shadow:
+            0 0 0 4px rgba(0, 136, 255, 0.10),
+            0 0 30px rgba(0, 136, 255, 0.45),
+            0 0 70px rgba(0, 198, 255, 0.25);
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        transition:
+            left 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+            top 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+            width 0.35s ease,
+            height 0.35s ease;
+    }
+
+    #vim-tour-card {
+        position: fixed;
+        width: min(360px, calc(100vw - 32px));
+        background: rgba(255, 255, 255, 0.97);
+        color: #0f172a;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: 20px;
+        padding: 22px;
+        box-shadow:
+            0 30px 80px rgba(0, 0, 0, 0.35),
+            0 10px 30px rgba(0, 136, 255, 0.15);
+        z-index: 50002;
+        pointer-events: auto;
+        transition:
+            left 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+            top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #vim-tour-card::before {
+        content: "";
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: white;
+        border-left: 1px solid rgba(226, 232, 240, 0.9);
+        border-top: 1px solid rgba(226, 232, 240, 0.9);
+        transform: rotate(45deg);
+        top: -7px;
+        left: 34px;
+    }
+
+    #vim-tour-card.centered::before {
+        display: none;
+    }
+
+    .vim-tour-eyebrow {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.2em;
         text-transform: uppercase;
-        color: rgba(255,255,255,0.55);
+        color: #0088ff;
+        margin-bottom: 6px;
     }
-    .pc-footer p {
-        margin: 0;
-        font-size: 0.92rem;
+
+    .vim-tour-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 20px;
+        font-weight: 900;
+        line-height: 1.15;
+        margin-bottom: 8px;
+    }
+
+    .vim-tour-description {
+        color: #64748b;
+        font-size: 12px;
         line-height: 1.65;
-        color: rgba(255,255,255,0.75);
-        max-width: 28rem;
+        margin-bottom: 18px;
     }
-    .pc-footer a {
-        color: rgba(255,255,255,0.85);
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 600;
-    }
-    .pc-footer a:hover { color: #fff; }
-    .pc-socials {
+
+    .vim-tour-progress {
         display: flex;
-        flex-wrap: wrap;
-        gap: 0.65rem;
-    }
-    .pc-social {
-        display: inline-flex;
         align-items: center;
-        gap: 0.45rem;
-        padding: 0.7rem 1.1rem;
+        gap: 5px;
+        margin-bottom: 16px;
+    }
+
+    .vim-tour-progress span {
+        height: 4px;
+        width: 20px;
         border-radius: 999px;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.15);
-        color: #fff !important;
-        font-size: 0.78rem !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.04em;
-        transition: background 0.2s ease, transform 0.2s ease;
+        background: #e2e8f0;
+        transition: all 0.25s ease;
     }
-    .pc-social:hover {
-        background: rgba(255,255,255,0.18);
-        transform: translateY(-2px);
-        color: #fff !important;
+
+    .vim-tour-progress span.active {
+        width: 32px;
+        background: linear-gradient(90deg, #0088ff, #00c6ff);
     }
-    .pc-social svg { width: 1.1rem; height: 1.1rem; }
-    .pc-footer-bottom {
-        border-top: 1px solid rgba(255,255,255,0.12);
-        padding-top: 1.25rem;
+
+    .vim-tour-actions {
         display: flex;
-        flex-wrap: wrap;
         justify-content: space-between;
-        gap: 0.75rem;
-        font-size: 0.75rem;
-        color: rgba(255,255,255,0.45);
+        align-items: center;
+        gap: 10px;
     }
 
-    .pc-empty {
-        padding: 2.25rem; text-align: center; border: 1px dashed rgba(255,255,255,0.12);
-        border-radius: 1.15rem; color: var(--soft); font-size: 0.75rem; font-weight: 700;
-        letter-spacing: 0.1em; text-transform: uppercase; background: rgba(255,255,255,0.02);
+    .vim-tour-skip {
+        border: none;
+        background: transparent;
+        color: #94a3b8;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 8px 4px;
     }
 
-    .pc-link {
-        font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-        color: rgba(255,255,255,0.7); text-decoration: none;
-    }
-    .pc-link:hover { color: #fff; }
-
-    .pc-section-head {
-        display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
-        gap: 0.75rem; margin-bottom: 1.15rem;
-    }
-    .pc-section-head h2 {
-        margin: 0.35rem 0 0; font-size: clamp(1.7rem, 3vw, 2.2rem);
-    }
-
-    @media (max-width: 960px) {
-        .pc-hero-shell { grid-template-columns: 1fr; min-height: 70vh; }
-        .pc-hero-inner { grid-template-columns: 1fr; }
-        .pc-hero-side { display: none; }
-        .pc-hero-copy { padding: 2.5rem 1rem 2.75rem; max-width: none; }
-        .pc-pops-grid { grid-template-columns: repeat(2, 1fr); }
-        .pc-split, .pc-about-grid, .pc-footer-grid { grid-template-columns: 1fr; }
-        .pc-gallery { grid-template-columns: repeat(2, 1fr); }
-        .pc-stories, .pc-results { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 560px) {
-        .pc-pops-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-        .pc-search { flex-direction: column; border-radius: 1.1rem; }
-        .pc-search button { width: 100%; }
-        .pc-match { grid-template-columns: 1fr; }
+    .vim-tour-next {
+        border: none;
+        background: linear-gradient(135deg, #0088ff, #00c6ff);
+        color: white;
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 11px 17px;
+        border-radius: 11px;
+        box-shadow: 0 7px 18px rgba(0, 136, 255, 0.25);
     }
 
-    /* Tour */
-    #vim-tour-overlay { position: fixed; inset: 0; z-index: 50000; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease; }
-    #vim-tour-overlay.active { opacity: 1; visibility: visible; }
-    #vim-tour-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.82); pointer-events: auto; }
-    #vim-tour-spotlight { position: absolute; width: 100px; height: 100px; border-radius: 9999px; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 0 30px rgba(255,255,255,0.15); pointer-events: none; transform: translate(-50%, -50%); transition: left 0.45s ease, top 0.45s ease, width 0.35s ease, height 0.35s ease; }
-    #vim-tour-card { position: fixed; width: min(360px, calc(100vw - 32px)); background: #1a1a1a; color: #f0f0f0; border: 1px solid rgba(255,255,255,0.1); border-radius: 1.25rem; padding: 1.3rem; box-shadow: 0 24px 60px rgba(0,0,0,0.5); z-index: 50002; pointer-events: auto; }
-    .vim-tour-eyebrow { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 0.35rem; }
-    .vim-tour-title { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 0.4rem; }
-    .vim-tour-description { color: var(--soft); font-size: 0.88rem; line-height: 1.55; margin-bottom: 1rem; }
-    .vim-tour-progress { display: flex; gap: 5px; margin-bottom: 1rem; }
-    .vim-tour-progress span { height: 3px; width: 18px; border-radius: 999px; background: rgba(255,255,255,0.12); }
-    .vim-tour-progress span.active { width: 28px; background: #fff; }
-    .vim-tour-actions { display: flex; justify-content: space-between; align-items: center; }
-    .vim-tour-skip { border: 0; background: transparent; color: var(--soft); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
-    .vim-tour-next { border: 0; background: #fff; color: #0e0e0e; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.7rem 1rem; border-radius: 999px; cursor: pointer; }
-    #vim-tour-launcher { position: fixed; right: 1.1rem; bottom: 1.1rem; width: 2.5rem; height: 2.5rem; border-radius: 999px; background: #1a1a1a; color: #fff; border: 1px solid rgba(255,255,255,0.12); z-index: 40000; font-weight: 800; cursor: pointer; box-shadow: 0 10px 24px rgba(0,0,0,0.4); }
+    #vim-tour-launcher {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        width: 42px;
+        height: 42px;
+        border-radius: 9999px;
+        background: rgba(15, 23, 42, 0.92);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25);
+        z-index: 40000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 900;
+        transition: all 0.2s ease;
+    }
+
+    #vim-tour-launcher:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 16px 35px rgba(0, 136, 255, 0.25);
+    }
+
+    html.dark #vim-tour-launcher {
+        background: rgba(255, 255, 255, 0.94);
+        color: #0f172a;
+    }
+
+    @media (max-width: 640px) {
+        #vim-tour-card {
+            bottom: 20px !important;
+            top: auto !important;
+            left: 16px !important;
+            width: calc(100vw - 32px);
+        }
+
+        #vim-tour-card::before {
+            display: none;
+        }
+
+        #vim-tour-spotlight {
+            width: 75px;
+            height: 75px;
+        }
+
+        #vim-tour-launcher {
+            right: 14px;
+            bottom: 14px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        #vim-tour-spotlight,
+        #vim-tour-card {
+            transition: none !important;
+        }
+    }
 </style>
 
-<div class="pc">
+<!-- =========================================================
+     HOMEPAGE TOUR
+     ========================================================= -->
 
 <div id="vim-tour-overlay" aria-hidden="true">
     <div id="vim-tour-backdrop"></div>
     <div id="vim-tour-spotlight"></div>
+
     <div id="vim-tour-card">
-        <div class="vim-tour-eyebrow" id="vim-tour-eyebrow">VIM SUPER LEAGUE</div>
-        <div class="vim-tour-title" id="vim-tour-title">Welcome</div>
-        <div class="vim-tour-description" id="vim-tour-description">A quick look around the league.</div>
+        <div class="vim-tour-eyebrow" id="vim-tour-eyebrow">
+            VIM SUPER LEAGUE
+        </div>
+
+        <div class="vim-tour-title" id="vim-tour-title">
+            Welcome to VIMSL
+        </div>
+
+        <div class="vim-tour-description" id="vim-tour-description">
+            Let's take a quick look around the league.
+        </div>
+
         <div class="vim-tour-progress" id="vim-tour-progress"></div>
+
         <div class="vim-tour-actions">
-            <button type="button" id="vim-tour-skip" class="vim-tour-skip">Skip</button>
-            <button type="button" id="vim-tour-next" class="vim-tour-next">Next</button>
+            <button type="button" id="vim-tour-skip" class="vim-tour-skip">
+                Skip Tour
+            </button>
+
+            <button type="button" id="vim-tour-next" class="vim-tour-next">
+                Next →
+            </button>
         </div>
     </div>
 </div>
-<button id="vim-tour-launcher" type="button" aria-label="Tutorial" title="Tutorial">?</button>
 
-<!-- HERO -->
-<section class="pc-hero">
-        <div class="pc-hero-shell reveal">
-            <div class="pc-hero-inner">
-            <div class="pc-hero-copy">
-                <div class="pc-label">VIM Super League</div>
-                <h1 class="pc-serif">
-                    Compete with purpose.
-                    <em>Play with pride.</em>
-                </h1>
-                <p class="pc-hero-lead">
-                    Official fixtures, player market, and matchday energy — built for managers and players who take the league seriously.
-                </p>
-                <div class="pc-actions">
-                    <a href="/market" class="pc-btn pc-btn-coral">Enter market →</a>
-                    <a href="/matches" class="pc-btn pc-btn-ghost">View fixtures</a>
+<button
+    id="vim-tour-launcher"
+    type="button"
+    aria-label="Replay VIMSL tutorial"
+    title="Replay VIMSL tutorial"
+>
+    ?
+</button>
+
+<!-- HERO SECTION -->
+<header class="hero-container relative flex items-center justify-center pt-24 pb-48 px-6 text-center">
+    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent"></div>
+
+    <div class="relative z-10 max-w-4xl mx-auto mt-8">
+        <span class="inline-block bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full mb-6">
+            VIM SUPER LEAGUE
+        </span>
+
+        <h1 class="font-['Syne'] text-4xl sm:text-6xl md:text-7xl font-black text-white uppercase tracking-tight leading-tight mb-4">
+            FIND THE PERFECT <span class="gradient-text">LEAGUE</span> TO COMPETE
+        </h1>
+        
+        <p class="text-white/80 text-sm sm:text-base font-medium max-w-2xl mx-auto mb-10 tracking-wide">
+            Track official fixtures, inspect player markets, and jump straight into high-stakes league competitions.
+        </p>
+
+        <!-- Centered Floating Quick Bar -->
+        <div class="relative max-w-2xl mx-auto z-50">
+            <form id="search-form" action="/matches" method="GET" class="search-pill rounded-2xl p-3 flex flex-col sm:flex-row items-center gap-3">
+                <div class="flex-1 w-full flex items-center gap-3 px-4 py-2">
+                    <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0a7 7 0 0114 0z"></path>
+                    </svg>
+
+                    <input 
+                        id="live-search-input" 
+                        name="q"
+                        type="text" 
+                        placeholder="Search teams, players, or matches..." 
+                        autocomplete="off"
+                        class="w-full bg-transparent text-gray-800 placeholder-gray-400 text-sm font-medium focus:outline-none"
+                    >
                 </div>
-                <form id="search-form" action="/matches" method="GET" class="pc-search">
-                    <input id="live-search-input" name="q" type="text" placeholder="Search teams, players, matches…" autocomplete="off">
-                    <button type="submit" id="search-btn">Search</button>
-                    <div id="search-results-dropdown" class="hidden"></div>
-                </form>
-            </div>
-            <div class="pc-hero-side">
-                <!-- Swap these later: put <img src="..."> inside each card -->
-                <div class="pc-float-card tall">
-                    <!-- <img src="/images/your-photo-1.png" alt=""> -->
-                    Photo slot
-                </div>
-                <div class="pc-float-card">
-                    <!-- <img src="/images/your-photo-2.png" alt=""> -->
-                    Photo slot
-                </div>
-            </div>
+
+                <button 
+                    type="submit" 
+                    id="search-btn" 
+                    class="btn-gradient text-white text-xs font-bold uppercase tracking-wider px-8 py-4 rounded-xl w-full sm:w-auto shrink-0 transition text-center cursor-pointer"
+                >
+                    SEARCH ARENA
+                </button>
+            </form>
+
+            <!-- Live Suggestions Dropdown -->
+            <div 
+                id="search-results-dropdown" 
+                class="hidden absolute left-0 right-0 mt-2 bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-2xl p-4 space-y-4 max-h-96 overflow-y-auto text-left z-50"
+            >
             </div>
         </div>
-    <svg class="pc-wave" viewBox="0 0 1440 72" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0,32 C240,64 480,0 720,24 C960,48 1200,64 1440,24 L1440,72 L0,72 Z"></path>
-    </svg>
-</section>
-
-<!-- 3D POP BUTTONS -->
-<section class="pc-wrap pc-pops">
-    <div class="pc-pops-grid">
-        <a href="/market" class="pc-pop reveal reveal-d1">
-            <div class="pc-pop-icon" aria-hidden="true">
-                <!-- Jersey / transfer card -->
-                <svg viewBox="0 0 48 48" fill="none">
-                    <defs>
-                        <linearGradient id="mk1" x1="8" y1="6" x2="40" y2="42" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#60a5fa"/><stop offset="1" stop-color="#2563eb"/>
-                        </linearGradient>
-                        <linearGradient id="mk2" x1="16" y1="14" x2="32" y2="36" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#93c5fd"/><stop offset="1" stop-color="#3b82f6"/>
-                        </linearGradient>
-                    </defs>
-                    <path d="M16 10l-6 4v6c0 2 1 3 2.5 3.5L14 40h20l1.5-16.5C37 23 38 22 38 20v-6l-6-4-2 3h-12l-2-3z" fill="url(#mk1)"/>
-                    <path d="M18 14h12v4c0 4-2.5 7-6 7s-6-3-6-7v-4z" fill="url(#mk2)" opacity="0.9"/>
-                    <circle cx="24" cy="28" r="3.2" fill="#fde68a"/>
-                    <path d="M22.5 28.2l.9.7-.3 1.1 1-.5 1 .5-.3-1.1.9-.7-1.1-.1-.5-1-.5 1-1.1.1z" fill="#b45309"/>
-                    <path d="M14 8h4l2 4H16L14 8zm16 0h4l-2 4h-4l2-4z" fill="#38bdf8"/>
-                </svg>
-            </div>
-            <strong>Market</strong>
-            <span>Player cards & registration</span>
-        </a>
-        <a href="/matches" class="pc-pop reveal reveal-d2">
-            <div class="pc-pop-icon" aria-hidden="true">
-                <!-- Soccer ball -->
-                <svg viewBox="0 0 48 48" fill="none">
-                    <defs>
-                        <radialGradient id="ball" cx="18" cy="16" r="22" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#ffffff"/><stop offset="1" stop-color="#d1d5db"/>
-                        </radialGradient>
-                    </defs>
-                    <circle cx="24" cy="24" r="16" fill="url(#ball)"/>
-                    <circle cx="24" cy="24" r="16" fill="none" stroke="#0f172a" stroke-width="1.2" opacity="0.25"/>
-                    <path d="M24 12l4.2 3.1-1.6 5.1H21.4l-1.6-5.1L24 12z" fill="#0f172a"/>
-                    <path d="M13.5 20.5l5.1-1.2 1.6 5.1-4.2 3.2-4.1-3.5.6-3.6z" fill="#0f172a"/>
-                    <path d="M34.5 20.5l-5.1-1.2-1.6 5.1 4.2 3.2 4.1-3.5-.6-3.6z" fill="#0f172a"/>
-                    <path d="M17.2 33.5l1.2-5.1 5.1 1.6v5.2l-4.5 1.8-1.8-3.5z" fill="#0f172a"/>
-                    <path d="M30.8 33.5l-1.2-5.1-5.1 1.6v5.2l4.5 1.8 1.8-3.5z" fill="#0f172a"/>
-                    <path d="M19.8 24.4l4.2-3.2 4.2 3.2-1.6 5.1h-5.2l-1.6-5.1z" fill="#22c55e" opacity="0.35"/>
-                    <circle cx="24" cy="24" r="16" fill="none" stroke="#4ade80" stroke-width="2" opacity="0.35"/>
-                </svg>
-            </div>
-            <strong>Matches</strong>
-            <span>Fixtures & live scores</span>
-        </a>
-        <a href="/metrics" class="pc-pop reveal reveal-d3">
-            <div class="pc-pop-icon" aria-hidden="true">
-                <!-- Rising bars / stats -->
-                <svg viewBox="0 0 48 48" fill="none">
-                    <defs>
-                        <linearGradient id="b1" x1="10" y1="36" x2="10" y2="22" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#a78bfa"/><stop offset="1" stop-color="#7c3aed"/>
-                        </linearGradient>
-                        <linearGradient id="b2" x1="24" y1="36" x2="24" y2="14" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#c4b5fd"/><stop offset="1" stop-color="#8b5cf6"/>
-                        </linearGradient>
-                        <linearGradient id="b3" x1="38" y1="36" x2="38" y2="10" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#ddd6fe"/><stop offset="1" stop-color="#a78bfa"/>
-                        </linearGradient>
-                    </defs>
-                    <rect x="7" y="22" width="7" height="16" rx="2" fill="url(#b1)"/>
-                    <rect x="20.5" y="14" width="7" height="24" rx="2" fill="url(#b2)"/>
-                    <rect x="34" y="10" width="7" height="28" rx="2" fill="url(#b3)"/>
-                    <path d="M9 20l12-8 8 4 10-10" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                    <circle cx="39" cy="6" r="2.5" fill="#fbbf24"/>
-                    <path d="M6 38h36" stroke="#ffffff" stroke-opacity="0.2" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <strong>Metrics</strong>
-            <span>Goals, assists, MVPs</span>
-        </a>
-        <a href="/records" class="pc-pop reveal reveal-d4">
-            <div class="pc-pop-icon" aria-hidden="true">
-                <!-- Trophy -->
-                <svg viewBox="0 0 48 48" fill="none">
-                    <defs>
-                        <linearGradient id="tr" x1="14" y1="8" x2="34" y2="40" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#fde68a"/><stop offset="0.5" stop-color="#f59e0b"/><stop offset="1" stop-color="#d97706"/>
-                        </linearGradient>
-                        <linearGradient id="tr2" x1="20" y1="28" x2="28" y2="42" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#fbbf24"/><stop offset="1" stop-color="#b45309"/>
-                        </linearGradient>
-                    </defs>
-                    <path d="M16 10h16v8c0 5.5-3.5 10-8 10s-8-4.5-8-10V10z" fill="url(#tr)"/>
-                    <path d="M16 10h16v3H16V10z" fill="#fef3c7" opacity="0.7"/>
-                    <path d="M16 12H11c0 5 2.5 8 5 9V12zm16 0h5c0 5-2.5 8-5 9V12z" fill="#f59e0b"/>
-                    <path d="M22 28h4v5h-4v-5z" fill="url(#tr2)"/>
-                    <rect x="17" y="33" width="14" height="4" rx="1.5" fill="#fbbf24"/>
-                    <rect x="15" y="37" width="18" height="4" rx="1.5" fill="#d97706"/>
-                    <circle cx="24" cy="18" r="3" fill="#fef3c7"/>
-                    <path d="M24 15.5l.7 1.5 1.6.2-1.2 1.1.3 1.6L24 19l-1.4.9.3-1.6-1.2-1.1 1.6-.2.7-1.5z" fill="#b45309"/>
-                </svg>
-            </div>
-            <strong>Records</strong>
-            <span>League history & milestones</span>
-        </a>
     </div>
-</section>
 
-<!-- UPCOMING + STREAM -->
-<section class="pc-wrap pc-band">
-    <div class="pc-section-head reveal">
-        <div>
-            <div class="pc-label">Schedule</div>
-            <h2 class="pc-serif" id="tour-featured-match">Upcoming match</h2>
-        </div>
-        <a href="/matches" class="pc-link">All fixtures →</a>
-    </div>
-    <% const matchList = (typeof matches !== 'undefined' && matches) ? matches : []; %>
-    <% let nextMatch = matchList.find(m => m.status === 'upcoming'); %>
-    <div class="pc-split">
-        <div class="pc-card reveal reveal-d1">
-            <% if (nextMatch) { %>
-                <div class="pc-match">
-                    <div class="pc-team">
-                        <img src="<%= nextMatch.logoA %>" alt="">
-                        <span><%= nextMatch.teamA %></span>
+    <div class="fog-bottom"></div>
+</header>
+
+<main class="relative z-20 max-w-7xl mx-auto px-6 -mt-16 pb-32">
+
+    <!-- FLOATING FEATURE CARDS -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24">
+        
+        <!-- Next Match Card -->
+        <div id="tour-featured-match" class="lg:col-span-7 clean-card p-8 flex flex-col justify-between">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <span class="text-[11px] font-bold text-sky-500 uppercase tracking-widest block">
+                        Featured Fixture
+                    </span>
+
+                    <h3 class="font-['Syne'] text-2xl font-bold text-gray-900">
+                        Upcoming Match
+                    </h3>
+                </div>
+
+                <span class="bg-sky-50 text-sky-600 border border-sky-100 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    LIVE SCHEDULE
+                </span>
+            </div>
+
+            <% let nextMatch = matches.find(m => m.status === 'upcoming'); %>
+
+            <% if(nextMatch) { %>
+                <div class="flex items-center justify-between bg-gradient-to-r from-slate-50 via-white to-slate-50 rounded-2xl p-6 border border-slate-200/60 my-4 shadow-sm">
+                    <div class="flex flex-col items-center gap-2 flex-1">
+                        <img src="<%= nextMatch.logoA %>" class="w-14 h-14 object-contain drop-shadow-sm">
+                        <span class="font-bold text-sm text-gray-800 uppercase">
+                            <%= nextMatch.teamA %>
+                        </span>
                     </div>
-                    <div class="pc-vs">
-                        <strong>vs</strong>
-                        <small><%= nextMatch.time || 'Time TBC' %></small>
+                    
+                    <div class="text-center px-4">
+                        <span class="font-['Syne'] font-black text-2xl text-sky-500">
+                            VS
+                        </span>
+
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                            <%= nextMatch.time %>
+                        </span>
                     </div>
-                    <div class="pc-team">
-                        <img src="<%= nextMatch.logoB %>" alt="">
-                        <span><%= nextMatch.teamB %></span>
+
+                    <div class="flex flex-col items-center gap-2 flex-1">
+                        <img src="<%= nextMatch.logoB %>" class="w-14 h-14 object-contain drop-shadow-sm">
+                        <span class="font-bold text-sm text-gray-800 uppercase">
+                            <%= nextMatch.teamB %>
+                        </span>
                     </div>
                 </div>
             <% } else { %>
-                <div class="pc-empty">No upcoming match scheduled</div>
-            <% } %>
-        </div>
-        <div class="pc-stream reveal reveal-d2">
-            <% if (typeof liveLink !== 'undefined' && liveLink && String(liveLink).trim() !== '') { %>
-                <%
-                    let embedLink = liveLink;
-                    if (liveLink.includes('watch?v=')) embedLink = liveLink.replace('watch?v=', 'embed/').split('&')[0];
-                    else if (liveLink.includes('youtu.be/')) embedLink = liveLink.replace('youtu.be/', 'youtube.com/embed/').split('?')[0];
-                %>
-                <iframe src="<%= embedLink %>" allowfullscreen title="Live stream"></iframe>
-            <% } else { %>
-                <div class="pc-stream-empty">
-                    <strong>Stream offline</strong>
-                    <span>Live broadcast shows up here</span>
+                <div class="py-12 text-center bg-slate-50/80 rounded-2xl border border-dashed border-slate-200">
+                    <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                        No upcoming matches scheduled
+                    </p>
                 </div>
             <% } %>
-        </div>
-    </div>
-</section>
 
-<!-- GALLERY PLACEHOLDERS -->
-<section class="pc-gallery-band">
-    <div class="pc-wrap">
-        <div class="reveal">
-            <div class="pc-label">Gallery</div>
-            <h2 class="pc-serif">Moments from the league</h2>
-            <p class="sub">Drop images into these slots anytime — paths like <code style="opacity:0.8">/images/gallery-1.png</code></p>
-        </div>
-        <div class="pc-gallery">
-            <% /* To use: set src and add class "has-img" on the div */ %>
-            <div class="pc-ph reveal reveal-d1" id="gallery-slot-1">
-                <!-- <img src="/images/gallery-1.png" alt=""> -->
-                <span>Slot 1</span>
-            </div>
-            <div class="pc-ph reveal reveal-d2" id="gallery-slot-2">
-                <span>Slot 2</span>
-            </div>
-            <div class="pc-ph reveal reveal-d3" id="gallery-slot-3">
-                <span>Slot 3</span>
-            </div>
-            <div class="pc-ph reveal reveal-d4" id="gallery-slot-4">
-                <span>Slot 4</span>
-            </div>
-            <div class="pc-ph reveal" id="gallery-slot-5">
-                <span>Slot 5</span>
-            </div>
-        </div>
-    </div>
-</section>
+            <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-200/60 text-xs font-semibold text-gray-500">
+                <span>Laague Matches</span>
 
-<!-- ABOUT -->
-<section class="pc-about">
-    <div class="pc-wrap pc-about-grid">
-        <div class="pc-about-photo reveal" id="about-photo-slot">
-            <!-- <img src="/images/about-team.png" alt="VIM team"> -->
-            About photo slot
-        </div>
-        <div class="reveal reveal-d2">
-            <div class="pc-label">About us</div>
-            <h2 class="pc-serif">Thoughtful competition. Real community.</h2>
-            <p>
-                VIM Super League is a competitive Roblox football league built around fair play, clear structure, and a community that actually shows up — managers, players, and staff.
-            </p>
-            <p>
-                From the player market to matchday fixtures, everything on this site is designed to make the season easier to follow and more exciting to play.
-            </p>
-            <div class="pc-about-quote">
-                “We care about the details so matchday feels like it matters.”
-                <cite>— VIM Super League</cite>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- RESULTS -->
-<section class="pc-wrap pc-band" id="tour-results">
-    <div class="pc-section-head reveal">
-        <div>
-            <div class="pc-label">Scoreboard</div>
-            <h2 class="pc-serif">Recent results</h2>
-        </div>
-        <a href="/matches" class="pc-link">Full list →</a>
-    </div>
-    <div class="pc-results">
-        <%
-            const recent = matchList
-                .filter(m => m.status === 'completed' || m.status === 'complete' || (m.details && (m.details.goalsA != null || m.details.goalsB != null)))
-                .slice(-8)
-                .reverse();
-        %>
-        <% if (recent.length) { %>
-            <% recent.forEach((r, i) => { %>
-                <a class="pc-result reveal reveal-d<%= (i % 4) + 1 %>" href="/match/<%= r._id || r.id || '' %>">
-                    <div class="pc-result-row">
-                        <div class="pc-result-team">
-                            <img src="<%= r.logoA %>" alt="">
-                            <span><%= r.teamA %></span>
-                        </div>
-                        <span class="pc-result-score"><%= (r.details && r.details.goalsA != null) ? r.details.goalsA : 0 %></span>
-                    </div>
-                    <div class="pc-result-row">
-                        <div class="pc-result-team">
-                            <img src="<%= r.logoB %>" alt="">
-                            <span style="color:var(--soft)"><%= r.teamB %></span>
-                        </div>
-                        <span class="pc-result-score dim"><%= (r.details && r.details.goalsB != null) ? r.details.goalsB : 0 %></span>
-                    </div>
+                <a href="/matches" class="text-sky-500 hover:text-sky-600 flex items-center gap-1 font-bold">
+                    View Full Fixtures →
                 </a>
-            <% }) %>
-        <% } else { %>
-            <div class="pc-empty" style="grid-column:1/-1">No results yet</div>
-        <% } %>
-    </div>
-</section>
-
-<!-- STORIES -->
-<section class="pc-wrap pc-band">
-    <div class="pc-section-head reveal">
-        <div>
-            <div class="pc-label">Journal</div>
-            <h2 class="pc-serif">League stories</h2>
-        </div>
-    </div>
-    <div class="pc-stories">
-        <% if (typeof stories !== 'undefined' && stories && stories.length) { %>
-            <% stories.slice().reverse().slice(0, 6).forEach((story, i) => { %>
-                <article class="pc-story reveal reveal-d<%= (i % 3) + 1 %>">
-                    <div class="pc-story-img">
-                        <% if (story.image) { %><img src="<%= story.image %>" alt=""><% } %>
-                    </div>
-                    <div class="pc-story-body">
-                        <small><%= story.date || 'Article' %></small>
-                        <h3><%= story.title %></h3>
-                        <p><%= story.description %></p>
-                    </div>
-                </article>
-            <% }) %>
-        <% } else { %>
-            <div class="pc-empty" style="grid-column:1/-1">Stories will appear here</div>
-        <% } %>
-    </div>
-</section>
-
-<!-- CTA -->
-<section class="pc-wrap">
-    <div class="pc-cta reveal">
-        <div>
-            <h3 class="pc-serif">Ready for the next matchday?</h3>
-            <p>Open the market, set up your card, or browse who’s available.</p>
-        </div>
-        <a href="/market" class="pc-btn">Enter market →</a>
-    </div>
-</section>
-
-<!-- FOOTER / SOCIALS -->
-<footer class="pc-footer">
-    <div class="pc-wrap">
-        <div class="pc-footer-grid reveal">
-            <div>
-                <h4>VIM Super League</h4>
-                <p>
-                    A competitive Roblox football league focused on structure, community, and matchday quality. Built by people who care about the game and the people in it.
-                </p>
             </div>
-            <div>
-                <h4>Explore</h4>
-                <p style="display:flex;flex-direction:column;gap:0.5rem;">
-                    <a href="/market">Player market</a>
-                    <a href="/matches">Fixtures</a>
-                    <a href="/metrics">Metrics</a>
-                    <a href="/records">Records</a>
-                </p>
-            </div>
-            <div>
-                <h4>Connect</h4>
-                <div class="pc-socials">
-                    <!-- Update these URLs to your real invites -->
-                    <a class="pc-social" href="https://discord.gg/" target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 5.5A16 16 0 0015.6 4l-.3.6a14 14 0 014 2 13 13 0 00-10.6 0 14 14 0 014-2l-.3-.6A16 16 0 004 5.5 16 16 0 002 16.5a15 15 0 004.5 2.3l.6-.9a10 10 0 01-1.5-.7l.4-.3a11 11 0 009 0l.4.3a10 10 0 01-1.5.7l.6.9A15 15 0 0022 16.5 16 16 0 0020 5.5zM9 13.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm6 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
-                        Discord
-                    </a>
-                    <a class="pc-social" href="https://youtube.com/" target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 8s-.2-1.4-.8-2c-.7-.8-1.6-.8-2-.9C17.2 4.7 12 4.7 12 4.7s-5.2 0-8.2.4c-.4 0-1.3.1-2 .9C1.2 6.6 1 8 1 8S.8 9.6.8 11.3v1.4C.8 14.4 1 16 1 16s.2 1.4.8 2c.7.8 1.7.8 2.1.9 1.5.1 6.1.4 8.1.4s6.6-.3 8.1-.4c.4 0 1.3-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.3v-1.4C23.2 9.6 23 8 23 8zM9.8 14.6V8.9l5.3 2.9-5.3 2.8z"/></svg>
-                        YouTube
-                    </a>
+        </div>
+
+        <!-- Live Broadcast Preview Card -->
+        <div class="lg:col-span-5 clean-card p-3 flex flex-col overflow-hidden bg-black text-white relative group">
+            <% if(liveLink && liveLink.trim() !== "") { %>
+                <% 
+                    let embedLink = liveLink;
+
+                    if (liveLink.includes('watch?v=')) {
+                        embedLink = liveLink.replace('watch?v=', 'embed/').split('&')[0];
+                    }
+                    else if (liveLink.includes('youtu.be/')) {
+                        embedLink = liveLink.replace('youtu.be/', 'youtube.com/embed/').split('?')[0];
+                    }
+                %>
+
+                <iframe 
+                    class="w-full h-full min-h-[260px] rounded-xl" 
+                    src="<%= embedLink %>" 
+                    frameborder="0" 
+                    allowfullscreen
+                ></iframe>
+            <% } else { %>
+                <div class="flex-1 min-h-[260px] rounded-xl bg-slate-900 flex flex-col items-center justify-center p-6 text-center">
+                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+
+                    <span class="font-['Syne'] text-lg font-bold uppercase text-white/70">
+                        Stream is currently Offline
+                    </span>
+
+                    <span class="text-xs text-gray-500 uppercase tracking-wider mt-1">
+                        No live stream active
+                    </span>
                 </div>
-            </div>
-        </div>
-        <div class="pc-footer-bottom">
-            <span>© <%= new Date().getFullYear() %> VIM Super League</span>
-            <span>Roblox football · Community first</span>
+            <% } %>
         </div>
     </div>
-</footer>
 
-</div>
+    <!-- 3-STEP GUIDE SECTION -->
+    <div class="section-grey-gradient p-10 sm:p-14 mb-28">
+        <div class="text-center max-w-3xl mx-auto mb-14">
+            <span class="text-xs font-bold text-sky-500 uppercase tracking-[0.25em] block mb-2">
+                A GUIDE TO THE LEAGUE
+            </span>
 
-<script>
-/* Scroll reveal */
-(function () {
-    const els = document.querySelectorAll('.reveal');
-    if (!els.length) return;
-    const io = new IntersectionObserver((entries) => {
-        entries.forEach((e) => {
-            if (e.isIntersecting) {
-                e.target.classList.add('in');
-                io.unobserve(e.target);
-            }
-        });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-    els.forEach((el) => io.observe(el));
-})();
-</script>
+            <h2 class="font-['Syne'] text-3xl sm:text-4xl font-black text-gray-900">
+                ENTER THE LEAGUE WITH EASE
+            </h2>
+
+            <p class="text-gray-600 text-sm mt-3">
+                Follow these three straightforward steps to go from free agent to competing on the main stage.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+
+            <!-- Step 1 -->
+            <div class="flex flex-col items-center group">
+                <div class="w-20 h-20 rounded-2xl bg-white text-sky-500 border border-slate-200/80 flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300 shadow-md">
+                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0a3 3 0 016 0zm6 3a2 2 0 11-4 0a2 2 0 014 0zM7 10a2 2 0 11-4 0a2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+
+                <h3 class="font-['Syne'] font-bold text-xl text-gray-900 mb-2">
+                    1. Join Community
+                </h3>
+
+                <p class="text-xs text-gray-600 leading-relaxed max-w-xs">
+                    Connect your Discord account and introduce yourself to active scouts and team leaders.
+                </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="flex flex-col items-center group">
+                <div class="w-20 h-20 rounded-2xl bg-white text-sky-500 border border-slate-200/80 flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300 shadow-md">
+                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+
+                <h3 class="font-['Syne'] font-bold text-xl text-gray-900 mb-2">
+                    2. Register Card
+                </h3>
+
+                <p class="text-xs text-gray-600 leading-relaxed max-w-xs">
+                    Fill out your player profile, stats, and role preferences in our live Market Hub.
+                </p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="flex flex-col items-center group">
+                <div class="w-20 h-20 rounded-2xl bg-white text-sky-500 border border-slate-200/80 flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300 shadow-md">
+                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                    </svg>
+                </div>
+
+                <h3 class="font-['Syne'] font-bold text-xl text-gray-900 mb-2">
+                    3. Start Competing
+                </h3>
+
+                <p class="text-xs text-gray-600 leading-relaxed max-w-xs">
+                    Get recruited to an official roster and compete for championship titles.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECENT RESULTS SECTION -->
+    <div class="mb-24" id="tour-results">
+        <div class="flex justify-between items-end mb-8 border-b border-slate-300/60 pb-4">
+            <div>
+                <span class="text-xs font-bold text-sky-500 uppercase tracking-widest block mb-1">
+                    SCOREBOARD
+                </span>
+
+                <h2 class="font-['Syne'] text-3xl font-bold text-gray-900">
+                    Recent Match Results
+                </h2>
+            </div>
+
+            <a href="/matches" class="text-xs font-bold text-sky-500 hover:text-sky-600 uppercase tracking-wider">
+                All Results →
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <% let recentResults = matches.filter(m => m.status === 'completed').reverse().slice(0, 4); %>
+
+            <% if(recentResults.length > 0) { %>
+                <% recentResults.forEach(r => { %>
+                    <a href="/match/<%= r.id %>" class="clean-card p-6 block group">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full uppercase">
+                                Final Score
+                            </span>
+
+                            <span class="text-[10px] text-gray-400 font-semibold">
+                                <%= r.time %>
+                            </span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <img src="<%= r.logoA %>" class="w-6 h-6 object-contain">
+
+                                    <span class="font-bold text-xs text-gray-800 uppercase group-hover:text-sky-500 transition">
+                                        <%= r.teamA %>
+                                    </span>
+                                </div>
+
+                                <span class="font-['Syne'] font-black text-base text-gray-900">
+                                    <%= (r.details && r.details.goalsA) ? r.details.goalsA : 0 %>
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <img src="<%= r.logoB %>" class="w-6 h-6 object-contain">
+
+                                    <span class="font-bold text-xs text-gray-500 uppercase">
+                                        <%= r.teamB %>
+                                    </span>
+                                </div>
+
+                                <span class="font-['Syne'] font-black text-base text-gray-400">
+                                    <%= (r.details && r.details.goalsB) ? r.details.goalsB : 0 %>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <div class="col-span-full py-12 clean-card text-center text-gray-400 text-xs font-bold uppercase tracking-widest">
+                    No recent match results available
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- NEWS AND STORIES SECTION -->
+    <div class="mb-24">
+        <div class="flex justify-between items-end mb-8 border-b border-slate-300/60 pb-4">
+            <div>
+                <span class="text-xs font-bold text-sky-500 uppercase tracking-widest block mb-1">
+                    JOURNAL
+                </span>
+
+                <h2 class="font-['Syne'] text-3xl font-bold text-gray-900">
+                    Latest League Stories
+                </h2>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <% if (typeof stories !== 'undefined' && stories.length > 0) { %>
+                <% stories.slice().reverse().forEach(story => { %>
+                    <div class="clean-card overflow-hidden group flex flex-col">
+                        <div class="aspect-video w-full overflow-hidden relative">
+                            <img 
+                                src="<%= story.image %>" 
+                                class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                            >
+                        </div>
+
+                        <div class="p-6 flex-1 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
+                                    <%= story.date || 'Article' %>
+                                </span>
+
+                                <h4 class="font-['Syne'] font-bold text-lg text-gray-900 group-hover:text-sky-500 transition leading-snug mb-2">
+                                    <%= story.title %>
+                                </h4>
+
+                                <p class="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                                    <%= story.description %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="col-span-full py-12 clean-card text-center text-gray-400 text-xs font-bold uppercase tracking-widest">
+                    No news articles published yet
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- BOTTOM ACTION CTA -->
+    <div class="section-grey-gradient p-12 text-center">
+        <h3 class="font-['Syne'] text-3xl font-bold text-gray-900 mb-3">
+            READY TO JOIN THE COMPETITION?
+        </h3>
+
+        <p class="text-xs text-gray-600 uppercase tracking-widest max-w-md mx-auto mb-8">
+            Set up your player card and start connecting with teams right away.
+        </p>
+
+        <a href="/market" class="btn-gradient inline-flex items-center gap-3 text-white px-10 py-5 rounded-2xl font-bold text-xs uppercase tracking-widest transition">
+            LET'S PLAN YOUR CAREER
+
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+        </a>
+    </div>
+
+</main>
+
+<!-- =========================================================
+     HOMEPAGE TOUR SCRIPT
+     ========================================================= -->
 
 <script>
 (function () {
@@ -1114,156 +740,518 @@
     const backdrop = document.getElementById('vim-tour-backdrop');
     const spotlight = document.getElementById('vim-tour-spotlight');
     const card = document.getElementById('vim-tour-card');
+
     const eyebrow = document.getElementById('vim-tour-eyebrow');
     const title = document.getElementById('vim-tour-title');
     const description = document.getElementById('vim-tour-description');
     const progress = document.getElementById('vim-tour-progress');
+
     const nextButton = document.getElementById('vim-tour-next');
     const skipButton = document.getElementById('vim-tour-skip');
     const launcher = document.getElementById('vim-tour-launcher');
+
     if (!overlay || !spotlight || !card) return;
 
     const tourSteps = [
-        { selector: '[data-tour="market"]', mobileSelector: '[data-tour="market-mobile"]', eyebrow: 'MARKET', title: 'Player market', description: 'Browse cards and register.' },
-        { selector: '[data-tour="matches"]', mobileSelector: '[data-tour="matches-mobile"]', eyebrow: 'MATCHES', title: 'Fixtures', description: 'Upcoming and completed games.' },
-        { selector: '#live-search-input', eyebrow: 'SEARCH', title: 'Find anything', description: 'Teams, players or matches.' },
-        { selector: '#tour-featured-match', eyebrow: 'SCHEDULE', title: 'Next match', description: 'Featured upcoming fixture.' },
-        { selector: '#tour-results', eyebrow: 'RESULTS', title: 'Scores', description: 'Recent completed matches.' }
+        {
+            selector: '[data-tour="market"]',
+            mobileSelector: '[data-tour="market-mobile"]',
+            eyebrow: 'PLAYER MARKET',
+            title: 'Build your player profile',
+            description: 'The Market is where you can browse registered players, inspect their cards, stats, positions and player information.'
+        },
+        {
+            selector: '[data-tour="matches"]',
+            mobileSelector: '[data-tour="matches-mobile"]',
+            eyebrow: 'MATCH CENTER',
+            title: 'Follow the fixtures',
+            description: 'Matches contains upcoming fixtures, completed games and individual match details.'
+        },
+        {
+            selector: '[data-tour="metrics"]',
+            mobileSelector: '[data-tour="metrics-mobile"]',
+            eyebrow: 'LEAGUE METRICS',
+            title: 'Track the numbers',
+            description: 'Metrics is where the league statistics come together — goals, assists, saves, MVPs and other player records.'
+        },
+        {
+            selector: '[data-tour="records"]',
+            mobileSelector: '[data-tour="records-mobile"]',
+            eyebrow: 'LEAGUE RECORDS',
+            title: 'Explore the history',
+            description: 'Records gives you the bigger picture: notable league achievements, historical records and milestones.'
+        },
+        {
+            selector: '#live-search-input',
+            eyebrow: 'SEARCH ARENA',
+            title: 'Find anything quickly',
+            description: 'Search for teams, players or matches directly from the homepage. Start typing and the live suggestions will appear.'
+        },
+        {
+            selector: '#tour-featured-match',
+            eyebrow: 'FEATURED FIXTURE',
+            title: 'See what is coming up',
+            description: 'The homepage automatically highlights the next scheduled match so you can jump into the action quickly.'
+        },
+        {
+            selector: '#tour-results',
+            eyebrow: 'SCOREBOARD',
+            title: 'Keep up with results',
+            description: 'Recent completed matches appear here with their final scores. You can open any match for its full details.'
+        }
     ];
+
     let currentStep = 0;
-    function isMobileLayout() { return window.innerWidth < 1280; }
-    function getTarget(step) {
-        let t = null;
-        if (isMobileLayout() && step.mobileSelector) t = document.querySelector(step.mobileSelector);
-        if (!t && step.selector) t = document.querySelector(step.selector);
-        return t;
+
+    function isMobileLayout() {
+        return window.innerWidth < 1280;
     }
+
+    function getTarget(step) {
+        let target = null;
+
+        if (isMobileLayout() && step.mobileSelector) {
+            target = document.querySelector(step.mobileSelector);
+        }
+
+        if (!target && step.selector) {
+            target = document.querySelector(step.selector);
+        }
+
+        return target;
+    }
+
     function createProgress() {
         progress.innerHTML = '';
-        tourSteps.forEach((_, i) => {
-            const d = document.createElement('span');
-            if (i === currentStep) d.classList.add('active');
-            progress.appendChild(d);
+
+        tourSteps.forEach(function (_, index) {
+            const dot = document.createElement('span');
+
+            if (index === currentStep) {
+                dot.classList.add('active');
+            }
+
+            progress.appendChild(dot);
         });
     }
+
     function positionTourCard(target) {
-        const margin = 16, cardWidth = Math.min(360, window.innerWidth - 32);
+        const margin = 16;
+        const cardWidth = Math.min(360, window.innerWidth - 32);
+
         card.style.width = cardWidth + 'px';
+
         if (window.innerWidth <= 640) {
-            card.style.left = '16px'; card.style.top = 'auto'; card.style.bottom = '20px';
+            card.classList.add('centered');
+            card.style.left = '16px';
+            card.style.top = 'auto';
+            card.style.bottom = '20px';
             return;
         }
+
+        card.classList.remove('centered');
+
         const rect = target.getBoundingClientRect();
-        let left = Math.min(Math.max(margin, rect.left), window.innerWidth - cardWidth - margin);
+
+        let left = rect.left;
         let top = rect.bottom + 22;
-        if (top + 200 > window.innerHeight - margin) top = Math.max(margin, rect.top - 200);
-        card.style.left = left + 'px'; card.style.top = top + 'px'; card.style.bottom = 'auto';
+
+        if (left + cardWidth > window.innerWidth - margin) {
+            left = window.innerWidth - cardWidth - margin;
+        }
+
+        if (left < margin) {
+            left = margin;
+        }
+
+        const estimatedCardHeight = 220;
+
+        if (top + estimatedCardHeight > window.innerHeight - margin) {
+            top = rect.top - estimatedCardHeight - 22;
+
+            if (top < margin) {
+                top = margin;
+                card.classList.add('centered');
+            }
+        }
+
+        card.style.left = left + 'px';
+        card.style.top = top + 'px';
+        card.style.bottom = 'auto';
     }
+
     function moveSpotlight(target) {
         const rect = target.getBoundingClientRect();
-        const pad = 9;
+
+        const isSmall = window.innerWidth <= 640;
+
+        let width = rect.width;
+        let height = rect.height;
+
+        if (width < 55) width = 55;
+        if (height < 45) height = 45;
+
+        const padding = isSmall ? 10 : 9;
+
         spotlight.style.left = (rect.left + rect.width / 2) + 'px';
         spotlight.style.top = (rect.top + rect.height / 2) + 'px';
-        spotlight.style.width = (Math.max(rect.width, 55) + pad * 2) + 'px';
-        spotlight.style.height = (Math.max(rect.height, 45) + pad * 2) + 'px';
+        spotlight.style.width = (width + padding * 2) + 'px';
+        spotlight.style.height = (height + padding * 2) + 'px';
     }
+
     function showStep(index) {
         currentStep = index;
+
         const step = tourSteps[currentStep];
         const target = getTarget(step);
+
         if (!target) {
-            if (currentStep < tourSteps.length - 1) showStep(currentStep + 1);
-            else finishTour();
+            if (currentStep < tourSteps.length - 1) {
+                showStep(currentStep + 1);
+            } else {
+                finishTour();
+            }
+
             return;
         }
+
         if (isMobileLayout() && step.mobileSelector) {
-            const m = document.getElementById('mobile-menu');
-            if (m && !m.classList.contains('active')) m.classList.add('active');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenu && !mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.add('active');
+            }
         }
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(() => { moveSpotlight(target); positionTourCard(target); }, 120);
+
+        target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center'
+        });
+
+        setTimeout(function () {
+            moveSpotlight(target);
+            positionTourCard(target);
+        }, 120);
+
         eyebrow.textContent = step.eyebrow;
         title.textContent = step.title;
         description.textContent = step.description;
+
         createProgress();
-        nextButton.textContent = currentStep === tourSteps.length - 1 ? 'Done' : 'Next';
+
+        if (currentStep === tourSteps.length - 1) {
+            nextButton.textContent = 'Finish ✓';
+        } else {
+            nextButton.textContent = 'Next →';
+        }
     }
+
     function startTour() {
+        currentStep = 0;
+
         overlay.classList.add('active');
+        overlay.setAttribute('aria-hidden', 'false');
+
         document.body.style.overflow = 'hidden';
+
         showStep(0);
     }
+
     function finishTour() {
         overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+
         document.body.style.overflow = '';
+
         localStorage.setItem('vim_home_tour_seen', 'true');
-        const m = document.getElementById('mobile-menu');
-        if (m) m.classList.remove('active');
+
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenu) {
+            mobileMenu.classList.remove('active');
+        }
     }
-    nextButton.addEventListener('click', () => currentStep >= tourSteps.length - 1 ? finishTour() : showStep(currentStep + 1));
-    skipButton.addEventListener('click', finishTour);
-    backdrop.addEventListener('click', finishTour);
-    launcher.addEventListener('click', startTour);
-    if (!localStorage.getItem('vim_home_tour_seen')) setTimeout(startTour, 900);
+
+    nextButton.addEventListener('click', function () {
+        if (currentStep >= tourSteps.length - 1) {
+            finishTour();
+            return;
+        }
+
+        showStep(currentStep + 1);
+    });
+
+    skipButton.addEventListener('click', function () {
+        finishTour();
+    });
+
+    backdrop.addEventListener('click', function () {
+        finishTour();
+    });
+
+    launcher.addEventListener('click', function () {
+        startTour();
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (!overlay.classList.contains('active')) return;
+
+        if (event.key === 'Escape') {
+            finishTour();
+        }
+
+        if (event.key === 'ArrowRight') {
+            if (currentStep < tourSteps.length - 1) {
+                showStep(currentStep + 1);
+            }
+        }
+
+        if (event.key === 'ArrowLeft') {
+            if (currentStep > 0) {
+                showStep(currentStep - 1);
+            }
+        }
+    });
+
+    window.addEventListener('resize', function () {
+        if (!overlay.classList.contains('active')) return;
+
+        const step = tourSteps[currentStep];
+        const target = getTarget(step);
+
+        if (target) {
+            moveSpotlight(target);
+            positionTourCard(target);
+        }
+    });
+
+    /*
+     * First visit only.
+     *
+     * If you want to test the tour again in your browser console:
+     *
+     * localStorage.removeItem('vim_home_tour_seen')
+     *
+     * Then refresh the homepage.
+     */
+
+    const hasSeenTour = localStorage.getItem('vim_home_tour_seen');
+
+    if (!hasSeenTour) {
+        setTimeout(function () {
+            startTour();
+        }, 900);
+    }
 })();
 </script>
 
+<!-- =========================================================
+     EXISTING HOMEPAGE SEARCH
+     ========================================================= -->
+
 <script>
-    const localMatches = <%- JSON.stringify(typeof matches !== 'undefined' ? matches : []) %>;
+    // Embed existing EJS data directly into browser JS
+    const localMatches = <%- JSON.stringify(matches || []) %>;
     const localPlayers = <%- typeof players !== 'undefined' ? JSON.stringify(players) : '[]' %>;
+
     const searchInput = document.getElementById('live-search-input');
     const dropdown = document.getElementById('search-results-dropdown');
     const searchForm = document.getElementById('search-form');
-    let debounceTimer, topTargetUrl = '';
 
+    let debounceTimer;
+    let topTargetUrl = '';
+
+    // Handle typing input
     searchInput.addEventListener('input', (e) => {
         clearTimeout(debounceTimer);
+
         const query = e.target.value.trim().toLowerCase();
-        if (query.length < 1) { dropdown.classList.add('hidden'); dropdown.innerHTML = ''; topTargetUrl = ''; return; }
+
+        if (query.length < 1) {
+            dropdown.classList.add('hidden');
+            dropdown.innerHTML = '';
+            topTargetUrl = '';
+            return;
+        }
+
         debounceTimer = setTimeout(() => {
+
+            // Try server endpoint first
             fetch(`/api/search?q=${encodeURIComponent(query)}`)
-                .then(res => res.ok ? res.json() : Promise.reject())
+                .then(res => res.ok ? res.json() : Promise.reject('No server API'))
                 .then(data => renderSearchResults(data, query))
-                .catch(() => renderSearchResults({
-                    matches: localMatches.filter(m => (m.teamA && m.teamA.toLowerCase().includes(query)) || (m.teamB && m.teamB.toLowerCase().includes(query))),
-                    players: localPlayers.filter(p => (p.name && p.name.toLowerCase().includes(query)) || (p.role && p.role.toLowerCase().includes(query)))
-                }, query));
+                .catch(() => {
+
+                    // Client-Side Search Engine Fallback
+                    const matchedMatches = localMatches.filter(m => 
+                        (m.teamA && m.teamA.toLowerCase().includes(query)) ||
+                        (m.teamB && m.teamB.toLowerCase().includes(query))
+                    );
+
+                    const matchedPlayers = localPlayers.filter(p =>
+                        (p.name && p.name.toLowerCase().includes(query)) ||
+                        (p.role && p.role.toLowerCase().includes(query))
+                    );
+
+                    renderSearchResults(
+                        {
+                            matches: matchedMatches,
+                            players: matchedPlayers
+                        },
+                        query
+                    );
+                });
+
         }, 150);
     });
 
     function renderSearchResults(data, query) {
         const { players, matches } = data;
+
         let html = '';
+
         topTargetUrl = '';
-        if ((!matches || !matches.length) && (!players || !players.length)) {
-            dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:#9a9a9a;font-size:0.8rem;">No results</div>';
+
+        const hasMatches = matches && matches.length > 0;
+        const hasPlayers = players && players.length > 0;
+
+        if (!hasMatches && !hasPlayers) {
+            dropdown.innerHTML = `
+                <div class="text-center py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    No matching teams or players found for "${query}"
+                </div>
+            `;
+
             dropdown.classList.remove('hidden');
+
             return;
         }
-        if (matches && matches.length) {
-            if (!topTargetUrl) topTargetUrl = `/match/${matches[0]._id || matches[0].id || ''}`;
-            html += '<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#9a9a9a;margin-bottom:0.35rem;">Matches</div>';
+
+        // 1. Render Matches
+        if (hasMatches) {
+
+            if (!topTargetUrl) {
+                topTargetUrl = `/match/${matches[0].id || ''}`;
+            }
+
+            html += `
+                <div>
+                    <span class="text-[10px] font-bold text-sky-500 uppercase tracking-widest block mb-2 px-2">
+                        Matches & Teams
+                    </span>
+
+                    <div class="space-y-1">
+            `;
+
             matches.forEach(m => {
-                const url = (m._id || m.id) ? `/match/${m._id || m.id}` : `/matches?q=${encodeURIComponent(query)}`;
-                html += `<a href="${url}" style="display:block;padding:0.45rem 0.2rem;text-decoration:none;color:#f0f0f0;font-size:0.85rem;font-weight:600;">${m.teamA} vs ${m.teamB}</a>`;
+
+                const matchUrl = m.id
+                    ? `/match/${m.id}`
+                    : `/matches?q=${encodeURIComponent(query)}`;
+
+                html += `
+                    <a 
+                        href="${matchUrl}" 
+                        class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 transition border border-transparent hover:border-slate-200"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+
+                            <span class="text-xs font-bold text-gray-800 uppercase">
+                                ${m.teamA}
+                                <span class="text-sky-500">vs</span>
+                                ${m.teamB}
+                            </span>
+                        </div>
+
+                        <span class="text-[10px] text-gray-400 font-semibold uppercase px-2 py-0.5 bg-slate-100 rounded-md">
+                            ${m.status || m.time || 'Fixture'}
+                        </span>
+                    </a>
+                `;
             });
+
+            html += `
+                    </div>
+                </div>
+            `;
         }
-        if (players && players.length) {
-            if (!topTargetUrl) topTargetUrl = (players[0]._id || players[0].id) ? `/player/${players[0]._id || players[0].id}` : '/market';
-            html += '<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#9a9a9a;margin:0.55rem 0 0.35rem;">Players</div>';
+
+        // 2. Render Players
+        if (hasPlayers) {
+
+            if (!topTargetUrl) {
+                topTargetUrl = players[0].id
+                    ? `/player/${players[0].id}`
+                    : `/market`;
+            }
+
+            html += `
+                <div class="${hasMatches ? 'pt-3 border-t border-slate-100' : ''}">
+                    <span class="text-[10px] font-bold text-sky-500 uppercase tracking-widest block mb-2 px-2">
+                        Registered Players
+                    </span>
+
+                    <div class="space-y-1">
+            `;
+
             players.forEach(p => {
-                const url = (p._id || p.id) ? `/player/${p._id || p.id}` : `/market?search=${encodeURIComponent(p.name)}`;
-                html += `<a href="${url}" style="display:block;padding:0.45rem 0.2rem;text-decoration:none;color:#f0f0f0;font-size:0.85rem;font-weight:600;">${p.name}</a>`;
+
+                const playerUrl = p.id
+                    ? `/player/${p.id}`
+                    : `/market?search=${encodeURIComponent(p.name)}`;
+
+                html += `
+                    <a 
+                        href="${playerUrl}" 
+                        class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 transition border border-transparent hover:border-slate-200"
+                    >
+                        <div class="flex items-center gap-3">
+                            <div class="w-7 h-7 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                                ${p.name ? p.name.charAt(0) : 'P'}
+                            </div>
+
+                            <div>
+                                <span class="text-xs font-bold text-gray-800 block">
+                                    ${p.name}
+                                </span>
+
+                                <span class="text-[10px] text-gray-400 font-medium">
+                                    ${p.team || 'Free Agent'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <span class="text-[10px] text-sky-600 font-bold uppercase tracking-wider bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
+                            ${p.role || 'Player'}
+                        </span>
+                    </a>
+                `;
             });
+
+            html += `
+                    </div>
+                </div>
+            `;
         }
+
         dropdown.innerHTML = html;
         dropdown.classList.remove('hidden');
     }
 
+    // Direct submit action
     searchForm.addEventListener('submit', (e) => {
-        if (topTargetUrl) { e.preventDefault(); window.location.href = topTargetUrl; }
+        if (topTargetUrl) {
+            e.preventDefault();
+            window.location.href = topTargetUrl;
+        }
     });
+
+    // Hide dropdown when clicking outside
     document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.add('hidden');
+        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
     });
 </script>

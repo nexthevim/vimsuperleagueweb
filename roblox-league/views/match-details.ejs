@@ -79,7 +79,9 @@
     const leg2PlayersB = normalizePlayers(details.leg2TeamBPlayers || details.teamBPlayersLeg2 || []);
 
     // If no leg split in admin data, show the single list under "Match stats" as leg1 only
-    const showLeg2Block = leg2A != null || leg2PlayersA.length > 0 || leg2PlayersB.length > 0;
+    const legStatsObj = details.legStats || {};
+    const legKeysExtra = Object.keys(legStatsObj).map(Number).filter(n => n >= 2).sort((a,b)=>a-b);
+    const showLeg2Block = leg2A != null || leg2PlayersA.length > 0 || leg2PlayersB.length > 0 || legKeysExtra.length > 0;
 
     // Merge lineup ratings into a lookup for richer rows
     function lineupMap(arr) {
@@ -651,16 +653,21 @@ body { margin: 0; font-family: var(--md-body); }
             const type = String(p.type || '').toLowerCase();
             let chips = '';
             // type often goal/assist/save from admin
-            if (p.value !== '' && p.value != null) {
-              const label = type ? type : 'stat';
-              const cls = type.indexOf('goal') >= 0 ? 'g' : (type.indexOf('assist') >= 0 ? 'a' : (type.indexOf('save') >= 0 ? 's' : ''));
-              chips += '<span class="pstat-chip ' + cls + '">' + label + ' ' + p.value + '</span>';
+            if (p.goals !== '' && p.goals != null && Number(p.goals) > 0) {
+              chips += '<span class="pstat-chip g">G ' + p.goals + '</span>';
+            } else if (p.value !== '' && p.value != null && type.indexOf('goal') >= 0) {
+              chips += '<span class="pstat-chip g">G ' + p.value + '</span>';
+            } else if (p.value !== '' && p.value != null && !type) {
+              chips += '<span class="pstat-chip">' + p.value + '</span>';
             }
             if (p.assists !== '' && p.assists != null && Number(p.assists) > 0) {
               chips += '<span class="pstat-chip a">A ' + p.assists + '</span>';
             }
             if (p.saves !== '' && p.saves != null && Number(p.saves) > 0) {
-              chips += '<span class="pstat-chip s">Saves ' + p.saves + '</span>';
+              chips += '<span class="pstat-chip s">S ' + p.saves + '</span>';
+            }
+            if (p.tackles !== '' && p.tackles != null && Number(p.tackles) > 0) {
+              chips += '<span class="pstat-chip">T ' + p.tackles + '</span>';
             }
             if (p.rating !== '' && p.rating != null) {
               chips += '<span class="pstat-chip r">★ ' + p.rating + '</span>';

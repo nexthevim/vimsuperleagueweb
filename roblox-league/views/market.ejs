@@ -3,220 +3,334 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* =========================================================
-   VIM MARKET — editorial skin (matches profile hub)
-========================================================= */
 :root {
-    --mk-paper: #f4f1e9;
-    --mk-paper-2: #fffdf8;
-    --mk-ink: #123b3c;
-    --mk-ink-deep: #073536;
-    --mk-teal: #07595a;
-    --mk-teal-2: #0a7778;
-    --mk-coral: #f18470;
-    --mk-coral-dark: #d96756;
-    --mk-mint: #d9ece6;
-    --mk-muted: #728081;
-    --mk-line: rgba(18,59,60,.105);
-    --mk-line-strong: rgba(18,59,60,.16);
-    --mk-display: "DM Serif Display", Georgia, serif;
-    --mk-body: "Manrope", system-ui, sans-serif;
-    --mk-radius: 1.5rem;
-    --mk-shadow: 0 12px 40px rgba(18,59,60,.055), 0 2px 8px rgba(18,59,60,.035);
+  --mk-bg: #ece7dc;
+  --mk-surface: #fffdf8;
+  --mk-ink: #0f2f2f;
+  --mk-ink-2: #1a4544;
+  --mk-muted: #6d7f7a;
+  --mk-teal: #0a6b68;
+  --mk-teal-d: #064e4c;
+  --mk-coral: #e87a64;
+  --mk-gold: #c9a227;
+  --mk-line: rgba(15,47,47,.1);
+  --mk-serif: "DM Serif Display", Georgia, serif;
+  --mk-sans: "Manrope", system-ui, sans-serif;
 }
 
+* { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; font-family: var(--mk-body); }
+body { margin: 0; font-family: var(--mk-sans); }
 
-main.py-16, main {
-    background:
-        radial-gradient(circle at 8% 8%, rgba(241,132,112,.10), transparent 22rem),
-        radial-gradient(circle at 92% 18%, rgba(7,89,90,.08), transparent 26rem),
-        radial-gradient(circle at 50% 100%, rgba(217,236,230,.55), transparent 30rem),
-        var(--mk-paper) !important;
-    color: var(--mk-ink) !important;
-    font-family: var(--mk-body);
-    padding-top: 5.5rem !important;
-    padding-bottom: 3.5rem !important;
-}
-
-.mk-display { font-family: var(--mk-display); font-weight: 400; letter-spacing: -.025em; }
-.mk-eyebrow {
-    display: inline-flex; align-items: center; gap: 8px;
-    color: var(--mk-coral-dark); font-size: .61rem; font-weight: 800;
-    letter-spacing: .17em; text-transform: uppercase;
-}
-.mk-eyebrow::before { content: ""; width: 16px; height: 1px; background: currentColor; }
-
-/* shell */
-.mk-shell { width: min(1200px, calc(100% - 2rem)); margin: 0 auto; }
-
-/* panel cards */
-.mk-panel {
-    background: rgba(255,253,248,.88);
-    border: 1px solid var(--mk-line);
-    border-radius: var(--mk-radius);
-    box-shadow: var(--mk-shadow);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+main.mk-market {
+  min-height: 100vh;
+  color: var(--mk-ink);
+  background:
+    radial-gradient(ellipse 70% 40% at 0% 0%, rgba(232,122,100,.14), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 100% 5%, rgba(10,107,104,.1), transparent 48%),
+    radial-gradient(ellipse 60% 30% at 50% 100%, rgba(201,162,39,.08), transparent 50%),
+    var(--mk-bg);
+  padding: 5.25rem 0 4rem;
+  overflow-x: hidden;
 }
 
-/* buttons */
-.mk-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    min-height: 42px; padding: 0 16px; border-radius: 999px; border: 0;
-    font-family: inherit; font-size: .62rem; font-weight: 800;
-    letter-spacing: .08em; text-transform: uppercase; text-decoration: none;
-    cursor: pointer;
-    transition: transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s ease, background .22s ease;
-}
-.mk-btn:hover { transform: translateY(-2px); }
-.mk-btn:active { transform: translateY(0) scale(.98); }
-.mk-btn-teal { background: var(--mk-teal); color: #fff; box-shadow: 0 8px 22px rgba(7,89,90,.18); }
-.mk-btn-teal:hover { background: var(--mk-teal-2); color: #fff; }
-.mk-btn-coral { background: var(--mk-coral); color: #fff; box-shadow: 0 8px 22px rgba(241,132,112,.2); }
-.mk-btn-coral:hover { background: #ed7966; color: #fff; }
-.mk-btn-ghost {
-    background: rgba(255,255,255,.5); color: var(--mk-ink);
-    border: 1px solid var(--mk-line-strong); box-shadow: none;
-}
-.mk-btn-ghost:hover { background: #fff; color: var(--mk-ink); }
+.mk-wrap { width: min(1220px, calc(100% - 1.75rem)); margin: 0 auto; }
 
-/* underline link */
-.mk-link {
-    position: relative; color: var(--mk-teal); font-weight: 800; font-size: .68rem;
-    letter-spacing: .06em; text-transform: uppercase; text-decoration: none;
+/* ===== HERO ===== */
+.mk-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.3fr .7fr;
+  gap: 1.5rem;
+  align-items: end;
+  margin-bottom: 1.75rem;
+  padding: 0 .15rem 1.5rem;
 }
-.mk-link::after {
-    content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1.5px;
-    background: currentColor; transform: scaleX(0); transform-origin: right;
-    transition: transform .28s cubic-bezier(.22,1,.36,1);
+@media (max-width: 900px) {
+  .mk-hero { grid-template-columns: 1fr; }
 }
-.mk-link:hover::after { transform: scaleX(1); transform-origin: left; }
+.mk-hero-copy .eyebrow {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .62rem; font-weight: 800; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--mk-coral);
+}
+.mk-hero-copy .eyebrow::before {
+  content: ""; width: 18px; height: 2px; background: currentColor; border-radius: 2px;
+}
+.mk-hero-copy h1 {
+  margin: .45rem 0 .4rem;
+  font-family: var(--mk-serif);
+  font-size: clamp(2.8rem, 6vw, 4.2rem);
+  line-height: .9; letter-spacing: -.03em; color: var(--mk-ink);
+}
+.mk-hero-copy h1 em { font-style: italic; color: var(--mk-teal); }
+.mk-hero-copy p {
+  margin: 0; max-width: 34rem; color: var(--mk-muted); font-size: .92rem; line-height: 1.5;
+}
 
-/* header */
-.mk-header {
-    display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
-    gap: 1.25rem; margin-bottom: 1.25rem; padding-bottom: 1.15rem;
-    border-bottom: 1px solid var(--mk-line);
+.mk-hero-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .55rem;
 }
-.mk-header h1 {
-    margin: .3rem 0 0; font-size: clamp(2.4rem, 5vw, 3.4rem); line-height: .92;
-    color: var(--mk-ink-deep);
+.mk-stat {
+  background: var(--mk-surface);
+  border: 1px solid var(--mk-line);
+  border-radius: 1.25rem;
+  padding: 1rem 1.05rem;
+  box-shadow: 0 10px 28px rgba(15,47,47,.05);
+  transition: transform .25s cubic-bezier(.22,1,.36,1);
 }
-.mk-header h1 em { font-style: italic; color: var(--mk-teal); }
-.mk-header p { margin: .35rem 0 0; color: var(--mk-muted); font-size: .82rem; }
+.mk-stat:hover { transform: translateY(-3px); }
+.mk-stat span {
+  display: block; font-size: .55rem; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--mk-muted);
+}
+.mk-stat strong {
+  font-family: var(--mk-serif); font-style: italic;
+  font-size: 1.55rem; color: var(--mk-ink);
+}
 
-/* controls bar */
-.mk-controls {
-    display: flex; flex-wrap: wrap; align-items: center; gap: .55rem;
-    padding: .85rem 1rem; margin-bottom: 1.25rem;
+/* curved divider */
+.mk-curve {
+  height: 28px; margin: 0 0 1.25rem;
+  background: var(--mk-surface);
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  border: 1px solid var(--mk-line);
+  border-top: 0;
+  opacity: .7;
+}
+
+/* ===== CONTROLS ===== */
+.mk-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .6rem;
+  background: var(--mk-surface);
+  border: 1px solid var(--mk-line);
+  border-radius: 1.5rem;
+  padding: .75rem .9rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 12px 32px rgba(15,47,47,.05);
 }
 .mk-mode {
-    display: flex; background: rgba(18,59,60,.06); padding: 4px; border-radius: 999px;
+  display: flex; background: rgba(15,47,47,.06); padding: 3px; border-radius: 999px;
 }
 .mk-mode button {
-    border: 0; border-radius: 999px; padding: .55rem 1.1rem;
-    font-family: inherit; font-size: .62rem; font-weight: 800;
-    letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
-    background: transparent; color: var(--mk-muted);
-    transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+  border: 0; border-radius: 999px; padding: .5rem 1.05rem;
+  font-family: inherit; font-size: .62rem; font-weight: 800;
+  letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
+  background: transparent; color: var(--mk-muted);
+  transition: .2s ease;
 }
 .mk-mode button.is-on {
-    background: #fff; color: var(--mk-ink-deep);
-    box-shadow: 0 4px 14px rgba(18,59,60,.1);
+  background: var(--mk-ink); color: #fff;
+  box-shadow: 0 6px 16px rgba(15,47,47,.18);
 }
-
-.mk-search {
-    position: relative; flex: 1; min-width: 180px; max-width: 280px;
-}
+.mk-search { position: relative; flex: 1; min-width: 160px; max-width: 260px; }
 .mk-search input {
-    width: 100%; padding: .7rem 1rem .7rem 2.35rem; border-radius: 999px;
-    border: 1.5px solid var(--mk-line); background: #fff; color: var(--mk-ink);
-    font-family: inherit; font-size: .8rem; font-weight: 600; outline: none;
-    transition: border-color .2s, box-shadow .2s;
+  width: 100%; border: 1.5px solid var(--mk-line); border-radius: 999px;
+  padding: .65rem 1rem .65rem 2.3rem; background: #f7f4ec;
+  font-family: inherit; font-size: .8rem; font-weight: 600; color: var(--mk-ink); outline: none;
+  transition: border-color .2s, box-shadow .2s;
 }
 .mk-search input:focus {
-    border-color: var(--mk-teal); box-shadow: 0 0 0 4px rgba(7,89,90,.1);
+  border-color: var(--mk-teal); box-shadow: 0 0 0 4px rgba(10,107,104,.12); background: #fff;
 }
 .mk-search svg {
-    position: absolute; left: .85rem; top: 50%; transform: translateY(-50%);
-    width: 15px; height: 15px; color: var(--mk-muted); pointer-events: none;
+  position: absolute; left: .8rem; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; color: var(--mk-muted); pointer-events: none;
 }
-
-.mk-filters {
-    display: flex; flex-wrap: wrap; gap: .3rem;
-    padding: 4px; border-radius: 999px; background: rgba(18,59,60,.05);
+.mk-chips {
+  display: flex; flex-wrap: wrap; gap: .25rem;
+  background: rgba(15,47,47,.04); padding: 3px; border-radius: 999px;
 }
-.mk-filters .filter-btn {
-    border: 0; border-radius: 999px; padding: .45rem .75rem;
-    font-family: inherit; font-size: .58rem; font-weight: 800;
-    letter-spacing: .06em; text-transform: uppercase; cursor: pointer;
-    background: transparent; color: var(--mk-muted);
-    transition: background .18s, color .18s, transform .18s;
+.mk-chips .filter-btn {
+  border: 0; border-radius: 999px; padding: .4rem .7rem;
+  font-family: inherit; font-size: .58rem; font-weight: 800;
+  letter-spacing: .06em; text-transform: uppercase; cursor: pointer;
+  background: transparent; color: var(--mk-muted); transition: .18s ease;
 }
-.mk-filters .filter-btn:hover { color: var(--mk-ink); transform: translateY(-1px); }
-.mk-filters .filter-btn.active {
-    background: var(--mk-ink-deep); color: #fff;
+.mk-chips .filter-btn:hover { color: var(--mk-ink); }
+.mk-chips .filter-btn.active {
+  background: var(--mk-teal); color: #fff;
 }
-
+.mk-pill {
+  border: 0; border-radius: 999px; padding: .45rem .85rem;
+  font-family: inherit; font-size: .58rem; font-weight: 800;
+  letter-spacing: .06em; text-transform: uppercase; cursor: pointer;
+  background: #e8f3f1; color: var(--mk-teal); transition: .2s;
+}
+.mk-pill.on { background: var(--mk-teal); color: #fff; }
 .mk-count {
-    padding: .55rem .9rem; border-radius: 999px;
-    background: var(--mk-mint); color: var(--mk-teal);
-    font-size: .58rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  margin-left: auto; padding: .45rem .85rem; border-radius: 999px;
+  background: #f3ebe0; color: var(--mk-ink-2);
+  font-size: .58rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
 }
 
-/* section title */
-.mk-section-head {
-    display: flex; align-items: center; justify-content: space-between; gap: .75rem;
-    margin-bottom: 1rem;
+/* ===== LEADERBOARD / SPOTLIGHT ===== */
+.mk-lb {
+  margin-bottom: 2rem;
+  background: var(--mk-surface);
+  border: 1px solid var(--mk-line);
+  border-radius: 2rem 2rem 1.5rem 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 18px 48px rgba(15,47,47,.07);
 }
-.mk-section-head h3 {
-    margin: .15rem 0 0; font-size: clamp(1.25rem, 2.5vw, 1.6rem);
-    color: var(--mk-ink-deep); line-height: 1;
+.mk-lb-top {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: 1rem; padding: 1.35rem 1.4rem 1.1rem;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(201,162,39,.15), transparent 40%),
+    linear-gradient(180deg, #faf6ee, var(--mk-surface));
+  border-bottom: 1px solid var(--mk-line);
+}
+.mk-lb-top h2 {
+  margin: .2rem 0 0; font-family: var(--mk-serif);
+  font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1; color: var(--mk-ink);
+}
+.mk-lb-top p { margin: .35rem 0 0; color: var(--mk-muted); font-size: .78rem; }
+.mk-lb-btn {
+  border: 0; border-radius: 999px; padding: .6rem 1.1rem;
+  font-family: inherit; font-size: .62rem; font-weight: 800;
+  letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
+  background: var(--mk-ink); color: #fff;
+  box-shadow: 0 8px 20px rgba(15,47,47,.15);
+  transition: transform .2s, background .2s;
+}
+.mk-lb-btn:hover { transform: translateY(-2px); background: var(--mk-teal); }
+
+.mk-lb-body { padding: 1.25rem 1.25rem 1.5rem; }
+
+.mk-lb-section { margin-bottom: 1.5rem; }
+.mk-lb-section:last-child { margin-bottom: 0; }
+.mk-lb-section h3 {
+  display: flex; align-items: center; gap: .5rem;
+  margin: 0 0 1rem; font-size: .62rem; font-weight: 800;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--mk-muted);
+}
+.mk-lb-section h3 i {
+  font-style: normal; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--mk-coral); display: inline-block;
 }
 
-/* MULTI-DIRECTIONAL CONVEYOR */
+.mk-podium {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  align-items: end;
+  perspective: 1200px;
+}
+@media (max-width: 800px) {
+  .mk-podium { grid-template-columns: 1fr; }
+}
+.mk-podium-item { position: relative; display: flex; flex-direction: column; align-items: center; }
+.mk-podium-item.mk-1 { order: 2; }
+.mk-podium-item.mk-2 { order: 1; }
+.mk-podium-item.mk-3 { order: 3; }
+@media (max-width: 800px) {
+  .mk-podium-item.mk-1, .mk-podium-item.mk-2, .mk-podium-item.mk-3 { order: 0; }
+}
+.mk-medal {
+  position: absolute; top: -12px; z-index: 30;
+  font-size: 1.5rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,.2));
+}
+.mk-podium-item.mk-1 .player-card { width: 230px !important; height: 320px !important; }
+.mk-podium-item.mk-2 .player-card,
+.mk-podium-item.mk-3 .player-card { width: 200px !important; height: 280px !important; opacity: .96; }
+
+.mk-rank-list {
+  display: none; margin-top: .85rem;
+  border: 1px solid var(--mk-line); border-radius: 1.15rem; overflow: hidden;
+  background: #faf7f0;
+}
+.mk-rank-list.open { display: block; animation: mkSlide .35s cubic-bezier(.22,1,.36,1); }
+@keyframes mkSlide {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.mk-rank-row {
+  display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+  padding: .7rem 1rem; border-bottom: 1px solid var(--mk-line);
+  transition: background .15s;
+}
+.mk-rank-row:last-child { border-bottom: 0; }
+.mk-rank-row:hover { background: #fff; }
+.mk-rank-row .n {
+  width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: .65rem; font-weight: 800; background: rgba(15,47,47,.08); color: var(--mk-ink);
+  flex-shrink: 0;
+}
+.mk-rank-row .name { font-weight: 800; font-size: .85rem; color: var(--mk-ink); }
+.mk-rank-row .meta { font-size: .65rem; color: var(--mk-muted); font-weight: 600; }
+.mk-rank-row .bid { font-weight: 800; color: var(--mk-teal); font-size: .9rem; }
+
+/* ===== LANES / CONVEYOR ===== */
+.mk-lanes { display: flex; flex-direction: column; gap: 1.25rem; }
+.mk-lane {
+  position: relative;
+  background: var(--mk-surface);
+  border: 1px solid var(--mk-line);
+  border-radius: 1.75rem;
+  padding: 2.4rem 0 1.4rem;
+  overflow: hidden;
+  box-shadow: 0 14px 36px rgba(15,47,47,.05);
+}
+.mk-lane-label {
+  position: absolute; top: .75rem; left: 1.1rem; z-index: 5;
+}
+.mk-lane-label span {
+  display: inline-block; padding: .35rem .75rem; border-radius: 999px;
+  background: rgba(15,47,47,.06); color: var(--mk-ink-2);
+  font-size: .58rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+}
+
 @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 @keyframes scrollRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
-.animate-conveyor-1 { display: flex; animation: scrollLeft 32s linear infinite; width: max-content; }
-.animate-conveyor-2 { display: flex; animation: scrollRight 38s linear infinite; width: max-content; }
+.animate-conveyor-1 { display: flex; animation: scrollLeft 36s linear infinite; width: max-content; }
+.animate-conveyor-2 { display: flex; animation: scrollRight 42s linear infinite; width: max-content; }
 .animate-conveyor-1:hover, .animate-conveyor-2:hover { animation-play-state: paused; }
 
-/* GLASS + CARD */
+/* ===== PLAYER CARDS ===== */
 .glass-light {
-    background: rgba(255, 253, 248, 0.95);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(18, 59, 60, 0.1);
-    box-shadow: 0 16px 36px -12px rgba(18, 59, 60, 0.08);
+  background: #fffdf8;
+  border: 1px solid rgba(15,47,47,.1);
+  box-shadow: 0 16px 36px -10px rgba(15,47,47,.12);
 }
-
-.player-card {
-    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transform-style: preserve-3d;
-    perspective: 1000px;
-    background: rgba(255, 253, 248, 0.97);
-    border-radius: 1.5rem !important;
+.player-card, .mk-card {
+  transition: transform .22s cubic-bezier(.2,0,0,1), box-shadow .3s ease, border-color .3s ease;
+  cursor: pointer; position: relative; overflow: hidden;
+  transform-style: preserve-3d; perspective: 1000px;
+  border-radius: 1.35rem !important;
+  background: #0d1615;
 }
 .player-card:hover {
-    z-index: 20;
-    border-color: rgba(7, 89, 90, 0.45) !important;
-    box-shadow: 0 0 32px rgba(7, 89, 90, 0.18), 0 20px 40px -10px rgba(18, 59, 60, 0.14);
+  z-index: 20;
+  border-color: rgba(10,107,104,.5) !important;
+  box-shadow: 0 0 40px rgba(10,107,104,.22), 0 24px 48px -12px rgba(15,47,47,.25);
 }
-
 .card-sheen {
-    position: absolute; inset: 0;
-    background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.65) 45%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.65) 55%, transparent 80%);
-    pointer-events: none; z-index: 12; opacity: 0; transform: translateX(-100%);
-    transition: opacity 0.3s ease;
+  position: absolute; inset: 0;
+  background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,.55) 45%, rgba(255,255,255,.85) 50%, rgba(255,255,255,.55) 55%, transparent 80%);
+  pointer-events: none; z-index: 12; opacity: 0; transform: translateX(-100%);
 }
 .player-card:hover .card-sheen {
-    opacity: 1; transform: translateX(100%);
-    transition: transform 0.8s ease-in-out, opacity 0.3s ease;
+  opacity: 1; transform: translateX(100%);
+  transition: transform .75s ease-in-out, opacity .25s ease;
+}
+.card-img {
+  filter: grayscale(85%) contrast(1.05);
+  transition: filter .45s ease, transform .5s ease;
+}
+.player-card:hover .card-img {
+  filter: grayscale(0%) contrast(1.02);
+  transform: scale(1.07);
+}
+.card-active-anim {
+  animation: sleekClick .4s cubic-bezier(.4,0,.2,1) forwards;
+  pointer-events: none;
+}
+@keyframes sleekClick {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(10,107,104,.4); }
+  100% { transform: scale(1.02); opacity: .9; }
 }
 
 .pos-fwd { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
@@ -224,169 +338,130 @@ main.py-16, main {
 .pos-def { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; }
 .pos-gk  { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
 .pos-pro { background: linear-gradient(135deg, #64748b, #475569); color: #fff; }
-
-.rank-ss { background: linear-gradient(135deg, #ec4899, #a855f7, #f59e0b); background-size: 200% 200%; animation: rankShimmer 3s ease infinite; color: #fff; border: 1px solid rgba(255,255,255,0.6); }
-.rank-s { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; border: 1px solid #fef08a; }
+.rank-ss { background: linear-gradient(135deg, #ec4899, #a855f7, #f59e0b); background-size: 200% 200%; animation: rankShimmer 3s ease infinite; color: #fff; }
+.rank-s { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; }
 .rank-a { background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: #fff; }
 .rank-b { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
 .rank-c { background: linear-gradient(135deg, #64748b, #475569); color: #fff; }
-
 @keyframes rankShimmer {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-.card-img {
-    filter: grayscale(100%) contrast(1.05);
-    transition: filter 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s ease;
-}
-.player-card:hover .card-img {
-    filter: grayscale(0%) contrast(1);
-    transform: scale(1.06);
-}
-
-.card-active-anim {
-    animation: sleekClick 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    pointer-events: none;
-}
-@keyframes sleekClick {
-    0% { transform: scale(1); box-shadow: 0 0 0 rgba(7,89,90,0); }
-    50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(7,89,90,0.4); }
-    100% { transform: scale(1.02); opacity: 0.9; }
-}
-
-/* MODAL */
+/* modal keep functional */
 .modal {
-    display: none; position: fixed; inset: 0;
-    background: rgba(7, 20, 20, 0); z-index: 100;
-    align-items: center; justify-content: center; padding: 20px;
-    backdrop-filter: blur(0px); transition: all 0.4s ease;
+  display: none; position: fixed; inset: 0; background: rgba(8,16,16,0);
+  z-index: 100; align-items: center; justify-content: center; padding: 20px;
+  backdrop-filter: blur(0); transition: all .4s ease;
 }
-.modal.active { background: rgba(7, 20, 20, 0.55); backdrop-filter: blur(16px); }
+.modal.active { background: rgba(8,16,16,.6); backdrop-filter: blur(16px); }
 #modalContainer {
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-    transform: translateY(30px) scale(0.96); opacity: 0;
+  transition: transform .5s cubic-bezier(.16,1,.3,1), opacity .4s ease;
+  transform: translateY(30px) scale(.96); opacity: 0;
 }
 #modalContainer.show { transform: translateY(0) scale(1); opacity: 1; }
-
 .stat-badge {
-    background: rgba(241, 245, 249, 0.85);
-    border: 1px solid rgba(226, 232, 240, 1);
-    backdrop-filter: blur(8px);
+  background: rgba(241,245,249,.85); border: 1px solid #e2e8f0; backdrop-filter: blur(8px);
 }
-
 .form-label {
-    display: block; font-size: 0.62rem; font-weight: 800;
-    text-transform: uppercase; letter-spacing: 0.1em; color: var(--mk-muted); margin-bottom: 0.35rem;
+  display: block; font-size: .62rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--mk-muted); margin-bottom: .35rem;
 }
 .form-input {
-    width: 100%; background: #fffdf8; border: 1.5px solid var(--mk-line);
-    padding: 0.75rem 1rem; border-radius: 0.9rem; outline: none;
-    transition: all 0.25s ease; color: var(--mk-ink); font-weight: 700; font-size: 0.85rem;
-    font-family: inherit;
+  width: 100%; background: #fffdf8; border: 1.5px solid var(--mk-line);
+  padding: .75rem 1rem; border-radius: .9rem; outline: none;
+  transition: .25s ease; color: var(--mk-ink); font-weight: 700; font-size: .85rem;
+  font-family: inherit;
 }
 .form-input:focus {
-    border-color: var(--mk-teal); background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(7, 89, 90, 0.1);
+  border-color: var(--mk-teal); background: #fff;
+  box-shadow: 0 0 0 4px rgba(10,107,104,.1);
 }
-select.form-input option { background: #ffffff; color: #0f172a; }
 .position-radio:checked + label {
-    border-color: var(--mk-teal); background: var(--mk-mint); color: var(--mk-teal);
-    box-shadow: 0 0 0 2px var(--mk-teal);
+  border-color: var(--mk-teal); background: #e8f3f1; color: var(--mk-teal);
+  box-shadow: 0 0 0 2px var(--mk-teal);
 }
 .hidden-form { display: none !important; }
-
 .custom-scroll::-webkit-scrollbar { width: 4px; }
-.custom-scroll::-webkit-scrollbar-track { background: rgba(241, 245, 249, 0.5); }
 .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-
 .team-tile {
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-    border-radius: 1.25rem !important;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  border-radius: 1.25rem !important;
 }
 .team-tile.active {
-    border-color: transparent;
-    box-shadow: 0 0 0 3px hsl(var(--team-hue) 75% 52%), 0 20px 35px -15px rgba(15, 23, 42, 0.2);
-    transform: translateY(-3px);
+  border-color: transparent;
+  box-shadow: 0 0 0 3px hsl(var(--team-hue) 75% 52%), 0 20px 35px -15px rgba(15,23,42,.2);
+  transform: translateY(-3px);
 }
 
-#spotlightTopFull .text-slate-400,
-#spotlightPosFull .text-slate-400,
-#spotlightRisingFull .text-slate-400 { color: #94a3b8 !important; }
-
-/* spotlight panel */
-.mk-spotlight {
-    position: relative; overflow: hidden;
-    border-radius: 1.75rem; margin-bottom: 2rem;
-    border: 1px solid var(--mk-line);
-    background:
-        radial-gradient(circle at 15% 10%, rgba(241,132,112,.1), transparent 40%),
-        radial-gradient(circle at 85% 70%, rgba(7,89,90,.07), transparent 45%),
-        rgba(255,253,248,.92);
-    box-shadow: var(--mk-shadow);
-}
-.mk-spotlight-inner { position: relative; padding: 1.5rem 1.35rem 1.75rem; }
-
-/* auction hub */
-#auctionSection .mk-panel { margin-bottom: 1rem; }
-
-/* fade-up */
-@keyframes mkFadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.mk-fade { animation: mkFadeUp .55s cubic-bezier(.22,1,.36,1) both; }
-
-/* auth boxes */
-#registerBox, #loginBox {
-    border-radius: 1.5rem !important;
-    border-color: var(--mk-line) !important;
-    background: rgba(255,253,248,.95) !important;
+/* auction section polish */
+#auctionSection {
+  width: min(1220px, calc(100% - 1.75rem)) !important;
+  margin-left: auto !important; margin-right: auto !important;
+  padding-left: 0 !important; padding-right: 0 !important;
 }
 
-@media (max-width: 640px) {
-    .mk-header h1 { font-size: 2.3rem; }
-    .mk-controls { padding: .75rem; }
+.mk-alert {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: .75rem; padding: 1rem 1.15rem; margin-bottom: 1.25rem;
+  border-radius: 1.25rem; background: linear-gradient(135deg, #e87a64, #d96756);
+  color: #fff; box-shadow: 0 12px 28px rgba(232,122,100,.25);
 }
+.mk-alert button {
+  border: 0; border-radius: 999px; padding: .55rem 1rem;
+  font-family: inherit; font-size: .62rem; font-weight: 800;
+  letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
+  background: #fff; color: #c45a48;
+}
+
+@keyframes mkIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.mk-in { animation: mkIn .55s cubic-bezier(.22,1,.36,1) both; }
 </style>
 
-
 <% if (typeof error !== 'undefined' && error) { %>
-    <div class="fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-red-600 text-white px-8 py-4 rounded-full font-black uppercase italic shadow-[0_15px_30px_rgba(220,38,38,0.3)] border border-white/20 text-xs tracking-wider">
+    <div class="fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-red-600 text-white px-8 py-4 rounded-full font-black uppercase italic shadow-lg border border-white/20 text-xs tracking-wider">
         ⚠️ <%= error %>
     </div>
 <% } %>
 
-<main class="py-16 min-h-screen overflow-hidden mk-fade">
-    <div class="mk-shell">
-    <!-- MARKET HEADER -->
-    <div class="mk-header">
-        <div>
-            <div class="mk-eyebrow">VIM Super League</div>
-            <h1 class="mk-display">Player <em>Market</em></h1>
-            <p>Scout cards, filter by class, and jump into the auction hub.</p>
+<main class="mk-market">
+<div class="mk-wrap">
+
+    <header class="mk-hero mk-in">
+        <div class="mk-hero-copy">
+            <div class="eyebrow">Official transfer board</div>
+            <h1>Player <em>Market</em></h1>
+            <p>Scout every card, track the money, and move when the price is right. Filters and auction tools sit right under the boards.</p>
         </div>
-        <div class="mk-mode" role="tablist">
-            <button type="button" id="viewMarketBtn" onclick="switchMode('market')" class="is-on">Market</button>
+        <div class="mk-hero-stats">
+            <div class="mk-stat"><span>Players</span><strong><%= typeof players !== 'undefined' ? players.length : 0 %></strong></div>
+            <div class="mk-stat"><span>Mode</span><strong style="font-size:1.15rem">Live</strong></div>
+            <div class="mk-stat"><span>Classes</span><strong style="font-size:1.15rem">SS–C</strong></div>
+            <div class="mk-stat"><span>Hub</span><strong style="font-size:1.15rem">Auction</strong></div>
+        </div>
+    </header>
+
+    <div class="mk-toolbar mk-in">
+        <div class="mk-mode">
+            <button type="button" id="viewMarketBtn" class="is-on" onclick="switchMode('market')">Market</button>
             <button type="button" id="viewAuctionBtn" onclick="switchMode('auction')">Auction Hub</button>
         </div>
-    </div>
-
-    <!-- CONTROLS -->
-    <div class="mk-controls mk-panel">
         <div class="mk-search" id="searchWrapper">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input type="text" id="searchInput" onkeyup="filterCards()" placeholder="Search name, Discord, country…">
         </div>
-        <div class="mk-filters" id="filterWrapper">
+        <div class="mk-chips" id="filterWrapper">
             <button data-pos-filter="ALL" onclick="setFilter('ALL')" class="filter-btn active">ALL</button>
             <button data-pos-filter="FWD" onclick="setFilter('FWD')" class="filter-btn">FWD</button>
             <button data-pos-filter="MID" onclick="setFilter('MID')" class="filter-btn">MID</button>
             <button data-pos-filter="DEF" onclick="setFilter('DEF')" class="filter-btn">DEF</button>
             <button data-pos-filter="GK" onclick="setFilter('GK')" class="filter-btn">GK</button>
         </div>
-        <div class="mk-filters" id="classFilterWrapper">
+        <div class="mk-chips" id="classFilterWrapper">
             <button data-class-filter="ALL" onclick="setClassFilter('ALL')" class="filter-btn active">ALL CLASS</button>
             <button data-class-filter="SS" onclick="setClassFilter('SS')" class="filter-btn">SS</button>
             <button data-class-filter="S" onclick="setClassFilter('S')" class="filter-btn">S</button>
@@ -395,270 +470,244 @@ select.form-input option { background: #ffffff; color: #0f172a; }
             <button data-class-filter="C" onclick="setClassFilter('C')" class="filter-btn">C</button>
         </div>
         <% if (typeof isManager !== 'undefined' && isManager) { %>
-            <button id="eligibleFilterBtn" onclick="toggleEligibleFilter()" title="Only show players you can currently legally bid on"
-                class="mk-btn mk-btn-ghost" style="min-height:36px;font-size:.58rem">I can bid</button>
+        <button type="button" id="eligibleFilterBtn" class="mk-pill" onclick="toggleEligibleFilter()">I can bid</button>
         <% } %>
-        <div class="mk-count" id="countWrapper">● Players: <%= players.length %></div>
+        <div class="mk-count" id="countWrapper">● <%= typeof players !== 'undefined' ? players.length : 0 %> players</div>
     </div>
 
-
-    <!-- AUCTION OVERRIDE NOTIFICATION BANNER (FOR MANAGERS) -->
     <% if (typeof isManager !== 'undefined' && isManager && typeof myOutbidPlayers !== 'undefined' && myOutbidPlayers && myOutbidPlayers.length > 0) { %>
-        <div class="max-w-7xl mx-auto px-6 mb-6">
-            <div class="bg-amber-500 text-white p-4 rounded-2xl shadow-lg border border-amber-400 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                    <span class="text-xl">⚠️</span>
-                    <div>
-                        <p class="text-xs font-black uppercase tracking-wider">You've Been Outbid!</p>
-                        <p class="text-[11px] text-amber-100 font-bold">
-                            Other managers are now winning <%= myOutbidPlayers.length %> player(s) you bid on:
-                            <% myOutbidPlayers.slice(0, 3).forEach((p, i) => { %><%= i > 0 ? ', ' : '' %><%= p.name %> (<%= p.highestBid %> Vollars)<% }) %><%= myOutbidPlayers.length > 3 ? ', …' : '' %>
-                        </p>
-                    </div>
-                </div>
-                <button onclick="switchMode('auction')" class="bg-white text-amber-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-50 transition shadow-sm">
-                    Review Bids
-                </button>
-            </div>
+    <div class="mk-alert">
+        <div>
+            <strong style="display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase">You've been outbid</strong>
+            <span style="font-size:.8rem;opacity:.95"><%= myOutbidPlayers.length %> player(s) — check your bids in the hub.</span>
         </div>
+        <button type="button" onclick="switchMode('auction')">Review bids</button>
+    </div>
     <% } %>
 
-    <!-- MODE 1: STANDARD MARKET VIEW -->
-    <div id="marketSection">
+    <div id="marketSection" class="mk-in">
 
-        <!-- ============================================================
-             MARKET SPOTLIGHT — real player cards (same hover tilt/sheen)
-             ============================================================ -->
-        <% if (typeof marketSpotlight !== 'undefined' && marketSpotlight) { %>
-            <%
-                // Shared helper bits for spotlight cards
-                function spotPosClass(pos) {
-                    const u = (pos || 'PRO').toUpperCase();
-                    if (u === 'FWD' || u === 'FORWARD') return 'pos-fwd';
-                    if (u === 'MID' || u === 'MIDFIELD') return 'pos-mid';
-                    if (u === 'DEF' || u === 'DEFENSE') return 'pos-def';
-                    if (u === 'GK' || u === 'GOALKEEPER') return 'pos-gk';
-                    return 'pos-pro';
-                }
-                function spotRankClass(rank) {
-                    const u = (rank || 'C').toUpperCase();
-                    if (u === 'SS') return 'rank-ss';
-                    if (u === 'S') return 'rank-s';
-                    if (u === 'A') return 'rank-a';
-                    if (u === 'B') return 'rank-b';
-                    return 'rank-c';
-                }
-            %>
-            <div class="mb-10">
-                <div class="mk-spotlight">
-                    <div class="mk-spotlight-inner">
-                <div class="flex items-center justify-between gap-3 mb-8">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center text-lg shadow-sm">🔥</div>
-                        <div>
-                            <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500">Market Spotlight</h3>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Live auction heat · hover the cards</p>
-                        </div>
-                    </div>
-                    <button type="button" id="spotlightExpandBtn" onclick="toggleSpotlightExpand()"
-                        class="text-[10px] font-black uppercase tracking-wider text-white bg-slate-900 hover:bg-amber-500 px-4 py-2.5 rounded-xl transition shadow-md">
-                        Show Top 10 →
-                    </button>
-                </div>
+    <% if (typeof marketSpotlight !== 'undefined' && marketSpotlight) { %>
+    <%
+        function spotPosClass(pos) {
+            const u = (pos || 'PRO').toUpperCase();
+            if (u === 'FWD' || u === 'FORWARD') return 'pos-fwd';
+            if (u === 'MID' || u === 'MIDFIELD') return 'pos-mid';
+            if (u === 'DEF' || u === 'DEFENSE') return 'pos-def';
+            if (u === 'GK' || u === 'GOALKEEPER') return 'pos-gk';
+            return 'pos-pro';
+        }
+        function spotRankClass(rank) {
+            const u = (rank || 'C').toUpperCase();
+            if (u === 'SS') return 'rank-ss';
+            if (u === 'S') return 'rank-s';
+            if (u === 'A') return 'rank-a';
+            if (u === 'B') return 'rank-b';
+            return 'rank-c';
+        }
+        function renderPodiumCard(p, medal) {
+            // returns nothing - we inline below
+        }
+    %>
 
-                <!-- ════ TOP BIDS — real hovering player cards ════ -->
-                <div class="mb-10">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>👑 Top Bids</p>
-                    <% if (marketSpotlight.topBids && marketSpotlight.topBids.length > 0) { %>
-                        <div id="spotlightTopPodium" class="flex flex-wrap justify-center gap-6 py-4" style="perspective: 1200px;">
-                            <% marketSpotlight.topBids.slice(0, 3).forEach((p, i) => {
-                                const medals = ['🥇','🥈','🥉'];
-                                const pos = (p.position || 'PRO').toUpperCase();
-                                const rank = (p.rank || 'C').toUpperCase();
-                                const pId = p._id || p.id || '';
-                                const isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
-                                const isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
-                            %>
-                                <div class="relative flex flex-col items-center">
-                                    <span class="absolute -top-3 z-30 text-2xl drop-shadow-lg"><%= medals[i] %></span>
-                                    <div class="player-card w-[220px] h-[300px] glass-light rounded-[28px] border border-slate-200 shadow-lg relative group"
-                                         
-                                         onmouseleave="resetTilt(this)"
-                                         onmousemove="tiltCard(event, this)" onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
-                                        <div class="card-sheen"></div>
-                                        <% if (p.cardImage && String(p.cardImage).trim()) { %>
-                                            <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover rounded-[28px]">
-                                        <% } else { %>
-                                            <div class="card-img w-full h-full bg-gradient-to-b from-slate-100 to-slate-200 flex items-center justify-center rounded-[28px]">
-                                                <span class="text-[48px] font-black italic text-slate-300/50 uppercase"><%= pos %></span>
-                                            </div>
-                                        <% } %>
-                                        <div class="absolute top-3 left-3 z-20 flex gap-1.5">
-                                            <span class="<%= spotPosClass(pos) %> text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= pos %></span>
-                                            <span class="<%= spotRankClass(rank) %> text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= rank %></span>
-                                        </div>
-                                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent rounded-b-[28px] z-20">
-                                            <h3 class="font-black text-xl italic uppercase tracking-tighter text-white drop-shadow-md truncate"><%= p.name %></h3>
-                                            <div class="mt-1 flex items-center justify-between text-[9px] font-black text-emerald-400">
-                                                <span><%= Number(p.highestBid || 0).toLocaleString() %> V</span>
-                                                <span class="text-slate-300 text-[8px] uppercase truncate max-w-[90px]"><%= p.highestBidder || '—' %></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <% }) %>
-                        </div>
-                        <div id="spotlightTopFull" class="hidden mt-3 bg-white/90 rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden max-w-2xl mx-auto">
-                            <% marketSpotlight.topBids.forEach((p, i) => { %>
-                                <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50 transition cursor-pointer"
-                                     onclick="document.querySelectorAll('.player-card').forEach(c=>{if((c.getAttribute('data-name')||'')==='<%= (p.name||'').toLowerCase() %>'){c.click();}})">
-                                    <div class="flex items-center gap-3 min-w-0">
-                                        <span class="text-xs font-black text-slate-400 w-6">#<%= i + 1 %></span>
-                                        <% if (p.cardImage && String(p.cardImage).trim()) { %>
-                                            <img src="<%= p.cardImage %>" class="w-10 h-10 rounded-lg object-cover" alt="">
-                                        <% } %>
-                                        <div class="min-w-0">
-                                            <p class="text-xs font-black text-slate-900 uppercase truncate"><%= p.name %></p>
-                                            <p class="text-[9px] text-slate-400 font-bold uppercase truncate"><%= p.position || 'PRO' %> · <%= p.highestBidder || '—' %></p>
-                                        </div>
-                                    </div>
-                                    <span class="text-sm font-black text-emerald-600 flex-shrink-0"><%= Number(p.highestBid).toLocaleString() %></span>
-                                </div>
-                            <% }) %>
-                        </div>
-                    <% } else { %>
-                        <p class="text-xs text-slate-400 italic font-bold py-10 text-center bg-white/70 rounded-2xl border border-dashed border-slate-200">No bids placed yet.</p>
-                    <% } %>
-                </div>
-
-                <!-- ════ POSITION LEADERS — real cards ════ -->
-                <div class="mb-10">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>⚡ Position Leaders</p>
-                    <div id="spotlightPosPodium" class="flex flex-wrap justify-center gap-5 py-4" style="perspective: 1200px;">
-                        <% ['FWD','MID','DEF','GK'].forEach(posKey => {
-                            const p = marketSpotlight.byPosition && marketSpotlight.byPosition[posKey];
-                            if (!p) { %>
-                                <div class="w-[200px] h-[280px] rounded-[28px] border border-dashed border-slate-200 bg-white/80 flex flex-col items-center justify-center text-slate-400">
-                                    <span class="text-[10px] font-black uppercase"><%= posKey %></span>
-                                    <span class="text-xs font-bold mt-1">No bids</span>
-                                </div>
-                            <% return; }
-                            const pos = (p.position || posKey).toUpperCase();
-                            const rank = (p.rank || 'C').toUpperCase();
-                            const pId = p._id || p.id || '';
-                            const isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
-                            const isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
-                        %>
-                            <div class="relative flex flex-col items-center">
-                                <span class="<%= spotPosClass(posKey) %> text-white text-[9px] font-black px-2.5 py-1 rounded-lg uppercase absolute -top-2 z-30 shadow"><%= posKey %></span>
-                                <div class="player-card w-[200px] h-[280px] glass-light rounded-[28px] border border-slate-200 shadow-lg relative group"
-                                     
-                                     onmouseleave="resetTilt(this)"
-                                     onmousemove="tiltCard(event, this)" onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
-                                    <div class="card-sheen"></div>
-                                    <% if (p.cardImage && String(p.cardImage).trim()) { %>
-                                        <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover rounded-[28px]">
-                                    <% } else { %>
-                                        <div class="card-img w-full h-full bg-gradient-to-b from-slate-100 to-slate-200 flex items-center justify-center rounded-[28px]">
-                                            <span class="text-[40px] font-black italic text-slate-300/50 uppercase"><%= posKey %></span>
-                                        </div>
-                                    <% } %>
-                                    <div class="absolute bottom-0 left-0 right-0 p-3.5 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent rounded-b-[28px] z-20">
-                                        <h3 class="font-black text-lg italic uppercase tracking-tighter text-white truncate"><%= p.name %></h3>
-                                        <p class="text-[9px] font-black text-emerald-400 mt-0.5"><%= Number(p.highestBid || 0).toLocaleString() %> Vollars</p>
-                                    </div>
-                                </div>
-                            </div>
-                        <% }) %>
-                    </div>
-                    <div id="spotlightPosFull" class="hidden mt-3 bg-white/90 rounded-2xl border border-slate-200 overflow-hidden max-w-2xl mx-auto">
-                        <% ['FWD','MID','DEF','GK'].forEach(posKey => {
-                            const list = (marketSpotlight.byPositionTop && marketSpotlight.byPositionTop[posKey]) || [];
-                        %>
-                            <div class="border-b border-slate-100 last:border-0">
-                                <p class="text-[9px] font-black uppercase tracking-wider text-slate-400 px-4 pt-3 pb-1"><%= posKey %></p>
-                                <% if (!list.length) { %>
-                                    <p class="text-[10px] text-slate-300 px-4 pb-3 italic">No bids</p>
-                                <% } else { list.forEach((p, i) => { %>
-                                    <div class="flex items-center justify-between gap-3 px-4 py-2 hover:bg-slate-50">
-                                        <div class="flex items-center gap-2 min-w-0">
-                                            <span class="text-[9px] font-black text-slate-400 w-5">#<%= i + 1 %></span>
-                                            <span class="text-[11px] font-black text-slate-900 uppercase truncate"><%= p.name %></span>
-                                        </div>
-                                        <span class="text-[11px] font-black text-emerald-600"><%= Number(p.highestBid).toLocaleString() %></span>
-                                    </div>
-                                <% }) } %>
-                            </div>
-                        <% }) %>
-                    </div>
-                </div>
-
-                <!-- ════ RISING BIDS — real cards ════ -->
-                <div>
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>📈 Rising Bids <span class="text-rose-400 normal-case tracking-normal font-bold">(last 2h)</span></p>
-                    <% if (marketSpotlight.rising && marketSpotlight.rising.length > 0) { %>
-                        <div id="spotlightRisingPodium" class="flex flex-wrap justify-center gap-6 py-4" style="perspective: 1200px;">
-                            <% marketSpotlight.rising.slice(0, 3).forEach((r, i) => {
-                                const p = r.player;
-                                const pos = (p.position || 'PRO').toUpperCase();
-                                const rank = (p.rank || 'C').toUpperCase();
-                                const pId = p._id || p.id || '';
-                                const isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
-                                const isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
-                            %>
-                                <div class="relative flex flex-col items-center">
-                                    <span class="absolute -top-3 z-30 bg-rose-600 text-white text-[9px] font-black px-2.5 py-1 rounded-full shadow uppercase"><%= r.bidCount %>× bids</span>
-                                    <div class="player-card w-[220px] h-[300px] glass-light rounded-[28px] border border-rose-200 shadow-lg relative group"
-                                         
-                                         onmouseleave="resetTilt(this)"
-                                         onmousemove="tiltCard(event, this)" onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
-                                        <div class="card-sheen"></div>
-                                        <% if (p.cardImage && String(p.cardImage).trim()) { %>
-                                            <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover rounded-[28px]">
-                                        <% } else { %>
-                                            <div class="card-img w-full h-full bg-gradient-to-b from-rose-50 to-slate-200 flex items-center justify-center rounded-[28px]">
-                                                <span class="text-[48px] font-black italic text-rose-200 uppercase"><%= pos %></span>
-                                            </div>
-                                        <% } %>
-                                        <div class="absolute top-3 left-3 z-20 flex gap-1.5">
-                                            <span class="<%= spotPosClass(pos) %> text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= pos %></span>
-                                            <span class="<%= spotRankClass(rank) %> text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= rank %></span>
-                                        </div>
-                                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent rounded-b-[28px] z-20">
-                                            <h3 class="font-black text-xl italic uppercase tracking-tighter text-white drop-shadow-md truncate"><%= p.name %></h3>
-                                            <p class="text-[9px] font-black text-emerald-400 mt-1"><%= Number(p.highestBid || 0).toLocaleString() %> V · #<%= i + 1 %> rising</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            <% }) %>
-                        </div>
-                        <div id="spotlightRisingFull" class="hidden mt-3 bg-white/90 rounded-2xl border border-rose-100 divide-y divide-rose-50 overflow-hidden max-w-2xl mx-auto">
-                            <% marketSpotlight.rising.forEach((r, i) => { %>
-                                <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-rose-50/50 transition">
-                                    <div class="flex items-center gap-3 min-w-0">
-                                        <span class="text-xs font-black text-rose-300 w-6">#<%= i + 1 %></span>
-                                        <% if (r.player.cardImage && String(r.player.cardImage).trim()) { %>
-                                            <img src="<%= r.player.cardImage %>" class="w-10 h-10 rounded-lg object-cover" alt="">
-                                        <% } %>
-                                        <div class="min-w-0">
-                                            <p class="text-xs font-black text-slate-900 uppercase truncate"><%= r.player.name %></p>
-                                            <p class="text-[9px] text-slate-400 font-bold uppercase"><%= r.player.position || 'PRO' %></p>
-                                        </div>
-                                    </div>
-                                    <span class="bg-rose-600 text-white text-[9px] font-black px-2 py-0.5 rounded-lg uppercase flex-shrink-0"><%= r.bidCount %>×</span>
-                                </div>
-                            <% }) %>
-                        </div>
-                    <% } else { %>
-                        <p class="text-xs text-rose-400 italic font-bold py-10 text-center bg-rose-50/80 rounded-2xl border border-dashed border-rose-100">No bidding flurries recently.</p>
-                    <% } %>
-                </div>
-                    </div><!-- /relative pad -->
-                </div><!-- /stage -->
+    <section class="mk-lb">
+        <div class="mk-lb-top">
+            <div>
+                <div class="eyebrow" style="display:inline-flex;align-items:center;gap:.5rem;font-size:.62rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--mk-gold)">Live heat</div>
+                <h2>Market leaderboards</h2>
+                <p>Top money, hottest positions, and rising bids — hover the cards.</p>
             </div>
-        <% } %>
+            <button type="button" id="spotlightExpandBtn" class="mk-lb-btn" onclick="toggleSpotlightExpand()">Show full top 10</button>
+        </div>
+        <div class="mk-lb-body">
 
-        <!-- MULTI-TIER DUAL CONVEYOR CARDS DISPLAY -->
+            <!-- TOP BIDS -->
+            <div class="mk-lb-section">
+                <h3><i></i> Top bids</h3>
+                <% if (marketSpotlight.topBids && marketSpotlight.topBids.length > 0) { %>
+                <div id="spotlightTopPodium" class="mk-podium">
+                    <% marketSpotlight.topBids.slice(0, 3).forEach((p, i) => {
+                        const medals = ['🥇','🥈','🥉'];
+                        const ord = ['mk-1','mk-2','mk-3'][i];
+                        const pos = (p.position || 'PRO').toUpperCase();
+                        const rank = (p.rank || 'C').toUpperCase();
+                        const pId = p._id || p.id || '';
+                        const isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
+                        const isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
+                    %>
+                    <div class="mk-podium-item <%= ord %>">
+                        <span class="mk-medal"><%= medals[i] %></span>
+                        <div class="player-card glass-light relative group"
+                             onmouseleave="resetTilt(this)" onmousemove="tiltCard(event, this)"
+                             onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
+                            <div class="card-sheen"></div>
+                            <% if (p.cardImage && String(p.cardImage).trim()) { %>
+                                <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover" style="border-radius:1.35rem">
+                            <% } else { %>
+                                <div class="card-img w-full h-full flex items-center justify-center" style="background:linear-gradient(160deg,#1a2e2c,#0d1615);border-radius:1.35rem">
+                                    <span style="font-family:var(--mk-serif);font-size:2.5rem;color:rgba(255,255,255,.15);font-style:italic"><%= pos %></span>
+                                </div>
+                            <% } %>
+                            <div class="absolute top-3 left-3 z-20 flex gap-1.5">
+                                <span class="<%= spotPosClass(pos) %> text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= pos %></span>
+                                <span class="<%= spotRankClass(rank) %> text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= rank %></span>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 p-4 z-20" style="background:linear-gradient(to top,rgba(0,0,0,.92),transparent);border-radius:0 0 1.35rem 1.35rem">
+                                <h3 class="font-black text-lg italic uppercase tracking-tighter text-white truncate" style="margin:0"><%= p.name %></h3>
+                                <div class="mt-1 flex items-center justify-between text-[9px] font-black text-emerald-400">
+                                    <span><%= Number(p.highestBid || 0).toLocaleString() %> V</span>
+                                    <span class="text-slate-300 text-[8px] uppercase truncate max-w-[90px]"><%= p.highestBidder || '—' %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+                <div id="spotlightTopFull" class="mk-rank-list">
+                    <% marketSpotlight.topBids.forEach((p, i) => { %>
+                    <div class="mk-rank-row">
+                        <div style="display:flex;align-items:center;gap:.65rem;min-width:0">
+                            <span class="n"><%= i+1 %></span>
+                            <div style="min-width:0">
+                                <div class="name truncate"><%= p.name %></div>
+                                <div class="meta truncate"><%= p.position || '—' %> · <%= p.rank || 'C' %> · <%= p.highestBidder || 'no bid' %></div>
+                            </div>
+                        </div>
+                        <span class="bid"><%= Number(p.highestBid || 0).toLocaleString() %></span>
+                    </div>
+                    <% }) %>
+                </div>
+                <% } else { %>
+                <p style="color:var(--mk-muted);font-size:.85rem;font-style:italic">No top bids yet.</p>
+                <% } %>
+            </div>
+
+            <!-- POSITION HEAT -->
+            <div class="mk-lb-section">
+                <h3><i style="background:var(--mk-teal)"></i> Position heat</h3>
+                <% if (marketSpotlight.byPosition && marketSpotlight.byPosition.length > 0) { %>
+                <div id="spotlightPosPodium" class="mk-podium">
+                    <% marketSpotlight.byPosition.slice(0, 3).forEach((p, i) => {
+                        const medals = ['🥇','🥈','🥉'];
+                        const ord = ['mk-1','mk-2','mk-3'][i];
+                        const pos = (p.position || 'PRO').toUpperCase();
+                        const rank = (p.rank || 'C').toUpperCase();
+                        const pId = p._id || p.id || '';
+                        const isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
+                        const isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
+                    %>
+                    <div class="mk-podium-item <%= ord %>">
+                        <span class="mk-medal"><%= medals[i] %></span>
+                        <div class="player-card glass-light relative group"
+                             onmouseleave="resetTilt(this)" onmousemove="tiltCard(event, this)"
+                             onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
+                            <div class="card-sheen"></div>
+                            <% if (p.cardImage && String(p.cardImage).trim()) { %>
+                                <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover" style="border-radius:1.35rem">
+                            <% } else { %>
+                                <div class="card-img w-full h-full flex items-center justify-center" style="background:linear-gradient(160deg,#1a2e2c,#0d1615);border-radius:1.35rem">
+                                    <span style="font-family:var(--mk-serif);font-size:2.5rem;color:rgba(255,255,255,.15);font-style:italic"><%= pos %></span>
+                                </div>
+                            <% } %>
+                            <div class="absolute top-3 left-3 z-20 flex gap-1.5">
+                                <span class="<%= spotPosClass(pos) %> text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= pos %></span>
+                                <span class="<%= spotRankClass(rank) %> text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= rank %></span>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 p-4 z-20" style="background:linear-gradient(to top,rgba(0,0,0,.92),transparent);border-radius:0 0 1.35rem 1.35rem">
+                                <h3 class="font-black text-lg italic uppercase tracking-tighter text-white truncate" style="margin:0"><%= p.name %></h3>
+                                <div class="mt-1 flex items-center justify-between text-[9px] font-black text-emerald-400">
+                                    <span><%= Number(p.highestBid || 0).toLocaleString() %> V</span>
+                                    <span class="text-slate-300 text-[8px] uppercase truncate max-w-[90px]"><%= p.highestBidder || '—' %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+                <div id="spotlightPosFull" class="mk-rank-list">
+                    <% marketSpotlight.byPosition.forEach((p, i) => { %>
+                    <div class="mk-rank-row">
+                        <div style="display:flex;align-items:center;gap:.65rem;min-width:0">
+                            <span class="n"><%= i+1 %></span>
+                            <div style="min-width:0">
+                                <div class="name truncate"><%= p.name %></div>
+                                <div class="meta truncate"><%= p.position || '—' %> · <%= p.rank || 'C' %></div>
+                            </div>
+                        </div>
+                        <span class="bid"><%= Number(p.highestBid || 0).toLocaleString() %></span>
+                    </div>
+                    <% }) %>
+                </div>
+                <% } else { %>
+                <p style="color:var(--mk-muted);font-size:.85rem;font-style:italic">No position heat yet.</p>
+                <% } %>
+            </div>
+
+            <!-- RISING -->
+            <div class="mk-lb-section">
+                <h3><i style="background:#8b5cf6"></i> Rising bids</h3>
+                <% if (marketSpotlight.rising && marketSpotlight.rising.length > 0) { %>
+                <div id="spotlightRisingPodium" class="mk-podium">
+                    <% marketSpotlight.rising.slice(0, 3).forEach((p, i) => {
+                        const medals = ['🥇','🥈','🥉'];
+                        const ord = ['mk-1','mk-2','mk-3'][i];
+                        const pos = (p.position || 'PRO').toUpperCase();
+                        const rank = (p.rank || 'C').toUpperCase();
+                        const pId = p._id || p.id || '';
+                        const isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
+                        const isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
+                    %>
+                    <div class="mk-podium-item <%= ord %>">
+                        <span class="mk-medal"><%= medals[i] %></span>
+                        <div class="player-card glass-light relative group"
+                             onmouseleave="resetTilt(this)" onmousemove="tiltCard(event, this)"
+                             onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
+                            <div class="card-sheen"></div>
+                            <% if (p.cardImage && String(p.cardImage).trim()) { %>
+                                <img src="<%= p.cardImage %>" class="card-img w-full h-full object-cover" style="border-radius:1.35rem">
+                            <% } else { %>
+                                <div class="card-img w-full h-full flex items-center justify-center" style="background:linear-gradient(160deg,#1a2e2c,#0d1615);border-radius:1.35rem">
+                                    <span style="font-family:var(--mk-serif);font-size:2.5rem;color:rgba(255,255,255,.15);font-style:italic"><%= pos %></span>
+                                </div>
+                            <% } %>
+                            <div class="absolute top-3 left-3 z-20 flex gap-1.5">
+                                <span class="<%= spotPosClass(pos) %> text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= pos %></span>
+                                <span class="<%= spotRankClass(rank) %> text-[8px] font-black px-2 py-0.5 rounded-md uppercase"><%= rank %></span>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 p-4 z-20" style="background:linear-gradient(to top,rgba(0,0,0,.92),transparent);border-radius:0 0 1.35rem 1.35rem">
+                                <h3 class="font-black text-lg italic uppercase tracking-tighter text-white truncate" style="margin:0"><%= p.name %></h3>
+                                <div class="mt-1 flex items-center justify-between text-[9px] font-black text-emerald-400">
+                                    <span><%= Number(p.highestBid || 0).toLocaleString() %> V</span>
+                                    <span class="text-slate-300 text-[8px] uppercase truncate max-w-[90px]"><%= p.highestBidder || '—' %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+                <div id="spotlightRisingFull" class="mk-rank-list">
+                    <% marketSpotlight.rising.forEach((p, i) => { %>
+                    <div class="mk-rank-row">
+                        <div style="display:flex;align-items:center;gap:.65rem;min-width:0">
+                            <span class="n"><%= i+1 %></span>
+                            <div style="min-width:0">
+                                <div class="name truncate"><%= p.name %></div>
+                                <div class="meta truncate"><%= p.position || '—' %> · <%= p.rank || 'C' %></div>
+                            </div>
+                        </div>
+                        <span class="bid"><%= Number(p.highestBid || 0).toLocaleString() %></span>
+                    </div>
+                    <% }) %>
+                </div>
+                <% } else { %>
+                <p style="color:var(--mk-muted);font-size:.85rem;font-style:italic">No rising bids yet.</p>
+                <% } %>
+            </div>
+
+        </div>
+    </section>
+    <% } %>
+<!-- MULTI-TIER DUAL CONVEYOR CARDS DISPLAY -->
         <% if(players.length > 0) { %>
             <% 
                 let fullList = players.length < 6 ? [...players, ...players, ...players, ...players] : [...players, ...players]; 
@@ -670,10 +719,11 @@ select.form-input option { background: #ffffff; color: #0f172a; }
                 ];
             %>
 
-            <div class="space-y-6 mb-24">
+            <div class="mk-lanes mb-20">
                 <% tiers.forEach((t, idx) => { %>
-                    <div class="relative flex items-center border-y border-slate-200/80 bg-white/40 py-6">
-                        <div class="<%= t.anim %> gap-6 px-4" id="cardContainer<%= idx %>">
+                    <div class="mk-lane">
+                        <div class="mk-lane-label"><span><%= t.label %></span></div>
+                        <div class="<%= t.anim %> gap-7 px-5" id="cardContainer<%= idx %>">
                             <% t.list.forEach(p => { %>
                                 <% 
                                     let posClass = 'pos-pro';
@@ -834,7 +884,10 @@ select.form-input option { background: #ffffff; color: #0f172a; }
         </div>
     <% } %>
 
-    <!-- MODE 2: AUCTION HUB VIEW -->
+    
+    </div><!-- /marketSection -->
+
+<!-- MODE 2: AUCTION HUB VIEW -->
     <div id="auctionSection" class="hidden max-w-7xl mx-auto px-6 mb-24">
         <%
             function hueFromName(str) {
@@ -1161,6 +1214,8 @@ select.form-input option { background: #ffffff; color: #0f172a; }
     </div>
 
     </div><!-- /mk-shell -->
+
+</div><!-- /mk-wrap -->
 
 <!-- LIGHT THEME FIFA MODAL WITH BIDDING CAPABILITY FOR MANAGERS -->
     <div id="bioModal" class="modal" onclick="closeBio()">
@@ -1669,21 +1724,20 @@ select.form-input option { background: #ffffff; color: #0f172a; }
     // MARKET SPOTLIGHT — expand top 3 cards into full top 10 lists
     let spotlightExpanded = false;
     function toggleSpotlightExpand() {
-        spotlightExpanded = !spotlightExpanded;
-        const btn = document.getElementById('spotlightExpandBtn');
-        const pairs = [
-            ['spotlightTopPodium', 'spotlightTopFull'],
-            ['spotlightPosPodium', 'spotlightPosFull'],
-            ['spotlightRisingPodium', 'spotlightRisingFull']
-        ];
-        if (btn) btn.textContent = spotlightExpanded ? '← Show Cards' : 'Show Top 10 →';
-        pairs.forEach(([podiumId, fullId]) => {
-            const podium = document.getElementById(podiumId);
-            const full = document.getElementById(fullId);
-            if (podium) podium.classList.toggle('hidden', spotlightExpanded);
-            if (full) full.classList.toggle('hidden', !spotlightExpanded);
-        });
-    }
+    const ids = ['spotlightTopFull','spotlightPosFull','spotlightRisingFull'];
+    let anyOpen = ids.some(id => {
+        const el = document.getElementById(id);
+        return el && el.classList.contains('open');
+    });
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (anyOpen) el.classList.remove('open');
+        else el.classList.add('open');
+    });
+    const btn = document.getElementById('spotlightExpandBtn');
+    if (btn) btn.textContent = anyOpen ? 'Show full top 10' : 'Hide top 10';
+}
 
     // MODE SWITCHER LOGIC (MARKET vs AUCTION HUB)
     function switchMode(mode) {
@@ -1696,18 +1750,29 @@ select.form-input option { background: #ffffff; color: #0f172a; }
         const classWrap = document.getElementById('classFilterWrapper');
         const cWrap = document.getElementById('countWrapper');
         const elig = document.getElementById('eligibleFilterBtn');
-
+        const toolbar = document.querySelector('.mk-toolbar');
         if(mode === 'auction') {
-            mSec.classList.add('hidden');
-            aSec.classList.remove('hidden');
-            mBtn.classList.remove('is-on');
-            aBtn.classList.add('is-on');
+            if(mSec) mSec.classList.add('hidden');
+            if(aSec) aSec.classList.remove('hidden');
+            if(mBtn) mBtn.classList.remove('is-on');
+            if(aBtn) aBtn.classList.add('is-on');
             if(sWrap) sWrap.classList.add('hidden');
             if(fWrap) fWrap.classList.add('hidden');
             if(classWrap) classWrap.classList.add('hidden');
             if(cWrap) cWrap.classList.add('hidden');
             if(elig) elig.classList.add('hidden');
         } else {
+            if(aSec) aSec.classList.add('hidden');
+            if(mSec) mSec.classList.remove('hidden');
+            if(mBtn) mBtn.classList.add('is-on');
+            if(aBtn) aBtn.classList.remove('is-on');
+            if(sWrap) sWrap.classList.remove('hidden');
+            if(fWrap) fWrap.classList.remove('hidden');
+            if(classWrap) classWrap.classList.remove('hidden');
+            if(cWrap) cWrap.classList.remove('hidden');
+            if(elig) elig.classList.remove('hidden');
+        }
+    } else {
             aSec.classList.add('hidden');
             mSec.classList.remove('hidden');
             mBtn.classList.add('is-on');
@@ -1798,11 +1863,7 @@ select.form-input option { background: #ffffff; color: #0f172a; }
         eligibleOnly = !eligibleOnly;
         const btn = document.getElementById('eligibleFilterBtn');
         if (btn) {
-            btn.className = eligibleOnly
-                ? 'mk-btn mk-btn-teal'
-                : 'mk-btn mk-btn-ghost';
-            btn.style.minHeight = '36px';
-            btn.style.fontSize = '.58rem';
+            btn.className = eligibleOnly ? 'mk-pill on' : 'mk-pill';
         }
         filterCards();
     }

@@ -2666,25 +2666,25 @@ app.post('/admin/delete-match', async (req, res) => {
 const LINEUP_SLOTS = ['gk', 'lb', 'rb', 'cm', 'lf', 'rf', 'cf'];
 
 const LINEUP_SLOT_COORDS = {
-    // Team A defends top, attacks toward bottom of pitch graphic
+    // Team A = TOP half of pitch
     A: {
-        gk: { x: 50, y: 10 },
-        lb: { x: 22, y: 28 },
-        rb: { x: 78, y: 28 },
-        cm: { x: 50, y: 42 },
-        lf: { x: 22, y: 58 },
-        rf: { x: 78, y: 58 },
-        cf: { x: 50, y: 72 }
+        gk: { x: 50, y: 7 },
+        lb: { x: 20, y: 16 },
+        rb: { x: 80, y: 16 },
+        cm: { x: 50, y: 24 },
+        lf: { x: 22, y: 33 },
+        rf: { x: 78, y: 33 },
+        cf: { x: 50, y: 40 }
     },
-    // Team B mirrors (defends bottom)
+    // Team B = BOTTOM half of pitch
     B: {
-        gk: { x: 50, y: 90 },
-        lb: { x: 78, y: 72 },
-        rb: { x: 22, y: 72 },
-        cm: { x: 50, y: 58 },
-        lf: { x: 78, y: 42 },
-        rf: { x: 22, y: 42 },
-        cf: { x: 50, y: 28 }
+        gk: { x: 50, y: 93 },
+        lb: { x: 80, y: 84 },
+        rb: { x: 20, y: 84 },
+        cm: { x: 50, y: 76 },
+        lf: { x: 78, y: 67 },
+        rf: { x: 22, y: 67 },
+        cf: { x: 50, y: 60 }
     }
 };
 

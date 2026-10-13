@@ -1,231 +1,337 @@
 <%- include('partials/navbar') %>
 
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-    /* Clean Light Glass Canvas */
-    .bg-vim-canvas {
-        background-color: #f8fafc;
-        background-image: 
-            radial-gradient(at 0% 0%, rgba(241, 245, 249, 0.9) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(226, 232, 240, 0.6) 0px, transparent 50%);
-        background-attachment: fixed;
-    }
+:root {
+  --mt-paper: #f4f1e9;
+  --mt-ink: #0f2f2f;
+  --mt-ink-deep: #073536;
+  --mt-teal: #07595a;
+  --mt-coral: #e87a64;
+  --mt-muted: #6d7f7a;
+  --mt-line: rgba(15,47,47,.1);
+  --mt-display: "DM Serif Display", Georgia, serif;
+  --mt-body: "Manrope", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--mt-body); }
 
-    /* Glass Containers */
-    .vim-glass-card {
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(226, 232, 240, 0.8);
-        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.03);
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+.mt-page {
+  min-height: 100vh;
+  color: var(--mt-ink);
+  background:
+    radial-gradient(ellipse 55% 40% at 8% 0%, rgba(232,122,100,.12), transparent 50%),
+    radial-gradient(ellipse 45% 35% at 95% 8%, rgba(7,89,90,.1), transparent 48%),
+    var(--mt-paper);
+  padding: 5.5rem 0 4rem;
+}
+.mt-wrap { width: min(1120px, calc(100% - 1.75rem)); margin: 0 auto; }
 
-    .vim-glass-card:hover {
-        background: rgba(255, 255, 255, 0.9);
-        border-color: rgba(203, 213, 225, 1);
-        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
-    }
+.mt-hero {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: mtIn .55s cubic-bezier(.22,1,.36,1) both;
+}
+.mt-hero .eyebrow {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .62rem; font-weight: 800; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--mt-coral);
+}
+.mt-hero .eyebrow::before {
+  content: ""; width: 16px; height: 2px; background: currentColor;
+}
+.mt-hero h1 {
+  margin: .4rem 0 .3rem;
+  font-family: var(--mt-display);
+  font-size: clamp(2.6rem, 5.5vw, 3.8rem);
+  line-height: .92; color: var(--mt-ink-deep);
+}
+.mt-hero h1 em { font-style: italic; color: var(--mt-teal); }
+.mt-hero p { margin: 0; color: var(--mt-muted); font-size: .85rem; }
 
-    /* Stat Pill Accents */
-    .rank-pill-1 { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-    .rank-pill-2 { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
-    .rank-pill-3 { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
-    .rank-pill-default { background: rgba(241, 245, 249, 0.6); color: #64748b; }
+.mt-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .85rem;
+  margin-bottom: 2rem;
+  animation: mtIn .55s .06s cubic-bezier(.22,1,.36,1) both;
+}
+@media (max-width: 900px) {
+  .mt-stats { grid-template-columns: repeat(2, 1fr); }
+}
+.mt-stat {
+  background: #fffdf8;
+  border: 1px solid var(--mt-line);
+  border-radius: 1.35rem;
+  padding: 1.1rem 1.15rem;
+  box-shadow: 0 12px 30px rgba(15,47,47,.05);
+  transition: transform .25s cubic-bezier(.22,1,.36,1);
+}
+.mt-stat:hover { transform: translateY(-3px); }
+.mt-stat span {
+  display: block; font-size: .55rem; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--mt-muted);
+}
+.mt-stat strong {
+  display: block; margin-top: .35rem;
+  font-family: var(--mt-display); font-size: 1.75rem;
+  color: var(--mt-ink-deep); line-height: 1;
+}
+.mt-stat em {
+  display: block; margin-top: .35rem; font-style: normal;
+  font-size: .72rem; font-weight: 800; color: var(--mt-teal);
+  text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.mt-card {
+  background: #fffdf8;
+  border: 1px solid var(--mt-line);
+  border-radius: 1.55rem;
+  overflow: hidden;
+  box-shadow: 0 14px 36px rgba(15,47,47,.05);
+  margin-bottom: 1.35rem;
+  animation: mtIn .55s cubic-bezier(.22,1,.36,1) both;
+}
+
+.mt-card-head {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: .75rem; padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--mt-line);
+  background: linear-gradient(135deg, rgba(7,89,90,.05), rgba(232,122,100,.04));
+}
+.mt-card-head h2 {
+  margin: 0; font-family: var(--mt-display);
+  font-size: 1.35rem; color: var(--mt-ink-deep);
+}
+.mt-pill {
+  font-size: .55rem; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; padding: .35rem .7rem; border-radius: 999px;
+  background: rgba(15,47,47,.06); color: var(--mt-muted);
+}
+
+table.mt-table {
+  width: 100%; border-collapse: collapse; text-align: left;
+}
+.mt-table thead th {
+  padding: .85rem 1rem;
+  font-size: .55rem; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--mt-muted);
+  border-bottom: 1px solid var(--mt-line);
+  background: rgba(15,47,47,.02);
+}
+.mt-table tbody tr {
+  border-bottom: 1px solid var(--mt-line);
+  transition: background .15s;
+}
+.mt-table tbody tr:last-child { border-bottom: 0; }
+.mt-table tbody tr:hover { background: rgba(7,89,90,.03); }
+.mt-table td { padding: .9rem 1rem; vertical-align: middle; }
+
+.pos {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.7rem; height: 1.7rem; border-radius: 50%;
+  font-size: .7rem; font-weight: 900;
+  background: rgba(15,47,47,.06); color: var(--mt-ink);
+}
+.pos.g { background: linear-gradient(135deg, #f5d78e, #c9a227); color: #fff; }
+.pos.s { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #fff; }
+.pos.b { background: linear-gradient(135deg, #fdba74, #c2410c); color: #fff; }
+
+.club {
+  display: flex; align-items: center; gap: .65rem;
+  text-decoration: none; color: inherit;
+}
+.club img {
+  width: 36px; height: 36px; object-fit: contain;
+  border-radius: .65rem; background: rgba(15,47,47,.04);
+  border: 1px solid var(--mt-line); padding: 4px;
+  transition: transform .2s;
+}
+.club:hover img { transform: scale(1.08); }
+.club span {
+  font-size: .82rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: -.01em; color: var(--mt-ink-deep);
+}
+.club:hover span { color: var(--mt-teal); }
+
+.num { font-size: .8rem; font-weight: 800; color: var(--mt-muted); text-align: center; }
+.num.w { color: #059669; }
+.num.l { color: #e11d48; }
+.pts {
+  font-family: var(--mt-display); font-size: 1.35rem;
+  color: var(--mt-ink-deep); text-align: right; font-weight: 400;
+}
+
+.mt-boards {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+  margin-top: 1.5rem;
+}
+@media (max-width: 800px) {
+  .mt-boards { grid-template-columns: 1fr; }
+}
+.mt-board-list { padding: .75rem; }
+.mt-row {
+  display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+  padding: .65rem .7rem; border-radius: .9rem;
+  border: 1px solid transparent;
+  transition: background .15s, border-color .15s;
+}
+.mt-row:hover {
+  background: rgba(7,89,90,.04);
+  border-color: var(--mt-line);
+}
+.mt-row-left { display: flex; align-items: center; gap: .55rem; min-width: 0; }
+.mt-row-n {
+  width: 1.45rem; height: 1.45rem; border-radius: .45rem;
+  display: grid; place-items: center;
+  font-size: .6rem; font-weight: 900;
+  background: rgba(15,47,47,.07); color: var(--mt-ink); flex-shrink: 0;
+}
+.mt-row-name {
+  font-size: .75rem; font-weight: 800; text-transform: uppercase;
+  color: var(--mt-ink-deep); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mt-row-val {
+  display: flex; align-items: center; gap: .45rem; flex-shrink: 0;
+}
+.mt-row-val strong { font-size: .8rem; font-weight: 900; color: var(--mt-ink-deep); }
+.mt-bar {
+  width: 48px; height: 5px; border-radius: 999px;
+  background: rgba(15,47,47,.08); overflow: hidden;
+}
+.mt-bar i {
+  display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--mt-teal), var(--mt-coral));
+}
+
+.mt-empty {
+  padding: 2.5rem; text-align: center;
+  font-size: .75rem; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--mt-muted);
+}
+
+@keyframes mtIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
 </style>
 
-<div class="min-h-screen bg-vim-canvas text-slate-900 font-sans pb-24">
-    <main class="py-12 px-4 sm:px-6 max-w-7xl mx-auto space-y-12">
+<div class="mt-page">
+  <div class="mt-wrap">
 
-        <!-- PAGE HEADER -->
-        <div class="flex flex-col items-center text-center space-y-3">
-            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-200/60 border border-slate-300/50">
-                <span class="w-2 h-2 rounded-full bg-slate-900 animate-pulse"></span>
-                <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-700">Live Analytics & Standings</span>
-            </div>
-            <h1 class="text-5xl md:text-7xl font-black uppercase tracking-tight text-slate-900">
-                LEAGUE <span class="text-slate-400 font-light">METRICS</span>
-            </h1>
-            <p class="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Season Standings & Individual Leaders</p>
-        </div>
+    <header class="mt-hero">
+      <div class="eyebrow">Live analytics</div>
+      <h1>League <em>Metrics</em></h1>
+      <p>Standings, squads & individual leaders</p>
+    </header>
 
-        <!-- QUICK SUMMARY METRICS CARDS -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <% 
-                let totalTeamsCount = 0;
-                if (groups && groups.length > 0) {
-                    groups.forEach(g => { totalTeamsCount += (g.teams ? g.teams.length : 0); });
-                }
-            %>
-            <div class="vim-glass-card p-5 rounded-3xl flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Active Groups</span>
-                    <span class="text-3xl font-black text-slate-900"><%= groups ? groups.length : 0 %></span>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-700 font-black text-lg">
-                    📊
-                </div>
-            </div>
+    <%
+      let totalTeamsCount = 0;
+      if (groups && groups.length > 0) {
+        groups.forEach(g => { totalTeamsCount += (g.teams ? g.teams.length : 0); });
+      }
+      const topScorer = (leaderboards && leaderboards.scorers && leaderboards.scorers[0]) ? leaderboards.scorers[0] : null;
+      const topSaves = (leaderboards && leaderboards.saves && leaderboards.saves[0]) ? leaderboards.saves[0] : null;
+    %>
 
-            <div class="vim-glass-card p-5 rounded-3xl flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Registered Squads</span>
-                    <span class="text-3xl font-black text-slate-900"><%= totalTeamsCount %></span>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-700 font-black text-lg">
-                    🛡️
-                </div>
-            </div>
+    <div class="mt-stats">
+      <div class="mt-stat">
+        <span>Active groups</span>
+        <strong><%= groups ? groups.length : 0 %></strong>
+      </div>
+      <div class="mt-stat">
+        <span>Registered squads</span>
+        <strong><%= totalTeamsCount %></strong>
+      </div>
+      <div class="mt-stat">
+        <span>Top goalscorer</span>
+        <strong style="font-size:1.15rem"><%= topScorer ? topScorer.value : 0 %></strong>
+        <em><%= topScorer ? topScorer.name : '—' %></em>
+      </div>
+      <div class="mt-stat">
+        <span>Golden glove</span>
+        <strong style="font-size:1.15rem"><%= topSaves ? topSaves.value : 0 %></strong>
+        <em><%= topSaves ? topSaves.name : '—' %></em>
+      </div>
+    </div>
 
-            <div class="vim-glass-card p-5 rounded-3xl flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Top Goalscorer</span>
-                    <span class="text-sm font-black text-slate-900 uppercase block truncate max-w-[120px]">
-                        <%= (leaderboards && leaderboards.scorers && leaderboards.scorers[0]) ? leaderboards.scorers[0].name : 'N/A' %>
-                    </span>
-                    <span class="text-[10px] font-bold text-slate-400">
-                        <%= (leaderboards && leaderboards.scorers && leaderboards.scorers[0]) ? leaderboards.scorers[0].value + ' Goals' : '0 Goals' %>
-                    </span>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-center justify-center text-amber-600 font-black text-lg">
-                    ⚽
-                </div>
-            </div>
-
-            <div class="vim-glass-card p-5 rounded-3xl flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Golden Glove</span>
-                    <span class="text-sm font-black text-slate-900 uppercase block truncate max-w-[120px]">
-                        <%= (leaderboards && leaderboards.saves && leaderboards.saves[0]) ? leaderboards.saves[0].name : 'N/A' %>
-                    </span>
-                    <span class="text-[10px] font-bold text-slate-400">
-                        <%= (leaderboards && leaderboards.saves && leaderboards.saves[0]) ? leaderboards.saves[0].value + ' Saves' : '0 Saves' %>
-                    </span>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-600 font-black text-lg">
-                    🧤
-                </div>
-            </div>
-        </div>
-
-        <!-- GROUP STANDINGS TABLES -->
-        <div class="space-y-8">
-            <% if (groups && groups.length > 0) { %>
-                <% groups.forEach(group => { %>
-                    <div class="vim-glass-card rounded-3xl overflow-hidden">
-                        
-                        <!-- Table Header Bar -->
-                        <div class="px-6 py-5 border-b border-slate-200/80 flex items-center justify-between bg-white/40">
-                            <div class="flex items-center gap-3">
-                                <span class="w-3 h-3 rounded-full bg-slate-900"></span>
-                                <h2 class="text-lg font-black uppercase text-slate-900 tracking-tight">
-                                    <%= group.name %>
-                                </h2>
-                            </div>
-                            <span class="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[10px] font-extrabold uppercase text-slate-600 tracking-wider">
-                                Official Standings
-                            </span>
-                        </div>
-                        
-                        <!-- Table Data -->
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="text-[10px] uppercase font-black text-slate-400 border-b border-slate-100 bg-slate-50/50">
-                                        <th class="py-4 px-6 text-center w-16">Pos</th>
-                                        <th class="py-4 px-4">Club</th>
-                                        <th class="py-4 text-center w-16">MP</th>
-                                        <th class="py-4 text-center w-16">W</th>
-                                        <th class="py-4 text-center w-16">L</th>
-                                        <th class="py-4 text-right px-6 w-24">PTS</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100 text-slate-800">
-                                    <% group.teams.forEach((team, index) => { %>
-                                        <% 
-                                            let pillClass = "rank-pill-default";
-                                            if(index === 0) pillClass = "rank-pill-1";
-                                            if(index === 1) pillClass = "rank-pill-2";
-                                            if(index === 2) pillClass = "rank-pill-3";
-                                        %>
-                                        <tr class="hover:bg-slate-50/80 transition-colors group">
-                                            <td class="py-4 px-6 text-center">
-                                                <span class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-black <%= pillClass %>">
-                                                    <%= index + 1 %>
-                                                </span>
-                                            </td>
-                                            <td class="py-4 px-4">
-                                                <div class="flex items-center gap-3">
-                                                    <img src="<%= team.logo %>" onerror="this.onerror=null; this.src='https://via.placeholder.com/80/f1f5f9/475569?text=CLUB';" class="w-9 h-9 object-contain group-hover:scale-105 transition-transform">
-                                                    <a href="/team/<%= group.id %>/<%= index %>" class="font-extrabold text-sm uppercase tracking-tight text-slate-900 hover:text-slate-600 transition-colors">
-                                                        <%= team.name %>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td class="py-4 text-center text-xs font-extrabold text-slate-500"><%= team.mp || 0 %></td>
-                                            <td class="py-4 text-center text-xs font-extrabold text-emerald-600"><%= team.wins || 0 %></td>
-                                            <td class="py-4 text-center text-xs font-extrabold text-rose-500"><%= team.loses || 0 %></td>
-                                            <td class="py-4 text-right px-6 font-black text-slate-900 text-lg tracking-tight">
-                                                <%= team.pts || 0 %>
-                                            </td>
-                                        </tr>
-                                    <% }) %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+    <% if (groups && groups.length > 0) { %>
+      <% groups.forEach((group, gIdx) => { %>
+        <div class="mt-card" style="animation-delay:<%= (gIdx * 0.05).toFixed(2) %>s">
+          <div class="mt-card-head">
+            <h2><%= group.name %></h2>
+            <span class="mt-pill">Official standings</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="mt-table">
+              <thead>
+                <tr>
+                  <th style="text-align:center;width:3.5rem">Pos</th>
+                  <th>Club</th>
+                  <th style="text-align:center;width:3rem">MP</th>
+                  <th style="text-align:center;width:3rem">W</th>
+                  <th style="text-align:center;width:3rem">L</th>
+                  <th style="text-align:right;width:4rem">Pts</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% (group.teams || []).forEach((team, index) => {
+                  const posCls = index === 0 ? 'g' : (index === 1 ? 's' : (index === 2 ? 'b' : ''));
+                  const gid = group._id || group.id;
+                %>
+                  <tr>
+                    <td style="text-align:center"><span class="pos <%= posCls %>"><%= index + 1 %></span></td>
+                    <td>
+                      <a class="club" href="/team/<%= gid %>/<%= index %>">
+                        <img src="<%= team.logo %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/80/f4f1e9/07595a?text=FC'" alt="">
+                        <span><%= team.name %></span>
+                      </a>
+                    </td>
+                    <td class="num"><%= team.mp || 0 %></td>
+                    <td class="num w"><%= team.wins || 0 %></td>
+                    <td class="num l"><%= team.loses || 0 %></td>
+                    <td class="pts"><%= team.pts || 0 %></td>
+                  </tr>
                 <% }) %>
-            <% } else { %>
-                <div class="vim-glass-card p-16 rounded-3xl text-center">
-                    <p class="text-xs font-black uppercase tracking-widest text-slate-400">No active group standings available</p>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="mt-card"><div class="mt-empty">No active group standings</div></div>
+    <% } %>
+
+    <div class="mt-boards">
+      <% ['scorers', 'saves', 'assists'].forEach((type, tIdx) => { %>
+        <div class="mt-card" style="animation-delay:<%= (0.15 + tIdx * 0.05).toFixed(2) %>s;margin-bottom:0">
+          <div class="mt-card-head">
+            <h2 style="font-size:1.1rem">Top <%= type %></h2>
+            <span class="mt-pill">Individual</span>
+          </div>
+          <div class="mt-board-list">
+            <% if (leaderboards && leaderboards[type] && leaderboards[type].length > 0) {
+              const maxVal = leaderboards[type][0].value || 1;
+              leaderboards[type].slice(0, 8).forEach((player, index) => {
+            %>
+              <div class="mt-row">
+                <div class="mt-row-left">
+                  <span class="mt-row-n"><%= index + 1 %></span>
+                  <span class="mt-row-name"><%= player.name %></span>
                 </div>
+                <div class="mt-row-val">
+                  <strong><%= player.value %></strong>
+                  <div class="mt-bar"><i style="width:<%= Math.min(100, (player.value / maxVal) * 100) %>%"></i></div>
+                </div>
+              </div>
+            <% }); } else { %>
+              <div class="mt-empty" style="padding:1.5rem">No stats yet</div>
             <% } %>
+          </div>
         </div>
+      <% }) %>
+    </div>
 
-        <!-- PLAYER STAT LEADERBOARDS -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <% ['scorers', 'saves', 'assists'].forEach(type => { %>
-                <div class="vim-glass-card rounded-3xl overflow-hidden flex flex-col justify-between">
-                    <div>
-                        <div class="p-5 border-b border-slate-100 bg-white/40 flex items-center justify-between">
-                            <h3 class="text-xs font-black uppercase tracking-widest text-slate-900">
-                                Top <%= type %>
-                            </h3>
-                            <span class="text-[10px] font-black uppercase text-slate-400 bg-slate-100 border border-slate-200/80 px-2.5 py-0.5 rounded-full">
-                                Individual
-                            </span>
-                        </div>
-                        
-                        <div class="p-4 space-y-2">
-                            <% if(leaderboards && leaderboards[type] && leaderboards[type].length > 0) { %>
-                                <% const maxVal = leaderboards[type][0].value || 1; %>
-                                <% leaderboards[type].slice(0, 8).forEach((player, index) => { %>
-                                    <div class="flex items-center justify-between p-2.5 rounded-2xl bg-white/50 border border-slate-200/60 hover:bg-white transition-all group">
-                                        <div class="flex items-center gap-3">
-                                            <span class="w-6 h-6 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-black text-slate-600">
-                                                <%= index + 1 %>
-                                            </span>
-                                            <span class="text-xs font-extrabold uppercase text-slate-800 truncate max-w-[110px]">
-                                                <%= player.name %>
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs font-black text-slate-900"><%= player.value %></span>
-                                            <div class="h-1.5 w-12 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50">
-                                                <div class="h-full bg-slate-900 rounded-full" style="width: <%= (player.value / maxVal) * 100 %>%"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <% }) %>
-                            <% } else { %>
-                                <div class="py-12 text-center">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">No stats recorded</p>
-                                </div>
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-            <% }) %>
-        </div>
-
-    </main>
+  </div>
 </div>

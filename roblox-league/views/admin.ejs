@@ -154,11 +154,7 @@
                                         <% }) %>
                                     <% } %>
                                 </select>
-                            </div>
-
-                            <div>
-                                <label class="admin-label">Team A Logo URL</label>
-                                <input name="logoA" placeholder="Optional logo URL" class="admin-input">
+                                <p class="text-[9px] text-slate-400 font-bold uppercase mt-1.5">Logo auto-fills from Metrics</p>
                             </div>
 
                             <div>
@@ -173,13 +169,11 @@
                                         <% }) %>
                                     <% } %>
                                 </select>
-                            </div>
-
-                            <div>
-                                <label class="admin-label">Team B Logo URL</label>
-                                <input name="logoB" placeholder="Optional logo URL" class="admin-input">
+                                <p class="text-[9px] text-slate-400 font-bold uppercase mt-1.5">Logo auto-fills from Metrics</p>
                             </div>
                         </div>
+                        <input type="hidden" name="logoA" value="">
+                        <input type="hidden" name="logoB" value="">
 
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -763,10 +757,7 @@
                         </select>
                     </div>
 
-                    <div>
-                        <label class="admin-label">Team A Logo URL</label>
-                        <input name="logoA" id="scheduleEditLogoA" class="admin-input" placeholder="Optional logo URL">
-                    </div>
+                    
 
                     <div>
                         <label class="admin-label">Team B</label>
@@ -782,10 +773,7 @@
                         </select>
                     </div>
 
-                    <div>
-                        <label class="admin-label">Team B Logo URL</label>
-                        <input name="logoB" id="scheduleEditLogoB" class="admin-input" placeholder="Optional logo URL">
-                    </div>
+                    
 
                     <div>
                         <label class="admin-label">Date & Time</label>
@@ -1193,7 +1181,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
                                 <div class="sm:col-span-2">
-                                    <label class="admin-label">Goalkeeper</label>
+                                    <label class="admin-label">GK</label>
 
                                     <select
                                         name="lineupA_gk"
@@ -1202,15 +1190,14 @@
                                         <option value="">Select goalkeeper...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupA_gk_number" id="lineupA_gk_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupA_gk_rating" id="lineupA_gk_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
                                 </div>
 
 
                                 <div>
-                                    <label class="admin-label">Defender 1</label>
+                                    <label class="admin-label">LB</label>
 
                                     <select
                                         name="lineupA_def1"
@@ -1219,15 +1206,14 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupA_def1_number" id="lineupA_def1_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupA_def1_rating" id="lineupA_def1_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
                                 </div>
 
 
                                 <div>
-                                    <label class="admin-label">Defender 2</label>
+                                    <label class="admin-label">RB</label>
 
                                     <select
                                         name="lineupA_def2"
@@ -1236,15 +1222,14 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupA_def2_number" id="lineupA_def2_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupA_def2_rating" id="lineupA_def2_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
                                 </div>
 
 
                                 <div>
-                                    <label class="admin-label">Midfielder 1</label>
+                                    <label class="admin-label">CM</label>
 
                                     <select
                                         name="lineupA_mid1"
@@ -1253,15 +1238,14 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupA_mid1_number" id="lineupA_mid1_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupA_mid1_rating" id="lineupA_mid1_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
                                 </div>
 
 
                                 <div>
-                                    <label class="admin-label">Midfielder 2</label>
+                                    <label class="admin-label">CM (2)</label>
 
                                     <select
                                         name="lineupA_mid2"
@@ -1270,15 +1254,14 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupA_mid2_number" id="lineupA_mid2_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupA_mid2_rating" id="lineupA_mid2_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
                                 </div>
 
 
                                 <div>
-                                    <label class="admin-label">Forward 1</label>
+                                    <label class="admin-label">LF / RF</label>
 
                                     <select
                                         name="lineupA_fwd1"
@@ -1287,15 +1270,14 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupA_fwd1_number" id="lineupA_fwd1_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupA_fwd1_rating" id="lineupA_fwd1_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
                                 </div>
 
 
                                 <div>
-                                    <label class="admin-label">Forward 2</label>
+                                    <label class="admin-label">CF</label>
 
                                     <select
                                         name="lineupA_fwd2"
@@ -1304,8 +1286,7 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupA_fwd2_number" id="lineupA_fwd2_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupA_fwd2_rating" id="lineupA_fwd2_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
                                 </div>
@@ -1313,7 +1294,7 @@
                             </div>
 
                             <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
-                                Shirt # and Rating are optional — ratings show as a colour-coded badge on the public lineup card.
+                                Match rating is optional — ratings show as a colour-coded badge on the public lineup card.
                             </p>
 
                         </div>
@@ -1356,8 +1337,7 @@
                                         <option value="">Select goalkeeper...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupB_gk_number" id="lineupB_gk_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupB_gk_rating" id="lineupB_gk_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
 
@@ -1377,8 +1357,7 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupB_def1_number" id="lineupB_def1_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupB_def1_rating" id="lineupB_def1_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
 
@@ -1398,8 +1377,7 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupB_def2_number" id="lineupB_def2_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupB_def2_rating" id="lineupB_def2_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
 
@@ -1419,8 +1397,7 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupB_mid1_number" id="lineupB_mid1_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupB_mid1_rating" id="lineupB_mid1_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
 
@@ -1440,8 +1417,7 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupB_mid2_number" id="lineupB_mid2_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupB_mid2_rating" id="lineupB_mid2_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
 
@@ -1461,8 +1437,7 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupB_fwd1_number" id="lineupB_fwd1_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupB_fwd1_rating" id="lineupB_fwd1_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
 
@@ -1482,8 +1457,7 @@
                                         <option value="">Select player...</option>
                                     </select>
 
-                                    <div class="grid grid-cols-2 gap-2 mt-2">
-                                        <input type="text" name="lineupB_fwd2_number" id="lineupB_fwd2_number" placeholder="Shirt #" maxlength="3" class="admin-input text-center">
+                                    <div class="mt-2">
                                         <input type="number" name="lineupB_fwd2_rating" id="lineupB_fwd2_rating" placeholder="Rating" step="0.1" min="0" max="10" class="admin-input text-center">
                                     </div>
 
@@ -1492,7 +1466,7 @@
                             </div>
 
                             <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
-                                Shirt # and Rating are optional — ratings show as a colour-coded badge on the public lineup card.
+                                Match rating is optional — ratings show as a colour-coded badge on the public lineup card.
                             </p>
 
                         </div>
@@ -1501,38 +1475,8 @@
 
 
                     <!-- OLD COMPATIBILITY LINEUP FIELDS -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
 
-                        <div>
-
-                            <label class="admin-label">
-                                Legacy Team A Lineup
-                            </label>
-
-                            <textarea
-                                name="lineupA"
-                                rows="4"
-                                placeholder="GK:PlayerOne:8.5&#10;DEF:PlayerTwo:7.9"
-                                class="w-full bg-white border border-slate-200 p-3 rounded-xl text-slate-900 text-xs outline-none focus:border-emerald-500 font-mono"></textarea>
-
-                        </div>
-
-
-                        <div>
-
-                            <label class="admin-label">
-                                Legacy Team B Lineup
-                            </label>
-
-                            <textarea
-                                name="lineupB"
-                                rows="4"
-                                placeholder="GK:PlayerThree:8.0&#10;MID:PlayerFour:8.2"
-                                class="w-full bg-white border border-slate-200 p-3 rounded-xl text-slate-900 text-xs outline-none focus:border-emerald-500 font-mono"></textarea>
-
-                        </div>
-
-                    </div>
 
                 </div>
 
@@ -1540,101 +1484,107 @@
                 <!-- ================================================= -->
                 <!-- PLAYER MATCH STATS -->
                 <!-- ================================================= -->
-                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-6">
+                
+                <!-- ========================================= -->
+                <!-- 04 • MATCH PLAYER STATISTICS (LEGS) -->
+                <!-- ========================================= -->
+                <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-6">
 
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-
                             <h3 class="text-xs font-black uppercase text-emerald-600 tracking-wider">
                                 04 • Match Player Statistics
                             </h3>
-
                             <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
-                                Stats for this match only — player database remains the main source of career totals
+                                Up to 5 legs · searchable roster players only · goals / assists / saves / tackles
                             </p>
-
                         </div>
-
+                        <button type="button" onclick="addLeg()"
+                            class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase tracking-wide transition">
+                            + Add Leg
+                        </button>
                     </div>
 
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                        <!-- TEAM A -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
-
-                            <div class="flex justify-between items-center">
-
-                                <div>
-                                    <p class="text-xs font-black uppercase text-blue-600">
-                                        Team A Players
-                                    </p>
-
-                                    <p class="text-[10px] text-slate-400 uppercase font-bold">
-                                        Goals • assists • saves • rating
-                                    </p>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    onclick="addStatRow('teamA')"
-                                    class="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded-lg font-bold uppercase border border-blue-200">
-                                    + Player
-                                </button>
-
-                            </div>
-
-                            <div
-                                id="statRows-teamA"
-                                class="space-y-2">
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- TEAM B -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
-
-                            <div class="flex justify-between items-center">
-
-                                <div>
-                                    <p class="text-xs font-black uppercase text-red-600">
-                                        Team B Players
-                                    </p>
-
-                                    <p class="text-[10px] text-slate-400 uppercase font-bold">
-                                        Goals • assists • saves • rating
-                                    </p>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    onclick="addStatRow('teamB')"
-                                    class="text-[10px] bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg font-bold uppercase border border-red-200">
-                                    + Player
-                                </button>
-
-                            </div>
-
-                            <div
-                                id="statRows-teamB"
-                                class="space-y-2">
-
-                            </div>
-
-                        </div>
-
+                    <div id="legsContainer" class="space-y-5">
+                        <!-- Legs injected by JS -->
                     </div>
 
+                    <p class="text-[10px] text-slate-400 font-semibold">
+                        Players in the dropdowns are limited to the selected match’s Team A / Team B rosters from Metrics (auction signings appear when stored on the team roster).
+                    </p>
                 </div>
 
 
-                <!-- ================================================= -->
-                <!-- MVP -->
-                <!-- ================================================= -->
-                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                <!-- ========================================= -->
+                <!-- MATCH TOTALS (combined) -->
+                <!-- ========================================= -->
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 space-y-4">
+                    <div>
+                        <h3 class="text-xs font-black uppercase text-slate-700 tracking-wider">Match totals</h3>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">Aggregate scoreline &amp; team totals (auto-hint from player rows when possible)</p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div>
+                            <label class="admin-label">Goals A</label>
+                            <input type="number" name="goalsA" id="goalsAInput" min="0" class="admin-input" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="admin-label">Goals B</label>
+                            <input type="number" name="goalsB" id="goalsBInput" min="0" class="admin-input" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="admin-label">Assists A</label>
+                            <input type="number" name="assistsA" min="0" class="admin-input" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="admin-label">Assists B</label>
+                            <input type="number" name="assistsB" min="0" class="admin-input" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="admin-label">Saves A</label>
+                            <input type="number" name="savesA" min="0" class="admin-input" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="admin-label">Saves B</label>
+                            <input type="number" name="savesB" min="0" class="admin-input" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="admin-label">Tackles A</label>
+                            <input type="number" name="tacklesA" min="0" class="admin-input" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="admin-label">Tackles B</label>
+                            <input type="number" name="tacklesB" min="0" class="admin-input" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
+                        <div>
+                            <label class="admin-label">Leg 1 Goals A–B</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" name="leg1GoalsA" min="0" class="admin-input" placeholder="A">
+                                <input type="number" name="leg1GoalsB" min="0" class="admin-input" placeholder="B">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="admin-label">Leg 2 Goals A–B</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" name="leg2GoalsA" min="0" class="admin-input" placeholder="A">
+                                <input type="number" name="leg2GoalsB" min="0" class="admin-input" placeholder="B">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="admin-label">Possession A %</label>
+                            <input type="number" name="possessionA" min="0" max="100" class="admin-input" placeholder="50">
+                        </div>
+                        <div>
+                            <label class="admin-label">Possession B %</label>
+                            <input type="number" name="possessionB" min="0" max="100" class="admin-input" placeholder="50">
+                        </div>
+                    </div>
+                </div>
+
+
+<div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
 
                     <div class="mb-5">
 
@@ -1680,76 +1630,6 @@
                             <input
                                 name="mvpCardUrl"
                                 placeholder="Optional image URL"
-                                class="admin-input">
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ================================================= -->
-                <!-- TEAM TOTALS -->
-                <!-- ================================================= -->
-                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-
-                    <div class="mb-5">
-
-                        <h3 class="text-xs font-black uppercase text-emerald-600 tracking-wider">
-                            06 • Match Totals
-                        </h3>
-
-                        <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">
-                            Team-level totals for the completed match
-                        </p>
-
-                    </div>
-
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                        <div class="bg-white p-5 rounded-2xl border border-blue-200 space-y-3">
-
-                            <p class="text-xs font-black text-blue-600 uppercase">
-                                Team A
-                            </p>
-
-                            <input
-                                type="number"
-                                name="assistsA"
-                                min="0"
-                                placeholder="Total Assists"
-                                class="admin-input">
-
-                            <input
-                                type="number"
-                                name="savesA"
-                                min="0"
-                                placeholder="Total Saves"
-                                class="admin-input">
-
-                        </div>
-
-
-                        <div class="bg-white p-5 rounded-2xl border border-red-200 space-y-3">
-
-                            <p class="text-xs font-black text-red-600 uppercase">
-                                Team B
-                            </p>
-
-                            <input
-                                type="number"
-                                name="assistsB"
-                                min="0"
-                                placeholder="Total Assists"
-                                class="admin-input">
-
-                            <input
-                                type="number"
-                                name="savesB"
-                                min="0"
-                                placeholder="Total Saves"
                                 class="admin-input">
 
                         </div>
@@ -3878,6 +3758,179 @@
        picks a match from the dropdown)
     ============================================================ */
 
+    
+    // Team name -> roster player names (from Metrics groups)
+    const ADMIN_TEAM_ROSTERS = <%- JSON.stringify((() => {
+        const map = {};
+        (typeof groups !== 'undefined' ? groups : []).forEach(g => {
+            (g.teams || []).forEach(t => {
+                const names = (t.roster || []).map(p => p.name).filter(Boolean);
+                if (t.name) map[t.name] = names;
+            });
+        });
+        return map;
+    })()).replace(/</g, '\\u003c') %>;
+
+    const ADMIN_MATCH_TEAMS = <%- JSON.stringify(
+        (typeof matches !== 'undefined' ? matches : []).map(m => ({
+            id: (m._id || m.id || '').toString(),
+            teamA: m.teamA || '',
+            teamB: m.teamB || ''
+        }))
+    ).replace(/</g, '\\u003c') %>;
+
+    let currentTeamA = '';
+    let currentTeamB = '';
+    let legCount = 0;
+
+    function rosterOptions(side, selected) {
+        const teamName = side === 'A' ? currentTeamA : currentTeamB;
+        let names = (ADMIN_TEAM_ROSTERS[teamName] || []).slice();
+        // Fallback: all verified if roster empty
+        if (!names.length) {
+            names = ADMIN_VERIFIED_PLAYERS.map(p => p.name);
+        }
+        let html = `<option value="">Search / select player...</option>`;
+        names.forEach(n => {
+            const sel = selected && selected === n ? 'selected' : '';
+            html += `<option value="${n.replace(/"/g,'&quot;')}" ${sel}>${n}</option>`;
+        });
+        return html;
+    }
+
+    function addLeg(prefill) {
+        if (legCount >= 5) {
+            alert('Maximum 5 legs');
+            return;
+        }
+        legCount += 1;
+        const leg = legCount;
+        const box = document.createElement('div');
+        box.className = 'bg-white border border-slate-200 rounded-2xl p-5 space-y-4';
+        box.id = 'leg-block-' + leg;
+        box.dataset.leg = String(leg);
+        box.innerHTML = `
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">Leg ${leg}</span>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase" id="leg-teams-label-${leg}"></span>
+                </div>
+                <button type="button" onclick="removeLeg(${leg})" class="text-[10px] font-black uppercase text-red-500 hover:text-red-700">Remove</button>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-[10px] font-black uppercase text-blue-600 mb-2">Team A players</p>
+                    <div class="mb-2">
+                        <input type="text" placeholder="Filter players..." class="admin-input text-[11px] p-2" oninput="filterLegSelects(${leg},'A',this.value)">
+                    </div>
+                    <div id="leg-${leg}-A-rows" class="space-y-2"></div>
+                    <button type="button" onclick="addLegPlayerRow(${leg},'A')" class="mt-2 w-full py-2 rounded-lg border border-dashed border-slate-300 text-[10px] font-black uppercase text-slate-500 hover:border-emerald-400 hover:text-emerald-600">+ Player</button>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black uppercase text-rose-600 mb-2">Team B players</p>
+                    <div class="mb-2">
+                        <input type="text" placeholder="Filter players..." class="admin-input text-[11px] p-2" oninput="filterLegSelects(${leg},'B',this.value)">
+                    </div>
+                    <div id="leg-${leg}-B-rows" class="space-y-2"></div>
+                    <button type="button" onclick="addLegPlayerRow(${leg},'B')" class="mt-2 w-full py-2 rounded-lg border border-dashed border-slate-300 text-[10px] font-black uppercase text-slate-500 hover:border-emerald-400 hover:text-emerald-600">+ Player</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('legsContainer').appendChild(box);
+        document.getElementById('leg-teams-label-' + leg).textContent =
+            (currentTeamA || 'Team A') + ' vs ' + (currentTeamB || 'Team B');
+        if (prefill && prefill.A) prefill.A.forEach(p => addLegPlayerRow(leg, 'A', p));
+        if (prefill && prefill.B) prefill.B.forEach(p => addLegPlayerRow(leg, 'B', p));
+        if (!prefill) {
+            // start with one empty row each side
+            addLegPlayerRow(leg, 'A');
+            addLegPlayerRow(leg, 'B');
+        }
+    }
+
+    function removeLeg(leg) {
+        const el = document.getElementById('leg-block-' + leg);
+        if (el) el.remove();
+    }
+
+    function addLegPlayerRow(leg, side, prefill) {
+        prefill = prefill || {};
+        const container = document.getElementById(`leg-${leg}-${side}-rows`);
+        if (!container) return;
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-12 gap-1.5 items-center bg-slate-50 border border-slate-200 rounded-xl p-2 leg-player-row';
+        row.innerHTML = `
+            <div class="col-span-12 sm:col-span-4">
+                <select name="legPlayer" data-leg="${leg}" data-side="${side}" class="player-select text-[11px] p-2 w-full leg-player-select">
+                    ${rosterOptions(side, prefill.name || '')}
+                </select>
+                <input type="hidden" name="legIndex" value="${leg}">
+                <input type="hidden" name="legSide" value="${side}">
+            </div>
+            <div class="col-span-3 sm:col-span-2">
+                <input type="number" name="legGoals" min="0" placeholder="G" value="${prefill.goals != null ? prefill.goals : (prefill.value != null && String(prefill.type||'').toLowerCase().includes('goal') ? prefill.value : '')}" class="admin-input text-[11px] p-2 text-center" title="Goals">
+            </div>
+            <div class="col-span-3 sm:col-span-2">
+                <input type="number" name="legAssists" min="0" placeholder="A" value="${prefill.assists != null ? prefill.assists : ''}" class="admin-input text-[11px] p-2 text-center" title="Assists">
+            </div>
+            <div class="col-span-3 sm:col-span-2">
+                <input type="number" name="legSaves" min="0" placeholder="S" value="${prefill.saves != null ? prefill.saves : ''}" class="admin-input text-[11px] p-2 text-center" title="Saves">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+                <input type="number" name="legTackles" min="0" placeholder="T" value="${prefill.tackles != null ? prefill.tackles : ''}" class="admin-input text-[11px] p-2 text-center" title="Tackles">
+            </div>
+            <div class="col-span-1 text-center">
+                <button type="button" onclick="this.closest('.leg-player-row').remove()" class="text-red-500 font-black text-xs">✕</button>
+            </div>
+        `;
+        // Sync name into a dedicated field for backend pairing: use legPlayer as name
+        // The select already has name=legPlayer
+        container.appendChild(row);
+    }
+
+    function filterLegSelects(leg, side, query) {
+        const q = (query || '').toLowerCase().trim();
+        const container = document.getElementById(`leg-${leg}-${side}-rows`);
+        if (!container) return;
+        container.querySelectorAll('select.leg-player-select').forEach(sel => {
+            Array.from(sel.options).forEach((opt, i) => {
+                if (i === 0) { opt.hidden = false; return; }
+                opt.hidden = !(!q || opt.text.toLowerCase().includes(q));
+            });
+        });
+    }
+
+    function refreshLineupSelectsForMatch() {
+        // Lineup selects: filter to roster of each side
+        const filterSelect = (sel, side) => {
+            if (!sel) return;
+            const current = sel.value;
+            const teamName = side === 'A' ? currentTeamA : currentTeamB;
+            let names = (ADMIN_TEAM_ROSTERS[teamName] || []).slice();
+            if (!names.length) names = ADMIN_VERIFIED_PLAYERS.map(p => p.name);
+            let html = `<option value="">Select player...</option>`;
+            names.forEach(n => {
+                const pos = (ADMIN_VERIFIED_PLAYERS.find(p => p.name === n) || {}).position || '';
+                html += `<option value="${n.replace(/"/g,'&quot;')}" ${current===n?'selected':''}>${n}${pos?' ('+pos+')':''}</option>`;
+            });
+            sel.innerHTML = html;
+        };
+        document.querySelectorAll('select.player-select[id^="lineupA_"]').forEach(s => filterSelect(s, 'A'));
+        document.querySelectorAll('select.player-select[id^="lineupB_"]').forEach(s => filterSelect(s, 'B'));
+        const mvp = document.getElementById('mvpSelect');
+        if (mvp) {
+            const current = mvp.value;
+            const all = [...new Set([...(ADMIN_TEAM_ROSTERS[currentTeamA]||[]), ...(ADMIN_TEAM_ROSTERS[currentTeamB]||[])])];
+            const names = all.length ? all : ADMIN_VERIFIED_PLAYERS.map(p => p.name);
+            let html = `<option value="">Select MVP...</option>`;
+            names.forEach(n => {
+                html += `<option value="${n.replace(/"/g,'&quot;')}" ${current===n?'selected':''}>${n}</option>`;
+            });
+            mvp.innerHTML = html;
+        }
+    }
+
+
     const ADMIN_VERIFIED_PLAYERS = <%- JSON.stringify(
         (typeof players !== 'undefined' ? players : [])
             .filter(p => p.verified)
@@ -4054,10 +4107,23 @@
 
         clearMatchEditor(true);
 
+        const meta = ADMIN_MATCH_TEAMS.find(m => m.id === matchId);
+        currentTeamA = meta ? meta.teamA : '';
+        currentTeamB = meta ? meta.teamB : '';
+        refreshLineupSelectsForMatch();
+
         const match = ADMIN_MATCHES_DATA.find(m => m.id === matchId);
         const details = match && match.details ? match.details : null;
 
-        if (!details) return;
+        // Always ensure at least one leg UI
+        legCount = 0;
+        const legsBox = document.getElementById('legsContainer');
+        if (legsBox) legsBox.innerHTML = '';
+
+        if (!details) {
+            addLeg();
+            return;
+        }
 
         const form = document.querySelector('form[action="/admin/update-match-details"]');
         if (!form) return;
@@ -4095,8 +4161,56 @@
         // Re-populate selects now that values are set, keeping selections.
         populatePlayerSelects();
 
-        (details.teamAPlayers || []).forEach(p => addStatRow('teamA', p));
-        (details.teamBPlayers || []).forEach(p => addStatRow('teamB', p));
+        // Load multi-leg player stats if present, else fall back to teamAPlayers as Leg 1
+        const legStats = details.legStats || null;
+        if (legStats && typeof legStats === 'object') {
+            const legKeys = Object.keys(legStats).sort((a,b) => Number(a)-Number(b));
+            if (legKeys.length) {
+                legKeys.forEach(k => {
+                    const block = legStats[k] || {};
+                    addLeg({ A: block.teamA || [], B: block.teamB || [] });
+                });
+            } else {
+                addLeg();
+            }
+        } else if ((details.teamAPlayers && details.teamAPlayers.length) || (details.teamBPlayers && details.teamBPlayers.length)) {
+            addLeg({
+                A: (details.teamAPlayers || []).map(p => ({
+                    name: p.name,
+                    goals: p.type && String(p.type).toLowerCase().includes('goal') ? p.value : (p.goals || ''),
+                    assists: p.assists || '',
+                    saves: p.saves || '',
+                    tackles: p.tackles || ''
+                })),
+                B: (details.teamBPlayers || []).map(p => ({
+                    name: p.name,
+                    goals: p.type && String(p.type).toLowerCase().includes('goal') ? p.value : (p.goals || ''),
+                    assists: p.assists || '',
+                    saves: p.saves || '',
+                    tackles: p.tackles || ''
+                }))
+            });
+        } else {
+            addLeg();
+        }
+
+        // totals
+        const setNum = (name, value) => {
+            const field = form.elements[name];
+            if (field && value !== undefined && value !== null && value !== '') field.value = value;
+        };
+        setNum('goalsA', details.goalsA);
+        setNum('goalsB', details.goalsB);
+        setNum('assistsA', details.assistsA);
+        setNum('assistsB', details.assistsB);
+        setNum('savesA', details.savesA);
+        setNum('savesB', details.savesB);
+        setNum('tacklesA', details.tacklesA);
+        setNum('tacklesB', details.tacklesB);
+        setNum('leg1GoalsA', details.leg1GoalsA);
+        setNum('leg1GoalsB', details.leg1GoalsB);
+        setNum('leg2GoalsA', details.leg2GoalsA);
+        setNum('leg2GoalsB', details.leg2GoalsB);
     }
 
     function clearMatchEditor(keepMatchId) {
@@ -4110,9 +4224,12 @@
         document .querySelectorAll('.player-select') .forEach(select => {
             select.value = '';
         });
-        document .querySelectorAll('[id^="statRows-"]') .forEach(container => {
+        document.querySelectorAll('[id^="statRows-"]').forEach(container => {
             container.innerHTML = '';
         });
+        legCount = 0;
+        const legsBox = document.getElementById('legsContainer');
+        if (legsBox) legsBox.innerHTML = '';
     }
 
     /* ============================================================ SAFETY: CLOSE MODALS WITH ESCAPE ============================================================ */

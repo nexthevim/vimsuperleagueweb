@@ -919,48 +919,81 @@ function absoluteUrl(req, maybeRelativePath) {
 // Generic fallback embed for any page that doesn't build its own
 // (home, market, metrics, records, info, etc.) — still gives Discord
 // something decent to show instead of a blank/broken embed.
-function defaultOg(req, title, description) {
+function defaultOg(req, title, description, imagePath) {
     return {
         ogTitle: title || 'VIM Super League',
         ogDescription:
             description ||
             'Competitive Roblox football league — player market, live matches, stats and records.',
-        ogImage: absoluteUrl(req),
+        ogImage: absoluteUrl(req, imagePath || '/images/vimgfx.png'),
         ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl
     };
 }
 
-// Rich per-match embed: score (or kickoff time) + competition, and the
-// home team's crest as the preview image so the embed actually looks
-// like "this match" rather than a generic site banner.
+// Discord / Twitter embed for a single match link.
+// Title shows the scoreline when known; image prefers Team A crest
+// (falls back to Team B, then site banner).
 function buildMatchOg(req, match) {
-    const details = match.details || {};
+    const details = (match && match.details) || {};
+    const goalsA = parseInt(details.goalsA, 10);
+    const goalsB = parseInt(details.goalsB, 10);
+    const status = String(match.status || details.status || '').toLowerCase();
+    const isLive = status === 'live' || match.isLive === true;
+    const isDone = status === 'completed' || status === 'finished' || status === 'ft' || match.completed === true;
+    const hasScore = !Number.isNaN(goalsA) && !Number.isNaN(goalsB);
 
-    const goalsA = parseInt(details.goalsA);
-    const goalsB = parseInt(details.goalsB);
-
-    const hasScore =
-        !Number.isNaN(goalsA) &&
-        !Number.isNaN(goalsB) &&
-        (match.status === 'completed' || match.status === 'live');
-
-    const competition = details.competition || 'VIM Super League';
+    const competition = details.competition || match.competition || 'VIM Super League';
     const teamA = match.teamA || 'Team A';
     const teamB = match.teamB || 'Team B';
+    const tags = (match.tags || details.tags || '').toString().trim();
 
-    const ogTitle = `${teamA} vs ${teamB} — VIM Super League`;
-
-    let ogDescription;
-
-    if (hasScore) {
-        const finished = match.status === 'completed' ? 'FT' : 'LIVE';
-        ogDescription = `${finished}: ${teamA} ${goalsA} - ${goalsB} ${teamB} · ${competition}`;
+    let ogTitle;
+    if (hasScore && (isDone || isLive)) {
+        ogTitle = `${teamA} ${goalsA}–${goalsB} ${teamB}`;
     } else {
-        const when = details.date || match.time || 'Kickoff TBC';
-        ogDescription = `Upcoming fixture · ${when} · ${competition}`;
+        ogTitle = `${teamA} vs ${teamB}`;
+    }
+    ogTitle += ' · VIM Super League';
+
+    const parts = [];
+    if (isLive) parts.push('🔴 LIVE');
+    else if (isDone) parts.push('Full Time');
+    else parts.push('Fixture');
+
+    if (hasScore && (isDone || isLive)) {
+        parts.push(`${teamA} ${goalsA}–${goalsB} ${teamB}`);
+    } else {
+        parts.push(`${teamA} vs ${teamB}`);
     }
 
-    const ogImage = absoluteUrl(req, match.logoA || match.logoB);
+    let when = '';
+    if (match.time) {
+        try {
+            const d = new Date(match.time);
+            if (!Number.isNaN(d.getTime())) {
+                when = d.toLocaleString('en-GB', {
+                    weekday: 'short', day: 'numeric', month: 'short',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            } else {
+                when = String(match.time);
+            }
+        } catch (e) {
+            when = String(match.time);
+        }
+    } else if (details.date) {
+        when = String(details.date);
+    }
+    if (when && !isDone) parts.push(when);
+
+    parts.push(competition);
+    if (tags) parts.push(tags);
+
+    const ogDescription = parts.join(' · ');
+
+    // Crest for the embed image (Discord shows one large image)
+    const crest = match.logoA || match.logoB || details.logoA || details.logoB || '';
+    const ogImage = absoluteUrl(req, crest || '/images/vimgfx.png');
 
     return {
         ogTitle,
@@ -1186,8 +1219,9 @@ app.get('/matches', (req, res) => {
         page: 'matches',
         ...defaultOg(
             req,
-            'Matches — VIM Super League',
-            'Upcoming fixtures, live scores and completed match results.'
+            'Fixtures & Results — VIM Super League',
+            'Upcoming fixtures, live scores and completed match results for VIM Super League.',
+            '/images/vimgfx.png'
         )
     });
 });

@@ -2736,51 +2736,85 @@ app.post('/admin/update-match-details', async (req, res) => {
                 ? val
                 : (val ? [val] : []);
 
-        const teamAPlayers =
+        // Legacy single-list player stats (still accepted)
+        const teamAPlayersLegacy =
             toArr(req.body.teamAPlayer)
                 .map((name, i) => ({
-
                     name,
-
-                    type:
-                        toArr(
-                            req.body.teamAType
-                        )[i] || "",
-
-                    value:
-                        toArr(
-                            req.body.teamAMainValue
-                        )[i] || "",
-
-                    assists:
-                        toArr(
-                            req.body.teamAAssists
-                        )[i] || ""
-
+                    type: toArr(req.body.teamAType)[i] || "",
+                    value: toArr(req.body.teamAMainValue)[i] || "",
+                    assists: toArr(req.body.teamAAssists)[i] || ""
                 }));
 
-        const teamBPlayers =
+        const teamBPlayersLegacy =
             toArr(req.body.teamBPlayer)
                 .map((name, i) => ({
-
                     name,
-
-                    type:
-                        toArr(
-                            req.body.teamBType
-                        )[i] || "",
-
-                    value:
-                        toArr(
-                            req.body.teamBMainValue
-                        )[i] || "",
-
-                    assists:
-                        toArr(
-                            req.body.teamBAssists
-                        )[i] || ""
-
+                    type: toArr(req.body.teamBType)[i] || "",
+                    value: toArr(req.body.teamBMainValue)[i] || "",
+                    assists: toArr(req.body.teamBAssists)[i] || ""
                 }));
+
+        // Multi-leg player statistics (up to 5 legs)
+        // Parallel arrays: legIndex[], legSide[], legPlayer[], legGoals[], legAssists[], legSaves[], legTackles[]
+        const legIndexes = toArr(req.body.legIndex);
+        const legSides = toArr(req.body.legSide);
+        const legPlayers = toArr(req.body.legPlayer);
+        const legGoals = toArr(req.body.legGoals);
+        const legAssistsArr = toArr(req.body.legAssists);
+        const legSavesArr = toArr(req.body.legSaves);
+        const legTacklesArr = toArr(req.body.legTackles);
+
+        const legStats = {};
+        for (let i = 0; i < legPlayers.length; i++) {
+            const name = (legPlayers[i] || '').toString().trim();
+            if (!name) continue;
+            const leg = String(legIndexes[i] || '1');
+            const side = String(legSides[i] || 'A').toUpperCase() === 'B' ? 'B' : 'A';
+            if (!legStats[leg]) legStats[leg] = { teamA: [], teamB: [] };
+            const row = {
+                name,
+                goals: legGoals[i] !== undefined && legGoals[i] !== '' ? Number(legGoals[i]) || 0 : 0,
+                assists: legAssistsArr[i] !== undefined && legAssistsArr[i] !== '' ? Number(legAssistsArr[i]) || 0 : 0,
+                saves: legSavesArr[i] !== undefined && legSavesArr[i] !== '' ? Number(legSavesArr[i]) || 0 : 0,
+                tackles: legTacklesArr[i] !== undefined && legTacklesArr[i] !== '' ? Number(legTacklesArr[i]) || 0 : 0
+            };
+            if (side === 'B') legStats[leg].teamB.push(row);
+            else legStats[leg].teamA.push(row);
+        }
+
+        // Flatten leg 1 (or all) into teamAPlayers / teamBPlayers for older views
+        const flatA = [];
+        const flatB = [];
+        Object.keys(legStats).sort((a,b)=>Number(a)-Number(b)).forEach(leg => {
+            (legStats[leg].teamA || []).forEach(p => {
+                flatA.push({
+                    name: p.name,
+                    type: p.goals ? 'Goal' : (p.assists ? 'Assist' : (p.saves ? 'Save' : 'Stat')),
+                    value: p.goals || p.assists || p.saves || p.tackles || '',
+                    assists: p.assists || '',
+                    goals: p.goals || 0,
+                    saves: p.saves || 0,
+                    tackles: p.tackles || 0,
+                    leg: Number(leg)
+                });
+            });
+            (legStats[leg].teamB || []).forEach(p => {
+                flatB.push({
+                    name: p.name,
+                    type: p.goals ? 'Goal' : (p.assists ? 'Assist' : (p.saves ? 'Save' : 'Stat')),
+                    value: p.goals || p.assists || p.saves || p.tackles || '',
+                    assists: p.assists || '',
+                    goals: p.goals || 0,
+                    saves: p.saves || 0,
+                    tackles: p.tackles || 0,
+                    leg: Number(leg)
+                });
+            });
+        });
+
+        const teamAPlayers = flatA.length ? flatA : teamAPlayersLegacy;
+        const teamBPlayers = flatB.length ? flatB : teamBPlayersLegacy;
 
         const existingMatch =
             await Match.findById(matchId);
@@ -2834,17 +2868,28 @@ app.post('/admin/update-match-details', async (req, res) => {
             existingMatch.status ||
             'completed';
 
+        // Attach leg number onto valid players when present
+        const withLegA = validTeamAPlayers;
+        const withLegB = validTeamBPlayers;
+
         existingMatch.details = {
 
             ...(existingMatch.details || {}),
 
             ...req.body,
 
-            teamAPlayers:
-                validTeamAPlayers,
+            teamAPlayers: withLegA,
 
-            teamBPlayers:
-                validTeamBPlayers,
+            teamBPlayers: withLegB,
+
+            legStats,
+
+            leg1TeamAPlayers: (legStats['1'] && legStats['1'].teamA) || [],
+            leg1TeamBPlayers: (legStats['1'] && legStats['1'].teamB) || [],
+            leg2TeamAPlayers: (legStats['2'] && legStats['2'].teamA) || [],
+            leg2TeamBPlayers: (legStats['2'] && legStats['2'].teamB) || [],
+            leg3TeamAPlayers: (legStats['3'] && legStats['3'].teamA) || [],
+            leg3TeamBPlayers: (legStats['3'] && legStats['3'].teamB) || [],
 
             lineupPlayersA,
 

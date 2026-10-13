@@ -11,12 +11,19 @@
 <meta property="og:type" content="website" />
 <meta property="og:title" content="<%= _ogTitle %>" />
 <meta property="og:description" content="<%= _ogDesc %>" />
-<% if (_ogImage) { %><meta property="og:image" content="<%= _ogImage %>" /><% } %>
+<% if (_ogImage) { %>
+<meta property="og:image" content="<%= _ogImage %>" />
+<meta property="og:image:secure_url" content="<%= _ogImage %>" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:image" content="<%= _ogImage %>" />
+<% } %>
 <% if (_ogUrl) { %><meta property="og:url" content="<%= _ogUrl %>" /><% } %>
+<meta name="theme-color" content="#07595a" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="<%= _ogTitle %>" />
 <meta name="twitter:description" content="<%= _ogDesc %>" />
-<% if (_ogImage) { %><meta name="twitter:image" content="<%= _ogImage %>" /><% } %>
 <title><%= _ogTitle %></title>
 <meta name="description" content="<%= _ogDesc %>" />
 

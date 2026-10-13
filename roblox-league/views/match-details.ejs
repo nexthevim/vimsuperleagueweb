@@ -11,31 +11,41 @@
     const lineupA = details.lineupPlayersA || [];
     const lineupB = details.lineupPlayersB || [];
 
-    // 7v7: GK, LB, RB, CM, LF, RF, CF
+    // 7v7 formation (same shape as position picker):
+    //        CF
+    //     LF    RF
+    //        CM
+    //     LB    RB
+    //        GK
+    // Team A defends the TOP goal; Team B the BOTTOM goal.
     const POS_SLOTS_A = [
-        { key: 'GK', x: 50, y: 10 },
-        { key: 'LB', x: 22, y: 24 },
-        { key: 'RB', x: 78, y: 24 },
-        { key: 'CM', x: 50, y: 36 },
-        { key: 'LF', x: 22, y: 48 },
-        { key: 'RF', x: 78, y: 48 },
-        { key: 'CF', x: 50, y: 44 }
+        { key: 'GK', x: 50, y: 8 },
+        { key: 'LB', x: 22, y: 22 },
+        { key: 'RB', x: 78, y: 22 },
+        { key: 'CM', x: 50, y: 34 },
+        { key: 'LF', x: 22, y: 46 },
+        { key: 'RF', x: 78, y: 46 },
+        { key: 'CF', x: 50, y: 40 }
     ];
     const POS_SLOTS_B = [
-        { key: 'GK', x: 50, y: 90 },
-        { key: 'LB', x: 78, y: 76 },
-        { key: 'RB', x: 22, y: 76 },
-        { key: 'CM', x: 50, y: 64 },
-        { key: 'LF', x: 78, y: 52 },
-        { key: 'RF', x: 22, y: 52 },
-        { key: 'CF', x: 50, y: 56 }
+        { key: 'GK', x: 50, y: 92 },
+        { key: 'LB', x: 78, y: 78 },
+        { key: 'RB', x: 22, y: 78 },
+        { key: 'CM', x: 50, y: 66 },
+        { key: 'LF', x: 78, y: 54 },
+        { key: 'RF', x: 22, y: 54 },
+        { key: 'CF', x: 50, y: 60 }
     ];
 
     function slotForPlayer(player, index, isTeamA) {
         const slots = isTeamA ? POS_SLOTS_A : POS_SLOTS_B;
         const pos = String(player.position || player.pos || player.slot || '').toUpperCase().trim();
         // map old def/mid/fwd slots
-        const map = { DEF1: 'LB', DEF2: 'RB', MID1: 'CM', MID2: 'CM', FWD1: 'LF', FWD2: 'RF', DEF: 'LB', MID: 'CM', FWD: 'CF' };
+        const map = {
+            DEF1: 'LB', DEF2: 'RB', MID1: 'CM', MID2: 'LF', FWD1: 'RF', FWD2: 'CF',
+            DEF: 'LB', MID: 'CM', FWD: 'CF',
+            GK: 'GK', LB: 'LB', RB: 'RB', CM: 'CM', LF: 'LF', RF: 'RF', CF: 'CF'
+        };
         const key = map[pos] || pos;
         const byKey = slots.find(s => s.key === key || s.key === pos);
         if (byKey) return byKey;
@@ -498,8 +508,27 @@ body { margin: 0; font-family: var(--md-body); }
             <h2 class="text-2xl font-black italic uppercase" style="font-family:var(--md-display)">Highlights</h2>
           </div>
           <div class="rounded-2xl overflow-hidden bg-black aspect-video">
-            <iframe src="<%= videoUrl %>" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+            <iframe
+              id="highlightsFrame"
+              src="<%= videoUrl %>"
+              class="w-full h-full"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
           </div>
+          <script>
+          (function() {
+            var frame = document.getElementById('highlightsFrame');
+            if (!frame) return;
+            var u = frame.getAttribute('src') || '';
+            if (!u || u.indexOf('youtube.com/embed/') >= 0) return;
+            var id = '';
+            var m = u.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) || u.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
+                    u.match(/youtube\.com\/live\/([a-zA-Z0-9_-]{6,})/) || u.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,})/);
+            if (m) id = m[1];
+            if (id) frame.src = 'https://www.youtube.com/embed/' + id;
+          })();
+          </script>
         </section>
       <% } %>
 

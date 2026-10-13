@@ -103,6 +103,7 @@ const Player = mongoose.model('Player', new mongoose.Schema({
     goals: { type: Number, default: 0 },
     assists: { type: Number, default: 0 },
     saves: { type: Number, default: 0 },
+    tackles: { type: Number, default: 0 },
     mvps: { type: Number, default: 0 },
     position: { type: String, default: "FWD" },
     rank: { type: String, enum: ['C', 'B', 'A', 'S', 'SS'], default: 'C' },
@@ -2656,34 +2657,66 @@ app.post('/admin/delete-match', async (req, res) => {
 // Fixed 7-slot formation (GK + 2 DEF + 2 MID + 2 FWD) used to place
 // lineup cards on the pitch graphic. Team A attacks downward (their own
 // goal sits near the top of the pitch), Team B is the mirror image.
-const LINEUP_SLOTS = ['gk', 'def1', 'def2', 'mid1', 'mid2', 'fwd1', 'fwd2'];
+// 7v7 formation (matches pitch UI):
+//        CF
+//     LF    RF
+//        CM
+//     LB    RB
+//        GK
+const LINEUP_SLOTS = ['gk', 'lb', 'rb', 'cm', 'lf', 'rf', 'cf'];
 
 const LINEUP_SLOT_COORDS = {
+    // Team A defends top, attacks toward bottom of pitch graphic
     A: {
-        gk:   { x: 50, y: 8 },
-        def1: { x: 18, y: 20 },
-        def2: { x: 82, y: 20 },
-        mid1: { x: 40, y: 32 },
-        mid2: { x: 60, y: 32 },
-        fwd1: { x: 20, y: 44 },
-        fwd2: { x: 80, y: 44 }
+        gk: { x: 50, y: 10 },
+        lb: { x: 22, y: 28 },
+        rb: { x: 78, y: 28 },
+        cm: { x: 50, y: 42 },
+        lf: { x: 22, y: 58 },
+        rf: { x: 78, y: 58 },
+        cf: { x: 50, y: 72 }
     },
+    // Team B mirrors (defends bottom)
     B: {
-        gk:   { x: 50, y: 92 },
-        def1: { x: 18, y: 80 },
-        def2: { x: 82, y: 80 },
-        mid1: { x: 40, y: 68 },
-        mid2: { x: 60, y: 68 },
-        fwd1: { x: 20, y: 56 },
-        fwd2: { x: 80, y: 56 }
+        gk: { x: 50, y: 90 },
+        lb: { x: 78, y: 72 },
+        rb: { x: 22, y: 72 },
+        cm: { x: 50, y: 58 },
+        lf: { x: 78, y: 42 },
+        rf: { x: 22, y: 42 },
+        cf: { x: 50, y: 28 }
     }
 };
 
 function lineupSlotGroup(slot) {
-    if (slot === 'gk') return 'GK';
-    if (slot.startsWith('def')) return 'DEF';
-    if (slot.startsWith('mid')) return 'MID';
-    return 'FWD';
+    const s = String(slot || '').toLowerCase();
+    if (s === 'gk') return 'GK';
+    if (s === 'lb' || s === 'rb') return s.toUpperCase();
+    if (s === 'cm') return 'CM';
+    if (s === 'lf' || s === 'rf' || s === 'cf') return s.toUpperCase();
+    return s.toUpperCase() || 'POS';
+}
+
+function toYoutubeEmbed(url) {
+    if (!url || typeof url !== 'string') return '';
+    const u = url.trim();
+    if (!u) return '';
+    // Already embed
+    if (u.includes('youtube.com/embed/')) return u.split('&')[0];
+    let id = '';
+    const m1 = u.match(/[?&]v=([a-zA-Z0-9_-]{6,})/);
+    const m2 = u.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/);
+    const m3 = u.match(/youtube\.com\/live\/([a-zA-Z0-9_-]{6,})/);
+    const m4 = u.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,})/);
+    const m5 = u.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{6,})/);
+    if (m1) id = m1[1];
+    else if (m2) id = m2[1];
+    else if (m3) id = m3[1];
+    else if (m4) id = m4[1];
+    else if (m5) id = m5[1];
+    if (id) return 'https://www.youtube.com/embed/' + id;
+    // non-youtube: return as-is (iframe may still work for some hosts)
+    return u;
 }
 
 // Turns the 7 raw "lineup{side}_{slot}" / "_number" / "_rating" form
@@ -2863,14 +2896,68 @@ app.post('/admin/update-match-details', async (req, res) => {
         const lineupPlayersA = buildLineupPlayers('A', req.body, playerMap);
         const lineupPlayersB = buildLineupPlayers('B', req.body, playerMap);
 
-        existingMatch.status =
-            req.body.matchStatus ||
-            existingMatch.status ||
-            'completed';
+        // Saving a full match report marks the fixture completed so it
+        // appears under Results even if the scheduled date is still future.
+        const requestedStatus = (req.body.matchStatus || '').toString().toLowerCase();
+        if (requestedStatus === 'live') {
+            existingMatch.status = 'live';
+            existingMatch.isLive = true;
+        } else {
+            existingMatch.status = 'completed';
+            existingMatch.isLive = false;
+            existingMatch.completed = true;
+        }
 
-        // Attach leg number onto valid players when present
-        const withLegA = validTeamAPlayers;
-        const withLegB = validTeamBPlayers;
+        // Auto-sum player leg stats → team totals (admin no longer needs to type them)
+        let sumGoalsA = 0, sumGoalsB = 0, sumAssistsA = 0, sumAssistsB = 0;
+        let sumSavesA = 0, sumSavesB = 0, sumTacklesA = 0, sumTacklesB = 0;
+        Object.keys(legStats).forEach(leg => {
+            (legStats[leg].teamA || []).forEach(p => {
+                sumGoalsA += Number(p.goals) || 0;
+                sumAssistsA += Number(p.assists) || 0;
+                sumSavesA += Number(p.saves) || 0;
+                sumTacklesA += Number(p.tackles) || 0;
+            });
+            (legStats[leg].teamB || []).forEach(p => {
+                sumGoalsB += Number(p.goals) || 0;
+                sumAssistsB += Number(p.assists) || 0;
+                sumSavesB += Number(p.saves) || 0;
+                sumTacklesB += Number(p.tackles) || 0;
+            });
+        });
+        // Fallback to legacy lists if no leg rows
+        if (!Object.keys(legStats).length) {
+            validTeamAPlayers.forEach(p => {
+                sumGoalsA += Number(p.goals) || (String(p.type||'').toLowerCase().includes('goal') ? Number(p.value)||0 : 0);
+                sumAssistsA += Number(p.assists) || 0;
+                sumSavesA += Number(p.saves) || 0;
+                sumTacklesA += Number(p.tackles) || 0;
+            });
+            validTeamBPlayers.forEach(p => {
+                sumGoalsB += Number(p.goals) || (String(p.type||'').toLowerCase().includes('goal') ? Number(p.value)||0 : 0);
+                sumAssistsB += Number(p.assists) || 0;
+                sumSavesB += Number(p.saves) || 0;
+                sumTacklesB += Number(p.tackles) || 0;
+            });
+        }
+
+        // Possession from share of non-zero contribution, or 50-50
+        const touchA = sumGoalsA + sumAssistsA + sumTacklesA + sumSavesA;
+        const touchB = sumGoalsB + sumAssistsB + sumTacklesB + sumSavesB;
+        let possessionA = 50, possessionB = 50;
+        if (touchA + touchB > 0) {
+            possessionA = Math.round((touchA / (touchA + touchB)) * 100);
+            possessionB = 100 - possessionA;
+        }
+
+        const highlightsRaw = (req.body.highlights || req.body.videoUrl || '').toString().trim();
+        const highlightsEmbed = toYoutubeEmbed(highlightsRaw);
+
+        // Per-leg goal sums for score pills
+        const leg1GoalsA = ((legStats['1'] && legStats['1'].teamA) || []).reduce((s,p)=>s+(Number(p.goals)||0),0);
+        const leg1GoalsB = ((legStats['1'] && legStats['1'].teamB) || []).reduce((s,p)=>s+(Number(p.goals)||0),0);
+        const leg2GoalsA = ((legStats['2'] && legStats['2'].teamA) || []).reduce((s,p)=>s+(Number(p.goals)||0),0);
+        const leg2GoalsB = ((legStats['2'] && legStats['2'].teamB) || []).reduce((s,p)=>s+(Number(p.goals)||0),0);
 
         existingMatch.details = {
 
@@ -2878,9 +2965,26 @@ app.post('/admin/update-match-details', async (req, res) => {
 
             ...req.body,
 
-            teamAPlayers: withLegA,
+            goalsA: sumGoalsA,
+            goalsB: sumGoalsB,
+            assistsA: sumAssistsA,
+            assistsB: sumAssistsB,
+            savesA: sumSavesA,
+            savesB: sumSavesB,
+            tacklesA: sumTacklesA,
+            tacklesB: sumTacklesB,
+            possessionA,
+            possessionB,
+            leg1GoalsA,
+            leg1GoalsB,
+            leg2GoalsA,
+            leg2GoalsB,
 
-            teamBPlayers: withLegB,
+            highlights: highlightsEmbed || highlightsRaw,
+            videoUrl: highlightsEmbed || highlightsRaw,
+
+            teamAPlayers: validTeamAPlayers,
+            teamBPlayers: validTeamBPlayers,
 
             legStats,
 
@@ -2892,12 +2996,62 @@ app.post('/admin/update-match-details', async (req, res) => {
             leg3TeamBPlayers: (legStats['3'] && legStats['3'].teamB) || [],
 
             lineupPlayersA,
+            lineupPlayersB,
 
-            lineupPlayersB
-
+            status: existingMatch.status
         };
 
         await existingMatch.save();
+
+        // Apply match stats onto player career totals (metrics / profile)
+        // Only increments when this report is saved as completed.
+        if (existingMatch.status === 'completed') {
+            const bump = {}; // name -> {goals, assists, saves, tackles, mvp}
+            const addBump = (name, g, a, s, t) => {
+                if (!name) return;
+                if (!bump[name]) bump[name] = { goals: 0, assists: 0, saves: 0, tackles: 0 };
+                bump[name].goals += Number(g) || 0;
+                bump[name].assists += Number(a) || 0;
+                bump[name].saves += Number(s) || 0;
+                bump[name].tackles += Number(t) || 0;
+            };
+            Object.keys(legStats).forEach(leg => {
+                (legStats[leg].teamA || []).forEach(p => addBump(p.name, p.goals, p.assists, p.saves, p.tackles));
+                (legStats[leg].teamB || []).forEach(p => addBump(p.name, p.goals, p.assists, p.saves, p.tackles));
+            });
+            // If re-saving the same match would double-count, track applied delta on the match.
+            const prevApplied = (existingMatch.details && existingMatch.details._statsApplied) || {};
+            for (const name of Object.keys(bump)) {
+                const next = bump[name];
+                const prev = prevApplied[name] || { goals: 0, assists: 0, saves: 0, tackles: 0 };
+                const dg = next.goals - (Number(prev.goals) || 0);
+                const da = next.assists - (Number(prev.assists) || 0);
+                const ds = next.saves - (Number(prev.saves) || 0);
+                const dt = next.tackles - (Number(prev.tackles) || 0);
+                if (dg === 0 && da === 0 && ds === 0 && dt === 0) continue;
+                const inc = {};
+                if (dg) inc.goals = dg;
+                if (da) inc.assists = da;
+                if (ds) inc.saves = ds;
+                if (dt) inc.tackles = dt;
+                try {
+                    await Player.updateOne({ name, verified: true }, { $inc: inc });
+                } catch (e) {
+                    console.error('stat bump', name, e.message);
+                }
+            }
+            // MVP bump once
+            const mvpName = (req.body.mvpName || '').toString().trim();
+            if (mvpName && !existingMatch.details._mvpApplied) {
+                try {
+                    await Player.updateOne({ name: mvpName, verified: true }, { $inc: { mvps: 1 } });
+                    existingMatch.details._mvpApplied = mvpName;
+                } catch (e) {}
+            }
+            existingMatch.details._statsApplied = bump;
+            existingMatch.markModified('details');
+            await existingMatch.save();
+        }
 
         res.redirect('/admin');
 

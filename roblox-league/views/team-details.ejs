@@ -1,77 +1,289 @@
 <%- include('partials/navbar') %>
 
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-    body { background-color: #030303; color: #fff; font-family: 'Inter', sans-serif; }
-    
-    .glass-panel { 
-        background: rgba(255, 255, 255, 0.02);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 2.5rem;
-    }
+:root {
+  --td-paper: #f4f1e9;
+  --td-ink: #0f2f2f;
+  --td-ink-deep: #073536;
+  --td-teal: #07595a;
+  --td-coral: #e87a64;
+  --td-muted: #6d7f7a;
+  --td-line: rgba(15,47,47,.1);
+  --td-display: "DM Serif Display", Georgia, serif;
+  --td-body: "Manrope", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--td-body); }
+
+.td-page {
+  min-height: 100vh;
+  color: var(--td-ink);
+  background:
+    radial-gradient(ellipse 50% 35% at 10% 0%, rgba(232,122,100,.11), transparent 50%),
+    radial-gradient(ellipse 45% 30% at 90% 10%, rgba(7,89,90,.09), transparent 48%),
+    var(--td-paper);
+  padding: 5.5rem 0 4rem;
+}
+.td-wrap { width: min(1000px, calc(100% - 1.75rem)); margin: 0 auto; }
+
+.td-back {
+  display: inline-flex; align-items: center; gap: .4rem;
+  margin-bottom: 1.5rem;
+  font-size: .62rem; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; text-decoration: none; color: var(--td-teal);
+  transition: gap .2s;
+}
+.td-back:hover { gap: .65rem; }
+
+.td-hero {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem;
+  background: #fffdf8;
+  border: 1px solid var(--td-line);
+  border-radius: 1.75rem;
+  padding: 1.5rem 1.6rem;
+  box-shadow: 0 16px 40px rgba(15,47,47,.06);
+  margin-bottom: 1.5rem;
+  animation: tdIn .55s cubic-bezier(.22,1,.36,1) both;
+}
+.td-logo {
+  width: 110px; height: 110px; border-radius: 1.5rem;
+  background: rgba(15,47,47,.04); border: 1px solid var(--td-line);
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  flex-shrink: 0;
+}
+.td-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.td-hero h1 {
+  margin: 0;
+  font-family: var(--td-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: .95; color: var(--td-ink-deep);
+  font-style: italic; text-transform: uppercase;
+}
+.td-hero p {
+  margin: .45rem 0 0;
+  font-size: .62rem; font-weight: 800; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--td-muted);
+}
+
+.td-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 280px) 1fr;
+  gap: 1.15rem;
+}
+@media (max-width: 760px) {
+  .td-grid { grid-template-columns: 1fr; }
+}
+
+.td-card {
+  background: #fffdf8;
+  border: 1px solid var(--td-line);
+  border-radius: 1.5rem;
+  padding: 1.25rem 1.3rem;
+  box-shadow: 0 12px 32px rgba(15,47,47,.05);
+  animation: tdIn .55s .08s cubic-bezier(.22,1,.36,1) both;
+}
+.td-card h3 {
+  margin: 0 0 1rem;
+  font-size: .58rem; font-weight: 800; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--td-muted);
+}
+
+.td-mgr {
+  text-align: center; padding: .5rem 0 .25rem;
+}
+.td-mgr .label {
+  font-size: .55rem; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--td-teal); margin-bottom: .65rem;
+}
+.td-mgr .name {
+  font-family: var(--td-display); font-size: 1.65rem; font-style: italic;
+  color: var(--td-ink-deep); line-height: 1.1;
+}
+.td-mgr .line {
+  width: 36px; height: 3px; border-radius: 999px;
+  background: var(--td-teal); margin: .75rem auto 0;
+}
+
+.td-meta {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem;
+  margin-top: 1.15rem; padding-top: 1rem; border-top: 1px solid var(--td-line);
+}
+.td-meta div {
+  text-align: center; padding: .55rem .35rem;
+  background: rgba(15,47,47,.03); border-radius: .85rem;
+}
+.td-meta span {
+  display: block; font-size: .5rem; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--td-muted);
+}
+.td-meta strong {
+  display: block; margin-top: .2rem;
+  font-family: var(--td-display); font-size: 1.25rem; color: var(--td-ink-deep);
+}
+
+.td-roster-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: .75rem; margin-bottom: 1rem;
+}
+.td-roster-head h3 { margin: 0; }
+.td-count {
+  font-size: .55rem; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--td-muted);
+  padding: .3rem .6rem; border-radius: 999px;
+  background: rgba(15,47,47,.05);
+}
+
+.td-players {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .65rem;
+}
+
+.td-player {
+  display: flex; align-items: center; gap: .7rem;
+  padding: .75rem .85rem;
+  border-radius: 1rem;
+  border: 1px solid var(--td-line);
+  background: rgba(255,255,255,.55);
+  transition: transform .2s ease, border-color .2s, box-shadow .2s;
+}
+.td-player:hover {
+  transform: translateY(-2px);
+  border-color: rgba(7,89,90,.25);
+  box-shadow: 0 10px 24px rgba(15,47,47,.06);
+}
+.td-player-av {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(15,47,47,.06); border: 1px solid var(--td-line);
+  display: grid; place-items: center;
+  font-size: .85rem; font-weight: 900; color: var(--td-teal);
+  overflow: hidden; flex-shrink: 0;
+}
+.td-player-av img { width: 100%; height: 100%; object-fit: cover; }
+.td-player-info { min-width: 0; }
+.td-player-name {
+  font-size: .82rem; font-weight: 800; text-transform: uppercase;
+  color: var(--td-ink-deep); letter-spacing: -.01em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.td-player-meta {
+  font-size: .58rem; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--td-muted); margin-top: .15rem;
+}
+.td-player-tags {
+  display: flex; flex-wrap: wrap; gap: .25rem; margin-top: .35rem;
+}
+.td-tag {
+  font-size: .5rem; font-weight: 800; letter-spacing: .06em;
+  text-transform: uppercase; padding: .2rem .4rem; border-radius: .4rem;
+  background: rgba(7,89,90,.1); color: var(--td-teal);
+}
+.td-tag.mgr { background: rgba(232,122,100,.15); color: #c45a48; }
+.td-tag.rank-ss { background: linear-gradient(135deg, #ec4899, #a855f7); color: #fff; }
+.td-tag.rank-s { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; }
+.td-tag.rank-a { background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: #fff; }
+.td-tag.rank-b { background: rgba(16,185,129,.15); color: #047857; }
+.td-tag.rank-c { background: rgba(15,47,47,.08); color: var(--td-muted); }
+
+.td-empty {
+  padding: 2rem; text-align: center;
+  font-size: .72rem; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--td-muted);
+}
+
+@keyframes tdIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
 </style>
 
-<main class="max-w-6xl mx-auto px-10 py-24 text-white min-h-screen">
-    <a href="/metrics" class="inline-flex items-center gap-2 text-blue-500 text-[10px] font-black uppercase tracking-[0.4em] mb-16 hover:opacity-70 transition-all">
-        <span class="text-lg">←</span> Return to Metrics
-    </a>
-    
-    <div class="flex flex-col md:flex-row items-center gap-12 mb-24">
-        <div class="relative group">
-            <div class="absolute -inset-1 bg-blue-600 rounded-full blur opacity-10 group-hover:opacity-30 transition duration-1000"></div>
-            <img src="<%= team.logo %>" class="relative w-48 h-48 object-contain drop-shadow-[0_0_30px_rgba(59,130,246,0.2)]">
-        </div>
-        
-        <div class="text-center md:text-left">
-            <h1 class="text-6xl md:text-8xl font-black italic uppercase tracking-tighter leading-none mb-4">
-                <%= team.name %>
-            </h1>
-            <p class="opacity-40 uppercase tracking-[0.5em] text-[10px] font-bold text-blue-500">
-                <%= group.name %> • Official Club Roster
-            </p>
-        </div>
+<div class="td-page">
+  <div class="td-wrap">
+
+    <a class="td-back" href="/metrics">← Back to metrics</a>
+
+    <div class="td-hero">
+      <div class="td-logo">
+        <img src="<%= team.logo %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/160/f4f1e9/07595a?text=FC'" alt="<%= team.name %>">
+      </div>
+      <div>
+        <h1><%= team.name %></h1>
+        <p><%= group.name %> · Official club roster</p>
+      </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="glass-panel p-10 flex flex-col items-center justify-center text-center border-blue-500/20">
-            <h3 class="text-blue-500 text-[10px] font-black uppercase mb-8 tracking-[0.4em] opacity-60">Team Manager</h3>
-            <% const manager = (team.roster || []).find(p => p.isManager); %>
-            <div class="relative">
-                <p class="text-4xl font-black uppercase italic tracking-tighter">
-                    <%= manager ? manager.name : 'Vacant' %>
-                </p>
-                <div class="h-1 w-12 bg-blue-600 mx-auto mt-4 rounded-full"></div>
-            </div>
+    <%
+      const roster = team.roster || [];
+      const manager = roster.find(p => p.isManager || p.role === 'manager');
+      const playersOnly = roster.filter(p => !p.isManager && p.role !== 'manager');
+      // Include manager in roster display too, marked
+      const displayList = roster.length ? roster : [];
+    %>
+
+    <div class="td-grid">
+      <aside class="td-card">
+        <h3>Club desk</h3>
+        <div class="td-mgr">
+          <div class="label">Team manager</div>
+          <div class="name"><%= manager ? manager.name : 'Vacant' %></div>
+          <div class="line"></div>
+        </div>
+        <div class="td-meta">
+          <div>
+            <span>MP</span>
+            <strong><%= team.mp || 0 %></strong>
+          </div>
+          <div>
+            <span>W – L</span>
+            <strong style="font-size:1.05rem"><%= team.wins || 0 %>–<%= team.loses || 0 %></strong>
+          </div>
+          <div>
+            <span>Pts</span>
+            <strong><%= team.pts || 0 %></strong>
+          </div>
+        </div>
+      </aside>
+
+      <section class="td-card">
+        <div class="td-roster-head">
+          <h3>Active squad</h3>
+          <span class="td-count"><%= displayList.length %> member<%= displayList.length === 1 ? '' : 's' %></span>
         </div>
 
-        <div class="glass-panel p-10 md:col-span-2">
-            <div class="flex justify-between items-center mb-10">
-                <h3 class="text-blue-500 text-[10px] font-black uppercase tracking-[0.4em] opacity-60">Active Squad</h3>
-                <span class="text-[10px] opacity-30 font-bold uppercase"><%= (team.roster || []).length %> Members</span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <% 
-                   const playersOnly = (team.roster || []).filter(p => !p.isManager); 
-                   if(playersOnly.length > 0) {
-                       playersOnly.forEach(player => { 
-                %>
-                    <div class="flex justify-between items-center p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-blue-500/40 transition-all group">
-                        <div class="flex items-center gap-4">
-                            <div class="w-1 h-8 bg-blue-600/20 group-hover:bg-blue-600 transition-colors rounded-full"></div>
-                            <span class="text-lg font-black uppercase italic tracking-tight group-hover:translate-x-1 transition-transform">
-                                <%= player.name %>
-                            </span>
-                        </div>
-                    </div>
-                <%     }); 
-                   } else { %>
-                    <div class="col-span-2 py-10 text-center opacity-20 italic uppercase tracking-widest text-sm">
-                        No active players found
-                    </div>
-                <% } %>
-            </div>
-        </div>
+        <% if (displayList.length > 0) { %>
+          <div class="td-players">
+            <% displayList.forEach(player => {
+              const isMgr = player.isManager || player.role === 'manager';
+              const rank = String(player.rank || player.class || '').toUpperCase();
+              const rankCls = rank === 'SS' ? 'rank-ss' : (rank === 'S' ? 'rank-s' : (rank === 'A' ? 'rank-a' : (rank === 'B' ? 'rank-b' : (rank === 'C' ? 'rank-c' : ''))));
+              const pos = player.position || player.pos || '';
+              const img = player.image || player.cardImage || player.photo || '';
+            %>
+              <div class="td-player">
+                <div class="td-player-av">
+                  <% if (img) { %>
+                    <img src="<%= img %>" alt="">
+                  <% } else { %>
+                    <%= (player.name || '?').charAt(0) %>
+                  <% } %>
+                </div>
+                <div class="td-player-info">
+                  <div class="td-player-name"><%= player.name || 'Unknown' %></div>
+                  <div class="td-player-meta"><%= pos || (isMgr ? 'Manager' : 'Player') %></div>
+                  <div class="td-player-tags">
+                    <% if (isMgr) { %><span class="td-tag mgr">Manager</span><% } %>
+                    <% if (rank) { %><span class="td-tag <%= rankCls %>"><%= rank %></span><% } %>
+                    <% if (player.soldPrice) { %><span class="td-tag"><%= Number(player.soldPrice).toLocaleString() %> V</span><% } %>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="td-empty">No active players on this roster</div>
+        <% } %>
+      </section>
     </div>
-</main>
+
+  </div>
+</div>

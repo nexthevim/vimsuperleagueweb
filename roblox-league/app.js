@@ -2422,6 +2422,38 @@ app.post('/admin/live', async (req, res) => {
     }
 });
 
+
+// Resolve club crest from Metrics (Group.teams) or AuctionTeam roster logos
+// so admins don't re-upload the same logo on every match.
+async function resolveTeamLogo(teamName, fallback) {
+    if (fallback && String(fallback).trim()) return String(fallback).trim();
+    const name = String(teamName || '').trim();
+    if (!name) return '';
+    const lower = name.toLowerCase();
+    try {
+        const groups = await Group.find().lean();
+        for (const g of groups || []) {
+            for (const t of (g.teams || [])) {
+                if (String(t.name || '').trim().toLowerCase() === lower && t.logo) {
+                    return t.logo;
+                }
+            }
+        }
+    } catch (e) {
+        console.error('resolveTeamLogo groups:', e.message);
+    }
+    try {
+        const at = await AuctionTeam.findOne({
+            name: { $regex: new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i') }
+        }).select('logo').lean();
+        if (at && at.logo) return at.logo;
+    } catch (e) {
+        console.error('resolveTeamLogo auction:', e.message);
+    }
+    return '';
+}
+
+
 // ADD MATCH
 
 app.post('/admin/add-match', async (req, res) => {
@@ -2435,15 +2467,20 @@ app.post('/admin/add-match', async (req, res) => {
                 req.body.scheduledAt
             );
 
+        const teamAName = req.body.teamA || "";
+        const teamBName = req.body.teamB || "";
+        const logoA = await resolveTeamLogo(teamAName, req.body.logoA);
+        const logoB = await resolveTeamLogo(teamBName, req.body.logoB);
+
         await Match.create({
 
-            teamA: req.body.teamA || "",
+            teamA: teamAName,
 
-            teamB: req.body.teamB || "",
+            teamB: teamBName,
 
-            logoA: req.body.logoA || "",
+            logoA,
 
-            logoB: req.body.logoB || "",
+            logoB,
 
             time:
                 req.body.time ||
@@ -2494,21 +2531,22 @@ app.post('/admin/update-match', async (req, res) => {
                 req.body.scheduledAt
             );
 
+        const teamAName = req.body.teamA || "";
+        const teamBName = req.body.teamB || "";
+        const logoA = await resolveTeamLogo(teamAName, req.body.logoA);
+        const logoB = await resolveTeamLogo(teamBName, req.body.logoB);
+
         await Match.findByIdAndUpdate(
             req.body.matchId,
             {
 
-                teamA:
-                    req.body.teamA || "",
+                teamA: teamAName,
 
-                teamB:
-                    req.body.teamB || "",
+                teamB: teamBName,
 
-                logoA:
-                    req.body.logoA || "",
+                logoA,
 
-                logoB:
-                    req.body.logoB || "",
+                logoB,
 
                 time:
                     req.body.time ||

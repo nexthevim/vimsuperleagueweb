@@ -22,17 +22,19 @@ body { margin: 0; font-family: var(--ms-body); }
   min-height: 100vh;
   color: var(--ms-ink);
   background:
-    radial-gradient(ellipse 60% 40% at 10% 0%, rgba(232,122,100,.12), transparent 50%),
-    radial-gradient(ellipse 50% 35% at 90% 10%, rgba(7,89,90,.1), transparent 48%),
+    radial-gradient(ellipse 60% 40% at 8% 0%, rgba(232,122,100,.13), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 92% 8%, rgba(7,89,90,.1), transparent 48%),
+    radial-gradient(ellipse 40% 25% at 50% 100%, rgba(7,89,90,.05), transparent 50%),
     var(--ms-paper);
-  padding: 5.5rem 0 4rem;
+  padding: 5.5rem 0 4.5rem;
+  overflow-x: hidden;
 }
-.ms-wrap { width: min(1100px, calc(100% - 1.75rem)); margin: 0 auto; }
+.ms-wrap { width: min(1120px, calc(100% - 1.75rem)); margin: 0 auto; }
 
 .ms-hero {
   text-align: center;
-  margin-bottom: 2rem;
-  animation: msIn .55s cubic-bezier(.22,1,.36,1) both;
+  margin-bottom: 1.75rem;
+  animation: msRise .6s cubic-bezier(.22,1,.36,1) both;
 }
 .ms-hero .eyebrow {
   display: inline-flex; align-items: center; gap: .5rem;
@@ -40,158 +42,200 @@ body { margin: 0; font-family: var(--ms-body); }
   text-transform: uppercase; color: var(--ms-coral);
 }
 .ms-hero .eyebrow::before {
-  content: ""; width: 16px; height: 2px; background: currentColor;
+  content: ""; width: 16px; height: 2px; background: currentColor; border-radius: 2px;
 }
 .ms-hero h1 {
-  margin: .4rem 0 .3rem;
+  margin: .45rem 0 .35rem;
   font-family: var(--ms-display);
-  font-size: clamp(2.8rem, 6vw, 4rem);
-  line-height: .92; color: var(--ms-ink-deep);
+  font-size: clamp(2.8rem, 6vw, 4.1rem);
+  line-height: .9; color: var(--ms-ink-deep);
 }
 .ms-hero h1 em { font-style: italic; color: var(--ms-teal); }
-.ms-hero p {
-  margin: 0; color: var(--ms-muted); font-size: .85rem;
-}
+.ms-hero p { margin: 0; color: var(--ms-muted); font-size: .88rem; }
 
 .ms-tabs {
   display: flex; flex-wrap: wrap; gap: .35rem;
   padding: .4rem; margin-bottom: 1.75rem;
-  background: rgba(255,253,248,.9);
+  background: rgba(255,253,248,.92);
   border: 1px solid var(--ms-line);
   border-radius: 999px;
-  box-shadow: 0 10px 30px rgba(15,47,47,.05);
-  animation: msIn .55s .08s cubic-bezier(.22,1,.36,1) both;
+  box-shadow: 0 12px 32px rgba(15,47,47,.05);
+  animation: msRise .6s .06s cubic-bezier(.22,1,.36,1) both;
 }
 .ms-tabs button {
-  flex: 1; min-width: 100px; border: 0; border-radius: 999px;
-  padding: .7rem 1rem; cursor: pointer;
+  flex: 1; min-width: 96px; border: 0; border-radius: 999px;
+  padding: .72rem 1rem; cursor: pointer;
   font-family: inherit; font-size: .62rem; font-weight: 800;
   letter-spacing: .08em; text-transform: uppercase;
   background: transparent; color: var(--ms-muted);
-  transition: .2s ease;
+  transition: transform .2s ease, background .2s, color .2s, box-shadow .2s;
 }
-.ms-tabs button:hover { color: var(--ms-ink); }
+.ms-tabs button:hover { color: var(--ms-ink); transform: translateY(-1px); }
 .ms-tabs button.active {
   background: var(--ms-ink-deep); color: #fff;
-  box-shadow: 0 6px 16px rgba(15,47,47,.18);
+  box-shadow: 0 8px 18px rgba(15,47,47,.18);
 }
 .ms-tabs button .dot {
-  display: inline-block; width: 6px; height: 6px;
-  border-radius: 50%; background: #ef4444; margin-left: .35rem;
-  animation: msPulse 1.2s ease infinite;
-}
-@keyframes msPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: .5; transform: scale(.85); }
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: #ef4444; margin-left: .35rem;
+  animation: msPulse 1.15s ease infinite;
 }
 
-.ms-section { margin-bottom: 2rem; }
+.ms-section { margin-bottom: 2.25rem; }
 .ms-section-title {
-  display: flex; align-items: center; gap: .5rem;
+  display: flex; align-items: center; gap: .55rem;
   margin: 0 0 1rem;
   font-size: .62rem; font-weight: 800; letter-spacing: .14em;
   text-transform: uppercase; color: var(--ms-muted);
 }
 .ms-section-title .live-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: #ef4444; animation: msPulse 1.2s ease infinite;
+  width: 8px; height: 8px; border-radius: 50%; background: #ef4444;
+  animation: msPulse 1.15s ease infinite;
 }
 
 .ms-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 1.1rem;
 }
 
-/* Match card */
 .ms-card {
   display: block; text-decoration: none; color: inherit;
+  position: relative;
   background: #fffdf8;
   border: 1px solid var(--ms-line);
-  border-radius: 1.5rem;
-  padding: 1.15rem 1.2rem 1.25rem;
-  box-shadow: 0 12px 32px rgba(15,47,47,.05);
-  transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s ease, border-color .2s;
-  animation: msIn .5s cubic-bezier(.22,1,.36,1) both;
+  border-radius: 1.55rem;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 14px 36px rgba(15,47,47,.055);
+  transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s ease, border-color .25s;
+  animation: msRise .55s cubic-bezier(.22,1,.36,1) both;
+}
+.ms-card::before {
+  content: "";
+  position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(180deg, var(--ms-teal), var(--ms-coral));
+  opacity: 0; transition: opacity .25s;
 }
 .ms-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(7,89,90,.25);
-  box-shadow: 0 20px 44px rgba(15,47,47,.1);
+  transform: translateY(-5px) scale(1.01);
+  border-color: rgba(7,89,90,.28);
+  box-shadow: 0 24px 50px rgba(15,47,47,.12);
 }
+.ms-card:hover::before { opacity: 1; }
+
+.ms-card-inner { padding: 1.15rem 1.25rem 1.2rem; }
+
 .ms-card-top {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: .9rem; padding-bottom: .7rem;
-  border-bottom: 1px solid var(--ms-line);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: .5rem; margin-bottom: .95rem;
 }
 .ms-badge {
   font-size: .55rem; font-weight: 800; letter-spacing: .1em;
-  text-transform: uppercase; padding: .3rem .65rem; border-radius: 999px;
+  text-transform: uppercase; padding: .32rem .7rem; border-radius: 999px;
 }
-.ms-badge.live { background: #fef2f2; color: #dc2626; }
+.ms-badge.live { background: #fef2f2; color: #dc2626; box-shadow: 0 0 0 1px rgba(220,38,38,.15); }
 .ms-badge.up { background: #ecfdf5; color: #059669; }
-.ms-badge.done { background: rgba(15,47,47,.06); color: var(--ms-muted); }
+.ms-badge.done { background: rgba(15,47,47,.07); color: var(--ms-muted); }
+
+.ms-tags { display: flex; flex-wrap: wrap; gap: .3rem; justify-content: flex-end; }
+.ms-tag {
+  font-size: .52rem; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; padding: .28rem .55rem; border-radius: 999px;
+  background: rgba(7,89,90,.1); color: var(--ms-teal);
+  border: 1px solid rgba(7,89,90,.12);
+}
+.ms-tag.preseason { background: rgba(232,122,100,.14); color: #c45a48; border-color: rgba(232,122,100,.25); }
+.ms-tag.friendly { background: rgba(59,130,246,.1); color: #2563eb; }
+.ms-tag.final { background: rgba(168,85,247,.12); color: #7c3aed; }
 
 .ms-teams {
   display: grid; grid-template-columns: 1fr auto 1fr;
-  gap: .75rem; align-items: center;
+  gap: .65rem; align-items: center;
 }
-.ms-team {
-  text-align: center; min-width: 0;
+.ms-team { text-align: center; min-width: 0; }
+.ms-team-logo {
+  width: 56px; height: 56px; margin: 0 auto .45rem;
+  border-radius: 1rem;
+  background: rgba(15,47,47,.04);
+  border: 1px solid var(--ms-line);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s;
 }
-.ms-team img {
-  width: 52px; height: 52px; object-fit: contain; margin: 0 auto .4rem;
-  display: block; filter: drop-shadow(0 4px 8px rgba(0,0,0,.08));
-  transition: transform .25s ease;
+.ms-card:hover .ms-team-logo {
+  transform: scale(1.08);
+  box-shadow: 0 10px 22px rgba(15,47,47,.1);
 }
-.ms-card:hover .ms-team img { transform: scale(1.06); }
+.ms-team-logo img { width: 40px; height: 40px; object-fit: contain; }
 .ms-team h3 {
-  margin: 0; font-size: .78rem; font-weight: 800;
+  margin: 0; font-size: .8rem; font-weight: 800;
   text-transform: uppercase; letter-spacing: -.01em;
   color: var(--ms-ink-deep); line-height: 1.2;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-
-.ms-scorebox {
-  text-align: center; min-width: 4.5rem;
-}
-.ms-score {
-  display: flex; align-items: center; justify-content: center; gap: .35rem;
-  font-family: var(--ms-display); font-size: 1.75rem; font-weight: 400;
-  color: var(--ms-ink-deep); line-height: 1;
-}
-.ms-score span.sep { color: #cbd5e1; font-size: 1.1rem; }
-.ms-legs {
-  display: flex; flex-direction: column; gap: .2rem; margin-top: .35rem;
-}
-.ms-leg {
-  font-size: .55rem; font-weight: 800; letter-spacing: .06em;
+.ms-team .side {
+  display: block; margin-top: .15rem;
+  font-size: .52rem; font-weight: 700; letter-spacing: .08em;
   text-transform: uppercase; color: var(--ms-muted);
 }
-.ms-time {
-  margin-top: .35rem; font-size: .65rem; font-weight: 800;
-  letter-spacing: .06em; text-transform: uppercase; color: var(--ms-teal);
+
+.ms-scorebox { text-align: center; min-width: 4.8rem; }
+.ms-score {
+  display: flex; align-items: center; justify-content: center; gap: .3rem;
+  font-family: var(--ms-display); font-size: 1.85rem;
+  color: var(--ms-ink-deep); line-height: 1;
+}
+.ms-score .sep { color: #cbd5e1; font-size: 1.15rem; }
+.ms-legs { display: flex; flex-direction: column; gap: .15rem; margin-top: .4rem; }
+.ms-leg {
+  font-size: .55rem; font-weight: 800; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--ms-muted);
+}
+.ms-kickoff {
+  margin-top: .35rem;
+  font-size: .72rem; font-weight: 800; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--ms-teal);
+}
+.ms-kickoff small {
+  display: block; margin-top: .15rem;
+  font-size: .55rem; font-weight: 700; color: var(--ms-muted);
 }
 
-/* Spotlight */
+.ms-card-foot {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: .4rem; margin-top: 1rem; padding-top: .75rem;
+  border-top: 1px solid var(--ms-line);
+}
+.ms-meta {
+  font-size: .58rem; font-weight: 700; color: var(--ms-muted);
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.ms-go {
+  font-size: .58rem; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ms-teal);
+  display: inline-flex; align-items: center; gap: .25rem;
+  transition: gap .2s ease;
+}
+.ms-card:hover .ms-go { gap: .45rem; }
+
 .ms-spot {
-  margin-bottom: 1.75rem;
-  animation: msIn .55s .12s cubic-bezier(.22,1,.36,1) both;
+  margin-bottom: 1.85rem;
+  animation: msRise .6s .1s cubic-bezier(.22,1,.36,1) both;
 }
 .ms-spot a {
   display: block; text-decoration: none; color: inherit;
   background: linear-gradient(135deg, #0f2f2f 0%, #07595a 55%, #0a6b68 100%);
-  border-radius: 1.75rem; padding: 1.5rem 1.35rem;
-  box-shadow: 0 20px 50px rgba(7,89,90,.25);
-  transition: transform .25s cubic-bezier(.22,1,.36,1);
+  border-radius: 1.75rem; padding: 1.4rem 1.35rem 1.35rem;
+  box-shadow: 0 22px 52px rgba(7,89,90,.28);
+  transition: transform .3s cubic-bezier(.22,1,.36,1);
   position: relative; overflow: hidden;
 }
 .ms-spot a::before {
   content: ""; position: absolute; inset: 0;
-  background: radial-gradient(circle at 80% 20%, rgba(232,122,100,.2), transparent 40%);
+  background: radial-gradient(circle at 85% 15%, rgba(232,122,100,.22), transparent 42%);
   pointer-events: none;
 }
-.ms-spot a:hover { transform: translateY(-3px); }
+.ms-spot a:hover { transform: translateY(-4px) scale(1.005); }
 .ms-spot-inner {
   position: relative; z-index: 1;
   display: grid; grid-template-columns: 1fr auto 1fr;
@@ -200,31 +244,46 @@ body { margin: 0; font-family: var(--ms-body); }
 @media (max-width: 640px) {
   .ms-spot-inner { grid-template-columns: 1fr; text-align: center; }
 }
-.ms-spot .ms-team h3 { color: #fff; font-size: 1rem; }
-.ms-spot .ms-team span { color: rgba(255,255,255,.55); font-size: .6rem; font-weight: 700; text-transform: uppercase; }
-.ms-spot .ms-score { color: #fff; font-size: 2.5rem; }
+.ms-spot .ms-team h3 { color: #fff; font-size: 1.05rem; }
+.ms-spot .ms-team .side { color: rgba(255,255,255,.5); }
+.ms-spot .ms-team-logo { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.15); }
+.ms-spot .ms-score { color: #fff; font-size: 2.6rem; }
 .ms-spot .ms-score .sep { color: rgba(255,255,255,.35); }
+.ms-spot .ms-leg { color: rgba(255,255,255,.65); }
 .ms-spot-live {
   display: inline-flex; align-items: center; gap: .4rem;
   padding: .35rem .75rem; border-radius: 999px;
   background: #ef4444; color: #fff;
   font-size: .55rem; font-weight: 800; letter-spacing: .1em;
-  text-transform: uppercase; margin-bottom: .5rem;
+  text-transform: uppercase; margin-bottom: .45rem;
 }
 .ms-spot-live i {
   width: 6px; height: 6px; border-radius: 50%; background: #fff;
   animation: msPulse 1s ease infinite;
 }
-
-.ms-empty {
-  padding: 2rem; text-align: center;
-  color: var(--ms-muted); font-size: .8rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .08em;
+.ms-spot-tags {
+  display: flex; flex-wrap: wrap; gap: .3rem; justify-content: center;
+  margin-top: .75rem; position: relative; z-index: 1;
+}
+.ms-spot-tags .ms-tag {
+  background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.2);
 }
 
-@keyframes msIn {
-  from { opacity: 0; transform: translateY(16px); }
+.ms-empty {
+  padding: 2.25rem; text-align: center;
+  color: var(--ms-muted); font-size: .78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  background: rgba(255,253,248,.6); border: 1px dashed var(--ms-line);
+  border-radius: 1.25rem;
+}
+
+@keyframes msRise {
+  from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: none; }
+}
+@keyframes msPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .45; transform: scale(.85); }
 }
 </style>
 
@@ -234,7 +293,7 @@ body { margin: 0; font-family: var(--ms-body); }
     <header class="ms-hero">
       <div class="eyebrow">VIM Super League</div>
       <h1>Match <em>Centre</em></h1>
-      <p>Fixtures, live scores & full-time results</p>
+      <p>Fixtures · live scores · full-time results</p>
     </header>
 
     <div class="ms-tabs" role="tablist">
@@ -245,10 +304,17 @@ body { margin: 0; font-family: var(--ms-body); }
     </div>
 
     <%
-      let spotlightMatch = matches ? matches.find(m => m.isToday || m.status === 'live') : null;
-      let liveMatches = matches ? matches.filter(m => m.status === 'live') : [];
-      let upcomingMatches = matches ? matches.filter(m => m.status !== 'completed' && m.status !== 'live') : [];
-      let completedMatches = matches ? matches.filter(m => m.status === 'completed') : [];
+      const list = (typeof matches !== 'undefined' && matches) ? matches : [];
+      function isLiveMatch(m) {
+        return m.status === 'live' || m.isLive === true;
+      }
+      function isDoneMatch(m) {
+        return m.status === 'completed' || m.status === 'finished' || m.status === 'ft';
+      }
+      let spotlightMatch = list.find(m => m.isToday || isLiveMatch(m)) || null;
+      let liveMatches = list.filter(m => isLiveMatch(m));
+      let upcomingMatches = list.filter(m => !isDoneMatch(m) && !isLiveMatch(m));
+      let completedMatches = list.filter(m => isDoneMatch(m));
 
       function legScores(m) {
         const d = m.details || {};
@@ -260,84 +326,139 @@ body { margin: 0; font-family: var(--ms-body); }
         const aggB = parseInt(d.goalsB) || ((l1b != null ? +l1b : 0) + (l2b != null ? +l2b : 0));
         return { l1a, l1b, l2a, l2b, aggA, aggB, hasLegs: l1a != null || l2a != null };
       }
+
+      function parseTags(m) {
+        const raw = (m.tags || (m.details && m.details.tags) || '').toString().trim();
+        if (!raw) return [];
+        return raw.split(/[,|/]+/).map(t => t.trim()).filter(Boolean);
+      }
+
+      function tagClass(t) {
+        const u = String(t).toLowerCase();
+        if (u.indexOf('pre') !== -1) return 'preseason';
+        if (u.indexOf('friend') !== -1) return 'friendly';
+        if (u.indexOf('final') !== -1 || u.indexOf('playoff') !== -1) return 'final';
+        return '';
+      }
+
+      function matchId(m) {
+        return m._id || m.id;
+      }
+
+      function formatWhen(m) {
+        if (m.scheduledAt) {
+          try {
+            const d = new Date(m.scheduledAt);
+            if (!isNaN(d.getTime())) {
+              return d.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+          } catch (e) {}
+        }
+        return m.time || '';
+      }
     %>
 
     <% if (spotlightMatch) {
       const sp = legScores(spotlightMatch);
+      const spTags = parseTags(spotlightMatch);
     %>
     <div class="ms-spot match-section-spotlight">
-      <a href="/match/<%= spotlightMatch.id %>">
+      <a href="/match/<%= matchId(spotlightMatch) %>">
         <div class="ms-spot-inner">
           <div class="ms-team">
-            <img src="<%= spotlightMatch.logoA %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/120/07595a/ffffff?text=A'" alt="">
+            <div class="ms-team-logo">
+              <img src="<%= spotlightMatch.logoA %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/80/07595a/ffffff?text=A'" alt="">
+            </div>
             <h3><%= spotlightMatch.teamA %></h3>
-            <span>Home</span>
+            <span class="side">Home</span>
           </div>
           <div class="ms-scorebox">
-            <% if (spotlightMatch.status === 'live') { %>
+            <% if (isLiveMatch(spotlightMatch)) { %>
               <div class="ms-spot-live"><i></i> Live</div>
             <% } %>
-            <% if (spotlightMatch.status === 'completed' || spotlightMatch.status === 'live') { %>
+            <% if (isDoneMatch(spotlightMatch) || isLiveMatch(spotlightMatch)) { %>
               <div class="ms-score">
                 <span><%= sp.aggA %></span>
                 <span class="sep">–</span>
                 <span><%= sp.aggB %></span>
               </div>
               <% if (sp.hasLegs) { %>
-                <div class="ms-legs" style="color:rgba(255,255,255,.7)">
-                  <% if (sp.l1a != null) { %><div class="ms-leg">L1 <%= sp.l1a %>–<%= sp.l1b %></div><% } %>
-                  <% if (sp.l2a != null) { %><div class="ms-leg">L2 <%= sp.l2a %>–<%= sp.l2b %></div><% } %>
+                <div class="ms-legs">
+                  <% if (sp.l1a != null) { %><div class="ms-leg">Leg 1 · <%= sp.l1a %>–<%= sp.l1b %></div><% } %>
+                  <% if (sp.l2a != null) { %><div class="ms-leg">Leg 2 · <%= sp.l2a %>–<%= sp.l2b %></div><% } %>
                 </div>
               <% } %>
             <% } else { %>
-              <div class="ms-score" style="font-size:1.25rem"><%= spotlightMatch.time || 'TBD' %></div>
-              <div class="ms-leg" style="color:rgba(255,255,255,.6);margin-top:.35rem">Today</div>
+              <div class="ms-score" style="font-size:1.2rem"><%= spotlightMatch.time || 'TBD' %></div>
+              <div class="ms-leg">Today’s fixture</div>
             <% } %>
           </div>
           <div class="ms-team">
-            <img src="<%= spotlightMatch.logoB %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/120/e87a64/ffffff?text=B'" alt="">
+            <div class="ms-team-logo">
+              <img src="<%= spotlightMatch.logoB %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/80/e87a64/ffffff?text=B'" alt="">
+            </div>
             <h3><%= spotlightMatch.teamB %></h3>
-            <span>Away</span>
+            <span class="side">Away</span>
           </div>
         </div>
+        <% if (spTags.length) { %>
+          <div class="ms-spot-tags">
+            <% spTags.forEach(t => { %><span class="ms-tag <%= tagClass(t) %>"><%= t %></span><% }) %>
+          </div>
+        <% } %>
       </a>
     </div>
     <% } %>
 
-    <!-- LIVE -->
     <div id="section-live" class="ms-section match-category-block">
       <% if (liveMatches.length > 0) { %>
         <h2 class="ms-section-title"><span class="live-dot"></span> Live matches</h2>
         <div class="ms-grid">
           <% liveMatches.forEach((m, idx) => {
             const sc = legScores(m);
+            const tags = parseTags(m);
           %>
-            <a href="/match/<%= m.id %>" class="ms-card" style="animation-delay:<%= idx * 0.05 %>s">
-              <div class="ms-card-top">
-                <span class="ms-badge live">Live</span>
-                <span style="font-size:.55rem;font-weight:800;color:var(--ms-muted);letter-spacing:.08em;text-transform:uppercase"><%= m.time || 'In play' %></span>
-              </div>
-              <div class="ms-teams">
-                <div class="ms-team">
-                  <img src="<%= m.logoA %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/100/f1f5f9/475569?text=A'" alt="">
-                  <h3><%= m.teamA %></h3>
-                </div>
-                <div class="ms-scorebox">
-                  <div class="ms-score">
-                    <span><%= sc.aggA %></span>
-                    <span class="sep">–</span>
-                    <span><%= sc.aggB %></span>
+            <a href="/match/<%= matchId(m) %>" class="ms-card" style="animation-delay:<%= (idx * 0.06).toFixed(2) %>s">
+              <div class="ms-card-inner">
+                <div class="ms-card-top">
+                  <span class="ms-badge live">Live</span>
+                  <div class="ms-tags">
+                    <% tags.forEach(t => { %><span class="ms-tag <%= tagClass(t) %>"><%= t %></span><% }) %>
                   </div>
-                  <% if (sc.hasLegs) { %>
-                    <div class="ms-legs">
-                      <% if (sc.l1a != null) { %><div class="ms-leg">L1 <%= sc.l1a %>–<%= sc.l1b %></div><% } %>
-                      <% if (sc.l2a != null) { %><div class="ms-leg">L2 <%= sc.l2a %>–<%= sc.l2b %></div><% } %>
-                    </div>
-                  <% } %>
                 </div>
-                <div class="ms-team">
-                  <img src="<%= m.logoB %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/100/f1f5f9/475569?text=B'" alt="">
-                  <h3><%= m.teamB %></h3>
+                <div class="ms-teams">
+                  <div class="ms-team">
+                    <div class="ms-team-logo">
+                      <img src="<%= m.logoA %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/80/f1f5f9/475569?text=A'" alt="">
+                    </div>
+                    <h3><%= m.teamA %></h3>
+                    <span class="side">Home</span>
+                  </div>
+                  <div class="ms-scorebox">
+                    <div class="ms-score">
+                      <span><%= sc.aggA %></span>
+                      <span class="sep">–</span>
+                      <span><%= sc.aggB %></span>
+                    </div>
+                    <% if (sc.hasLegs) { %>
+                      <div class="ms-legs">
+                        <% if (sc.l1a != null) { %><div class="ms-leg">L1 <%= sc.l1a %>–<%= sc.l1b %></div><% } %>
+                        <% if (sc.l2a != null) { %><div class="ms-leg">L2 <%= sc.l2a %>–<%= sc.l2b %></div><% } %>
+                      </div>
+                    <% } %>
+                    <% if (m.time) { %><div class="ms-kickoff"><%= m.time %></div><% } %>
+                  </div>
+                  <div class="ms-team">
+                    <div class="ms-team-logo">
+                      <img src="<%= m.logoB %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/80/f1f5f9/475569?text=B'" alt="">
+                    </div>
+                    <h3><%= m.teamB %></h3>
+                    <span class="side">Away</span>
+                  </div>
+                </div>
+                <div class="ms-card-foot">
+                  <span class="ms-meta"><%= m.timezone ? m.timezone + ' · ' : '' %>In play</span>
+                  <span class="ms-go">Open match →</span>
                 </div>
               </div>
             </a>
@@ -346,28 +467,49 @@ body { margin: 0; font-family: var(--ms-body); }
       <% } %>
     </div>
 
-    <!-- UPCOMING -->
     <div id="section-upcoming" class="ms-section match-category-block">
       <h2 class="ms-section-title">Upcoming fixtures</h2>
       <% if (upcomingMatches.length > 0) { %>
         <div class="ms-grid">
-          <% upcomingMatches.forEach((m, idx) => { %>
-            <a href="/match/<%= m.id %>" class="ms-card" style="animation-delay:<%= idx * 0.04 %>s">
-              <div class="ms-card-top">
-                <span class="ms-badge up">Scheduled</span>
-                <span style="font-size:.55rem;font-weight:800;color:var(--ms-muted);letter-spacing:.06em">#<%= String(m.id).substring(0,6) %></span>
-              </div>
-              <div class="ms-teams">
-                <div class="ms-team">
-                  <img src="<%= m.logoA %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/100/f1f5f9/475569?text=A'" alt="">
-                  <h3><%= m.teamA %></h3>
+          <% upcomingMatches.forEach((m, idx) => {
+            const tags = parseTags(m);
+            const when = formatWhen(m);
+          %>
+            <a href="/match/<%= matchId(m) %>" class="ms-card" style="animation-delay:<%= (idx * 0.05).toFixed(2) %>s">
+              <div class="ms-card-inner">
+                <div class="ms-card-top">
+                  <span class="ms-badge up">Scheduled</span>
+                  <div class="ms-tags">
+                    <% tags.forEach(t => { %><span class="ms-tag <%= tagClass(t) %>"><%= t %></span><% }) %>
+                  </div>
                 </div>
-                <div class="ms-scorebox">
-                  <div class="ms-time"><%= m.time || 'TBD' %></div>
+                <div class="ms-teams">
+                  <div class="ms-team">
+                    <div class="ms-team-logo">
+                      <img src="<%= m.logoA %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/80/f1f5f9/475569?text=A'" alt="">
+                    </div>
+                    <h3><%= m.teamA %></h3>
+                    <span class="side">Home</span>
+                  </div>
+                  <div class="ms-scorebox">
+                    <div class="ms-kickoff">
+                      <%= m.time || 'TBD' %>
+                      <% if (when && when !== m.time) { %><small><%= when %></small><% } %>
+                    </div>
+                  </div>
+                  <div class="ms-team">
+                    <div class="ms-team-logo">
+                      <img src="<%= m.logoB %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/80/f1f5f9/475569?text=B'" alt="">
+                    </div>
+                    <h3><%= m.teamB %></h3>
+                    <span class="side">Away</span>
+                  </div>
                 </div>
-                <div class="ms-team">
-                  <img src="<%= m.logoB %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/100/f1f5f9/475569?text=B'" alt="">
-                  <h3><%= m.teamB %></h3>
+                <div class="ms-card-foot">
+                  <span class="ms-meta">
+                    <%= m.timezone || '' %><%= m.timezone && tags.length ? ' · ' : '' %><%= tags.length ? tags[0] : 'Fixture' %>
+                  </span>
+                  <span class="ms-go">View details →</span>
                 </div>
               </div>
             </a>
@@ -378,40 +520,54 @@ body { margin: 0; font-family: var(--ms-body); }
       <% } %>
     </div>
 
-    <!-- RESULTS -->
     <div id="section-completed" class="ms-section match-category-block">
       <h2 class="ms-section-title">Results</h2>
       <% if (completedMatches.length > 0) { %>
         <div class="ms-grid">
           <% completedMatches.forEach((m, idx) => {
             const sc = legScores(m);
+            const tags = parseTags(m);
           %>
-            <a href="/match/<%= m.id %>" class="ms-card" style="animation-delay:<%= idx * 0.04 %>s">
-              <div class="ms-card-top">
-                <span class="ms-badge done">Full time</span>
-                <span style="font-size:.55rem;font-weight:800;color:var(--ms-muted);letter-spacing:.08em;text-transform:uppercase">Final</span>
-              </div>
-              <div class="ms-teams">
-                <div class="ms-team">
-                  <img src="<%= m.logoA %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/100/f1f5f9/475569?text=A'" alt="">
-                  <h3><%= m.teamA %></h3>
-                </div>
-                <div class="ms-scorebox">
-                  <div class="ms-score">
-                    <span><%= sc.aggA %></span>
-                    <span class="sep">–</span>
-                    <span><%= sc.aggB %></span>
+            <a href="/match/<%= matchId(m) %>" class="ms-card" style="animation-delay:<%= (idx * 0.05).toFixed(2) %>s">
+              <div class="ms-card-inner">
+                <div class="ms-card-top">
+                  <span class="ms-badge done">Full time</span>
+                  <div class="ms-tags">
+                    <% tags.forEach(t => { %><span class="ms-tag <%= tagClass(t) %>"><%= t %></span><% }) %>
                   </div>
-                  <% if (sc.hasLegs) { %>
-                    <div class="ms-legs">
-                      <% if (sc.l1a != null) { %><div class="ms-leg">Leg 1 · <%= sc.l1a %>–<%= sc.l1b %></div><% } %>
-                      <% if (sc.l2a != null) { %><div class="ms-leg">Leg 2 · <%= sc.l2a %>–<%= sc.l2b %></div><% } %>
-                    </div>
-                  <% } %>
                 </div>
-                <div class="ms-team">
-                  <img src="<%= m.logoB %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/100/f1f5f9/475569?text=B'" alt="">
-                  <h3><%= m.teamB %></h3>
+                <div class="ms-teams">
+                  <div class="ms-team">
+                    <div class="ms-team-logo">
+                      <img src="<%= m.logoA %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/80/f1f5f9/475569?text=A'" alt="">
+                    </div>
+                    <h3><%= m.teamA %></h3>
+                    <span class="side">Home</span>
+                  </div>
+                  <div class="ms-scorebox">
+                    <div class="ms-score">
+                      <span><%= sc.aggA %></span>
+                      <span class="sep">–</span>
+                      <span><%= sc.aggB %></span>
+                    </div>
+                    <% if (sc.hasLegs) { %>
+                      <div class="ms-legs">
+                        <% if (sc.l1a != null) { %><div class="ms-leg">Leg 1 · <%= sc.l1a %>–<%= sc.l1b %></div><% } %>
+                        <% if (sc.l2a != null) { %><div class="ms-leg">Leg 2 · <%= sc.l2a %>–<%= sc.l2b %></div><% } %>
+                      </div>
+                    <% } %>
+                  </div>
+                  <div class="ms-team">
+                    <div class="ms-team-logo">
+                      <img src="<%= m.logoB %>" onerror="this.onerror=null;this.src='https://via.placeholder.com/80/f1f5f9/475569?text=B'" alt="">
+                    </div>
+                    <h3><%= m.teamB %></h3>
+                    <span class="side">Away</span>
+                  </div>
+                </div>
+                <div class="ms-card-foot">
+                  <span class="ms-meta"><%= formatWhen(m) || 'Final' %></span>
+                  <span class="ms-go">Full report →</span>
                 </div>
               </div>
             </a>

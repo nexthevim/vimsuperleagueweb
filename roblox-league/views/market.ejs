@@ -349,245 +349,6 @@ select.form-input option { background: #ffffff; color: #0f172a; }
     .mk-header h1 { font-size: 2.3rem; }
     .mk-controls { padding: .75rem; }
 }
-
-/* ===== LEADERBOARD PRO ===== */
-.mk-spot-head {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    gap: 1rem; margin-bottom: 1.5rem;
-}
-.mk-spot-head h3 {
-    margin: .2rem 0 0; font-family: var(--mk-display);
-    font-size: 1.55rem; line-height: 1; color: var(--mk-ink-deep);
-}
-.mk-spot-head p { margin: .3rem 0 0; font-size: .72rem; color: var(--mk-muted); }
-.mk-spot-btn {
-    border: 0; border-radius: 999px; padding: .6rem 1.15rem;
-    font-family: inherit; font-size: .6rem; font-weight: 800;
-    letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
-    background: var(--mk-ink-deep); color: #fff;
-    box-shadow: 0 8px 20px rgba(7,53,54,.15);
-    transition: transform .2s ease, background .2s ease;
-}
-.mk-spot-btn:hover { transform: translateY(-2px); background: var(--mk-teal); }
-
-.mk-lb-block { margin-bottom: 1.75rem; }
-.mk-lb-block:last-child { margin-bottom: 0; }
-.mk-lb-label {
-    display: flex; align-items: center; gap: .5rem;
-    margin: 0 0 1rem; font-size: .6rem; font-weight: 800;
-    letter-spacing: .14em; text-transform: uppercase; color: var(--mk-muted);
-}
-.mk-lb-label .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--mk-coral);
-}
-
-.mk-podium {
-    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.1rem; align-items: end; justify-items: center;
-    perspective: 1400px; padding: .5rem 0 1rem;
-}
-@media (max-width: 820px) {
-    .mk-podium { grid-template-columns: 1fr; }
-}
-.mk-pod-slot {
-    position: relative; display: flex; flex-direction: column; align-items: center;
-    animation: mkPodIn .55s cubic-bezier(.22,1,.36,1) both;
-}
-.mk-pod-slot:nth-child(1) { animation-delay: .05s; }
-.mk-pod-slot:nth-child(2) { animation-delay: .12s; }
-.mk-pod-slot:nth-child(3) { animation-delay: .18s; }
-@keyframes mkPodIn {
-    from { opacity: 0; transform: translateY(22px) scale(.96); }
-    to { opacity: 1; transform: none; }
-}
-.mk-pod-slot.is-first { transform: translateY(-10px); }
-.mk-pod-slot.is-first .player-card { width: 236px !important; height: 318px !important; }
-.mk-pod-slot:not(.is-first) .player-card { width: 200px !important; height: 278px !important; }
-@media (max-width: 820px) {
-    .mk-pod-slot.is-first { transform: none; }
-    .mk-pod-slot.is-first .player-card,
-    .mk-pod-slot:not(.is-first) .player-card { width: 220px !important; height: 300px !important; }
-}
-.mk-pod-medal {
-    position: absolute; top: -14px; z-index: 25;
-    font-size: 1.55rem; filter: drop-shadow(0 6px 10px rgba(0,0,0,.2));
-    animation: mkMedal .8s cubic-bezier(.22,1,.36,1) both;
-}
-@keyframes mkMedal {
-    from { opacity: 0; transform: translateY(-8px) scale(.6); }
-    to { opacity: 1; transform: none; }
-}
-.mk-pod-base {
-    margin-top: .65rem; width: 70%; height: 6px; border-radius: 999px;
-    background: linear-gradient(90deg, transparent, rgba(18,59,60,.12), transparent);
-}
-
-/* full list */
-.mk-top10 {
-    margin-top: .85rem; border-radius: 1.15rem; overflow: hidden;
-    border: 1px solid var(--mk-line); background: rgba(255,255,255,.75);
-    max-height: 0; opacity: 0; transform: translateY(6px);
-    transition: max-height .4s cubic-bezier(.22,1,.36,1), opacity .3s ease, transform .3s ease;
-}
-.mk-top10.is-open {
-    max-height: 420px; opacity: 1; transform: none;
-    overflow-y: auto;
-}
-.mk-top10-row {
-    display: flex; align-items: center; justify-content: space-between; gap: .75rem;
-    padding: .7rem 1rem; border-bottom: 1px solid var(--mk-line);
-    transition: background .15s;
-}
-.mk-top10-row:last-child { border-bottom: 0; }
-.mk-top10-row:hover { background: rgba(7,89,90,.04); }
-.mk-top10-n {
-    width: 1.55rem; height: 1.55rem; border-radius: 50%;
-    display: grid; place-items: center; flex-shrink: 0;
-    font-size: .65rem; font-weight: 800;
-    background: rgba(18,59,60,.08); color: var(--mk-ink);
-}
-.mk-top10-n.gold { background: linear-gradient(135deg,#f5d78e,#c9a227); color: #fff; }
-.mk-top10-n.silver { background: linear-gradient(135deg,#e2e8f0,#94a3b8); color: #fff; }
-.mk-top10-n.bronze { background: linear-gradient(135deg,#fdba74,#c2410c); color: #fff; }
-
-/* ===== CARD PREVIEW UPGRADE ===== */
-.player-card {
-    border-radius: 1.4rem !important;
-    box-shadow:
-        0 1px 0 rgba(255,255,255,.5) inset,
-        0 18px 40px -16px rgba(18,59,60,.2) !important;
-}
-.player-card::before {
-    content: "";
-    position: absolute; inset: 0; z-index: 5; pointer-events: none;
-    border-radius: inherit;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
-}
-.player-card .mk-card-foot {
-    position: absolute; left: 0; right: 0; bottom: 0; z-index: 20;
-    padding: 2.5rem 1rem .95rem;
-    background: linear-gradient(to top, rgba(8,16,16,.95) 12%, rgba(8,16,16,.55) 55%, transparent);
-}
-.player-card .mk-card-foot h3 {
-    margin: 0; color: #fff; font-size: 1.15rem; font-weight: 900;
-    font-style: italic; text-transform: uppercase; letter-spacing: -.03em;
-    line-height: 1.05; text-shadow: 0 2px 8px rgba(0,0,0,.35);
-}
-.player-card .mk-card-meta {
-    display: flex; align-items: center; justify-content: space-between; gap: .5rem;
-    margin-top: .35rem;
-}
-.player-card .mk-card-bid {
-    font-size: .72rem; font-weight: 800; color: #6ee7b7;
-}
-.player-card .mk-card-team {
-    font-size: .62rem; font-weight: 700; color: rgba(255,255,255,.55);
-    text-transform: uppercase; max-width: 48%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.player-card .mk-card-ribbon {
-    position: absolute; top: 0; right: 0; z-index: 21;
-    padding: .35rem .65rem .35rem .85rem;
-    border-radius: 0 1.4rem 0 1rem;
-    font-size: .55rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase;
-    background: rgba(0,0,0,.45); color: #fff; backdrop-filter: blur(8px);
-}
-
-/* ===== MODAL PROFILE UPGRADE ===== */
-#modalContainer {
-    background: transparent !important;
-}
-.mk-modal-card {
-    border-radius: 1.75rem !important;
-    overflow: hidden;
-    box-shadow: 0 30px 60px rgba(0,0,0,.35) !important;
-}
-.mk-modal-side {
-    background: rgba(255,253,248,.97) !important;
-    border-radius: 1.75rem !important;
-    border: 1px solid var(--mk-line) !important;
-    box-shadow: 0 24px 50px rgba(18,59,60,.12) !important;
-}
-#modalBiddingBox {
-    border-radius: 1.25rem !important;
-    border-color: var(--mk-line) !important;
-    background: #fff !important;
-}
-#modalQuickBidRow button {
-    border-radius: .9rem !important;
-    font-family: var(--mk-body) !important;
-    transition: transform .15s ease, background .15s ease !important;
-}
-#modalQuickBidRow button:hover {
-    transform: translateY(-2px);
-    background: var(--mk-teal) !important;
-    color: #fff !important;
-    border-color: var(--mk-teal) !important;
-}
-#modalBidButton {
-    border-radius: 999px !important;
-    letter-spacing: .08em !important;
-    box-shadow: 0 8px 20px rgba(18,59,60,.15);
-}
-
-/* ===== AUDIT FEED ===== */
-.mk-feed {
-    background: rgba(255,253,248,.95);
-    border: 1px solid var(--mk-line);
-    border-radius: 1.5rem;
-    overflow: hidden;
-    box-shadow: var(--mk-shadow);
-    max-height: 28rem;
-}
-.mk-feed-item {
-    display: grid;
-    grid-template-columns: 2.5rem 1fr auto;
-    gap: .75rem;
-    align-items: start;
-    padding: .9rem 1.1rem;
-    border-bottom: 1px solid var(--mk-line);
-    transition: background .15s;
-}
-.mk-feed-item:last-child { border-bottom: 0; }
-.mk-feed-item:hover { background: rgba(7,89,90,.03); }
-.mk-feed-icon {
-    width: 2.35rem; height: 2.35rem; border-radius: .85rem;
-    display: grid; place-items: center; font-size: .95rem;
-    background: rgba(18,59,60,.06);
-}
-.mk-feed-icon.bid { background: rgba(5,150,105,.12); }
-.mk-feed-icon.withdraw { background: rgba(217,119,6,.12); }
-.mk-feed-icon.won { background: rgba(5,150,105,.15); }
-.mk-feed-icon.start { background: rgba(18,59,60,.1); }
-.mk-feed-icon.end { background: rgba(225,29,72,.1); }
-.mk-feed-icon.rank { background: rgba(124,58,237,.12); }
-.mk-feed-title {
-    margin: 0; font-size: .72rem; font-weight: 800;
-    letter-spacing: .04em; text-transform: uppercase;
-}
-.mk-feed-detail {
-    margin: .2rem 0 0; font-size: .78rem; color: var(--mk-ink);
-    font-weight: 600; line-height: 1.35;
-}
-.mk-feed-sub {
-    margin: .15rem 0 0; font-size: .65rem; color: var(--mk-muted); font-weight: 600;
-}
-.mk-feed-amt {
-    text-align: right; font-weight: 800; font-size: .9rem; color: var(--mk-teal);
-    white-space: nowrap;
-}
-.mk-feed-time {
-    display: block; margin-top: .15rem; font-size: .6rem; color: var(--mk-muted); font-weight: 600;
-}
-
-/* lane polish */
-.mk-lane-bar {
-    border-radius: 1.5rem !important;
-    border: 1px solid var(--mk-line) !important;
-    background: rgba(255,253,248,.55) !important;
-    overflow: hidden;
-}
-
 </style>
 
 
@@ -691,21 +452,25 @@ select.form-input option { background: #ffffff; color: #0f172a; }
             <div class="mb-10">
                 <div class="mk-spotlight">
                     <div class="mk-spotlight-inner">
-                <div class="mk-spot-head">
-                    <div>
-                        <div class="mk-eyebrow">Live boards</div>
-                        <h3>Market leaderboards</h3>
-                        <p>Top money · position heat · rising — cards tilt on hover</p>
+                <div class="flex items-center justify-between gap-3 mb-8">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center text-lg shadow-sm">🔥</div>
+                        <div>
+                            <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500">Market Spotlight</h3>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Live auction heat · hover the cards</p>
+                        </div>
                     </div>
-                    <button type="button" id="spotlightExpandBtn" class="mk-spot-btn" onclick="toggleSpotlightExpand()">Show top 10</button>
+                    <button type="button" id="spotlightExpandBtn" onclick="toggleSpotlightExpand()"
+                        class="text-[10px] font-black uppercase tracking-wider text-white bg-slate-900 hover:bg-amber-500 px-4 py-2.5 rounded-xl transition shadow-md">
+                        Show Top 10 →
+                    </button>
                 </div>
 
                 <!-- ════ TOP BIDS — real hovering player cards ════ -->
                 <div class="mb-10">
-                    <div class="mk-lb-block">
-                    <p class="mk-lb-label"><span class="dot"></span> Top bids</p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>👑 Top Bids</p>
                     <% if (marketSpotlight.topBids && marketSpotlight.topBids.length > 0) { %>
-                        <div id="spotlightTopPodium" class="mk-podium">
+                        <div id="spotlightTopPodium" class="flex flex-wrap justify-center gap-6 py-4" style="perspective: 1200px;">
                             <% marketSpotlight.topBids.slice(0, 3).forEach((p, i) => {
                                 const medals = ['🥇','🥈','🥉'];
                                 const pos = (p.position || 'PRO').toUpperCase();
@@ -714,9 +479,9 @@ select.form-input option { background: #ffffff; color: #0f172a; }
                                 const isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
                                 const isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
                             %>
-                                <div class="mk-pod-slot <%= i === 0 ? 'is-first' : '' %>">
-                                    <span class="mk-pod-medal"><%= medals[i] %></span>
-                                    <div class="player-card glass-light border border-slate-200 relative group"
+                                <div class="relative flex flex-col items-center">
+                                    <span class="absolute -top-3 z-30 text-2xl drop-shadow-lg"><%= medals[i] %></span>
+                                    <div class="player-card w-[220px] h-[300px] glass-light rounded-[28px] border border-slate-200 shadow-lg relative group"
                                          
                                          onmouseleave="resetTilt(this)"
                                          onmousemove="tiltCard(event, this)" onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
@@ -743,12 +508,12 @@ select.form-input option { background: #ffffff; color: #0f172a; }
                                 </div>
                             <% }) %>
                         </div>
-                        <div id="spotlightTopFull" class="mk-top10">
+                        <div id="spotlightTopFull" class="hidden mt-3 bg-white/90 rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden max-w-2xl mx-auto">
                             <% marketSpotlight.topBids.forEach((p, i) => { %>
                                 <div class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50 transition cursor-pointer"
                                      onclick="document.querySelectorAll('.player-card').forEach(c=>{if((c.getAttribute('data-name')||'')==='<%= (p.name||'').toLowerCase() %>'){c.click();}})">
                                     <div class="flex items-center gap-3 min-w-0">
-                                        <span class="mk-top10-n <%= i===0?'gold':(i===1?'silver':(i===2?'bronze':'')) %>"><%= i + 1 %></span>
+                                        <span class="text-xs font-black text-slate-400 w-6">#<%= i + 1 %></span>
                                         <% if (p.cardImage && String(p.cardImage).trim()) { %>
                                             <img src="<%= p.cardImage %>" class="w-10 h-10 rounded-lg object-cover" alt="">
                                         <% } %>
@@ -832,7 +597,7 @@ select.form-input option { background: #ffffff; color: #0f172a; }
                 <div>
                     <p class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 mb-4 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>📈 Rising Bids <span class="text-rose-400 normal-case tracking-normal font-bold">(last 2h)</span></p>
                     <% if (marketSpotlight.rising && marketSpotlight.rising.length > 0) { %>
-                        <div id="spotlightRisingPodium" class="mk-podium" style="perspective: 1200px;">
+                        <div id="spotlightRisingPodium" class="flex flex-wrap justify-center gap-6 py-4" style="perspective: 1200px;">
                             <% marketSpotlight.rising.slice(0, 3).forEach((r, i) => {
                                 const p = r.player;
                                 const pos = (p.position || 'PRO').toUpperCase();
@@ -841,9 +606,9 @@ select.form-input option { background: #ffffff; color: #0f172a; }
                                 const isMgrAccount = (typeof managerPlayerNames !== 'undefined' && managerPlayerNames.includes((p.name || '').toLowerCase()));
                                 const isWatched = (typeof user !== 'undefined' && user && Array.isArray(user.watchlist) && user.watchlist.map(String).includes(String(pId)));
                             %>
-                                <div class="mk-pod-slot <%= i === 0 ? 'is-first' : '' %>">
-                                    <span class="mk-pod-medal" style="font-size:.65rem;background:#e11d48;color:#fff;padding:.3rem .55rem;border-radius:999px;font-weight:900;letter-spacing:.06em"><%= r.bidCount %>× bids</span>
-                                    <div class="player-card glass-light border border-rose-200 relative group"
+                                <div class="relative flex flex-col items-center">
+                                    <span class="absolute -top-3 z-30 bg-rose-600 text-white text-[9px] font-black px-2.5 py-1 rounded-full shadow uppercase"><%= r.bidCount %>× bids</span>
+                                    <div class="player-card w-[220px] h-[300px] glass-light rounded-[28px] border border-rose-200 shadow-lg relative group"
                                          
                                          onmouseleave="resetTilt(this)"
                                          onmousemove="tiltCard(event, this)" onclick="openBio(this, '<%= p.name %>', '<%= p.cardImage %>', `<%= (p.experience || p.bio || '').toString().replace(/`/g, '') %>`, '<%= p.discord %>', '<%= p.goals || 0 %>', '<%= p.assists || 0 %>', '<%= p.saves || 0 %>', '<%= p.mvps || 0 %>', '<%= p.views ? p.views.length : 0 %>', '<%= p.position %>', '<%= p.country %>', '<%= p.timezone %>', '<%= p.highestBid || 0 %>', '<%= p.highestBidder || 'None' %>', '<%= pId %>', '<%= p.reservePrice || 0 %>', <%- !!isMgrAccount %>, <%- !!isWatched %>)">
@@ -907,7 +672,7 @@ select.form-input option { background: #ffffff; color: #0f172a; }
 
             <div class="space-y-6 mb-24">
                 <% tiers.forEach((t, idx) => { %>
-                    <div class="relative flex items-center mk-lane-bar py-7">
+                    <div class="relative flex items-center border-y border-slate-200/80 bg-white/40 py-6">
                         <div class="<%= t.anim %> gap-6 px-4" id="cardContainer<%= idx %>">
                             <% t.list.forEach(p => { %>
                                 <% 
@@ -1070,7 +835,7 @@ select.form-input option { background: #ffffff; color: #0f172a; }
     <% } %>
 
     <!-- MODE 2: AUCTION HUB VIEW -->
-    <div id="auctionSection" class="hidden max-w-7xl mx-auto px-6 mb-24 mk-in">
+    <div id="auctionSection" class="hidden max-w-7xl mx-auto px-6 mb-24">
         <%
             function hueFromName(str) {
                 let h = 0;
@@ -1351,48 +1116,42 @@ select.form-input option { background: #ffffff; color: #0f172a; }
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center text-sm">📜</div>
                     <div>
-                        <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">Auction feed</h3>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase">Bids · withdrawals · wins · session events</p>
+                        <h3 class="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">Auction Feed</h3>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase">Public trail of bids, wins & session events</p>
                     </div>
                 </div>
 
-                <div class="mk-feed custom-scroll overflow-y-auto">
+                <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm max-h-96 overflow-y-auto custom-scroll divide-y divide-slate-100">
                     <% auctionActivityFeed.forEach((ev) => {
                         let icon = '•';
-                        let label = (ev.type || 'event').replace(/_/g, ' ');
-                        let iconClass = '';
-                        if (ev.type === 'bid') { icon = '💰'; label = 'Bid placed'; iconClass = 'bid'; }
-                        else if (ev.type === 'withdraw') { icon = '↩️'; label = 'Withdrawal'; iconClass = 'withdraw'; }
-                        else if (ev.type === 'won') { icon = '🏆'; label = 'Player won'; iconClass = 'won'; }
-                        else if (ev.type === 'auction_start') { icon = '🚀'; label = 'Auction started'; iconClass = 'start'; }
-                        else if (ev.type === 'auction_end') { icon = '🔒'; label = 'Auction ended'; iconClass = 'end'; }
-                        else if (ev.type === 'rank_change') { icon = '🎖️'; label = 'Rank change'; iconClass = 'rank'; }
-                        else if (ev.type === 'outbid') { icon = '⚡'; label = 'Outbid'; iconClass = 'withdraw'; }
-                        const when = ev.createdAt ? new Date(ev.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : (ev.time || '');
-                        const detailParts = [];
-                        if (ev.playerName) detailParts.push(ev.playerName);
-                        if (ev.teamName) detailParts.push(ev.teamName);
-                        if (ev.managerName) detailParts.push('mgr ' + ev.managerName);
-                        if (ev.fromRank && ev.toRank) detailParts.push(ev.fromRank + ' → ' + ev.toRank);
-                        if (ev.message) detailParts.push(ev.message);
-                        const detail = detailParts.join(' · ') || (ev.note || '—');
+                        let label = ev.type;
+                        let colorClass = 'text-slate-500';
+                        if (ev.type === 'bid') { icon = '💰'; label = 'Bid'; colorClass = 'text-emerald-600'; }
+                        else if (ev.type === 'withdraw') { icon = '↩️'; label = 'Withdraw'; colorClass = 'text-amber-600'; }
+                        else if (ev.type === 'won') { icon = '🏆'; label = 'Won'; colorClass = 'text-emerald-700'; }
+                        else if (ev.type === 'auction_start') { icon = '🚀'; label = 'Started'; colorClass = 'text-slate-900'; }
+                        else if (ev.type === 'auction_end') { icon = '🔒'; label = 'Ended'; colorClass = 'text-rose-600'; }
+                        else if (ev.type === 'rank_change') { icon = '🎖️'; label = 'Class'; colorClass = 'text-violet-600'; }
                     %>
-                        <div class="mk-feed-item">
-                            <div class="mk-feed-icon <%= iconClass %>"><%= icon %></div>
-                            <div style="min-width:0">
-                                <p class="mk-feed-title"><%= label %></p>
-                                <p class="mk-feed-detail"><%= detail %></p>
-                                <p class="mk-feed-sub">
-                                    <% if (ev.playerName && ev.teamName) { %>Player target · team action<% } else if (ev.type === 'auction_start' || ev.type === 'auction_end') { %>Session event<% } else { %>Market event<% } %>
-                                </p>
+                        <div class="flex items-center justify-between gap-3 px-5 py-3.5 hover:bg-slate-50/80 transition">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <span class="text-base flex-shrink-0 w-7 text-center"><%= icon %></span>
+                                <div class="min-w-0">
+                                    <p class="text-[11px] font-black uppercase <%= colorClass %>">
+                                        <%= label %><% if (ev.playerName) { %> <span class="text-slate-900">· <%= ev.playerName %></span><% } %>
+                                    </p>
+                                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider truncate">
+                                        <% if (ev.teamName) { %><%= ev.teamName %><% } %>
+                                        <% if (ev.managerName) { %> · <%= ev.managerName %><% } %>
+                                        <% if (ev.meta && ev.meta.rank) { %> · → <%= ev.meta.rank %><% } %>
+                                    </p>
+                                </div>
                             </div>
-                            <div class="mk-feed-amt">
-                                <% if (ev.amount != null && ev.amount !== '') { %>
-                                    <%= Number(ev.amount).toLocaleString() %> V
-                                <% } else { %>
-                                    <span style="color:var(--mk-muted)">—</span>
+                            <div class="text-right flex-shrink-0">
+                                <% if (ev.amount) { %>
+                                    <p class="text-xs font-black text-slate-900"><%= Number(ev.amount).toLocaleString() %> V</p>
                                 <% } %>
-                                <span class="mk-feed-time"><%= when %></span>
+                                <p class="text-[8px] text-slate-400 font-bold uppercase"><%= ev.createdAt ? new Date(ev.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '' %></p>
                             </div>
                         </div>
                     <% }) %>
@@ -1405,9 +1164,9 @@ select.form-input option { background: #ffffff; color: #0f172a; }
 
 <!-- LIGHT THEME FIFA MODAL WITH BIDDING CAPABILITY FOR MANAGERS -->
     <div id="bioModal" class="modal" onclick="closeBio()">
-        <div class="max-w-5xl w-full flex flex-col md:flex-row gap-6 items-center relative" id="modalContainer" class="mk-modal-wrap" onclick="event.stopPropagation()">
+        <div class="max-w-5xl w-full flex flex-col md:flex-row gap-6 items-center relative" id="modalContainer" onclick="event.stopPropagation()">
             <!-- Player Card Spotlight -->
-            <div class="relative group w-[300px] h-[420px] flex-shrink-0 mk-modal-card">
+            <div class="relative group w-[300px] h-[420px] flex-shrink-0">
                 <div class="absolute -inset-2 bg-slate-300/40 blur-2xl rounded-full opacity-70"></div>
                 <div class="relative w-full h-full bg-white rounded-[36px] overflow-hidden border border-slate-200 shadow-2xl">
                     <img id="modalImg" src="" class="w-full h-full object-cover">
@@ -1912,25 +1671,21 @@ select.form-input option { background: #ffffff; color: #0f172a; }
     function toggleSpotlightExpand() {
         spotlightExpanded = !spotlightExpanded;
         const btn = document.getElementById('spotlightExpandBtn');
-        const fullIds = ['spotlightTopFull', 'spotlightPosFull', 'spotlightRisingFull'];
-        const podiumIds = ['spotlightTopPodium', 'spotlightPosPodium', 'spotlightRisingPodium'];
-        if (btn) btn.textContent = spotlightExpanded ? 'Hide top 10' : 'Show top 10';
-        fullIds.forEach(id => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            if (spotlightExpanded) el.classList.add('is-open');
-            else el.classList.remove('is-open');
-        });
-        podiumIds.forEach(id => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.style.opacity = spotlightExpanded ? '0.55' : '1';
-            el.style.filter = spotlightExpanded ? 'grayscale(0.15)' : 'none';
-            el.style.transition = 'opacity .3s ease, filter .3s ease';
+        const pairs = [
+            ['spotlightTopPodium', 'spotlightTopFull'],
+            ['spotlightPosPodium', 'spotlightPosFull'],
+            ['spotlightRisingPodium', 'spotlightRisingFull']
+        ];
+        if (btn) btn.textContent = spotlightExpanded ? '← Show Cards' : 'Show Top 10 →';
+        pairs.forEach(([podiumId, fullId]) => {
+            const podium = document.getElementById(podiumId);
+            const full = document.getElementById(fullId);
+            if (podium) podium.classList.toggle('hidden', spotlightExpanded);
+            if (full) full.classList.toggle('hidden', !spotlightExpanded);
         });
     }
 
-
+    // MODE SWITCHER LOGIC (MARKET vs AUCTION HUB)
     function switchMode(mode) {
         const mSec = document.getElementById('marketSection');
         const aSec = document.getElementById('auctionSection');

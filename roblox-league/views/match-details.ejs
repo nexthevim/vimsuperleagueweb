@@ -11,43 +11,42 @@
     const lineupA = details.lineupPlayersA || [];
     const lineupB = details.lineupPlayersB || [];
 
-    // 7v7 formation (same shape as position picker):
+    // 7v7 formation per half (shape like the position picker):
     //        CF
     //     LF    RF
     //        CM
     //     LB    RB
     //        GK
-    // Team A defends the TOP goal; Team B the BOTTOM goal.
+    // Team A = TOP half (defends top goal). Team B = BOTTOM half.
     const POS_SLOTS_A = [
-        { key: 'GK', x: 50, y: 8 },
-        { key: 'LB', x: 22, y: 22 },
-        { key: 'RB', x: 78, y: 22 },
-        { key: 'CM', x: 50, y: 34 },
-        { key: 'LF', x: 22, y: 46 },
-        { key: 'RF', x: 78, y: 46 },
+        { key: 'GK', x: 50, y: 7 },
+        { key: 'LB', x: 20, y: 16 },
+        { key: 'RB', x: 80, y: 16 },
+        { key: 'CM', x: 50, y: 24 },
+        { key: 'LF', x: 22, y: 33 },
+        { key: 'RF', x: 78, y: 33 },
         { key: 'CF', x: 50, y: 40 }
     ];
     const POS_SLOTS_B = [
-        { key: 'GK', x: 50, y: 92 },
-        { key: 'LB', x: 78, y: 78 },
-        { key: 'RB', x: 22, y: 78 },
-        { key: 'CM', x: 50, y: 66 },
-        { key: 'LF', x: 78, y: 54 },
-        { key: 'RF', x: 22, y: 54 },
+        { key: 'GK', x: 50, y: 93 },
+        { key: 'LB', x: 80, y: 84 },
+        { key: 'RB', x: 20, y: 84 },
+        { key: 'CM', x: 50, y: 76 },
+        { key: 'LF', x: 78, y: 67 },
+        { key: 'RF', x: 22, y: 67 },
         { key: 'CF', x: 50, y: 60 }
     ];
 
     function slotForPlayer(player, index, isTeamA) {
         const slots = isTeamA ? POS_SLOTS_A : POS_SLOTS_B;
-        const pos = String(player.position || player.pos || player.slot || '').toUpperCase().trim();
-        // map old def/mid/fwd slots
+        const raw = String(player.slot || player.position || player.pos || '').toUpperCase().trim();
         const map = {
             DEF1: 'LB', DEF2: 'RB', MID1: 'CM', MID2: 'LF', FWD1: 'RF', FWD2: 'CF',
             DEF: 'LB', MID: 'CM', FWD: 'CF',
             GK: 'GK', LB: 'LB', RB: 'RB', CM: 'CM', LF: 'LF', RF: 'RF', CF: 'CF'
         };
-        const key = map[pos] || pos;
-        const byKey = slots.find(s => s.key === key || s.key === pos);
+        const key = map[raw] || raw;
+        const byKey = slots.find(s => s.key === key);
         if (byKey) return byKey;
         return slots[Math.min(index, slots.length - 1)];
     }
@@ -598,9 +597,9 @@ body { margin: 0; font-family: var(--md-body); }
         <% if (lineupA.length > 0) { %>
           <% lineupA.forEach((player, index) => {
             const slot = slotForPlayer(player, index, true);
-            const px = player.x !== undefined ? player.x : slot.x;
-            const py = player.y !== undefined ? player.y : slot.y;
-            const posLabel = String(player.position || player.pos || slot.key).toUpperCase();
+            const px = slot.x;
+            const py = slot.y;
+            const posLabel = String(player.position || player.pos || player.slot || slot.key).toUpperCase();
           %>
             <div class="player-marker" style="left:<%= px %>%; top:<%= py %>%; animation-delay:<%= index * 0.05 %>s"
                  onclick='openPlayerProfile(<%- JSON.stringify(player) %>)'>
@@ -627,9 +626,9 @@ body { margin: 0; font-family: var(--md-body); }
         <% if (lineupB.length > 0) { %>
           <% lineupB.forEach((player, index) => {
             const slot = slotForPlayer(player, index, false);
-            const px = player.x !== undefined ? player.x : slot.x;
-            const py = player.y !== undefined ? player.y : slot.y;
-            const posLabel = String(player.position || player.pos || slot.key).toUpperCase();
+            const px = slot.x;
+            const py = slot.y;
+            const posLabel = String(player.position || player.pos || player.slot || slot.key).toUpperCase();
           %>
             <div class="player-marker" style="left:<%= px %>%; top:<%= py %>%; animation-delay:<%= (index + 7) * 0.05 %>s"
                  onclick='openPlayerProfile(<%- JSON.stringify(player) %>)'>

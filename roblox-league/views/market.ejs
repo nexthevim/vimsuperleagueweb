@@ -1,199 +1,356 @@
 <%- include('partials/navbar') %>
 
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-    /* MULTI-DIRECTIONAL CONVEYOR ANIMATIONS */
-    @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    @keyframes scrollRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+/* =========================================================
+   VIM MARKET — editorial skin (matches profile hub)
+========================================================= */
+:root {
+    --mk-paper: #f4f1e9;
+    --mk-paper-2: #fffdf8;
+    --mk-ink: #123b3c;
+    --mk-ink-deep: #073536;
+    --mk-teal: #07595a;
+    --mk-teal-2: #0a7778;
+    --mk-coral: #f18470;
+    --mk-coral-dark: #d96756;
+    --mk-mint: #d9ece6;
+    --mk-muted: #728081;
+    --mk-line: rgba(18,59,60,.105);
+    --mk-line-strong: rgba(18,59,60,.16);
+    --mk-display: "DM Serif Display", Georgia, serif;
+    --mk-body: "Manrope", system-ui, sans-serif;
+    --mk-radius: 1.5rem;
+    --mk-shadow: 0 12px 40px rgba(18,59,60,.055), 0 2px 8px rgba(18,59,60,.035);
+}
 
-    .animate-conveyor-1 { display: flex; animation: scrollLeft 32s linear infinite; width: max-content; }
-    .animate-conveyor-2 { display: flex; animation: scrollRight 38s linear infinite; width: max-content; }
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: var(--mk-body); }
 
-    .animate-conveyor-1:hover, 
-    .animate-conveyor-2:hover { 
-        animation-play-state: paused; 
-    }
-    
-    /* LIGHT GLASSMORPHY BASE */
-    .glass-light {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(226, 232, 240, 0.9);
-        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
-    }
+main.py-16, main {
+    background:
+        radial-gradient(circle at 8% 8%, rgba(241,132,112,.10), transparent 22rem),
+        radial-gradient(circle at 92% 18%, rgba(7,89,90,.08), transparent 26rem),
+        radial-gradient(circle at 50% 100%, rgba(217,236,230,.55), transparent 30rem),
+        var(--mk-paper) !important;
+    color: var(--mk-ink) !important;
+    font-family: var(--mk-body);
+    padding-top: 5.5rem !important;
+    padding-bottom: 3.5rem !important;
+}
 
-    /* 3D TILT & HOLOGRAM GLOW/SHEEN EFFECT */
-    .player-card { 
-        transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease;
-        cursor: pointer; 
-        position: relative;
-        overflow: hidden;
-        transform-style: preserve-3d;
-        perspective: 1000px;
-        background: rgba(255, 255, 255, 0.95);
-    }
-    
-    /* SHINY HOVER GLOW & HIGH LIGHT INSPECT EFFECT */
-    .player-card:hover { 
-        z-index: 20; 
-        border-color: rgba(59, 130, 246, 0.9); 
-        box-shadow: 0 0 35px rgba(59, 130, 246, 0.35), 0 20px 40px -10px rgba(15, 23, 42, 0.15);
-    }
+.mk-display { font-family: var(--mk-display); font-weight: 400; letter-spacing: -.025em; }
+.mk-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--mk-coral-dark); font-size: .61rem; font-weight: 800;
+    letter-spacing: .17em; text-transform: uppercase;
+}
+.mk-eyebrow::before { content: ""; width: 16px; height: 1px; background: currentColor; }
 
-    /* SHINY SWEEPING LIGHT GLARE */
-    .card-sheen {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.7) 45%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0.7) 55%, transparent 80%);
-        pointer-events: none;
-        z-index: 12;
-        opacity: 0;
-        transform: translateX(-100%);
-        transition: opacity 0.3s ease;
-    }
+/* shell */
+.mk-shell { width: min(1200px, calc(100% - 2rem)); margin: 0 auto; }
 
-    .player-card:hover .card-sheen {
-        opacity: 1;
-        transform: translateX(100%);
-        transition: transform 0.8s ease-in-out, opacity 0.3s ease;
-    }
+/* panel cards */
+.mk-panel {
+    background: rgba(255,253,248,.88);
+    border: 1px solid var(--mk-line);
+    border-radius: var(--mk-radius);
+    box-shadow: var(--mk-shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
 
-    /* COLOR-CODED POSITION BADGES */
-    .pos-fwd { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
-    .pos-mid { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; }
-    .pos-def { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; }
-    .pos-gk  { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
-    .pos-pro { background: linear-gradient(135deg, #64748b, #475569); color: #fff; }
+/* buttons */
+.mk-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 42px; padding: 0 16px; border-radius: 999px; border: 0;
+    font-family: inherit; font-size: .62rem; font-weight: 800;
+    letter-spacing: .08em; text-transform: uppercase; text-decoration: none;
+    cursor: pointer;
+    transition: transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s ease, background .22s ease;
+}
+.mk-btn:hover { transform: translateY(-2px); }
+.mk-btn:active { transform: translateY(0) scale(.98); }
+.mk-btn-teal { background: var(--mk-teal); color: #fff; box-shadow: 0 8px 22px rgba(7,89,90,.18); }
+.mk-btn-teal:hover { background: var(--mk-teal-2); color: #fff; }
+.mk-btn-coral { background: var(--mk-coral); color: #fff; box-shadow: 0 8px 22px rgba(241,132,112,.2); }
+.mk-btn-coral:hover { background: #ed7966; color: #fff; }
+.mk-btn-ghost {
+    background: rgba(255,255,255,.5); color: var(--mk-ink);
+    border: 1px solid var(--mk-line-strong); box-shadow: none;
+}
+.mk-btn-ghost:hover { background: #fff; color: var(--mk-ink); }
 
-    /* RANK BADGES */
-    .rank-ss { background: linear-gradient(135deg, #ec4899, #a855f7, #f59e0b); background-size: 200% 200%; animation: rankShimmer 3s ease infinite; color: #fff; border: 1px solid rgba(255,255,255,0.6); }
-    .rank-s { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; border: 1px solid #fef08a; }
-    .rank-a { background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: #fff; }
-    .rank-b { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
-    .rank-c { background: linear-gradient(135deg, #64748b, #475569); color: #fff; }
+/* underline link */
+.mk-link {
+    position: relative; color: var(--mk-teal); font-weight: 800; font-size: .68rem;
+    letter-spacing: .06em; text-transform: uppercase; text-decoration: none;
+}
+.mk-link::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1.5px;
+    background: currentColor; transform: scaleX(0); transform-origin: right;
+    transition: transform .28s cubic-bezier(.22,1,.36,1);
+}
+.mk-link:hover::after { transform: scaleX(1); transform-origin: left; }
 
-    @keyframes rankShimmer {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
+/* header */
+.mk-header {
+    display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+    gap: 1.25rem; margin-bottom: 1.25rem; padding-bottom: 1.15rem;
+    border-bottom: 1px solid var(--mk-line);
+}
+.mk-header h1 {
+    margin: .3rem 0 0; font-size: clamp(2.4rem, 5vw, 3.4rem); line-height: .92;
+    color: var(--mk-ink-deep);
+}
+.mk-header h1 em { font-style: italic; color: var(--mk-teal); }
+.mk-header p { margin: .35rem 0 0; color: var(--mk-muted); font-size: .82rem; }
 
-    /* GRAYSCALE TO FULL COLOR TRANSITION */
-    .card-img {
-        filter: grayscale(100%) contrast(1.05);
-        transition: filter 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s ease;
-    }
-    .player-card:hover .card-img {
-        filter: grayscale(0%) contrast(1);
-        transform: scale(1.06);
-    }
+/* controls bar */
+.mk-controls {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .55rem;
+    padding: .85rem 1rem; margin-bottom: 1.25rem;
+}
+.mk-mode {
+    display: flex; background: rgba(18,59,60,.06); padding: 4px; border-radius: 999px;
+}
+.mk-mode button {
+    border: 0; border-radius: 999px; padding: .55rem 1.1rem;
+    font-family: inherit; font-size: .62rem; font-weight: 800;
+    letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
+    background: transparent; color: var(--mk-muted);
+    transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.mk-mode button.is-on {
+    background: #fff; color: var(--mk-ink-deep);
+    box-shadow: 0 4px 14px rgba(18,59,60,.1);
+}
 
-    /* SLEEK CLICK ANIMATION */
-    .card-active-anim {
-        animation: sleekClick 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        pointer-events: none;
-    }
+.mk-search {
+    position: relative; flex: 1; min-width: 180px; max-width: 280px;
+}
+.mk-search input {
+    width: 100%; padding: .7rem 1rem .7rem 2.35rem; border-radius: 999px;
+    border: 1.5px solid var(--mk-line); background: #fff; color: var(--mk-ink);
+    font-family: inherit; font-size: .8rem; font-weight: 600; outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+.mk-search input:focus {
+    border-color: var(--mk-teal); box-shadow: 0 0 0 4px rgba(7,89,90,.1);
+}
+.mk-search svg {
+    position: absolute; left: .85rem; top: 50%; transform: translateY(-50%);
+    width: 15px; height: 15px; color: var(--mk-muted); pointer-events: none;
+}
 
-    @keyframes sleekClick {
-        0% { transform: scale(1); box-shadow: 0 0 0 rgba(59, 130, 246, 0); }
-        50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); }
-        100% { transform: scale(1.02); opacity: 0.9; }
-    }
+.mk-filters {
+    display: flex; flex-wrap: wrap; gap: .3rem;
+    padding: 4px; border-radius: 999px; background: rgba(18,59,60,.05);
+}
+.mk-filters .filter-btn {
+    border: 0; border-radius: 999px; padding: .45rem .75rem;
+    font-family: inherit; font-size: .58rem; font-weight: 800;
+    letter-spacing: .06em; text-transform: uppercase; cursor: pointer;
+    background: transparent; color: var(--mk-muted);
+    transition: background .18s, color .18s, transform .18s;
+}
+.mk-filters .filter-btn:hover { color: var(--mk-ink); transform: translateY(-1px); }
+.mk-filters .filter-btn.active {
+    background: var(--mk-ink-deep); color: #fff;
+}
 
-    /* MODAL */
-    .modal { 
-        display: none; 
-        position: fixed; 
-        inset: 0; 
-        background: rgba(15, 23, 42, 0); 
-        z-index: 100; 
-        align-items: center; 
-        justify-content: center; 
-        padding: 20px; 
-        backdrop-filter: blur(0px);
-        transition: all 0.4s ease;
-    }
-    
-    .modal.active { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); }
+.mk-count {
+    padding: .55rem .9rem; border-radius: 999px;
+    background: var(--mk-mint); color: var(--mk-teal);
+    font-size: .58rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+}
 
-    #modalContainer {
-        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-        transform: translateY(30px) scale(0.96);
-        opacity: 0;
-    }
+/* section title */
+.mk-section-head {
+    display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+    margin-bottom: 1rem;
+}
+.mk-section-head h3 {
+    margin: .15rem 0 0; font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+    color: var(--mk-ink-deep); line-height: 1;
+}
 
-    #modalContainer.show {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
+/* MULTI-DIRECTIONAL CONVEYOR */
+@keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes scrollRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+.animate-conveyor-1 { display: flex; animation: scrollLeft 32s linear infinite; width: max-content; }
+.animate-conveyor-2 { display: flex; animation: scrollRight 38s linear infinite; width: max-content; }
+.animate-conveyor-1:hover, .animate-conveyor-2:hover { animation-play-state: paused; }
 
-    .stat-badge {
-        background: rgba(241, 245, 249, 0.8);
-        border: 1px solid rgba(226, 232, 240, 1);
-        backdrop-filter: blur(8px);
-    }
+/* GLASS + CARD */
+.glass-light {
+    background: rgba(255, 253, 248, 0.95);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(18, 59, 60, 0.1);
+    box-shadow: 0 16px 36px -12px rgba(18, 59, 60, 0.08);
+}
 
-    /* IMPROVED REGISTRATION & LOGIN FORM STYLING */
-    .form-label {
-        display: block;
-        font-size: 0.65rem;
-        font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: #64748b;
-        margin-bottom: 0.35rem;
-    }
+.player-card {
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    background: rgba(255, 253, 248, 0.97);
+    border-radius: 1.5rem !important;
+}
+.player-card:hover {
+    z-index: 20;
+    border-color: rgba(7, 89, 90, 0.45) !important;
+    box-shadow: 0 0 32px rgba(7, 89, 90, 0.18), 0 20px 40px -10px rgba(18, 59, 60, 0.14);
+}
 
-    .form-input { 
-        width: 100%; 
-        background: #f8fafc; 
-        border: 1px solid #cbd5e1; 
-        padding: 0.75rem 1rem; 
-        border-radius: 0.85rem; 
-        outline: none; 
-        transition: all 0.25s ease; 
-        color: #0f172a; 
-        font-weight: 700;
-        font-size: 0.85rem;
-    }
-    .form-input:focus { 
-        border-color: #3b82f6; 
-        background: #ffffff;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
-    }
-    select.form-input option { background: #ffffff; color: #0f172a; }
+.card-sheen {
+    position: absolute; inset: 0;
+    background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.65) 45%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.65) 55%, transparent 80%);
+    pointer-events: none; z-index: 12; opacity: 0; transform: translateX(-100%);
+    transition: opacity 0.3s ease;
+}
+.player-card:hover .card-sheen {
+    opacity: 1; transform: translateX(100%);
+    transition: transform 0.8s ease-in-out, opacity 0.3s ease;
+}
 
-    .position-radio:checked + label {
-        border-color: #3b82f6;
-        background: #eff6ff;
-        color: #1d4ed8;
-        box-shadow: 0 0 0 2px #3b82f6;
-    }
+.pos-fwd { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+.pos-mid { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; }
+.pos-def { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; }
+.pos-gk  { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+.pos-pro { background: linear-gradient(135deg, #64748b, #475569); color: #fff; }
 
-    .hidden-form { display: none !important; }
+.rank-ss { background: linear-gradient(135deg, #ec4899, #a855f7, #f59e0b); background-size: 200% 200%; animation: rankShimmer 3s ease infinite; color: #fff; border: 1px solid rgba(255,255,255,0.6); }
+.rank-s { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; border: 1px solid #fef08a; }
+.rank-a { background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: #fff; }
+.rank-b { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+.rank-c { background: linear-gradient(135deg, #64748b, #475569); color: #fff; }
 
-    /* CUSTOM SCROLLBAR */
-    .custom-scroll::-webkit-scrollbar { width: 4px; }
-    .custom-scroll::-webkit-scrollbar-track { background: rgba(241, 245, 249, 0.5); }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+@keyframes rankShimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 
-    /* TAB ACTIVE STATES */
-    .team-tile {
-        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-    }
-    .team-tile.active {
-        border-color: transparent;
-        box-shadow: 0 0 0 3px hsl(var(--team-hue) 75% 52%), 0 20px 35px -15px rgba(15, 23, 42, 0.2);
-        transform: translateY(-3px);
-    }
+.card-img {
+    filter: grayscale(100%) contrast(1.05);
+    transition: filter 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s ease;
+}
+.player-card:hover .card-img {
+    filter: grayscale(0%) contrast(1);
+    transform: scale(1.06);
+}
 
-    #spotlightTopFull .text-slate-400,
-    #spotlightPosFull .text-slate-400,
-    #spotlightRisingFull .text-slate-400 { color: #94a3b8 !important; }
-    #spotlightTopFull:hover .hover\:bg-slate-50:hover,
-    #spotlightTopFull .hover\:bg-slate-50:hover { background: rgba(255,255,255,0.05) !important; }
+.card-active-anim {
+    animation: sleekClick 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    pointer-events: none;
+}
+@keyframes sleekClick {
+    0% { transform: scale(1); box-shadow: 0 0 0 rgba(7,89,90,0); }
+    50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(7,89,90,0.4); }
+    100% { transform: scale(1.02); opacity: 0.9; }
+}
+
+/* MODAL */
+.modal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(7, 20, 20, 0); z-index: 100;
+    align-items: center; justify-content: center; padding: 20px;
+    backdrop-filter: blur(0px); transition: all 0.4s ease;
+}
+.modal.active { background: rgba(7, 20, 20, 0.55); backdrop-filter: blur(16px); }
+#modalContainer {
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+    transform: translateY(30px) scale(0.96); opacity: 0;
+}
+#modalContainer.show { transform: translateY(0) scale(1); opacity: 1; }
+
+.stat-badge {
+    background: rgba(241, 245, 249, 0.85);
+    border: 1px solid rgba(226, 232, 240, 1);
+    backdrop-filter: blur(8px);
+}
+
+.form-label {
+    display: block; font-size: 0.62rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--mk-muted); margin-bottom: 0.35rem;
+}
+.form-input {
+    width: 100%; background: #fffdf8; border: 1.5px solid var(--mk-line);
+    padding: 0.75rem 1rem; border-radius: 0.9rem; outline: none;
+    transition: all 0.25s ease; color: var(--mk-ink); font-weight: 700; font-size: 0.85rem;
+    font-family: inherit;
+}
+.form-input:focus {
+    border-color: var(--mk-teal); background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(7, 89, 90, 0.1);
+}
+select.form-input option { background: #ffffff; color: #0f172a; }
+.position-radio:checked + label {
+    border-color: var(--mk-teal); background: var(--mk-mint); color: var(--mk-teal);
+    box-shadow: 0 0 0 2px var(--mk-teal);
+}
+.hidden-form { display: none !important; }
+
+.custom-scroll::-webkit-scrollbar { width: 4px; }
+.custom-scroll::-webkit-scrollbar-track { background: rgba(241, 245, 249, 0.5); }
+.custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+.team-tile {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    border-radius: 1.25rem !important;
+}
+.team-tile.active {
+    border-color: transparent;
+    box-shadow: 0 0 0 3px hsl(var(--team-hue) 75% 52%), 0 20px 35px -15px rgba(15, 23, 42, 0.2);
+    transform: translateY(-3px);
+}
+
+#spotlightTopFull .text-slate-400,
+#spotlightPosFull .text-slate-400,
+#spotlightRisingFull .text-slate-400 { color: #94a3b8 !important; }
+
+/* spotlight panel */
+.mk-spotlight {
+    position: relative; overflow: hidden;
+    border-radius: 1.75rem; margin-bottom: 2rem;
+    border: 1px solid var(--mk-line);
+    background:
+        radial-gradient(circle at 15% 10%, rgba(241,132,112,.1), transparent 40%),
+        radial-gradient(circle at 85% 70%, rgba(7,89,90,.07), transparent 45%),
+        rgba(255,253,248,.92);
+    box-shadow: var(--mk-shadow);
+}
+.mk-spotlight-inner { position: relative; padding: 1.5rem 1.35rem 1.75rem; }
+
+/* auction hub */
+#auctionSection .mk-panel { margin-bottom: 1rem; }
+
+/* fade-up */
+@keyframes mkFadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.mk-fade { animation: mkFadeUp .55s cubic-bezier(.22,1,.36,1) both; }
+
+/* auth boxes */
+#registerBox, #loginBox {
+    border-radius: 1.5rem !important;
+    border-color: var(--mk-line) !important;
+    background: rgba(255,253,248,.95) !important;
+}
+
+@media (max-width: 640px) {
+    .mk-header h1 { font-size: 2.3rem; }
+    .mk-controls { padding: .75rem; }
 }
 </style>
+
 
 <% if (typeof error !== 'undefined' && error) { %>
     <div class="fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-red-600 text-white px-8 py-4 rounded-full font-black uppercase italic shadow-[0_15px_30px_rgba(220,38,38,0.3)] border border-white/20 text-xs tracking-wider">
@@ -201,62 +358,49 @@
     </div>
 <% } %>
 
-<main class="py-16 bg-slate-50 min-h-screen text-slate-900 overflow-hidden">
-    <!-- MARKET HEADER & CONTROLS -->
-    <div class="max-w-7xl mx-auto px-6 mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+<main class="py-16 min-h-screen overflow-hidden mk-fade">
+    <div class="mk-shell">
+    <!-- MARKET HEADER -->
+    <div class="mk-header">
         <div>
-            <div class="flex items-center gap-3 mb-1">
-                <span class="h-2.5 w-2.5 rounded-full bg-blue-600 animate-pulse"></span>
-                <p class="text-[11px] text-slate-400 font-black uppercase tracking-[0.25em]">VIM Super League Official Market</p>
-            </div>
-            <h2 class="text-5xl font-black italic uppercase tracking-tighter text-slate-900">PLAYER MARKET</h2>
+            <div class="mk-eyebrow">VIM Super League</div>
+            <h1 class="mk-display">Player <em>Market</em></h1>
+            <p>Scout cards, filter by class, and jump into the auction hub.</p>
         </div>
-        
-        <!-- MODE SWITCH SLIDER & SEARCH BAR -->
-        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <!-- MODE SWITCH SLIDER -->
-            <div class="bg-slate-200 p-1 rounded-2xl flex items-center border border-slate-300 shadow-inner">
-                <button id="viewMarketBtn" onclick="switchMode('market')" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 bg-white text-slate-900 shadow-sm">
-                    Market
-                </button>
-                <button id="viewAuctionBtn" onclick="switchMode('auction')" class="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 text-slate-500 hover:text-slate-900">
-                    Auction Hub
-                </button>
-            </div>
-
-            <div class="relative flex-1 md:w-64" id="searchWrapper">
-                <input type="text" id="searchInput" onkeyup="filterCards()" placeholder="Search name, Discord, country..." class="w-full bg-white border border-slate-200 px-4 py-2.5 pl-9 rounded-2xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500 transition shadow-sm">
-                <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </div>
-            <div class="flex items-center bg-white border border-slate-200 p-1 rounded-2xl shadow-sm overflow-x-auto" id="filterWrapper">
-                <button data-pos-filter="ALL" onclick="setFilter('ALL')" class="filter-btn active text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-slate-900 text-white">ALL</button>
-                <button data-pos-filter="FWD" onclick="setFilter('FWD')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">FWD</button>
-                <button data-pos-filter="MID" onclick="setFilter('MID')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">MID</button>
-                <button data-pos-filter="DEF" onclick="setFilter('DEF')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">DEF</button>
-                <button data-pos-filter="GK" onclick="setFilter('GK')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">GK</button>
-            </div>
-            <div class="flex items-center bg-white border border-slate-200 p-1 rounded-2xl shadow-sm overflow-x-auto" id="classFilterWrapper">
-                <button data-class-filter="ALL" onclick="setClassFilter('ALL')" class="filter-btn active text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-slate-900 text-white">ALL CLASS</button>
-                <button data-class-filter="SS" onclick="setClassFilter('SS')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">SS</button>
-                <button data-class-filter="S" onclick="setClassFilter('S')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">S</button>
-                <button data-class-filter="A" onclick="setClassFilter('A')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">A</button>
-                <button data-class-filter="B" onclick="setClassFilter('B')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">B</button>
-                <button data-class-filter="C" onclick="setClassFilter('C')" class="filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition">C</button>
-            </div>
-            <% if (typeof isManager !== 'undefined' && isManager) { %>
-                <button
-                    id="eligibleFilterBtn"
-                    onclick="toggleEligibleFilter()"
-                    title="Only show players you can currently legally bid on"
-                    class="text-[10px] font-black px-3.5 py-1.5 rounded-xl transition text-emerald-600 hover:bg-emerald-50 bg-white border border-emerald-200 whitespace-nowrap">
-                    ✅ I Can Bid
-                </button>
-            <% } %>
-            <div class="bg-blue-50 border border-blue-200 px-4 py-2.5 rounded-2xl" id="countWrapper">
-                <span class="text-[10px] text-blue-600 font-black uppercase tracking-wider">● Players: <%= players.length %></span>
-            </div>
+        <div class="mk-mode" role="tablist">
+            <button type="button" id="viewMarketBtn" onclick="switchMode('market')" class="is-on">Market</button>
+            <button type="button" id="viewAuctionBtn" onclick="switchMode('auction')">Auction Hub</button>
         </div>
     </div>
+
+    <!-- CONTROLS -->
+    <div class="mk-controls mk-panel">
+        <div class="mk-search" id="searchWrapper">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="searchInput" onkeyup="filterCards()" placeholder="Search name, Discord, country…">
+        </div>
+        <div class="mk-filters" id="filterWrapper">
+            <button data-pos-filter="ALL" onclick="setFilter('ALL')" class="filter-btn active">ALL</button>
+            <button data-pos-filter="FWD" onclick="setFilter('FWD')" class="filter-btn">FWD</button>
+            <button data-pos-filter="MID" onclick="setFilter('MID')" class="filter-btn">MID</button>
+            <button data-pos-filter="DEF" onclick="setFilter('DEF')" class="filter-btn">DEF</button>
+            <button data-pos-filter="GK" onclick="setFilter('GK')" class="filter-btn">GK</button>
+        </div>
+        <div class="mk-filters" id="classFilterWrapper">
+            <button data-class-filter="ALL" onclick="setClassFilter('ALL')" class="filter-btn active">ALL CLASS</button>
+            <button data-class-filter="SS" onclick="setClassFilter('SS')" class="filter-btn">SS</button>
+            <button data-class-filter="S" onclick="setClassFilter('S')" class="filter-btn">S</button>
+            <button data-class-filter="A" onclick="setClassFilter('A')" class="filter-btn">A</button>
+            <button data-class-filter="B" onclick="setClassFilter('B')" class="filter-btn">B</button>
+            <button data-class-filter="C" onclick="setClassFilter('C')" class="filter-btn">C</button>
+        </div>
+        <% if (typeof isManager !== 'undefined' && isManager) { %>
+            <button id="eligibleFilterBtn" onclick="toggleEligibleFilter()" title="Only show players you can currently legally bid on"
+                class="mk-btn mk-btn-ghost" style="min-height:36px;font-size:.58rem">I can bid</button>
+        <% } %>
+        <div class="mk-count" id="countWrapper">● Players: <%= players.length %></div>
+    </div>
+
 
     <!-- AUCTION OVERRIDE NOTIFICATION BANNER (FOR MANAGERS) -->
     <% if (typeof isManager !== 'undefined' && isManager && typeof myOutbidPlayers !== 'undefined' && myOutbidPlayers && myOutbidPlayers.length > 0) { %>
@@ -305,14 +449,9 @@
                     return 'rank-c';
                 }
             %>
-            <div class="max-w-7xl mx-auto px-6 mb-14">
-                <div class="relative rounded-[32px] overflow-hidden border border-slate-200/90 shadow-xl shadow-slate-200/60">
-                    <!-- Soft white plate with gentle gradient -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-amber-50/40"></div>
-                    <div class="absolute inset-0 opacity-70" style="background-image: radial-gradient(circle at 15% 10%, rgba(251,191,36,0.12), transparent 42%), radial-gradient(circle at 85% 70%, rgba(16,185,129,0.08), transparent 45%), radial-gradient(circle at 50% 100%, rgba(148,163,184,0.1), transparent 50%);"></div>
-                    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300/80 to-transparent"></div>
-
-                    <div class="relative p-6 md:p-8">
+            <div class="mb-10">
+                <div class="mk-spotlight">
+                    <div class="mk-spotlight-inner">
                 <div class="flex items-center justify-between gap-3 mb-8">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center text-lg shadow-sm">🔥</div>
@@ -1021,7 +1160,9 @@
         <% } %>
     </div>
 
-    <!-- LIGHT THEME FIFA MODAL WITH BIDDING CAPABILITY FOR MANAGERS -->
+    </div><!-- /mk-shell -->
+
+<!-- LIGHT THEME FIFA MODAL WITH BIDDING CAPABILITY FOR MANAGERS -->
     <div id="bioModal" class="modal" onclick="closeBio()">
         <div class="max-w-5xl w-full flex flex-col md:flex-row gap-6 items-center relative" id="modalContainer" onclick="event.stopPropagation()">
             <!-- Player Card Spotlight -->
@@ -1552,24 +1693,30 @@
         const aBtn = document.getElementById('viewAuctionBtn');
         const sWrap = document.getElementById('searchWrapper');
         const fWrap = document.getElementById('filterWrapper');
+        const classWrap = document.getElementById('classFilterWrapper');
         const cWrap = document.getElementById('countWrapper');
+        const elig = document.getElementById('eligibleFilterBtn');
 
         if(mode === 'auction') {
             mSec.classList.add('hidden');
             aSec.classList.remove('hidden');
-            aBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 bg-white text-slate-900 shadow-sm';
-            mBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 text-slate-500 hover:text-slate-900';
+            mBtn.classList.remove('is-on');
+            aBtn.classList.add('is-on');
             if(sWrap) sWrap.classList.add('hidden');
             if(fWrap) fWrap.classList.add('hidden');
+            if(classWrap) classWrap.classList.add('hidden');
             if(cWrap) cWrap.classList.add('hidden');
+            if(elig) elig.classList.add('hidden');
         } else {
             aSec.classList.add('hidden');
             mSec.classList.remove('hidden');
-            mBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 bg-white text-slate-900 shadow-sm';
-            aBtn.className = 'px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 text-slate-500 hover:text-slate-900';
+            mBtn.classList.add('is-on');
+            aBtn.classList.remove('is-on');
             if(sWrap) sWrap.classList.remove('hidden');
             if(fWrap) fWrap.classList.remove('hidden');
+            if(classWrap) classWrap.classList.remove('hidden');
             if(cWrap) cWrap.classList.remove('hidden');
+            if(elig) elig.classList.remove('hidden');
         }
     }
 
@@ -1627,9 +1774,9 @@
         activePosFilter = pos;
         document.querySelectorAll('.filter-btn[data-pos-filter]').forEach(btn => {
             if(btn.dataset.posFilter === pos) {
-                btn.className = 'filter-btn active text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-slate-900 text-white';
+                btn.className = 'filter-btn active';
             } else {
-                btn.className = 'filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition';
+                btn.className = 'filter-btn';
             }
         });
         filterCards();
@@ -1639,9 +1786,9 @@
         activeClassFilter = cls;
         document.querySelectorAll('.filter-btn[data-class-filter]').forEach(btn => {
             if(btn.dataset.classFilter === cls) {
-                btn.className = 'filter-btn active text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-slate-900 text-white';
+                btn.className = 'filter-btn active';
             } else {
-                btn.className = 'filter-btn text-[10px] font-black px-3.5 py-1.5 rounded-xl text-slate-500 hover:text-slate-900 transition';
+                btn.className = 'filter-btn';
             }
         });
         filterCards();
@@ -1652,8 +1799,10 @@
         const btn = document.getElementById('eligibleFilterBtn');
         if (btn) {
             btn.className = eligibleOnly
-                ? 'text-[10px] font-black px-3.5 py-1.5 rounded-xl transition bg-emerald-600 text-white'
-                : 'text-[10px] font-black px-3.5 py-1.5 rounded-xl transition text-emerald-600 hover:bg-emerald-50';
+                ? 'mk-btn mk-btn-teal'
+                : 'mk-btn mk-btn-ghost';
+            btn.style.minHeight = '36px';
+            btn.style.fontSize = '.58rem';
         }
         filterCards();
     }

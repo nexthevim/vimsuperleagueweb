@@ -1,265 +1,299 @@
 <%- include('partials/navbar') %>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-    /* Clean Light Glass Canvas */
-    .bg-vim-canvas {
-        background-color: #f8fafc;
-        background-image: 
-            radial-gradient(at 0% 0%, rgba(241, 245, 249, 0.9) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(226, 232, 240, 0.6) 0px, transparent 50%);
-        background-attachment: fixed;
-    }
+:root {
+  --info-paper: #f4f1e9;
+  --info-ink: #0f2f2f;
+  --info-ink-deep: #073536;
+  --info-teal: #07595a;
+  --info-coral: #e87a64;
+  --info-muted: #6d7f7a;
+  --info-line: rgba(15,47,47,.1);
+  --info-display: "DM Serif Display", Georgia, serif;
+  --info-body: "Manrope", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--info-body); }
 
-    /* Glass Cards */
-    .vim-glass-card {
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(226, 232, 240, 0.8);
-        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.03);
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+.info-page {
+  min-height: 100vh;
+  color: var(--info-ink);
+  background:
+    radial-gradient(ellipse 55% 40% at 8% 0%, rgba(232,122,100,.12), transparent 50%),
+    radial-gradient(ellipse 45% 35% at 95% 8%, rgba(7,89,90,.1), transparent 48%),
+    var(--info-paper);
+  padding: 5.5rem 0 0;
+}
+.info-wrap { width: min(1000px, calc(100% - 1.75rem)); margin: 0 auto; }
 
-    .vim-glass-card:hover {
-        background: rgba(255, 255, 255, 0.92);
-        border-color: rgba(203, 213, 225, 1);
-        transform: translateY(-2px);
-        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.06);
-    }
+.info-hero {
+  text-align: center;
+  margin-bottom: 2.25rem;
+  animation: infoIn .55s cubic-bezier(.22,1,.36,1) both;
+}
+.info-hero .eyebrow {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .62rem; font-weight: 800; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--info-coral);
+}
+.info-hero .eyebrow::before {
+  content: ""; width: 16px; height: 2px; background: currentColor;
+}
+.info-hero h1 {
+  margin: .4rem 0 .35rem;
+  font-family: var(--info-display);
+  font-size: clamp(2.6rem, 5.5vw, 3.8rem);
+  line-height: .92; color: var(--info-ink-deep);
+}
+.info-hero h1 em { font-style: italic; color: var(--info-teal); }
+.info-hero p { margin: 0; color: var(--info-muted); font-size: .85rem; }
 
-    /* Accordion Toggle Smoothness */
-    .faq-answer {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
-        opacity: 0;
-    }
+.info-section { margin-bottom: 2.25rem; animation: infoIn .55s cubic-bezier(.22,1,.36,1) both; }
+.info-section-title {
+  display: flex; align-items: center; gap: .55rem;
+  margin: 0 0 1rem;
+  font-size: .62rem; font-weight: 800; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--info-muted);
+}
+.info-section-title i {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--info-teal); display: inline-block;
+}
 
-    .faq-item.active .faq-answer {
-        max-height: 200px;
-        opacity: 1;
-    }
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: .85rem;
+}
 
-    .faq-item.active .faq-icon {
-        transform: rotate(180deg);
-    }
+.info-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 1.15rem 1.2rem;
+  background: #fffdf8;
+  border: 1px solid var(--info-line);
+  border-radius: 1.35rem;
+  text-decoration: none; color: inherit;
+  box-shadow: 0 12px 30px rgba(15,47,47,.05);
+  transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s, border-color .2s;
+}
+.info-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(7,89,90,.25);
+  box-shadow: 0 18px 40px rgba(15,47,47,.1);
+}
+.info-card .meta span {
+  display: block; font-size: .55rem; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--info-muted);
+}
+.info-card .meta strong {
+  display: block; margin-top: .25rem;
+  font-size: 1rem; font-weight: 800; text-transform: uppercase;
+  color: var(--info-ink-deep); letter-spacing: -.01em;
+}
+.info-icon {
+  width: 3rem; height: 3rem; border-radius: 1rem;
+  display: grid; place-items: center; flex-shrink: 0;
+  font-size: 1.25rem;
+  transition: transform .25s ease;
+}
+.info-card:hover .info-icon { transform: scale(1.08); }
+.info-icon.discord { background: #eef0ff; color: #5865F2; border: 1px solid #dce0ff; }
+.info-icon.youtube { background: #fff1f1; color: #FF0000; border: 1px solid #ffd6d6; }
+.info-icon.book { background: #eef7fb; color: #0284c7; border: 1px solid #d0ebf7; }
+.info-icon.edit { background: rgba(15,47,47,.05); color: var(--info-ink-deep); border: 1px solid var(--info-line); }
+.info-icon.shield { background: rgba(7,89,90,.08); color: var(--info-teal); border: 1px solid rgba(7,89,90,.12); }
+.info-icon.tie { background: rgba(232,122,100,.12); color: #c45a48; border: 1px solid rgba(232,122,100,.2); }
+
+/* FAQ */
+.faq-item {
+  background: #fffdf8;
+  border: 1px solid var(--info-line);
+  border-radius: 1.25rem;
+  padding: 1.1rem 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(15,47,47,.04);
+  transition: border-color .2s, box-shadow .2s;
+  margin-bottom: .65rem;
+}
+.faq-item:hover { border-color: rgba(7,89,90,.2); }
+.faq-item.active {
+  border-color: rgba(7,89,90,.3);
+  box-shadow: 0 14px 32px rgba(15,47,47,.08);
+}
+.faq-q {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.faq-q h3 {
+  margin: 0; font-size: .95rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: -.01em; color: var(--info-ink-deep);
+}
+.faq-icon {
+  color: var(--info-muted); font-size: .7rem;
+  transition: transform .28s cubic-bezier(.22,1,.36,1);
+  flex-shrink: 0;
+}
+.faq-item.active .faq-icon {
+  transform: rotate(180deg); color: var(--info-teal);
+}
+.faq-answer {
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height .35s ease, opacity .3s ease, margin .3s ease;
+}
+.faq-item.active .faq-answer {
+  max-height: 280px; opacity: 1; margin-top: .85rem;
+  padding-top: .85rem; border-top: 1px solid var(--info-line);
+}
+.faq-answer p {
+  margin: 0; font-size: .82rem; font-weight: 600;
+  line-height: 1.55; color: var(--info-muted);
+}
+
+.info-foot {
+  margin-top: 3rem; padding: 2rem 0;
+  border-top: 1px solid var(--info-line);
+  text-align: center;
+}
+.info-foot p {
+  margin: 0; font-size: .58rem; font-weight: 800;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--info-muted);
+}
+
+@keyframes infoIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
 </style>
 
-<div class="min-h-screen bg-vim-canvas text-slate-900 font-sans pb-24">
-    <main class="py-12 px-4 sm:px-6 max-w-6xl mx-auto space-y-16">
+<div class="info-page">
+  <div class="info-wrap">
 
-        <!-- PAGE HEADER -->
-        <div class="flex flex-col items-center text-center space-y-3">
-            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-200/60 border border-slate-300/50">
-                <span class="w-2 h-2 rounded-full bg-slate-900 animate-pulse"></span>
-                <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-700">Official Directory</span>
-            </div>
-            <h1 class="text-5xl md:text-7xl font-black uppercase tracking-tight text-slate-900">
-                INFO <span class="text-slate-400 font-light">HUB</span>
-            </h1>
-            <p class="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Resources, Staff Applications & FAQ</p>
+    <header class="info-hero">
+      <div class="eyebrow">Official directory</div>
+      <h1>Info <em>Hub</em></h1>
+      <p>Resources, staff applications & FAQ</p>
+    </header>
+
+    <!-- RESOURCES -->
+    <section class="info-section">
+      <h2 class="info-section-title"><i></i> Platforms & resources</h2>
+      <div class="info-grid">
+        <a href="" target="_blank" class="info-card">
+          <div class="meta">
+            <span>Community hub</span>
+            <strong>Discord Server</strong>
+          </div>
+          <div class="info-icon discord"><i class="fa-brands fa-discord"></i></div>
+        </a>
+        <a href="https://youtube.com/@vimleague?si=YzHmcioUvJoCghTH" target="_blank" class="info-card">
+          <div class="meta">
+            <span>Video broadcasts</span>
+            <strong>YouTube Channel</strong>
+          </div>
+          <div class="info-icon youtube"><i class="fa-brands fa-youtube"></i></div>
+        </a>
+        <a href="https://vimsuperleague-rulebook.base44.app/" target="_blank" class="info-card">
+          <div class="meta">
+            <span>Official rules</span>
+            <strong>League Rulebook</strong>
+          </div>
+          <div class="info-icon book"><i class="fa-solid fa-book"></i></div>
+        </a>
+      </div>
+    </section>
+
+    <!-- STAFF -->
+    <section class="info-section" style="animation-delay:.06s">
+      <h2 class="info-section-title"><i></i> Staff & management recruitment</h2>
+      <div class="info-grid">
+        <a href="https://forms.gle/dQTwe3DbtFgrB7qFA" target="_blank" class="info-card">
+          <div class="meta">
+            <span>Google form</span>
+            <strong>Editorial Team</strong>
+          </div>
+          <div class="info-icon edit"><i class="fa-solid fa-pen-nib"></i></div>
+        </a>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfofj8qvOPyTMHvXn69VJCWPupnz0Bfm7inl5bmxJ54dtlt7Q/viewform" target="_blank" class="info-card">
+          <div class="meta">
+            <span>Google form</span>
+            <strong>Moderation Team</strong>
+          </div>
+          <div class="info-icon shield"><i class="fa-solid fa-shield-halved"></i></div>
+        </a>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSeRBPSTQQqUyHhkzA2FYeUkgLdXhRiBea-P2LjDHMTPU86f7w/viewform" target="_blank" class="info-card">
+          <div class="meta">
+            <span>Google form</span>
+            <strong>Management Team</strong>
+          </div>
+          <div class="info-icon tie"><i class="fa-solid fa-user-tie"></i></div>
+        </a>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="info-section" style="animation-delay:.1s">
+      <h2 class="info-section-title"><i></i> Frequently asked questions</h2>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <h3>Are we scammers?</h3>
+          <i class="fa-solid fa-chevron-down faq-icon"></i>
         </div>
+        <div class="faq-answer">
+          <p>We have paid out all prize pools for our past seasons. The only exception was Season 3, which we truly regret and have publicly addressed. All payout receipts, payment logs, and proof of transactions are fully transparent and accessible inside our official Discord server under the proof channels.</p>
+        </div>
+      </div>
 
-        <!-- SECTION 1: LEAGUE RESOURCES -->
-        <section>
-            <div class="flex items-center gap-2 mb-6">
-                <span class="w-2.5 h-2.5 rounded-full bg-slate-900"></span>
-                <h2 class="text-xs font-black uppercase tracking-widest text-slate-400">Official Platforms & Resources</h2>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                
-                <a href="" target="_blank" class="vim-glass-card p-6 rounded-3xl flex items-center justify-between group">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-wider">Community Hub</p>
-                        <p class="text-lg font-black text-slate-900 uppercase">Discord Server</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fa-brands fa-discord text-2xl text-[#5865F2]"></i>
-                    </div>
-                </a>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <h3>How to get staff?</h3>
+          <i class="fa-solid fa-chevron-down faq-icon"></i>
+        </div>
+        <div class="faq-answer">
+          <p>You can check the staff section above to fill out our official Google Forms for Editorial, Moderation, or Management roles. Once submitted, our Executive Board reviews all applications. If selected, an official administrator will DM you directly on Discord.</p>
+        </div>
+      </div>
 
-                <a href="https://www.roblox.com/communities/35728279/VIM-Super-League-BLR#!/about" target="_blank" class="vim-glass-card p-6 rounded-3xl flex items-center justify-between group">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-wider">Game Group</p>
-                        <p class="text-lg font-black text-slate-900 uppercase">Roblox Community</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-square-poll-vertical text-2xl text-slate-800"></i>
-                    </div>
-                </a>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <h3>How do I register my team for the league?</h3>
+          <i class="fa-solid fa-chevron-down faq-icon"></i>
+        </div>
+        <div class="faq-answer">
+          <p>Team registrations open prior to every official Gameweek or new Season launch. Announcement links and registration forms are posted inside the Discord announcements channel. Make sure your team roster fulfills the minimum player criteria before applying.</p>
+        </div>
+      </div>
 
-                <a href="https://youtube.com/@vimleague?si=YzHmcioUvJoCghTH" target="_blank" class="vim-glass-card p-6 rounded-3xl flex items-center justify-between group">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-wider">Video Broadcasts</p>
-                        <p class="text-lg font-black text-slate-900 uppercase">YouTube Channel</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fa-brands fa-youtube text-2xl text-[#FF0000]"></i>
-                    </div>
-                </a>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <h3>How are match disputes or stat errors handled?</h3>
+          <i class="fa-solid fa-chevron-down faq-icon"></i>
+        </div>
+        <div class="faq-answer">
+          <p>If you spot an error in goal stats, yellow cards, or match results, open a support ticket in our Discord server within 24 hours of match completion. Our Match Review Officers will verify the match recording and update the live metrics database accordingly.</p>
+        </div>
+      </div>
 
-                <a href="https://www.tiktok.com/@officialvimsuperleague?_r=1&_t=ZS-92gSKnCdXsL" target="_blank" class="vim-glass-card p-6 rounded-3xl flex items-center justify-between group">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-wider">Shorts & Clips</p>
-                        <p class="text-lg font-black text-slate-900 uppercase">TikTok</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fa-brands fa-tiktok text-2xl text-slate-900"></i>
-                    </div>
-                </a>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <h3>Where can I check live fixtures and match times?</h3>
+          <i class="fa-solid fa-chevron-down faq-icon"></i>
+        </div>
+        <div class="faq-answer">
+          <p>Head over to the Matches tab in the main navigation. You can view live games, upcoming fixtures, and past results — including dual-leg scores when available.</p>
+        </div>
+      </div>
+    </section>
 
-                <a href="https://m.twitch.tv/vim_super_league/home" target="_blank" class="vim-glass-card p-6 rounded-3xl flex items-center justify-between group">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-wider">Live Matches</p>
-                        <p class="text-lg font-black text-slate-900 uppercase">Twitch Broadcast</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fa-brands fa-twitch text-2xl text-[#9146FF]"></i>
-                    </div>
-                </a>
-
-                <a href="https://vimsuperleague-rulebook.base44.app/" target="_blank" class="vim-glass-card p-6 rounded-3xl flex items-center justify-between group">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-wider">Official Rules</p>
-                        <p class="text-lg font-black text-slate-900 uppercase">League Rulebook</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-book text-2xl text-sky-600"></i>
-                    </div>
-                </a>
-
-            </div>
-        </section>
-
-        <!-- SECTION 2: JOIN THE STAFF TEAM -->
-        <section>
-            <div class="flex items-center gap-2 mb-6">
-                <span class="w-2.5 h-2.5 rounded-full bg-slate-900"></span>
-                <h2 class="text-xs font-black uppercase tracking-widest text-slate-400">Staff & Management Recruitment</h2>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <a href="https://forms.gle/dQTwe3DbtFgrB7qFA" target="_blank" class="vim-glass-card p-6 rounded-3xl flex items-center gap-4 group">
-                    <div class="w-10 h-10 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
-                        <i class="fa-solid fa-pen-nib"></i>
-                    </div>
-                    <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Google Form</p>
-                        <p class="text-sm font-black uppercase text-slate-900">Editorial Team</p>
-                    </div>
-                </a>
-
-                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfofj8qvOPyTMHvXn69VJCWPupnz0Bfm7inl5bmxJ54dtlt7Q/viewform" target="_blank" class="vim-glass-card p-6 rounded-3xl flex items-center gap-4 group">
-                    <div class="w-10 h-10 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Google Form</p>
-                        <p class="text-sm font-black uppercase text-slate-900">Moderation Team</p>
-                    </div>
-                </a>
-
-                <a href="https://docs.google.com/forms/d/e/1FAIpQLSeRBPSTQQqUyHhkzA2FYeUkgLdXhRiBea-P2LjDHMTPU86f7w/viewform" target="_blank" class="vim-glass-card p-6 rounded-3xl flex items-center gap-4 group">
-                    <div class="w-10 h-10 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
-                        <i class="fa-solid fa-user-tie"></i>
-                    </div>
-                    <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Google Form</p>
-                        <p class="text-sm font-black uppercase text-slate-900">Management Team</p>
-                    </div>
-                </a>
-            </div>
-        </section>
-
-        <!-- SECTION 3: FREQUENTLY ASKED QUESTIONS -->
-        <section>
-            <div class="flex items-center gap-2 mb-6">
-                <span class="w-2.5 h-2.5 rounded-full bg-slate-900"></span>
-                <h2 class="text-xs font-black uppercase tracking-widest text-slate-400">Frequently Asked Questions</h2>
-            </div>
-
-            <div class="space-y-4">
-                
-                <!-- FAQ Item 1 -->
-                <div class="faq-item vim-glass-card rounded-3xl p-6 cursor-pointer" onclick="toggleFaq(this)">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-black uppercase text-slate-900 tracking-tight">Are we scammers?</h3>
-                        <i class="fa-solid fa-chevron-down faq-icon text-slate-400 text-xs transition-transform duration-300"></i>
-                    </div>
-                    <div class="faq-answer mt-3 pt-3 border-t border-slate-100">
-                        <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                            We have paid out all prize pools for our past seasons. The only exception was Season 3, which we truly regret and have publicly addressed. All payout receipts, payment logs, and proof of transactions are fully transparent and accessible inside our official Discord server under the proof channels.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- FAQ Item 2 -->
-                <div class="faq-item vim-glass-card rounded-3xl p-6 cursor-pointer" onclick="toggleFaq(this)">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-black uppercase text-slate-900 tracking-tight">How to get staff?</h3>
-                        <i class="fa-solid fa-chevron-down faq-icon text-slate-400 text-xs transition-transform duration-300"></i>
-                    </div>
-                    <div class="faq-answer mt-3 pt-3 border-t border-slate-100">
-                        <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                            You can check the "Join the Team" section above to fill out our official Google Forms for Editorial, Moderation, or Management roles. Once submitted, our Executive Board reviews all applications. If selected, an official administrator will DM you directly on Discord.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- FAQ Item 3 -->
-                <div class="faq-item vim-glass-card rounded-3xl p-6 cursor-pointer" onclick="toggleFaq(this)">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-black uppercase text-slate-900 tracking-tight">How do I register my team for the league?</h3>
-                        <i class="fa-solid fa-chevron-down faq-icon text-slate-400 text-xs transition-transform duration-300"></i>
-                    </div>
-                    <div class="faq-answer mt-3 pt-3 border-t border-slate-100">
-                        <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                            Team registrations open prior to every official Gameweek or new Season launch. Announcement links and registration forms are posted inside the Discord announcements channel. Make sure your team roster fulfills the minimum player criteria before applying.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- FAQ Item 4 -->
-                <div class="faq-item vim-glass-card rounded-3xl p-6 cursor-pointer" onclick="toggleFaq(this)">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-black uppercase text-slate-900 tracking-tight">How are match disputes or stat errors handled?</h3>
-                        <i class="fa-solid fa-chevron-down faq-icon text-slate-400 text-xs transition-transform duration-300"></i>
-                    </div>
-                    <div class="faq-answer mt-3 pt-3 border-t border-slate-100">
-                        <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                            If you spot an error in goal stats, yellow cards, or match results, open a support ticket in our Discord server within 24 hours of match completion. Our Match Review Officers will verify the match recording and update the live metrics database accordingly.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- FAQ Item 5 -->
-                <div class="faq-item vim-glass-card rounded-3xl p-6 cursor-pointer" onclick="toggleFaq(this)">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-black uppercase text-slate-900 tracking-tight">Where can I check live fixtures and match times?</h3>
-                        <i class="fa-solid fa-chevron-down faq-icon text-slate-400 text-xs transition-transform duration-300"></i>
-                    </div>
-                    <div class="faq-answer mt-3 pt-3 border-t border-slate-100">
-                        <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                            Head over to the Matches tab in the main navigation. You can view Live Games, Today's Spotlights, Upcoming Gameweek schedules, and past match results categorized cleanly.
-                        </p>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <footer class="py-12 text-center border-t border-slate-200/60 mt-12">
-        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">© 2026 VIM Super League • Built for the Community</p>
+    <footer class="info-foot">
+      <p>© 2026 VIM Super League · Built for the community</p>
     </footer>
+  </div>
 </div>
 
 <script>
-    function toggleFaq(element) {
-        element.classList.toggle('active');
-    }
+function toggleFaq(el) {
+  el.classList.toggle('active');
+}
 </script>

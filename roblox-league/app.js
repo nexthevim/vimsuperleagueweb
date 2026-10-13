@@ -991,9 +991,9 @@ function buildMatchOg(req, match) {
 
     const ogDescription = parts.join(' · ');
 
-    // Crest for the embed image (Discord shows one large image)
-    const crest = match.logoA || match.logoB || details.logoA || details.logoB || '';
-    const ogImage = absoluteUrl(req, crest || '/images/vimgfx.png');
+    // Dynamic dual-team card for Discord (not a single crest / random GFX)
+    const matchId = (match._id || match.id || '').toString();
+    const ogImage = absoluteUrl(req, matchId ? `/og/match/${matchId}` : '/og/matches');
 
     return {
         ogTitle,
@@ -1002,6 +1002,128 @@ function buildMatchOg(req, match) {
         ogUrl: req.protocol + '://' + req.get('host') + req.originalUrl
     };
 }
+
+
+// ---- Discord OG card images (SVG 1200×630) ----
+function escapeXml(s) {
+    return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function matchOgSvg(opts) {
+    const teamA = escapeXml(opts.teamA || 'Team A');
+    const teamB = escapeXml(opts.teamB || 'Team B');
+    const subtitle = escapeXml(opts.subtitle || 'VIM Super League');
+    const badge = escapeXml(opts.badge || 'FIXTURE');
+    const score = opts.score ? escapeXml(opts.score) : '';
+    const scoreBlock = score
+        ? `<text x="600" y="340" text-anchor="middle" font-family="Georgia, serif" font-size="72" font-weight="700" fill="#ffffff">${score}</text>`
+        : `<text x="600" y="340" text-anchor="middle" font-family="Georgia, serif" font-size="48" font-weight="700" fill="#e87a64">VS</text>`;
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#073536"/>
+      <stop offset="55%" stop-color="#07595a"/>
+      <stop offset="100%" stop-color="#0f2f2f"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#e87a64" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#e87a64" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="180" cy="120" r="220" fill="url(#glow)"/>
+  <circle cx="1020" cy="520" r="260" fill="url(#glow)"/>
+  <rect x="48" y="48" width="1104" height="534" rx="28" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+  <text x="600" y="100" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" font-weight="800" letter-spacing="6" fill="#e87a64">${badge}</text>
+  <text x="600" y="230" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="#ffffff">${teamA}</text>
+  ${scoreBlock}
+  <text x="600" y="430" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="#ffffff">${teamB}</text>
+  <text x="600" y="520" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" font-weight="700" letter-spacing="3" fill="rgba(255,255,255,0.65)">${subtitle}</text>
+  <text x="600" y="560" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" font-weight="800" letter-spacing="4" fill="rgba(255,255,255,0.4)">VIM SUPER LEAGUE</text>
+</svg>`;
+}
+
+function fixturesOgSvg(lines) {
+    const rows = (lines || []).slice(0, 5).map((line, i) => {
+        const y = 220 + i * 58;
+        return `<text x="600" y="${y}" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#ffffff">${escapeXml(line)}</text>`;
+    }).join('\\n');
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#073536"/>
+      <stop offset="100%" stop-color="#0f2f2f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="48" y="48" width="1104" height="534" rx="28" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+  <text x="600" y="120" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" font-weight="800" letter-spacing="6" fill="#e87a64">FIXTURES</text>
+  <text x="600" y="175" text-anchor="middle" font-family="Georgia, serif" font-size="42" font-weight="700" fill="#ffffff">VIM Super League</text>
+  ${rows || '<text x="600" y="320" text-anchor="middle" font-family="system-ui,sans-serif" font-size="26" fill="rgba(255,255,255,0.5)">No fixtures posted yet</text>'}
+  <text x="600" y="560" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" font-weight="800" letter-spacing="4" fill="rgba(255,255,255,0.35)">MATCHES · RESULTS · LIVE</text>
+</svg>`;
+}
+
+app.get('/og/match/:id', async (req, res) => {
+    try {
+        const match = await Match.findById(req.params.id).lean();
+        if (!match) {
+            res.status(404).type('image/svg+xml').send(matchOgSvg({ teamA: 'Match', teamB: 'Not Found', badge: 'ERROR' }));
+            return;
+        }
+        const details = match.details || {};
+        const goalsA = parseInt(details.goalsA, 10);
+        const goalsB = parseInt(details.goalsB, 10);
+        const status = String(match.status || '').toLowerCase();
+        const isLive = status === 'live' || match.isLive === true;
+        const isDone = status === 'completed' || status === 'finished' || match.completed === true;
+        const hasScore = !Number.isNaN(goalsA) && !Number.isNaN(goalsB);
+        let badge = 'FIXTURE';
+        if (isLive) badge = 'LIVE';
+        else if (isDone) badge = 'FULL TIME';
+        const tags = (match.tags || '').toString().trim();
+        if (tags) badge = tags.split(',')[0].trim().toUpperCase() || badge;
+        const score = hasScore && (isDone || isLive) ? `${goalsA}  -  ${goalsB}` : '';
+        res.set('Cache-Control', 'public, max-age=300');
+        res.type('image/svg+xml').send(matchOgSvg({
+            teamA: match.teamA,
+            teamB: match.teamB,
+            badge,
+            score,
+            subtitle: tags || 'VIM Super League'
+        }));
+    } catch (e) {
+        res.status(500).type('image/svg+xml').send(matchOgSvg({ teamA: 'Error', teamB: '', badge: 'ERROR' }));
+    }
+});
+
+app.get('/og/matches', async (req, res) => {
+    try {
+        const matches = await Match.find().sort({ time: 1 }).limit(12).lean();
+        const lines = matches.slice(0, 5).map(m => {
+            const d = m.details || {};
+            const ga = parseInt(d.goalsA, 10);
+            const gb = parseInt(d.goalsB, 10);
+            const done = m.status === 'completed' || m.completed;
+            if (done && !Number.isNaN(ga) && !Number.isNaN(gb)) {
+                return `${m.teamA} ${ga}–${gb} ${m.teamB}`;
+            }
+            return `${m.teamA}  vs  ${m.teamB}`;
+        });
+        res.set('Cache-Control', 'public, max-age=120');
+        res.type('image/svg+xml').send(fixturesOgSvg(lines));
+    } catch (e) {
+        res.type('image/svg+xml').send(fixturesOgSvg([]));
+    }
+});
+
 
 // --- PAGES ---
 
@@ -1214,14 +1336,27 @@ app.post('/market/view/:name', async (req, res) => {
     }
 });
 
-app.get('/matches', (req, res) => {
+app.get('/matches', async (req, res) => {
+    const list = (res.locals.matches || []).slice(0, 6);
+    const bits = list.map(m => {
+        const d = m.details || {};
+        const ga = parseInt(d.goalsA, 10);
+        const gb = parseInt(d.goalsB, 10);
+        if ((m.status === 'completed' || m.completed) && !Number.isNaN(ga) && !Number.isNaN(gb)) {
+            return `${m.teamA} ${ga}–${gb} ${m.teamB}`;
+        }
+        return `${m.teamA} vs ${m.teamB}`;
+    });
+    const desc = bits.length
+        ? bits.join(' · ')
+        : 'Upcoming fixtures, live scores and completed results.';
     res.render('matches', {
         page: 'matches',
         ...defaultOg(
             req,
             'Fixtures & Results — VIM Super League',
-            'Upcoming fixtures, live scores and completed match results for VIM Super League.',
-            '/images/vimgfx.png'
+            desc,
+            '/og/matches'
         )
     });
 });
